@@ -1,0 +1,25 @@
+/** View pura: franja de ventajas (estática, sin props ni lógica). */
+const VENTAJAS = [
+  { titulo: 'Notas reales', texto: 'Medias de Yelp y de nuestra comunidad.' },
+  { titulo: 'Cerca de ti', texto: 'Distancia real desde tu ubicación.' },
+  { titulo: 'Sin coste', texto: 'Buscar y reservar es siempre gratis.' },
+];
+
+export default function PromoBanner() {
+  return (
+    <section className="promo" aria-label="Ventajas de MIRA">
+      <ul className="promo-lista">
+        {VENTAJAS.map((v) => (
+          <li key={v.titulo} className="promo-item">
+            <span className="promo-check" aria-hidden="true">
+              ✓
+            </span>
+            <div>
+              <strong>{v.titulo}.</strong> {v.texto}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
