@@ -1,0 +1,22 @@
+/* Tokens — estilo limpio tipo guía de reservas: blanco, verde marca, gris cálido. */
+:root {
+  --fondo: #ffffff;
+  --fondo-suave: #f7f7f5;
+  --tinta: #2d333f;
+  --gris: #6b7280;
+  --borde: #e5e5e2;
+  --verde: #00664f; /* primario */
+  --verde-oscuro: #004c3b; /* hover */
+  --verde-suave: #e6f2ed; /* fondos y chips */
+  --rojo: #d92d20; /* badges de destacado */
+  --estrella: #00664f;
+  --papel: #ffffff; /* superficie de cards y modal */
+
+  --fuente: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --radio: 12px;
+  --radio-peq: 8px;
+  --sombra-card: 0 1px 3px rgba(45, 51, 63, 0.12);
+  --sombra-flotante: 0 8px 28px rgba(45, 51, 63, 0.16);
+  --ancho-max: 1120px;
+}

@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+
+# Build de producción (se genera con npm.cmd run build)
+dist/
+
+# Logs y temporales
+*.log
+.DS_Store
+Thumbs.db
+
+# Entorno local
+.env
+.env.local
