@@ -15,7 +15,7 @@ Todo el filtrado es 100% cliente. Sin backend propio.
 | Landing | Hero fotográfico, cifras reales, atajos por cocina y franja de ventajas |
 | Buscador | Texto (insensible a tildes), cocina, zona, precio, distancia, día/hora y 4 órdenes |
 | Fichas | Foto, nota Yelp + nota MIRA, dirección, teléfono, mapa, carta y reseñas Yelp/MIRA |
-| Carta libro | Modal con portada temática por cocina y páginas (doble en desktop) |
+| Carta libro | Modal con portada temática, páginas, leyenda fija + página Leyenda |
 | Dieta | Vegano/vegetariano/sin gluten + 7 alergias; oculta locales con <2 platos aptos |
 | Favoritos | Corazón en cards, contador en header, `#/favoritos` y comparador de hasta 3 |
 | Reservas | Slots fijos con cupo por nota Yelp, Mis reservas y cancelación |

@@ -6,6 +6,8 @@ import { DIAS, FRANJAS } from '../models/restaurantModel.js';
 
 export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distanciaDisponible, geoEstado, onChange, onClear }) {
   const [qLocal, setQLocal] = useState(filtros.q);
+  // En móvil los filtros empiezan plegados (menos scroll); en desktop siempre abiertos.
+  const [plegado, setPlegado] = useState(() => window.innerWidth < 768);
 
   // sincroniza si filtro se limpia externamente
   useEffect(()=> setQLocal(filtros.q), [filtros.q]);
@@ -24,7 +26,7 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
   const tooltipUbicacion = tuUbicacionDisabled ? 'Activa la ubicación para usar esta opción' : undefined;
 
   return (
-    <form role="search" aria-label="Buscar restaurantes" className="searchbar" onSubmit={manejarEnvio}>
+    <form role="search" aria-label="Buscar restaurantes" className={`searchbar${plegado ? ' plegada' : ''}`} onSubmit={manejarEnvio}>
       <div className="campo campo-texto">
         <label htmlFor="f-q">Buscar por nombre</label>
         <div style={{position:'relative'}}>
@@ -42,6 +44,17 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
         </div>
       </div>
 
+      <button
+        type="button"
+        className="filtros-toggle"
+        aria-expanded={!plegado}
+        aria-controls="filtros-plegables"
+        onClick={() => setPlegado((v) => !v)}
+      >
+        {plegado ? 'Mostrar filtros' : 'Ocultar filtros'}
+      </button>
+
+      <div className="filtros-plegables" id="filtros-plegables">
       <div className="campo">
         <label htmlFor="f-precio">Precio</label>
         <select id="f-precio" name="precio" value={filtros.precio} onChange={(e) => onChange('precio', e.target.value)}>
@@ -118,6 +131,8 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
+      </div>
+
       </div>
 
       <div className="campo campo-acciones">

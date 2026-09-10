@@ -249,14 +249,55 @@ export const MIN_PLATOS_APTOS = 2;
 
 /** Alérgenos del sistema (keys estables para guardar en perfil). */
 export const ALERGENOS = [
-  { key: 'gluten', label: 'Gluten' },
-  { key: 'lactosa', label: 'Lactosa' },
-  { key: 'huevo', label: 'Huevo' },
-  { key: 'frutos_secos', label: 'Frutos secos' },
-  { key: 'marisco', label: 'Marisco' },
-  { key: 'pescado', label: 'Pescado' },
-  { key: 'soja', label: 'Soja' },
+  { key: 'gluten', label: 'Gluten', codigo: 'GL' },
+  { key: 'lactosa', label: 'Lactosa', codigo: 'LA' },
+  { key: 'huevo', label: 'Huevo', codigo: 'HU' },
+  { key: 'frutos_secos', label: 'Frutos secos', codigo: 'FS' },
+  { key: 'marisco', label: 'Marisco', codigo: 'MA' },
+  { key: 'pescado', label: 'Pescado', codigo: 'PE' },
+  { key: 'soja', label: 'Soja', codigo: 'SO' },
 ];
+
+/**
+ * Catálogo único de sellos de la carta (platos). La leyenda visible se
+ * deriva de aquí: al añadir un sello o alérgeno aparece solo, sin tocar la UI.
+ * icono: emoji o null (entonces se usa el código como insignia de texto).
+ */
+export const SELLOS_PLATO = [
+  { id: 'vegano', icono: '🌱', codigo: null, nombre: 'Vegano', descripcion: 'Sin nada animal: ni carne, ni pescado, ni lácteos, ni huevo.' },
+  { id: 'vegetariano', icono: null, codigo: 'VG', nombre: 'Vegetariano', descripcion: 'Sin carne ni pescado. Puede llevar lácteos o huevo.' },
+  { id: 'sinGluten', icono: null, codigo: 'SG', nombre: 'Sin gluten', descripcion: 'Sin trigo, cebada, centeno ni avena.' },
+];
+
+/**
+ * Leyenda completa y derivada del catálogo: sellos de dieta + alérgenos +
+ * símbolos de la carta. Añadir entradas al catálogo las publica solas.
+ */
+export function leyendaSellos() {
+  return [
+    ...SELLOS_PLATO.map((s) => ({
+      simbolo: s.icono ?? s.codigo,
+      nombre: s.nombre,
+      descripcion: s.descripcion,
+    })),
+    ...ALERGENOS.map((a) => ({
+      simbolo: a.codigo,
+      nombre: a.label,
+      descripcion: `Contiene ${a.label.toLowerCase()}.`,
+    })),
+    { simbolo: '€', nombre: 'Precio', descripcion: 'Precio por plato en euros.' },
+    {
+      simbolo: '✓',
+      nombre: 'Apto para ti',
+      descripcion: 'Platos que cumplen tu dieta y evitan tus alergias marcadas.',
+    },
+  ];
+}
+
+/** Código corto de un alérgeno para las insignias de plato. */
+export function codigoAlergeno(key) {
+  return ALERGENOS.find((a) => a.key === key)?.codigo ?? key.slice(0, 2).toUpperCase();
+}
 
 /** Dieta vacía (forma canónica que se guarda en perfil/localStorage). */
 export const DIETA_VACIA = { vegano: false, vegetariano: false, sinGluten: false, alergias: [] };
