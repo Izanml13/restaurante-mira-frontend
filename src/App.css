@@ -46,6 +46,66 @@
   gap: 0.8rem;
 }
 
+/* Botón hamburguesa: solo móvil. En desktop el menú va en línea. */
+.menu-boton {
+  display: none;
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  color: var(--tinta);
+}
+
+.header-menu {
+  display: contents;
+}
+
+@media (max-width: 767px) {
+  .menu-boton {
+    display: block;
+  }
+
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .header-menu {
+    display: none;
+    flex-basis: 100%;
+    order: 3;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+    padding: 0.9rem 0 0.4rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  .header-menu.abierto {
+    display: flex;
+  }
+
+  .header-menu .nav-list {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .header-menu .nav-list a {
+    display: block;
+    padding: 0.55rem 0.2rem;
+    font-size: 1.02rem;
+  }
+
+  .header-menu .header-cuentas {
+    margin-left: 0;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+}
+
 .btn-texto {
   text-decoration: none;
   font-weight: 600;
@@ -748,11 +808,6 @@
 @media (max-width: 560px){
   .reserva-grid { grid-template-columns: 1fr; }
   .mapa-mini { height: 180px; }
-  /* Header: dos filas (logo+cuentas / nav con scroll) para que no se monte */
-  .site-header { flex-wrap: wrap; gap: 0.6rem 1rem; }
-  .site-header nav { order: 3; flex-basis: 100%; }
-  .nav-list { gap: 1rem; overflow-x: auto; padding-bottom: 0.2rem; }
-  .header-cuentas { gap: 0.6rem; }
   /* Ficha del modal: etiqueta encima del valor */
   .modal-datos > div { grid-template-columns: 1fr; gap: 0.1rem; }
   .modal-cuerpo { padding: 1rem 1rem 1.4rem; }
@@ -768,6 +823,73 @@
   .card-media { flex-basis: 108px; }
   .card-titulo { font-size: 0.98rem; }
   .card-cuerpo { padding: 0.65rem 0.7rem 0.75rem; }
+}
+
+/* ---------- Filtros colapsables (solo móvil) ---------- */
+.filtros-toggle {
+  display: none;
+  width: 100%;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  padding: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--verde);
+}
+
+.filtros-plegables {
+  display: contents;
+}
+
+@media (max-width: 767px) {
+  .filtros-toggle {
+    display: block;
+  }
+
+  .searchbar.plegada .filtros-plegables {
+    display: none;
+  }
+
+  .searchbar:not(.plegada) .filtros-plegables {
+    display: grid;
+    gap: 0.9rem;
+    grid-column: 1 / -1;
+  }
+
+  /* Hero compacto en móvil */
+  .hero {
+    padding: 2.2rem 1.25rem;
+  }
+
+  /* Modal casi a pantalla completa en móvil */
+  .modal-fondo {
+    padding: 2vh 0.6rem;
+  }
+
+  .modal-cuerpo {
+    padding: 1rem 1rem 1.4rem;
+  }
+
+  /* Auth y cuenta con menos aire */
+  .auth-pagina {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .auth-tarjeta {
+    padding: 1.4rem 1.1rem;
+  }
+
+  /* Cuenta: filas apiladas */
+  .cuenta-datos > div {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  /* Listas admin/reservas: botón debajo */
+  .registro {
+    flex-wrap: wrap;
+  }
 }
 
 /* ---------- Footer oscuro ---------- */
@@ -1384,6 +1506,81 @@ button.btn-texto {
 .libro-paginacion {
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* Barra de leyenda fija al pie del libro (siempre visible, con scroll si no cabe) */
+.libro-leyenda-barra {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-top: 1px solid var(--libro-acento);
+  border-bottom: 1px solid var(--libro-acento);
+  padding: 0.45rem 0.2rem;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
+
+.libro-leyenda-item strong {
+  font-weight: 800;
+}
+
+/* Página final de Leyenda: rejilla icono + nombre + frase */
+.libro-leyenda-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.libro-leyenda-lista li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+}
+
+.libro-leyenda-simbolo {
+  flex: 0 0 2rem;
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--libro-acento);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+/* Insignias de alérgenos en plato + texto solo-lectores */
+.mini-sello {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  background: #fdecea;
+  color: #8f1d14;
+  border: 1px solid currentColor;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0 0.25rem;
+}
+
+.plato-conflictos {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-left: 0.3rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 /* ---------- Favoritos y comparador ---------- */
