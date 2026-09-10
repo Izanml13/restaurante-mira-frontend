@@ -1,7 +1,7 @@
 /**
- * Controller — sesión (Firebase Auth) + dieta + favoritos.
- * - Logueado: dieta y favoritos en `usuarios/{uid}` (campos `preferencias` y
- *   `favoritos`); al entrar se fusionan con lo guardado como invitado.
+ * Controller — sesión (Firebase Auth) + dieta + accesibilidad + favoritos.
+ * - Logueado: todo en `usuarios/{uid}` (`preferencias`, `accesibilidad`,
+ *   `favoritos`); al entrar se fusionan los favoritos de invitado.
  * - Invitado: todo en localStorage (mira:dieta, mira:favoritos).
  * Las Views reciben todo por props.
  */
@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { suscribirSesion, crearCuenta, iniciarSesion, cerrarSesion } from '../services/authApi.js';
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
-import { DIETA_VACIA, normalizarDieta } from '../models/restaurantModel.js';
+import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
 
 const LS_DIETA = 'mira:dieta';
 const LS_FAVS = 'mira:favoritos';
@@ -31,6 +31,23 @@ function guardarJSON(clave, valor) {
   }
 }
 
+/** Lee ajustes locales tolerando la forma antigua (dieta plana sin accesibilidad). */
+function leerAjustesLS() {
+  const raw = leerJSON(LS_DIETA, null);
+  if (!raw || typeof raw !== 'object') {
+    return { dieta: { ...DIETA_VACIA }, accesibilidad: { ...ACCESIBILIDAD_VACIA } };
+  }
+  const esFormaVieja = 'vegano' in raw || 'alergias' in raw;
+  return {
+    dieta: normalizarDieta(esFormaVieja ? raw : (raw.dieta ?? DIETA_VACIA)),
+    accesibilidad: normalizarAccesibilidad(esFormaVieja ? raw.accesibilidad : (raw.accesibilidad ?? ACCESIBILIDAD_VACIA)),
+  };
+}
+
+function escribirAjustesLS(dieta, accesibilidad) {
+  guardarJSON(LS_DIETA, { dieta: normalizarDieta(dieta), accesibilidad: normalizarAccesibilidad(accesibilidad) });
+}
+
 /** Unión sin duplicados (para fusionar favoritos al iniciar sesión). */
 export function unirIds(a, b) {
   return [...new Set([...(a || []), ...(b || [])])];
@@ -43,6 +60,7 @@ export function useAuth() {
   const [perfil, setPerfil] = useState({ ...PERFIL_VACIO });
   const [seqPerfil, setSeqPerfil] = useState(0);
   const [dieta, setDieta] = useState({ ...DIETA_VACIA });
+  const [accesibilidad, setAccesibilidad] = useState({ ...ACCESIBILIDAD_VACIA });
   const [favoritos, setFavoritos] = useState([]);
   const [fusionadoUid, setFusionadoUid] = useState(null);
 
@@ -54,8 +72,10 @@ export function useAuth() {
     } else {
       setEsAdmin(false);
       setPerfil({ ...PERFIL_VACIO });
-      // Invitado: dieta y favoritos del navegador.
-      setDieta(normalizarDieta(leerJSON(LS_DIETA, DIETA_VACIA)));
+      // Invitado: ajustes del navegador.
+      const local = leerAjustesLS();
+      setDieta(local.dieta);
+      setAccesibilidad(local.accesibilidad);
       setFavoritos(leerJSON(LS_FAVS, []));
       setFusionadoUid(null);
     }
@@ -86,12 +106,23 @@ export function useAuth() {
           setFavoritos(favsRemotos);
         }
         // La dieta remota manda si existe; si no, se conserva la local ya puesta.
+        // Igual con accesibilidad (campo `accesibilidad` del perfil).
         const dietaLocal = leerJSON(LS_DIETA, null);
         const tieneRemota =
           p.preferencias && (p.preferencias.vegano || p.preferencias.vegetariano || p.preferencias.sinGluten || (p.preferencias.alergias || []).length);
-        setDieta(tieneRemota ? dietaRemota : normalizarDieta(dietaLocal ?? DIETA_VACIA));
+        setDieta(tieneRemota ? dietaRemota : normalizarDieta(dietaLocal?.dieta ?? dietaLocal ?? DIETA_VACIA));
+        setAccesibilidad(
+          p.accesibilidad && (p.accesibilidad.sillaRuedas || p.accesibilidad.tea)
+            ? normalizarAccesibilidad(p.accesibilidad)
+            : normalizarAccesibilidad(dietaLocal?.accesibilidad),
+        );
       })
-      .catch(() => vivo && setDieta(normalizarDieta(leerJSON(LS_DIETA, DIETA_VACIA))));
+      .catch(() => {
+        if (!vivo) return;
+        const local = leerAjustesLS();
+        setDieta(local.dieta);
+        setAccesibilidad(local.accesibilidad);
+      });
     return () => {
       vivo = false;
     };
@@ -102,14 +133,31 @@ export function useAuth() {
     setSeqPerfil((i) => i + 1);
   }
 
-  /** Guarda dieta (remoto si logueado, si no local). */
+  /** Guarda dieta (remoto si logueado, si no local; conserva accesibilidad). */
   async function guardarDieta(nueva) {
     const d = normalizarDieta(nueva);
     setDieta(d);
     if (usuario?.uid) {
       await guardarPerfil(usuario.uid, { preferencias: d });
     } else {
-      guardarJSON(LS_DIETA, d);
+      setAccesibilidad((acc) => {
+        escribirAjustesLS(d, acc);
+        return acc;
+      });
+    }
+  }
+
+  /** Guarda accesibilidad (remoto si logueado, si no local; conserva dieta). */
+  async function guardarAccesibilidad(nueva) {
+    const a = normalizarAccesibilidad(nueva);
+    setAccesibilidad(a);
+    if (usuario?.uid) {
+      await guardarPerfil(usuario.uid, { accesibilidad: a });
+    } else {
+      setDieta((d) => {
+        escribirAjustesLS(d, a);
+        return d;
+      });
     }
   }
 
@@ -138,6 +186,8 @@ export function useAuth() {
     recargarPerfil,
     dieta,
     guardarDieta,
+    accesibilidad,
+    guardarAccesibilidad,
     favoritos,
     toggleFavorito,
     crearCuenta,

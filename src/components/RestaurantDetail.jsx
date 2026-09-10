@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react';
 import { crearReserva, getDisponibilidad, SLOTS } from '../services/reservaApi.js';
 import { crearResena, listarResenasDeRestaurante, darLikeResena, quitarLikeResena } from '../services/resenasApi.js';
-import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLocal } from '../models/restaurantModel.js';
+import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLocal, flagsPlato } from '../models/restaurantModel.js';
+import { pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
+import { Sellos, MiniLeyenda } from './Sellos.jsx';
 
 function marcaInfo(valor) {
   if (valor === true) return 'Sí';
@@ -46,6 +48,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   const [mapaExpandido, setMapaExpandido] = useState(false);
   const [reserva, setReserva] = useState({ fecha: '', hora: '', comensales: '2', comentarios: '' });
   const [disponibilidad, setDisponibilidad] = useState(null); // { limite, ocupadas, libres } | null
+  const [meteoReserva, setMeteoReserva] = useState(null); // pronóstico del día elegido | null
   const [confirmacion, setConfirmacion] = useState(null);
   const [errorReserva, setErrorReserva] = useState('');
   const [cargandoReserva, setCargandoReserva] = useState(false);
@@ -95,6 +98,19 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
       .catch(() => { if (vivo) setDisponibilidad(null); });
     return () => { vivo = false; };
   }, [restaurant, reserva.fecha, reserva.hora]);
+
+  // Meteo del día elegido (solo si el local tiene terraza; gratis y con caché).
+  useEffect(() => {
+    let vivo = true;
+    setMeteoReserva(null);
+    if (restaurant.terraza !== true || !reserva.fecha || !restaurant.coords) return undefined;
+    pronosticoDia(restaurant.coords.lat, restaurant.coords.lng, reserva.fecha)
+      .then((p) => { if (vivo) setMeteoReserva(p); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [restaurant, reserva.fecha]);
+
+  const avisoTerraza = alertaTerraza(restaurant.terraza, meteoReserva);
 
   function cerrarDesdeFondo(e) { if (e.target === e.currentTarget) onClose(); }
   function cerrarExpandido(e) { if (e.target === e.currentTarget) setMapaExpandido(false); }
@@ -177,6 +193,9 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 {restaurant.telefono && (<div><dt>Teléfono</dt><dd><a href={`tel:${restaurant.telefono.replace(/\s/g,'')}`}>{restaurant.telefono}</a></dd></div>)}
                 <div><dt>Acceso adaptado</dt><dd>{marcaInfo(restaurant.accesoDiscapacidad)}</dd></div>
                 <div><dt>Menú infantil</dt><dd>{marcaInfo(restaurant.menuInfantil)}</dd></div>
+                <div><dt>Tronas / sillas de bebé</dt><dd>{marcaInfo(restaurant.tronas)}</dd></div>
+                <div><dt>Terraza</dt><dd>{marcaInfo(restaurant.terraza)}</dd></div>
+                <div><dt>Entorno tranquilo</dt><dd>{marcaInfo(restaurant.entornoTranquilo)}</dd></div>
                 <div><dt>Alérgenos</dt><dd>{restaurant.alergenos || 'Sin información: confirma con el local'}</dd></div>
               </dl>
               <p className="modal-acciones">
@@ -191,14 +210,20 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
 
               <section aria-labelledby="carta-titulo">
                 <h3 id="carta-titulo" className="modal-sub">La carta</h3>
+                <MiniLeyenda />
                 <ul className="carta-lista">
                   {cartaDelLocal(restaurant).map((p) => (
                     <li key={p.nombre}>
-                      <span>{p.nombre}</span>
+                      <span>{p.nombre} <Sellos plato={{ ...p, ...flagsPlato(p.nombre) }} /></span>
                       <span className="carta-precio">{p.precio} €</span>
                     </li>
                   ))}
                 </ul>
+                {onVerCarta && (
+                  <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
+                    Ver carta completa
+                  </button>
+                )}
               </section>
 
               <section className="reserva-bloque" aria-labelledby="reserva-titulo">
@@ -223,6 +248,12 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                       {disponibilidad.libres > 0
                         ? `${disponibilidad.libres} de ${disponibilidad.limite} plazas libres`
                         : 'Completo a esa hora. Prueba otra franja.'}
+                    </p>
+                  )}
+                  {avisoTerraza && (
+                    <p className="reserva-aviso-meteo" role="status">
+                      {avisoTerraza}
+                      {meteoReserva && ` (${meteoReserva.resumen})`}
                     </p>
                   )}
                   {errorReserva && <p className="reserva-error" role="alert">{errorReserva}</p>}

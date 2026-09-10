@@ -4,7 +4,7 @@ import { listarMisReservas } from '../services/reservaApi.js';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
 import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
-import { ALERGENOS, normalizarDieta } from '../models/restaurantModel.js';
+import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 
 function hoyISO() {
   const h = new Date();
@@ -12,7 +12,7 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, onSalir }) {
+export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir }) {
   const [proximas, setProximas] = useState([]);
   const [incidencias, setIncidencias] = useState([]);
   const [misResenas, setMisResenas] = useState([]);
@@ -52,10 +52,18 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, onSalir }
     };
   }, [usuario]);
 
-  // Sincroniza el borrador cuando llega la dieta guardada.
+  const [borradorAcc, setBorradorAcc] = useState(() => normalizarAccesibilidad(accesibilidad));
+  const [guardandoAcc, setGuardandoAcc] = useState(false);
+  const [accOk, setAccOk] = useState('');
+
+  // Sincroniza los borradores cuando llegan los datos guardados.
   useEffect(() => {
     setBorrador(normalizarDieta(dieta));
   }, [dieta]);
+
+  useEffect(() => {
+    setBorradorAcc(normalizarAccesibilidad(accesibilidad));
+  }, [accesibilidad]);
 
   function toggleDieta(campo) {
     setBorrador((prev) => ({ ...prev, [campo]: !prev[campo] }));
@@ -83,6 +91,25 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, onSalir }
       setPrefsOk('No se pudo guardar. Inténtalo de nuevo.');
     } finally {
       setGuardandoPrefs(false);
+    }
+  }
+
+  function toggleAcc(campo) {
+    setBorradorAcc((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setAccOk('');
+  }
+
+  async function guardarAcc(e) {
+    e.preventDefault();
+    setGuardandoAcc(true);
+    setAccOk('');
+    try {
+      await guardarAccesibilidad(borradorAcc);
+      setAccOk('Accesibilidad guardada. El buscador ya la aplica.');
+    } catch {
+      setAccOk('No se pudo guardar. Inténtalo de nuevo.');
+    } finally {
+      setGuardandoAcc(false);
     }
   }
 
@@ -160,6 +187,39 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, onSalir }
           {prefsOk && (
             <p className="vacio-texto" role="status">
               {prefsOk}
+            </p>
+          )}
+        </form>
+
+        <h2 className="cuenta-sub">Mi accesibilidad</h2>
+        <form onSubmit={guardarAcc} className="prefs-form">
+          <p className="vacio-texto">
+            Solo verás locales con accesibilidad verificada. Sin dato verificado, el local se oculta.
+          </p>
+          <label className="campo-check" htmlFor="acc-silla">
+            <input
+              id="acc-silla"
+              type="checkbox"
+              checked={Boolean(borradorAcc.sillaRuedas)}
+              onChange={() => toggleAcc('sillaRuedas')}
+            />
+            Voy en silla de ruedas (acceso sin escalones)
+          </label>
+          <label className="campo-check" htmlFor="acc-tea">
+            <input
+              id="acc-tea"
+              type="checkbox"
+              checked={Boolean(borradorAcc.tea)}
+              onChange={() => toggleAcc('tea')}
+            />
+            Estoy en el espectro autista (prefiero entornos tranquilos)
+          </label>
+          <button type="submit" className="btn-secundario btn-peq" disabled={guardandoAcc}>
+            {guardandoAcc ? 'Guardando…' : 'Guardar accesibilidad'}
+          </button>
+          {accOk && (
+            <p className="vacio-texto" role="status">
+              {accOk}
             </p>
           )}
         </form>

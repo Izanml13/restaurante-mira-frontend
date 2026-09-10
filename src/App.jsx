@@ -41,7 +41,30 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, favoritos, toggleFavorito } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito } = useAuth();
+  const [tema, setTema] = useState(() => {
+    try {
+      const guardado = localStorage.getItem('mira:tema');
+      if (guardado === 'claro' || guardado === 'oscuro') return guardado;
+    } catch {
+      /* sin almacenamiento: se usa el sistema */
+    }
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro';
+  });
+
+  useEffect(() => {
+    if (tema === 'oscuro') {
+      document.documentElement.dataset.theme = 'dark';
+    } else {
+      delete document.documentElement.dataset.theme;
+    }
+    try {
+      localStorage.setItem('mira:tema', tema);
+    } catch {
+      /* sin almacenamiento: solo sesión */
+    }
+  }, [tema]);
+
   const {
     filtros,
     filtrados,
@@ -72,7 +95,7 @@ export default function App() {
     verTodosIgual,
     obtenerRestaurante,
     elegirCocina,
-  } = useRestaurantController({ dieta });
+  } = useRestaurantController({ dieta, accesibilidad });
   const [ruta, setRuta] = useState(rutaActual);
 
   useEffect(() => {
@@ -94,13 +117,13 @@ export default function App() {
       <a className="skip-link" href="#buscar">
         Saltar al buscador
       </a>
-      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} onSalir={salir} />
+      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
       <main>
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} onSalir={salir} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
@@ -108,6 +131,7 @@ export default function App() {
         {ruta === 'favoritos' && (
           <Favoritos
             ids={favoritos}
+            todos={todos}
             dieta={dieta}
             onObtenerRestaurante={obtenerRestaurante}
             onVerCarta={abrirCarta}
@@ -166,8 +190,8 @@ export default function App() {
                   {ocultosDieta > 0 && !ignorarDieta && (
                     <p className="aviso">
                       {ocultosDieta} {ocultosDieta === 1 ? 'local oculto' : 'locales ocultos'} por tu
-                      dieta (mínimo 2 platos aptos).{' '}
-                      <a href="#/cuenta">Cambiar dieta</a> ·{' '}
+                      dieta o accesibilidad.{' '}
+                      <a href="#/cuenta">Cambiar en Mi cuenta</a> ·{' '}
                       <button type="button" className="btn-texto" onClick={verTodosIgual}>
                         Ver todos igual
                       </button>

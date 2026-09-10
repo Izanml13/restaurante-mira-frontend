@@ -4,8 +4,9 @@
  */
 import { useEffect, useState } from 'react';
 
-export default function Header({ usuario, esAdmin, perfil, numFavoritos, onSalir }) {
+export default function Header({ usuario, esAdmin, perfil, numFavoritos, tema, onCambiarTema, onSalir }) {
   const [abierto, setAbierto] = useState(false);
+  const [oculto, setOculto] = useState(false);
 
   useEffect(() => {
     if (!abierto) return undefined;
@@ -16,15 +17,43 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, onSalir
     return () => window.removeEventListener('keydown', alTeclar);
   }, [abierto]);
 
+  // En móvil el header se esconde al bajar y vuelve al subir.
+  useEffect(() => {
+    let ultimo = window.scrollY;
+    let turno = false;
+    function alDesplazar() {
+      if (turno) return;
+      turno = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setOculto(y > 160 && y > ultimo);
+        ultimo = y;
+        turno = false;
+      });
+    }
+    window.addEventListener('scroll', alDesplazar, { passive: true });
+    return () => window.removeEventListener('scroll', alDesplazar);
+  }, []);
+
   function cerrar() {
     setAbierto(false);
   }
 
   return (
-    <header className="site-header">
+    <header className={`site-header${oculto ? ' oculto' : ''}`}>
       <a href="#/" className="logo" onClick={cerrar}>
         MIRA
       </a>
+      <button
+        type="button"
+        className="tema-boton"
+        onClick={onCambiarTema}
+        aria-label={tema === 'oscuro' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+        aria-pressed={tema === 'oscuro'}
+        title={tema === 'oscuro' ? 'Modo claro' : 'Modo oscuro'}
+      >
+        ◐
+      </button>
       <button
         type="button"
         className="menu-boton"
@@ -49,7 +78,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, onSalir
               <a href="#/reservas" className="btn-texto">
                 Mis reservas
               </a>
-              <a href="#/favoritos" className="btn-texto" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
               {esAdmin && (
@@ -81,7 +110,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, onSalir
             </>
           ) : (
             <>
-              <a href="#/favoritos" className="btn-texto" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
               <a href="#/login" className="header-login">

@@ -64,6 +64,26 @@
   display: contents;
 }
 
+/* Botón de tema claro/oscuro, siempre visible junto al logo */
+.tema-boton {
+  background: none;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--tinta);
+}
+
+.tema-boton:hover {
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
 @media (max-width: 767px) {
   .menu-boton {
     display: block;
@@ -243,7 +263,7 @@
 
 .chip:hover {
   background: #fff;
-  color: var(--tinta);
+  color: #1b1e18;
 }
 
 /* ---------- Buscador (tarjeta flotante) ---------- */
@@ -777,7 +797,8 @@
   font-size: 0.9rem;
 }
 .reserva-confirm code {
-  background: #fff;
+  background: var(--fondo);
+  color: var(--tinta);
   border: 1px solid var(--borde);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
@@ -1286,6 +1307,12 @@ button.btn-texto {
   font-size: 0.88rem;
 }
 
+/* Badge "Accesible" en cards verificadas */
+.card-accesible {
+  color: var(--verde);
+  font-weight: 700;
+}
+
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -1324,11 +1351,11 @@ button.btn-texto {
   margin: 0.6rem 0 0;
 }
 
-/* ---------- Corazón de favoritos ---------- */
+/* ---------- Corazón de favoritos (arriba a la derecha de la foto) ---------- */
 .card-fav {
   position: absolute;
   top: 0.5rem;
-  left: 0.5rem;
+  right: 0.5rem;
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
@@ -1345,6 +1372,36 @@ button.btn-texto {
 .card-fav-activo {
   color: var(--rojo);
   border-color: var(--rojo);
+}
+
+/* Botón "Mis likes" del header con contorno */
+.btn-fav {
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+}
+
+.btn-fav:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+}
+
+/* Mini-leyenda bajo la carta plana del detalle */
+.mini-leyenda {
+  font-size: 0.82rem;
+  color: var(--gris);
+  margin: 0 0 0.6rem;
+}
+
+/* Header que se esconde al bajar en móvil */
+@media (max-width: 767px) {
+  .site-header {
+    transition: transform 0.25s ease;
+  }
+
+  .site-header.oculto {
+    transform: translateY(-100%);
+  }
 }
 
 /* ---------- Libro de carta ---------- */
@@ -1628,23 +1685,24 @@ button.btn-texto {
   background: var(--fondo-suave);
 }
 
-.comparador-col {
-  min-width: 11rem;
+.comparador-col-nombre {
+  font-size: 0.95rem;
+  min-width: 10rem;
 }
 
-.comparador-foto {
+.comparador-col-nombre .btn-texto {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.comparador-mini-foto {
   width: 100%;
-  height: 7rem;
+  height: 4.5rem;
   object-fit: cover;
   border-radius: var(--radio-peq);
   margin-bottom: 0.4rem;
-}
-
-.comparador-botones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
+  display: block;
 }
 
 .comparador-mejor {
@@ -1665,55 +1723,115 @@ button.btn-texto {
   clip: rect(0, 0, 0, 0);
 }
 
-.solo-movil {
-  display: none;
+/* La tabla conjunta desliza en horizontal en pantallas estrechas. */
+.comparador-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 719px) {
-  .solo-escritorio {
-    display: none;
-  }
+/* ---------- Calendario de reservas ---------- */
+.cal-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
 
-  .solo-movil {
-    display: grid;
-  }
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
 
-  .comparador-tarjeta {
-    border: 1px solid var(--borde);
-    border-radius: var(--radio-peq);
-    padding: 0.9rem;
-    background: var(--fondo);
-  }
+.cal-nombre-dia {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gris);
+  padding: 0.2rem 0;
+}
 
-  .comparador-lista {
-    margin: 0.8rem 0 0;
-    display: grid;
-    gap: 0.45rem;
-  }
+.cal-dia {
+  aspect-ratio: 1;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  background: var(--fondo);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.15rem;
+  min-width: 0;
+}
 
-  .comparador-lista > div {
-    display: grid;
-    grid-template-columns: 7.5rem 1fr;
-    gap: 0.5rem;
-    padding: 0.3rem 0.4rem;
-    border-radius: 4px;
-  }
+.cal-dia:hover {
+  border-color: var(--verde);
+}
 
-  .comparador-lista dt {
+.cal-vacio {
+  border: none;
+  background: none;
+  cursor: default;
+}
+
+.cal-hoy .cal-num {
+  background: var(--verde-suave);
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.cal-sel {
+  border: 2px solid var(--verde);
+}
+
+.cal-num {
+  font-size: 0.85rem;
+  line-height: 1.5rem;
+}
+
+.cal-puntos {
+  display: flex;
+  gap: 2px;
+}
+
+.cal-punto {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--verde);
+}
+
+.cal-temp {
+  font-size: 0.68rem;
+  color: var(--gris);
+  line-height: 1;
+}
+
+.reserva-aviso-meteo {
+  margin: 0.6rem 0 0;
+  background: #fef9c3;
+  border: 1px solid #eab308;
+  border-radius: var(--radio-peq);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  color: #713f12;
+}
+
+@media (max-width: 400px) {
+  .cal-num {
     font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--gris);
   }
 
-  .comparador-lista dd {
-    margin: 0;
-  }
-}
-
-@media (min-width: 720px) {
-  .solo-movil {
-    display: none;
+  .cal-temp {
+    font-size: 0.6rem;
   }
 }

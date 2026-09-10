@@ -17,11 +17,12 @@ Todo el filtrado es 100% cliente. Sin backend propio.
 | Fichas | Foto, nota Yelp + nota MIRA, dirección, teléfono, mapa, carta y reseñas Yelp/MIRA |
 | Carta libro | Modal con portada temática, páginas, leyenda fija + página Leyenda |
 | Dieta | Vegano/vegetariano/sin gluten + 7 alergias; oculta locales con <2 platos aptos |
+| Accesibilidad | Silla de ruedas y TEA en Mi cuenta; filtra solo verificados (lo declaran empresas) |
 | Favoritos | Corazón en cards, contador en header, `#/favoritos` y comparador de hasta 3 |
-| Reservas | Slots fijos con cupo por nota Yelp, Mis reservas y cancelación |
+| Reservas | Slots fijos con cupo, calendario con meteo y avisos de terraza, Mis reservas y cancelación |
 | Cuentas | Registro (cliente/empresa), login, "Mi cuenta" y panel `#/admin` |
 | Contacto | Formulario (reserva, sugerencia, incidencia) que guarda en Firestore |
-| Empresa | Propuesta de locales con acceso, infantil y alérgenos; el admin aprueba |
+| Empresa | Propuesta de locales con acceso, infantil, tronas, entorno, terraza y alérgenos; el admin aprueba |
 
 ## Rutas
 
