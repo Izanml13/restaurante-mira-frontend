@@ -16,9 +16,15 @@ import Login from './components/Login.jsx';
 import Registro from './components/Registro.jsx';
 import Cuenta from './components/Cuenta.jsx';
 import Contacto from './components/Contacto.jsx';
+import Reservas from './components/Reservas.jsx';
+import Admin from './components/Admin.jsx';
+import Negocio from './components/Negocio.jsx';
+import Favoritos from './components/Favoritos.jsx';
+import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import Footer from './components/Footer.jsx';
 import { enviarContacto } from './services/contactoApi.js';
+import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
 
 function rutaActual() {
@@ -27,14 +33,24 @@ function rutaActual() {
   if (h === '#/registro') return 'registro';
   if (h === '#/cuenta') return 'cuenta';
   if (h === '#/contacto') return 'contacto';
+  if (h === '#/reservas') return 'reservas';
+  if (h === '#/admin') return 'admin';
+  if (h === '#/negocio') return 'negocio';
+  if (h === '#/favoritos') return 'favoritos';
   return 'home';
 }
 
 export default function App() {
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, favoritos, toggleFavorito } = useAuth();
   const {
     filtros,
     filtrados,
+    todos,
     total,
+    modo,
+    hayMas,
+    cargandoMas,
+    cargarMas,
     estado,
     error,
     geoEstado,
@@ -42,15 +58,21 @@ export default function App() {
     cocinasDisponibles,
     zonasDisponibles,
     seleccionado,
+    libro,
+    ocultosDieta,
+    ignorarDieta,
     hayFiltrosActivos,
     actualizarFiltro,
-    elegirCocina,
     limpiarFiltros,
     recargar,
     abrirDetalle,
     cerrarDetalle,
-  } = useRestaurantController();
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion } = useAuth();
+    abrirCarta,
+    cerrarCarta,
+    verTodosIgual,
+    obtenerRestaurante,
+    elegirCocina,
+  } = useRestaurantController({ dieta });
   const [ruta, setRuta] = useState(rutaActual);
 
   useEffect(() => {
@@ -62,11 +84,6 @@ export default function App() {
     return () => window.removeEventListener('hashchange', alCambiarHash);
   }, []);
 
-  function buscarZona(cocina) {
-    elegirCocina(cocina);
-    document.getElementById('buscar')?.scrollIntoView({ behavior: 'smooth' });
-  }
-
   async function salir() {
     await cerrarSesion();
     window.location.hash = '#/';
@@ -77,17 +94,30 @@ export default function App() {
       <a className="skip-link" href="#buscar">
         Saltar al buscador
       </a>
-      <Header usuario={usuario} onSalir={salir} />
+      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} onSalir={salir} />
       <main>
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} onSalir={salir} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} onSalir={salir} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
+        {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
+        {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
+        {ruta === 'negocio' && <Negocio usuario={usuario} perfil={perfil} onProponer={proponerNegocio} />}
+        {ruta === 'favoritos' && (
+          <Favoritos
+            ids={favoritos}
+            dieta={dieta}
+            onObtenerRestaurante={obtenerRestaurante}
+            onVerCarta={abrirCarta}
+            onReservar={abrirDetalle}
+            onToggleFavorito={toggleFavorito}
+          />
+        )}
         {ruta === 'home' && (
           <>
-            <Hero onPickCocina={buscarZona} total={total} numZonas={zonasDisponibles.length} />
+            <Hero total={total} numZonas={zonasDisponibles.length} />
             <section id="buscar" className="buscar" aria-labelledby="buscar-titulo">
               <h2 id="buscar-titulo" className="buscar-titulo">
                 Busca tu sitio
@@ -122,23 +152,38 @@ export default function App() {
                     }}
                     hayFiltrosActivos={hayFiltrosActivos}
                     distanciaDisponible={distanciaDisponible}
+                    geoEstado={geoEstado}
                     onChange={actualizarFiltro}
                     onClear={limpiarFiltros}
                   />
-                  {geoEstado !== 'ok' && (
+
+                  <p aria-live="polite" className="contador">
+                    {modo === 'pagina'
+                      ? `Mostrando ${filtrados.length} de ${total} restaurantes`
+                      : `${filtrados.length} de ${total} ${filtrados.length === 1 ? 'restaurante' : 'restaurantes'}`}
+                    {filtros.q && ` para "${filtros.q}"`}
+                  </p>
+                  {ocultosDieta > 0 && !ignorarDieta && (
                     <p className="aviso">
-                      Sin tu ubicación no podemos calcular distancias: el filtro de distancia está
-                      desactivado. Actívala en el navegador para ver a cuántos km está cada sitio.
+                      {ocultosDieta} {ocultosDieta === 1 ? 'local oculto' : 'locales ocultos'} por tu
+                      dieta (mínimo 2 platos aptos).{' '}
+                      <a href="#/cuenta">Cambiar dieta</a> ·{' '}
+                      <button type="button" className="btn-texto" onClick={verTodosIgual}>
+                        Ver todos igual
+                      </button>
                     </p>
                   )}
-                  <p aria-live="polite" className="contador">
-                    {filtrados.length} de {total}{' '}
-                    {filtrados.length === 1 ? 'restaurante' : 'restaurantes'}
-                  </p>
                   <RestaurantList
                     restaurants={filtrados}
+                    filtros={filtros}
                     onClear={limpiarFiltros}
                     onSelect={abrirDetalle}
+                    hayMas={modo === 'pagina' && hayMas}
+                    cargandoMas={cargandoMas}
+                    onLoadMore={cargarMas}
+                    esFavorito={(id) => favoritos.includes(id)}
+                    onToggleFavorito={toggleFavorito}
+                    onVerCarta={abrirCarta}
                   />
                 </>
               )}
@@ -148,7 +193,8 @@ export default function App() {
         )}
       </main>
       <Footer />
-      {seleccionado && <RestaurantDetail restaurant={seleccionado} onClose={cerrarDetalle} />}
+      {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
+      {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
     </>
   );
 }

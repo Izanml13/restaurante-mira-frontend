@@ -12,7 +12,7 @@ export default function PromoBanner() {
         {VENTAJAS.map((v) => (
           <li key={v.titulo} className="promo-item">
             <span className="promo-check" aria-hidden="true">
-              ✓
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
             </span>
             <div>
               <strong>{v.titulo}.</strong> {v.texto}

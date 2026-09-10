@@ -7,6 +7,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [esEmpresa, setEsEmpresa] = useState(false);
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
 
@@ -18,7 +19,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
     setError('');
     setEnviando(true);
     try {
-      await onRegistro({ nombre, email, password });
+      await onRegistro({ nombre, email, password, tipo: esEmpresa ? 'empresa' : 'cliente' });
       window.location.hash = '#/';
     } catch (err) {
       setError(err.message);
@@ -71,6 +72,17 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </div>
+        <div className="campo campo-check">
+          <label htmlFor="reg-empresa">
+            <input
+              id="reg-empresa"
+              type="checkbox"
+              checked={esEmpresa}
+              onChange={(e) => setEsEmpresa(e.target.checked)}
+            />
+            Soy empresa: quiero añadir mi restaurante
+          </label>
         </div>
         <button type="submit" className="btn-cta btn-grande auth-boton" disabled={enviando}>
           {enviando ? 'Creando…' : 'Crear cuenta'}

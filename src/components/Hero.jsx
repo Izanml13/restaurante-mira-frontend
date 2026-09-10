@@ -1,7 +1,5 @@
-/** View pura: hero fotográfico con cifras y atajos (sin importar el Model). */
-const ATAJOS = ['Japonesa', 'Italiana', 'Mexicana', 'Mediterránea'];
-
-export default function Hero({ onPickCocina, total, numZonas }) {
+/** View pura: hero fotográfico con cifras (sin atajos). */
+export default function Hero({ total, numZonas }) {
   return (
     <section id="inicio" className="hero" aria-labelledby="hero-titulo">
       <div className="hero-contenido">
@@ -30,15 +28,6 @@ export default function Hero({ onPickCocina, total, numZonas }) {
             </li>
           </ul>
         )}
-        <ul className="hero-chips" aria-label="Atajos por cocina">
-          {ATAJOS.map((cocina) => (
-            <li key={cocina}>
-              <button type="button" className="chip" onClick={() => onPickCocina(cocina)}>
-                {cocina}
-              </button>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
