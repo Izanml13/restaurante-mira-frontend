@@ -1,6 +1,7 @@
 /**
- * View pura: tabla comparativa lado a lado (2-3 restaurantes).
- * En móvil se apilan tarjetas (misma data, otro layout).
+ * View pura: SOLO la tabla comparativa conjunta (2-3 restaurantes).
+ * Sin fichas individuales: cada columna se identifica por foto + nombre + Quitar.
+ * En móvil la tabla desliza horizontal (nada de tarjetas sueltas).
  * Todo por props (resúmenes ya calculados); sin lecturas.
  */
 import { resumenRestaurante } from '../models/restaurantModel.js';
@@ -12,26 +13,6 @@ function fmtDistancia(km) {
 
 function fmtNota(v) {
   return v > 0 ? `★ ${v.toLocaleString('es-ES')}` : '—';
-}
-
-function Cabecera({ s, r, onVerCarta, onReservar, onQuitar }) {
-  return (
-    <div className="comparador-cab">
-      <img src={s.imagen} alt="" loading="lazy" className="comparador-foto" />
-      <strong>{s.nombre}</strong>
-      <span className="comparador-botones">
-        <button type="button" className="btn-secundario btn-peq" onClick={() => onVerCarta(r)}>
-          Ver carta
-        </button>
-        <button type="button" className="btn-secundario btn-peq" onClick={() => onReservar(r)}>
-          Reservar
-        </button>
-        <button type="button" className="btn-texto" onClick={() => onQuitar(s.id)}>
-          Quitar
-        </button>
-      </span>
-    </div>
-  );
 }
 
 // Filas comparables: get numérico para el resaltado, fmt para pintar.
@@ -55,7 +36,7 @@ function filasDe(conAptos) {
   return filas;
 }
 
-export default function Comparador({ restaurantes, dieta, onVerCarta, onReservar, onQuitar }) {
+export default function Comparador({ restaurantes, dieta, onQuitar }) {
   const datos = restaurantes.map((r) => ({ r, s: resumenRestaurante(r, dieta) }));
   if (datos.length < 2) return null;
   const conAptos = datos.some((d) => d.s.aptos != null);
@@ -75,17 +56,21 @@ export default function Comparador({ restaurantes, dieta, onVerCarta, onReservar
         Comparando {datos.length}
       </h2>
 
-      {/* Escritorio: tabla lado a lado */}
-      <div className="comparador-scroll solo-escritorio">
+      {/* Tabla conjunta con scroll horizontal en pantallas estrechas */}
+      <div className="comparador-scroll">
         <table className="comparador-tabla">
           <thead>
             <tr>
               <th scope="col">
                 <span className="comparador-etiqueta">Restaurante</span>
               </th>
-              {datos.map(({ r, s }) => (
-                <th key={s.id} scope="col" className="comparador-col">
-                  <Cabecera s={s} r={r} onVerCarta={onVerCarta} onReservar={onReservar} onQuitar={onQuitar} />
+              {datos.map(({ s }) => (
+                <th key={s.id} scope="col" className="comparador-col-nombre">
+                  <img src={s.imagen} alt="" loading="lazy" className="comparador-mini-foto" />
+                  {s.nombre}
+                  <button type="button" className="btn-texto" onClick={() => onQuitar(s.id)}>
+                    Quitar
+                  </button>
                 </th>
               ))}
             </tr>
@@ -106,26 +91,6 @@ export default function Comparador({ restaurantes, dieta, onVerCarta, onReservar
             })}
           </tbody>
         </table>
-      </div>
-
-      {/* Móvil: tarjetas apiladas */}
-      <div className="solo-movil" style={{ display: 'grid', gap: '0.8rem' }}>
-        {datos.map(({ r, s }) => (
-          <article key={s.id} className="comparador-tarjeta">
-            <Cabecera s={s} r={r} onVerCarta={onVerCarta} onReservar={onReservar} onQuitar={onQuitar} />
-            <dl className="comparador-lista">
-              {filas.map((fila) => {
-                const top = ganadores(fila);
-                return (
-                  <div key={fila.label} className={top.has(s.id) ? 'comparador-mejor' : undefined}>
-                    <dt>{fila.label}</dt>
-                    <dd>{fila.fmt(s)}</dd>
-                  </div>
-                );
-              })}
-            </dl>
-          </article>
-        ))}
       </div>
     </section>
   );

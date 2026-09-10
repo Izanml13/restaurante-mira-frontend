@@ -1,16 +1,19 @@
 /**
- * View pura: #/favoritos — rejilla de guardados + comparador de cartas.
+ * View pura: #/favoritos — guardados + recomendaciones + comparador.
  * Resuelve los ids contra lo ya cargado y solo lee de Firestore los que falten.
  * La selección a comparar vive aquí (se pierde al salir, vale).
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
 import Comparador from './Comparador.jsx';
+import { recomendarPara } from '../models/restaurantModel.js';
 
 const MAX_COMPARAR = 3;
+const MAX_RECOMENDADOS = 6;
 
 export default function Favoritos({
   ids,
+  todos,
   dieta,
   onObtenerRestaurante,
   onVerCarta,
@@ -20,6 +23,7 @@ export default function Favoritos({
   const [locales, setLocales] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [comparar, setComparar] = useState([]);
+  const [comparando, setComparando] = useState(false);
   const [aviso, setAviso] = useState('');
 
   useEffect(() => {
@@ -55,6 +59,26 @@ export default function Favoritos({
     .map((id) => locales.find((r) => String(r.id) === String(id)))
     .filter(Boolean);
 
+  // Modo comparar: solo los elegidos, juntos; la rejilla individual se oculta.
+  const enComparativa = comparando && seleccionados.length >= 2;
+
+  function empezarComparar() {
+    setComparando(true);
+    requestAnimationFrame(() => {
+      document.getElementById('comparador')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  function volverAFavoritos() {
+    setComparando(false);
+  }
+
+  const recomendados = useMemo(
+    () => recomendarPara(locales, todos, MAX_RECOMENDADOS),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [locales, todos],
+  );
+
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="favoritos-titulo">
       <div className="auth-tarjeta tarjeta-ancha">
@@ -70,7 +94,7 @@ export default function Favoritos({
             </p>
           </div>
         )}
-        {!cargando && locales.length > 0 && (
+        {!cargando && locales.length > 0 && !enComparativa && (
           <>
             <ul className="grid">
               {locales.map((r) => (
@@ -104,23 +128,55 @@ export default function Favoritos({
                 className="btn-cta"
                 disabled={seleccionados.length < 2}
                 title={seleccionados.length < 2 ? 'Elige al menos 2 para comparar' : undefined}
-                onClick={() => document.getElementById('comparador')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={empezarComparar}
               >
                 Comparar ({seleccionados.length})
               </button>
             </p>
-            {seleccionados.length >= 2 && (
-              <div id="comparador">
+          </>
+        )}
+        {!cargando && enComparativa && (
+          <>
+            <p>
+              <button type="button" className="btn-secundario btn-peq" onClick={volverAFavoritos}>
+                ← Volver a mis favoritos
+              </button>
+            </p>
+            <div id="comparador">
                 <Comparador
                   restaurantes={seleccionados}
                   dieta={dieta}
-                  onVerCarta={onVerCarta}
-                  onReservar={onReservar}
                   onQuitar={(id) => toggleComparar(id)}
                 />
-              </div>
-            )}
+            </div>
           </>
+        )}
+        {!cargando && !enComparativa && locales.length > 0 && recomendados.length === 0 && (
+          <p className="vacio-texto">
+            Sin recomendaciones por ahora: guarda más cocinas o carga más restaurantes deslizando en el buscador.
+          </p>
+        )}
+        {!cargando && !enComparativa && recomendados.length > 0 && (
+          <section aria-labelledby="reco-titulo">
+                <h2 id="reco-titulo" className="cuenta-sub">
+                  Recomendados para ti
+                </h2>
+                <p className="vacio-texto">De tu misma cocina, según tus likes.</p>
+                <ul className="grid">
+                  {recomendados.map(({ restaurante: r, motivo }) => (
+                    <li key={r.id}>
+                      <RestaurantCard
+                        restaurant={r}
+                        esFavorito={() => false}
+                        onToggleFavorito={onToggleFavorito}
+                        onVerCarta={onVerCarta}
+                        onSelect={onReservar}
+                      />
+                      <p className="vacio-texto">{motivo}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
         )}
       </div>
     </section>

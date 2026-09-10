@@ -22,6 +22,9 @@ export default function Negocio({ usuario, perfil, onProponer }) {
     imagen_url: '',
     acceso: '',
     infantil: '',
+    entorno: '',
+    tronas: '',
+    terraza: '',
     alergenos: '',
   });
   const [error, setError] = useState('');
@@ -64,6 +67,9 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           categorias: form.categorias.split(',').map((c) => c.trim()).filter(Boolean).slice(0, 3),
           accesoDiscapacidad: triABooleano(form.acceso),
           menuInfantil: triABooleano(form.infantil),
+          entornoTranquilo: triABooleano(form.entorno),
+          tronas: triABooleano(form.tronas),
+          terraza: triABooleano(form.terraza),
         },
       });
       setEnviado(true);
@@ -161,6 +167,36 @@ export default function Negocio({ usuario, perfil, onProponer }) {
         <div className="campo">
           <label htmlFor="ng-infantil">Menú infantil</label>
           <select id="ng-infantil" value={form.infantil} onChange={(e) => set('infantil', e.target.value)}>
+            {TRI.map((t) => (
+              <option key={t.label} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="campo">
+          <label htmlFor="ng-entorno">Entorno tranquilo (apto TEA)</label>
+          <select id="ng-entorno" value={form.entorno} onChange={(e) => set('entorno', e.target.value)}>
+            {TRI.map((t) => (
+              <option key={t.label} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="campo">
+          <label htmlFor="ng-tronas">Tronas / sillas de bebé</label>
+          <select id="ng-tronas" value={form.tronas} onChange={(e) => set('tronas', e.target.value)}>
+            {TRI.map((t) => (
+              <option key={t.label} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="campo">
+          <label htmlFor="ng-terraza">Terraza</label>
+          <select id="ng-terraza" value={form.terraza} onChange={(e) => set('terraza', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
                 {t.label}

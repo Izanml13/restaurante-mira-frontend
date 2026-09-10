@@ -119,6 +119,14 @@ export default function Admin({ usuario, esAdmin }) {
                     {n.direccion} · {n.precio} · {n.email}
                     {n.descripcion ? ` — ${n.descripcion}` : ''}
                   </div>
+                  <div className="registro-detalle">
+                    Acceso: {n.accesoDiscapacidad == null ? '¿?' : n.accesoDiscapacidad ? 'sí' : 'no'}
+                    {' '}· Infantil: {n.menuInfantil == null ? '¿?' : n.menuInfantil ? 'sí' : 'no'}
+                    {' '}· Tronas: {n.tronas == null ? '¿?' : n.tronas ? 'sí' : 'no'}
+                    {' '}· Tranquilo: {n.entornoTranquilo == null ? '¿?' : n.entornoTranquilo ? 'sí' : 'no'}
+                    {' '}· Terraza: {n.terraza == null ? '¿?' : n.terraza ? 'sí' : 'no'}
+                    {n.alergenos ? ` · Alérgenos: ${n.alergenos}` : ''}
+                  </div>
                 </div>
                 <span style={{ display: 'flex', gap: '0.4rem' }}>
                   <button type="button" className="btn-cta btn-peq" onClick={() => handleAprobar(n.id)}>

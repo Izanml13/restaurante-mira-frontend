@@ -49,6 +49,9 @@ export async function proponerNegocio({ usuario, datos }) {
     imagen_url: (datos.imagen_url || '').trim(),
     accesoDiscapacidad: datos.accesoDiscapacidad ?? null,
     menuInfantil: datos.menuInfantil ?? null,
+    entornoTranquilo: datos.entornoTranquilo ?? null,
+    tronas: datos.tronas ?? null,
+    terraza: datos.terraza ?? null,
     alergenos: (datos.alergenos || '').trim(),
     creado: serverTimestamp(),
   });
@@ -96,6 +99,9 @@ export async function aprobarNegocio(negocioId) {
     total_resenas_yelp: 0,
     accesoDiscapacidad: n.accesoDiscapacidad ?? null,
     menuInfantil: n.menuInfantil ?? null,
+    entornoTranquilo: n.entornoTranquilo ?? null,
+    tronas: n.tronas ?? null,
+    terraza: n.terraza ?? null,
     alergenos: n.alergenos || '',
     resenas: [],
   });

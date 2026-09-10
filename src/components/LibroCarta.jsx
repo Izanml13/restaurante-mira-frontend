@@ -11,44 +11,8 @@ import {
   dietaActiva,
   aptosEnCarta,
   leyendaSellos,
-  codigoAlergeno,
 } from '../models/restaurantModel.js';
-
-function Sellos({ plato }) {
-  return (
-    <span className="plato-sellos">
-      {plato.vegano && (
-        <span className="sello sello-vegano" title="Vegano">
-          🌱<span className="sr-only">Vegano</span>
-        </span>
-      )}
-      {!plato.vegano && plato.vegetariano && (
-        <span className="sello sello-veg" title="Vegetariano">
-          VG<span className="sr-only">Vegetariano</span>
-        </span>
-      )}
-      {plato.sinGluten && (
-        <span className="sello sello-sg" title="Sin gluten">
-          SG<span className="sr-only">Sin gluten</span>
-        </span>
-      )}
-    </span>
-  );
-}
-
-function Conflictos({ alergenos }) {
-  if (!alergenos.length) return null;
-  return (
-    <span className="plato-conflictos">
-      {alergenos.map((a) => (
-        <span key={a} className="mini-sello" title={a}>
-          {codigoAlergeno(a)}
-          <span className="sr-only">{a}</span>
-        </span>
-      ))}
-    </span>
-  );
-}
+import { Sellos, ConflictosAlergenos } from './Sellos.jsx';
 
 function PaginaSeccion({ seccion, dieta, mostrarConflictos }) {
   return (
@@ -68,7 +32,7 @@ function PaginaSeccion({ seccion, dieta, mostrarConflictos }) {
               </p>
               <p className="libro-plato-tags">
                 <Sellos plato={p} />
-                {mostrarConflictos && <Conflictos alergenos={conflictos} />}
+                {mostrarConflictos && <ConflictosAlergenos alergenos={conflictos} />}
               </p>
             </li>
           );
@@ -156,10 +120,11 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
           <p className="libro-portada-sub">
             {restaurant.cocina} · {restaurant.precio}
           </p>
-          <p className="libro-portada-datos">
-            {libro.secciones.length} secciones · {totalPlatos} platos
-            {conDieta && ` · Aptos para ti: ${aptos}`}
-          </p>
+                <p className="libro-portada-datos">
+                  {libro.secciones.length} secciones · {totalPlatos} platos
+                  {conDieta && ` · Aptos para ti: ${aptos}`}
+                  {restaurant.menuInfantil === true && ' · Menú infantil'}
+                </p>
         </div>
       );
     }

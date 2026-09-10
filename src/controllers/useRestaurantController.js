@@ -13,7 +13,7 @@ import {
   contarRestaurantes,
 } from '../services/restaurantApi.js';
 import { filterRestaurants, sortRestaurants, necesitaCargaTotal } from '../services/filterService.js';
-import { completarRestaurante, dietaActiva, ZONAS_CATALUNA } from '../models/restaurantModel.js';
+import { completarRestaurante, dietaActiva, accesibilidadActiva, ZONAS_CATALUNA } from '../models/restaurantModel.js';
 
 const FILTROS_INICIALES = {
   q: '',
@@ -27,7 +27,7 @@ const FILTROS_INICIALES = {
   hora: '',
 };
 
-export function useRestaurantController({ dieta = null } = {}) {
+export function useRestaurantController({ dieta = null, accesibilidad = null } = {}) {
   const [datos, setDatos] = useState([]); // docs cargados (tanda(s) o todo)
   const [modo, setModo] = useState('pagina'); // pagina | todo
   const [cursor, setCursor] = useState(null);
@@ -189,20 +189,22 @@ export function useRestaurantController({ dieta = null } = {}) {
 
   const filtrados = useMemo(() => {
     const dietaEfectiva = ignorarDieta ? null : dieta;
-    const base = filterRestaurants(conDistancia, { ...filtros, dieta: dietaEfectiva });
+    const accEfectiva = ignorarDieta ? null : accesibilidad;
+    const base = filterRestaurants(conDistancia, { ...filtros, dieta: dietaEfectiva, accesibilidad: accEfectiva });
     // Si zona es tu-ubicación, ordenar por distancia automáticamente si orden es Relevancia
     if (filtros.zona === '__tu-ubicacion' && filtros.orden === 'Relevancia') {
       return sortRestaurants(base, 'Distancia');
     }
     return sortRestaurants(base, filtros.orden);
-  }, [conDistancia, filtros, dieta, ignorarDieta]);
+  }, [conDistancia, filtros, dieta, accesibilidad, ignorarDieta]);
 
-  // Locales ocultos SOLO por la dieta (para el aviso). Se comparan con y sin dieta.
+  // Locales ocultos SOLO por preferencias (dieta o accesibilidad). Se comparan
+  // con y sin ellas para el aviso.
   const ocultosDieta = useMemo(() => {
-    if (!dietaActiva(dieta) || ignorarDieta) return 0;
-    const sinDieta = filterRestaurants(conDistancia, { ...filtros, dieta: null });
-    return Math.max(0, sinDieta.length - filtrados.length);
-  }, [conDistancia, filtros, dieta, ignorarDieta, filtrados.length]);
+    if ((!dietaActiva(dieta) && !accesibilidadActiva(accesibilidad)) || ignorarDieta) return 0;
+    const sinPrefs = filterRestaurants(conDistancia, { ...filtros, dieta: null, accesibilidad: null });
+    return Math.max(0, sinPrefs.length - filtrados.length);
+  }, [conDistancia, filtros, dieta, accesibilidad, ignorarDieta, filtrados.length]);
 
   // Nota: la dieta es preferencia de perfil (se cambia en Mi cuenta),
   // no filtro del buscador: no entra en hayFiltrosActivos ni lo borra Limpiar.

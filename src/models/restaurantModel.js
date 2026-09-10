@@ -302,6 +302,38 @@ export function codigoAlergeno(key) {
 /** Dieta vacía (forma canónica que se guarda en perfil/localStorage). */
 export const DIETA_VACIA = { vegano: false, vegetariano: false, sinGluten: false, alergias: [] };
 
+/**
+ * Accesibilidad del perfil (forma canónica).
+ * - sillaRuedas: necesita acceso sin escalones, baños adaptados, etc.
+ * - tea: espectro autista → prefiere entornos tranquilos y predecibles.
+ * Solo filtra por datos VERIFICADOS (los declara la empresa); jamás se inventan.
+ */
+export const ACCESIBILIDAD_VACIA = { sillaRuedas: false, tea: false };
+
+export function normalizarAccesibilidad(a) {
+  return {
+    sillaRuedas: a?.sillaRuedas === true,
+    tea: a?.tea === true,
+  };
+}
+
+export function accesibilidadActiva(a) {
+  const n = normalizarAccesibilidad(a);
+  return n.sillaRuedas || n.tea;
+}
+
+/**
+ * ¿El local es apto verificado? null/sin dato = NO apto cuando el filtro pide.
+ * (Mostrarlo sería mentir a quien no puede arriesgarse.)
+ */
+export function aptoAccesibilidad(restaurante, accesibilidad) {
+  const a = normalizarAccesibilidad(accesibilidad);
+  if (!a.sillaRuedas && !a.tea) return true;
+  if (a.sillaRuedas && restaurante.accesoDiscapacidad !== true) return false;
+  if (a.tea && restaurante.entornoTranquilo !== true) return false;
+  return true;
+}
+
 /** Normaliza cualquier forma vieja (incluido el antiguo `soloVegano`). */
 export function normalizarDieta(d) {
   const keys = new Set(ALERGENOS.map((a) => a.key));
@@ -434,6 +466,70 @@ export function aptosEnCarta(restaurante, dieta) {
     for (const p of s.platos) if (platoApto(dieta, p)) n++;
   }
   return n;
+}
+
+/**
+ * Familias de cocina ('Sushi Bars' y 'Japanese' son lo mismo).
+ * Devuelve el nombre en español o el texto limpio si no encaja.
+ */
+const FAMILIAS_COCINA = [
+  ['japonesa', ['sushi', 'japon', 'japanese', 'ramen', 'nikkei']],
+  ['española', ['tapas', 'spanish', 'espa', 'mediterr', 'catalan', 'paella', 'arros', 'vasca', 'gallega', 'asturiana']],
+  ['italiana', ['italian', 'pizza', 'pasta', 'tagliatella', 'trattoria']],
+  ['mexicana', ['mexican', 'taco', 'tex-mex', 'texmex']],
+  ['china', ['chinese', 'china', 'wok', 'canton', 'asian', 'oriental', 'asiatico']],
+  ['tailandesa', ['thai', 'vietnam']],
+  ['india', ['indian', 'india', 'curry']],
+  ['americana', ['burger', 'hamburg', 'mcdonald', 'american', 'diner', 'sandwich', 'bocatta']],
+  ['marisco', ['seafood', 'marisc', 'pescad', 'marisqueria']],
+  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco']],
+  ['francesa', ['french', 'franc']],
+  ['griega', ['greek', 'grieg']],
+  ['turca', ['kebab', 'turk', 'leban', 'arab']],
+  ['dulce', ['dessert', 'postre', 'helad', 'pastel', 'chocolate', 'crep', 'bakery']],
+  ['desayuno', ['breakfast', 'brunch', 'caf']],
+  ['vinos', ['wine', 'vino', 'taberna', 'bodega', 'celler']],
+];
+
+export function familiaCocina(cocina) {
+  const t = (cocina || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  for (const [familia, claves] of FAMILIAS_COCINA) {
+    if (claves.some((k) => t.includes(k))) return familia;
+  }
+  return t.replace(/\s*bars?$/i, '').trim() || 'la carta';
+}
+
+/**
+ * Recomendaciones según tus likes: SOLO misma FAMILIA de cocina que tus
+ * favoritos (Sushi Bars y Japanese cuentan igual). La zona y la nota solo
+ * ordenan. Sin coincidencia no hay recomendación.
+ * Solo con lo ya cargado (0 lecturas). Excluye tus favoritos.
+ * El motivo siempre habla de COMIDA, nunca de ciudad ni de nota.
+ * @returns {{ restaurante, puntos:number, motivo:string }[]}
+ */
+export function recomendarPara(favoritos, todos, limite = 6) {
+  const favs = (favoritos || []).filter(Boolean);
+  if (!favs.length) return [];
+  const idsFav = new Set(favs.map((f) => String(f.id ?? f)));
+  const familiasFav = new Set(favs.map((f) => familiaCocina(f.cocina)).filter((f) => f && f !== 'la carta'));
+  if (!familiasFav.size) return [];
+  const zonasFav = new Set(favs.map((f) => f.zona || f.ciudad).filter(Boolean));
+  return (todos || [])
+    .filter((t) => t && !idsFav.has(String(t.id)) && familiasFav.has(familiaCocina(t.cocina)))
+    .map((t) => {
+      let puntos = 2;
+      const zonaT = t.zona || t.ciudad;
+      if (zonaT && zonasFav.has(zonaT)) {
+        puntos += 1;
+      }
+      puntos += (Number(t.valoracion) || 0) / 5;
+      return { restaurante: t, puntos, motivo: `Porque te gusta la cocina ${familiaCocina(t.cocina)}.` };
+    })
+    .sort(
+      (a, b) =>
+        b.puntos - a.puntos || (b.restaurante.valoracion || 0) - (a.restaurante.valoracion || 0),
+    )
+    .slice(0, Math.max(0, limite));
 }
 
 /**

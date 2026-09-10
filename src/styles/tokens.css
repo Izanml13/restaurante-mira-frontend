@@ -1,5 +1,6 @@
 /* Tokens — estilo limpio tipo guía de reservas: blanco, verde marca, gris cálido. */
 :root {
+  color-scheme: light;
   --fondo: #ffffff;
   --fondo-suave: #f7f7f5;
   --tinta: #2d333f;
@@ -19,4 +20,22 @@
   --sombra-card: 0 1px 3px rgba(45, 51, 63, 0.12);
   --sombra-flotante: 0 8px 28px rgba(45, 51, 63, 0.16);
   --ancho-max: 1120px;
+}
+
+/* Modo oscuro: mismos roles, valores adaptados (contraste AA). */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --fondo: #16181d;
+  --fondo-suave: #20242c;
+  --tinta: #eceae2;
+  --gris: #a9aeb7;
+  --borde: #353b46;
+  --verde: #0d7353;
+  --verde-oscuro: #0a5f45;
+  --verde-suave: #1c3230;
+  --rojo: #e06055;
+  --estrella: #3ecf8e;
+  --papel: #20242c;
+  --sombra-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --sombra-flotante: 0 8px 28px rgba(0, 0, 0, 0.55);
 }

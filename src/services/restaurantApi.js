@@ -43,6 +43,9 @@ function mapearDoc(id, d) {
     // La empresa los rellena en su formulario; en los 690 de Yelp no existen (null).
     accesoDiscapacidad: d.accesoDiscapacidad ?? null, // true | false | null (sin info)
     menuInfantil: d.menuInfantil ?? null, // true | false | null (sin info)
+    tronas: d.tronas ?? null, // sillas de bebé: true | false | null (sin info)
+    entornoTranquilo: d.entornoTranquilo ?? null, // true | false | null (sin info)
+    terraza: d.terraza ?? null, // true | false | null (sin info)
     alergenos: d.alergenos || '', // texto libre del local; vacío = sin información
     resenas, // 50 reseñas sintéticas para el detalle
   };
