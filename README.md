@@ -33,8 +33,9 @@ Todo el filtrado es 100% cliente. Sin backend propio.
 | `#/registro` | Crear cuenta |
 | `#/cuenta` | Mi cuenta (dieta, negocio, reservas, incidencias, reseñas) |
 | `#/contacto` | Formulario de contacto |
-| `#/reservas` | Mis reservas (próximas/pasadas/canceladas) |
+| `#/reservas` | Mis reservas (calendario con meteo, próximas/pasadas/canceladas) |
 | `#/favoritos` | Guardados + comparador de cartas (máx 3) |
+| `#/mensajes` | Buzón interno (avisos 24h de TEAM MIRA) |
 | `#/negocio` | Proponer restaurante (cuentas empresa) |
 | `#/admin` | Incidencias y locales pendientes (solo allowlist) |
 
@@ -170,6 +171,15 @@ service cloud.firestore {
       allow update: if isSignedIn();
       allow delete: if false;
     }
+    // Mensajería interna: los escribe el servidor (Admin SDK); el dueño
+    // solo lee los suyos y marca leído (solo cambia `leido`).
+    match /mensajes/{id} {
+      allow read: if isOwner(resource.data.uid);
+      allow create: if false;
+      allow update: if isOwner(resource.data.uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leido']);
+      allow delete: if false;
+    }
     // Allowlist de admins: cada uno solo lee su propio doc
     // (las reglas sí pueden consultarla con exists()).
     match /admins/{uid} {
@@ -193,6 +203,7 @@ Además, en Authentication → Método de inicio de sesión, activa
 | Filtrar / ordenar | 0 extra (todo en cliente tras cargar) |
 | Crear cuenta / entrar | 0 en Firestore (perfil: 1 lectura por sesión) |
 | Enviar contacto | 1 escritura |
+| Aviso 24h (script) | 1 query + 1 escritura por reserva |
 | Favoritos | 0 lecturas (reutiliza cargados; 1 por guardado aún no visto) |
 | Dieta y carta libro | 0 (todo determinista en cliente) |
 

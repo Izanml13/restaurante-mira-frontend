@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 
-export default function Header({ usuario, esAdmin, perfil, numFavoritos, tema, onCambiarTema, onSalir }) {
+export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, tema, onCambiarTema, onSalir }) {
   const [abierto, setAbierto] = useState(false);
   const [oculto, setOculto] = useState(false);
 
@@ -39,10 +39,19 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, tema, o
     setAbierto(false);
   }
 
+  // El icono del mail conmuta: si ya estás en el buzón, lo cierra (vuelve al inicio).
+  function conmutarMensajes(e) {
+    if (window.location.hash === '#/mensajes') {
+      e.preventDefault();
+      cerrar();
+      window.location.hash = '#/';
+    }
+  }
+
   return (
     <header className={`site-header${oculto ? ' oculto' : ''}`}>
-      <a href="#/" className="logo" onClick={cerrar}>
-        MIRA
+      <a href="#/" className="logo logo-imagen" aria-label="MIRA - inicio" onClick={cerrar}>
+        <img src="/logo.png" alt="MIRA" />
       </a>
       <button
         type="button"
@@ -80,6 +89,9 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, tema, o
               </a>
               <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
+              </a>
+              <a href="#/mensajes" className="btn-texto btn-fav" onClick={conmutarMensajes} aria-label={`Mensajes${noLeidos > 0 ? `, ${noLeidos} sin leer` : ''}`}>
+                ✉{noLeidos > 0 ? ` ${noLeidos}` : ''}
               </a>
               {esAdmin && (
                 <a href="#/admin" className="btn-texto">

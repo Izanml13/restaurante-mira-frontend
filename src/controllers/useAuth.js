@@ -10,6 +10,7 @@ import { suscribirSesion, crearCuenta, iniciarSesion, cerrarSesion } from '../se
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
 import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
+import { contarNoLeidos } from '../services/mensajesApi.js';
 
 const LS_DIETA = 'mira:dieta';
 const LS_FAVS = 'mira:favoritos';
@@ -61,6 +62,7 @@ export function useAuth() {
   const [seqPerfil, setSeqPerfil] = useState(0);
   const [dieta, setDieta] = useState({ ...DIETA_VACIA });
   const [accesibilidad, setAccesibilidad] = useState({ ...ACCESIBILIDAD_VACIA });
+  const [noLeidos, setNoLeidos] = useState(0);
   const [favoritos, setFavoritos] = useState([]);
   const [fusionadoUid, setFusionadoUid] = useState(null);
 
@@ -72,6 +74,7 @@ export function useAuth() {
     } else {
       setEsAdmin(false);
       setPerfil({ ...PERFIL_VACIO });
+      setNoLeidos(0);
       // Invitado: ajustes del navegador.
       const local = leerAjustesLS();
       setDieta(local.dieta);
@@ -133,6 +136,26 @@ export function useAuth() {
     setSeqPerfil((i) => i + 1);
   }
 
+  /** Nº de mensajes sin leer (1 query pequeña). */
+  async function recargarMensajes() {
+    if (!usuario?.uid) {
+      setNoLeidos(0);
+      return 0;
+    }
+    try {
+      const n = await contarNoLeidos(usuario.uid);
+      setNoLeidos(n);
+      return n;
+    } catch {
+      return noLeidos;
+    }
+  }
+
+  useEffect(() => {
+    if (usuario?.uid) recargarMensajes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario]);
+
   /** Guarda dieta (remoto si logueado, si no local; conserva accesibilidad). */
   async function guardarDieta(nueva) {
     const d = normalizarDieta(nueva);
@@ -188,6 +211,8 @@ export function useAuth() {
     guardarDieta,
     accesibilidad,
     guardarAccesibilidad,
+    noLeidos,
+    recargarMensajes,
     favoritos,
     toggleFavorito,
     crearCuenta,

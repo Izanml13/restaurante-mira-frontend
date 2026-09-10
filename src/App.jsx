@@ -20,6 +20,7 @@ import Reservas from './components/Reservas.jsx';
 import Admin from './components/Admin.jsx';
 import Negocio from './components/Negocio.jsx';
 import Favoritos from './components/Favoritos.jsx';
+import Mensajes from './components/Mensajes.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import Footer from './components/Footer.jsx';
@@ -37,11 +38,12 @@ function rutaActual() {
   if (h === '#/admin') return 'admin';
   if (h === '#/negocio') return 'negocio';
   if (h === '#/favoritos') return 'favoritos';
+  if (h === '#/mensajes') return 'mensajes';
   return 'home';
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -117,7 +119,7 @@ export default function App() {
       <a className="skip-link" href="#buscar">
         Saltar al buscador
       </a>
-      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
+      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
       <main>
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
@@ -139,6 +141,7 @@ export default function App() {
             onToggleFavorito={toggleFavorito}
           />
         )}
+        {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
         {ruta === 'home' && (
           <>
             <Hero total={total} numZonas={zonasDisponibles.length} />

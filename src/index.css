@@ -25,6 +25,26 @@ img {
   max-width: 100%;
 }
 
+/* Barra lateral minimalista y fina (se adapta al tema vía --borde) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--borde);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 h1,
 h2,
 h3 {
