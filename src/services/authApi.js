@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { getFirebaseApp } from './firebase.js';
+import { guardarPerfil } from './perfilApi.js';
 
 function auth() {
   return getAuth(getFirebaseApp());
@@ -36,13 +37,19 @@ function mensajeError(code, defecto) {
 }
 
 /**
- * Crea la cuenta y guarda el nombre visible.
+ * Crea la cuenta, guarda el nombre visible y crea el perfil en `usuarios/{uid}`
+ * (tipo 'cliente' o 'empresa'). 1 escritura extra, solo al registrarse.
  * @returns {Promise<{nombre:string,email:string}>}
  */
-export async function crearCuenta({ nombre, email, password }) {
+export async function crearCuenta({ nombre, email, password, tipo = 'cliente' }) {
   try {
     const cred = await createUserWithEmailAndPassword(auth(), email.trim(), password);
     await updateProfile(cred.user, { displayName: nombre.trim() });
+    await guardarPerfil(cred.user.uid, {
+      tipo: tipo === 'empresa' ? 'empresa' : 'cliente',
+      nombre: nombre.trim(),
+      email: cred.user.email,
+    });
     return { nombre: nombre.trim(), email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo crear la cuenta. Inténtalo de nuevo.'));
@@ -68,7 +75,7 @@ export function suscribirSesion(callback) {
   return onAuthStateChanged(auth(), (u) =>
     callback(
       u
-        ? { nombre: u.displayName || '', email: u.email ?? '', creado: u.metadata?.creationTime ?? null }
+        ? { uid: u.uid, nombre: u.displayName || '', email: u.email ?? '', creado: u.metadata?.creationTime ?? null }
         : null,
     ),
   );

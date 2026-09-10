@@ -10,7 +10,7 @@ export const restaurants = [
     precio: '€€',
     distanciaKm: 0.8,
     valoracion: 4.7,
-    imagen: 'https://picsum.photos/seed/mira-paco/600/400',
+    imagen: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Arroces y brasa frente al mercado del barrio.',
   },
   {
@@ -20,7 +20,7 @@ export const restaurants = [
     precio: '€€',
     distanciaKm: 1.5,
     valoracion: 4.5,
-    imagen: 'https://picsum.photos/seed/mira-nonna/600/400',
+    imagen: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Pasta fresca y horno de leña en una calle tranquila.',
   },
   {
@@ -30,7 +30,7 @@ export const restaurants = [
     precio: '€€',
     distanciaKm: 1.2,
     valoracion: 4.6,
-    imagen: 'https://picsum.photos/seed/mira-nami/600/400',
+    imagen: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Nigiris y makis al momento junto a la plaza.',
   },
   {
@@ -40,7 +40,7 @@ export const restaurants = [
     precio: '€',
     distanciaKm: 2.3,
     valoracion: 4.3,
-    imagen: 'https://picsum.photos/seed/mira-mexico/600/400',
+    imagen: 'https://images.unsplash.com/photo-1551506448-074afa034c05?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Tacos al pastor y aguas frescas con ambiente familiar.',
   },
   {
@@ -50,7 +50,7 @@ export const restaurants = [
     precio: '€€€',
     distanciaKm: 5.4,
     valoracion: 4.8,
-    imagen: 'https://picsum.photos/seed/mira-lena/600/400',
+    imagen: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Chuletón madurado y parrilla de encina a las afueras.',
   },
   {
@@ -60,7 +60,7 @@ export const restaurants = [
     precio: '€',
     distanciaKm: 0.4,
     valoracion: 4.2,
-    imagen: 'https://picsum.photos/seed/mira-verdi/600/400',
+    imagen: 'https://images.unsplash.com/photo-1512621776952-a57141f2eefd?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Bowls y hamburguesa vegetal a dos calles de casa.',
   },
   {
@@ -70,7 +70,7 @@ export const restaurants = [
     precio: '€€',
     distanciaKm: 3.1,
     valoracion: 4.9,
-    imagen: 'https://picsum.photos/seed/mira-kao/600/400',
+    imagen: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Menú degustación que mezcla Asia y producto local.',
   },
   {
@@ -80,7 +80,7 @@ export const restaurants = [
     precio: '€',
     distanciaKm: 0.9,
     valoracion: 3.8,
-    imagen: 'https://picsum.photos/seed/mira-solera/600/400',
+    imagen: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Tapas de siempre y vermut de grifo en el casco viejo.',
   },
   {
@@ -90,7 +90,7 @@ export const restaurants = [
     precio: '€€€',
     distanciaKm: 8.2,
     valoracion: 4.4,
-    imagen: 'https://picsum.photos/seed/mira-roma/600/400',
+    imagen: 'https://images.unsplash.com/photo-1498579150354-977bec7ea0af?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Cocina romana clásica con bodega italiana junto al río.',
   },
   {
@@ -100,7 +100,7 @@ export const restaurants = [
     precio: '€€€',
     distanciaKm: 6.7,
     valoracion: 4.1,
-    imagen: 'https://picsum.photos/seed/mira-tokio/600/400',
+    imagen: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&auto=format&fit=crop&q=60',
     descripcion: 'Barra omakase con vistas en la azotea del hotel.',
   },
 ];
