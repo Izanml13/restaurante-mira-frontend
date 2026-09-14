@@ -185,7 +185,6 @@
   padding: 0.65rem 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
 }
 
 .btn-secundario:hover:not(:disabled) {
