@@ -22,47 +22,59 @@ function escapar(s) {
     .replace(/"/g, '&quot;');
 }
 
+// Icono centro ciudad (evita bug iconos default de Leaflet en Vite)
+function iconoCentro() {
+  return L.divIcon({
+    className: 'mapa-centro-pin',
+    html: '★',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+}
+
 export default function Mapa({ todos, total, onVerDetalle }) {
   const refCont = useRef(null);
   const refMapa = useRef(null);
   const refCapa = useRef(null);
   const refCapaCentro = useRef(null);
-  const [fuente, setFuente] = useState(() => (Array.isArray(todos) ? todos : []));
+  const [fuente, setFuente] = useState(() => (Array.isArray(todos) && todos.length ? [...todos] : []));
   const [cargando, setCargando] = useState(() => !(Array.isArray(todos) && todos.length));
   const [error, setError] = useState('');
   const [zona, setZona] = useState('');
   const [reintento, setReintento] = useState(0);
 
-  // Datos: usa lo ya cargado al instante y mejora a colección completa en fondo.
+  // Datos: usa lo ya cargado y mejora a colección completa en fondo sin bloquear el mapa.
   useEffect(() => {
     let vivo = true;
     if (Array.isArray(todos) && todos.length > 0) {
-      setFuente(todos);
+      setFuente((prev) => (prev.length ? prev : [...todos]));
       setCargando(false);
-    } else {
-      setCargando(true);
     }
+    // No bloquear el mapa por el fetch: lo lanzamos en fondo. Si falla, seguimos con `todos`.
     fetchRestaurants()
       .then((l) => {
         if (!vivo) return;
-        setFuente(l);
+        if (Array.isArray(l) && l.length) {
+          setFuente(l);
+          setError('');
+        }
         setCargando(false);
-        setError('');
       })
       .catch((e) => {
         if (!vivo) return;
-        // Si ya tenemos algo (props o carga previa), no rompemos el mapa.
-        setFuente((prev) => (prev.length > 0 ? prev : Array.isArray(todos) ? todos : []));
-        if (fuente.length === 0 && (!todos || todos.length === 0)) {
-          setError(e.message || 'No se pudo cargar el mapa.');
+        // Si ya tenemos algo, no es error bloqueante
+        if (fuente.length > 0 || (Array.isArray(todos) && todos.length > 0)) {
+          setCargando(false);
+          return;
         }
+        setError(e.message || 'No se pudo cargar el mapa.');
         setCargando(false);
       });
     return () => {
       vivo = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reintento]);
+  }, [reintento, todos]);
 
   const porZona = useMemo(() => {
     const m = {};
@@ -78,11 +90,15 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     [fuente, zona],
   );
 
-  // Crear el mapa una sola vez.
+  // Crear el mapa cuando el contenedor existe (siempre renderizado, aunque cargando).
   useEffect(() => {
-    if (!refCont.current || refMapa.current) return undefined;
+    if (refMapa.current) return undefined;
+    if (!refCont.current) return undefined;
     const centroInicial = CENTRO_CATALUNA;
-    const mapa = L.map(refCont.current).setView([centroInicial.lat, centroInicial.lng], centroInicial.zoom);
+    const mapa = L.map(refCont.current, { zoomControl: true }).setView(
+      [centroInicial.lat, centroInicial.lng],
+      centroInicial.zoom,
+    );
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -90,20 +106,22 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     refMapa.current = mapa;
     refCapa.current = L.layerGroup().addTo(mapa);
     refCapaCentro.current = L.layerGroup().addTo(mapa);
-    // El contenedor puede montar con altura 0 en cambio de hash: revalidar varias veces.
-    const t1 = setTimeout(() => mapa.invalidateSize(), 100);
+    const t1 = setTimeout(() => mapa.invalidateSize(), 80);
     const t2 = setTimeout(() => mapa.invalidateSize(), 400);
     const t3 = setTimeout(() => mapa.invalidateSize(), 900);
+    const onResize = () => mapa.invalidateSize();
+    window.addEventListener('resize', onResize);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      window.removeEventListener('resize', onResize);
       mapa.remove();
       refMapa.current = null;
       refCapa.current = null;
       refCapaCentro.current = null;
     };
-  }, []);
+  }, [cargando, fuente.length, zona]);
 
   // Repintar marcadores al cambiar zona/datos + clic en popup.
   useEffect(() => {
@@ -114,12 +132,13 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     capa.clearLayers();
     if (capaCentro) capaCentro.clearLayers();
 
-    // Marca del centro de la ciudad (estrella, sin usar tu ubicación).
     const centro = centroDeZona(zona);
     if (zona && capaCentro) {
       const mkCentro = L.marker([centro.lat, centro.lng], {
+        icon: iconoCentro(),
         title: `Centro de ${centro.nombre || nombreZona(zona)}`,
         keyboard: false,
+        zIndexOffset: 1000,
       });
       mkCentro.bindTooltip(`Centro de ${escapar(centro.nombre || nombreZona(zona))}`, {
         permanent: false,
@@ -152,10 +171,12 @@ export default function Mapa({ todos, total, onVerDetalle }) {
       mapa.setView(puntos[0], 15);
     } else if (zona) {
       mapa.setView([centro.lat, centro.lng], centro.zoom || 13);
-    } else {
+    } else if (fuente.length === 0) {
       mapa.setView([CENTRO_CATALUNA.lat, CENTRO_CATALUNA.lng], CENTRO_CATALUNA.zoom);
     }
-    setTimeout(() => mapa.invalidateSize(), 100);
+    // Revalidar por si el fitBounds se hizo con contenedor aún a 0
+    setTimeout(() => mapa.invalidateSize(), 80);
+    setTimeout(() => mapa.invalidateSize(), 300);
 
     function alAbrirPopup(e) {
       const btn = e.popup?.getElement()?.querySelector('[data-ver-detalle]');
@@ -170,20 +191,50 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     return () => {
       mapa.off('popupopen', alAbrirPopup);
     };
-  }, [visibles, zona, onVerDetalle]);
+  }, [visibles, zona, fuente.length, onVerDetalle]);
 
   const zonas = useMemo(
     () => [...new Set([...ZONAS_CATALUNA, ...Object.keys(porZona)])],
     [porZona],
   );
 
+  const mapaVacio = !cargando && fuente.length === 0 && !error;
+
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="mapa-titulo">
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="mapa-titulo">Mapa por zonas</h1>
-        {cargando && <p>Cargando locales…</p>}
+
+        <div className="tabs" role="group" aria-label="Filtrar por zona">
+          <button
+            type="button"
+            aria-pressed={zona === ''}
+            className={zona === '' ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
+            onClick={() => setZona('')}
+          >
+            Todas ({fuente.length || total || 0})
+          </button>
+          {zonas.map((z) => (
+            <button
+              key={z}
+              type="button"
+              aria-pressed={zona === z}
+              className={zona === z ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
+              onClick={() => setZona(z)}
+            >
+              {nombreZona(z)} ({porZona[z] ?? 0})
+            </button>
+          ))}
+        </div>
+
+        <p className="vacio-texto" aria-live="polite">
+          {cargando
+            ? 'Cargando locales…'
+            : `${visibles.length} locales en el mapa${zona ? ` · ${nombreZona(zona)} (centrado en su centro)` : ''}.`}
+        </p>
+
         {error && fuente.length === 0 && (
-          <div className="error-panel" role="alert">
+          <div className="error-panel" role="alert" style={{ marginBottom: '0.8rem' }}>
             <p className="vacio-titulo">No se pudo cargar el mapa.</p>
             <p>{error}</p>
             <button type="button" className="btn-cta" onClick={() => setReintento((i) => i + 1)}>
@@ -191,35 +242,13 @@ export default function Mapa({ todos, total, onVerDetalle }) {
             </button>
           </div>
         )}
-        {(!cargando || fuente.length > 0) && !(error && fuente.length === 0) && (
-          <>
-            <div className="tabs" role="group" aria-label="Filtrar por zona">
-              <button
-                type="button"
-                aria-pressed={zona === ''}
-                className={zona === '' ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
-                onClick={() => setZona('')}
-              >
-                Todas ({fuente.length || total || 0})
-              </button>
-              {zonas.map((z) => (
-                <button
-                  key={z}
-                  type="button"
-                  aria-pressed={zona === z}
-                  className={zona === z ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
-                  onClick={() => setZona(z)}
-                >
-                  {nombreZona(z)} ({porZona[z] ?? 0})
-                </button>
-              ))}
-            </div>
-            <p className="vacio-texto" aria-live="polite">
-              {visibles.length} locales en el mapa{zona ? ` · ${nombreZona(zona)} (centrado en su centro)` : ''}.
-            </p>
-            <div ref={refCont} className="mapa-grande" role="application" aria-label="Mapa de restaurantes" />
-          </>
-        )}
+
+        {mapaVacio && <p className="vacio-texto">Aún no hay locales con coordenadas para mostrar.</p>}
+
+        {/* El mapa SIEMPRE en el DOM: si no, Leaflet no inicializa (altura 0) */}
+        <div ref={refCont} className="mapa-grande" role="application" aria-label="Mapa de restaurantes" />
+
+        {cargando && fuente.length === 0 && <p className="vacio-texto">Cargando mapa…</p>}
       </div>
     </section>
   );
