@@ -91,7 +91,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
             Ver más información
           </button>
           {onVerCarta && (
-            <button type="button" className="btn-secundario btn-peq" onClick={() => onVerCarta(restaurant)}>
+            <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
               Ver carta
             </button>
           )}

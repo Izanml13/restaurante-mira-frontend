@@ -177,6 +177,7 @@
 }
 
 .btn-secundario {
+  margin-top: 0.5rem;
   background: var(--fondo);
   color: var(--tinta);
   border: 1px solid var(--borde);
@@ -184,6 +185,7 @@
   padding: 0.65rem 1.1rem;
   font-weight: 600;
   cursor: pointer;
+  width: 100%;
 }
 
 .btn-secundario:hover:not(:disabled) {
