@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { buscarParkingsCercanos, formatoDistancia, mapsLink } from '../services/parkingApi.js';
+import { buscarParkingsCercanos, formatoDistancia, mapsLink, buscarParkingEnGoogle } from '../services/parkingApi.js';
 
 function escapar(s) {
   return String(s ?? '')
@@ -33,7 +33,8 @@ export default function RestaurantMap({ restaurant }) {
     ];
   }, [coords, parkings]);
 
-  // Cargar parkings una vez por restaurante.
+  // Cargar parkings una vez por restaurante (radio base 1,5 km; el servicio
+  // amplía solo a 2-3 km si sale vacío).
   useEffect(() => {
     let vivo = true;
     setCargando(true);
@@ -42,7 +43,7 @@ export default function RestaurantMap({ restaurant }) {
       setCargando(false);
       return undefined;
     }
-    buscarParkingsCercanos(coords.lat, coords.lng, { radio: 1000, limite: 5 })
+    buscarParkingsCercanos(coords.lat, coords.lng, { radio: 1500, limite: 5 })
       .then((l) => {
         if (!vivo) return;
         setParkings(Array.isArray(l) ? l : []);
@@ -170,7 +171,7 @@ export default function RestaurantMap({ restaurant }) {
           : mejor
             ? ` · Parking recomendado: ${mejor.nombre} (${formatoDistancia(mejor.distanciaM)})`
             : parkings.length === 0
-              ? ' · Sin parkings registrados a menos de 1 km en OpenStreetMap.'
+              ? ' · Sin parkings registrados en OpenStreetMap hasta 3 km.'
               : ''}
       </p>
       {!cargando && parkings.length > 0 && (
@@ -187,8 +188,15 @@ export default function RestaurantMap({ restaurant }) {
       )}
       {!cargando && parkings.length === 0 && (
         <p className="vacio-texto" style={{ fontSize: '0.82rem', margin: 0 }}>
-          Consejo: si no hay parking OSM a 1 km, prueba a alejar el mapa y buscar “parking” en el centro de{' '}
-          {restaurant.ciudad || 'la ciudad'}.
+          Sin parkings OSM hasta 3 km (en pueblos hay pocos mapeados).{' '}
+          <a
+            href={buscarParkingEnGoogle(coords.lat, coords.lng)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Buscar parking en Google Maps
+          </a>
+          .
         </p>
       )}
     </section>
