@@ -1,55 +1,68 @@
 /**
  * View pura: #/mapa — locales con coordenadas, filtrables por zona.
- * Leaflet + OpenStreetMap (gratis, sin claves). Usa lo ya cargado y solo
- * trae el conjunto entero la primera vez que hace falta (1 vez por visita).
+ * Leaflet + OpenStreetMap (gratis, sin claves).
+ * Sin geolocalización: centra en el punto más céntrico de cada ciudad.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { fetchRestaurants } from '../services/restaurantApi.js';
 import { ZONAS_CATALUNA } from '../models/restaurantModel.js';
-
-const CENTRO_CAT = [41.6, 1.8];
+import { centroDeZona, CENTRO_CATALUNA } from '../services/cityCenters.js';
 
 function nombreZona(z) {
   return String(z || '').replace(', Spain', '') || 'Sin zona';
+}
+
+function escapar(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 export default function Mapa({ todos, total, onVerDetalle }) {
   const refCont = useRef(null);
   const refMapa = useRef(null);
   const refCapa = useRef(null);
-  const [fuente, setFuente] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const refCapaCentro = useRef(null);
+  const [fuente, setFuente] = useState(() => (Array.isArray(todos) ? todos : []));
+  const [cargando, setCargando] = useState(() => !(Array.isArray(todos) && todos.length));
   const [error, setError] = useState('');
   const [zona, setZona] = useState('');
-  const intentoHecho = useRef(false);
+  const [reintento, setReintento] = useState(0);
 
-  // Datos: el mapa necesita TODO el conjunto para contar por zona.
-  // Ignora la paginación del buscador y trae la colección completa 1 vez.
+  // Datos: usa lo ya cargado al instante y mejora a colección completa en fondo.
   useEffect(() => {
     let vivo = true;
+    if (Array.isArray(todos) && todos.length > 0) {
+      setFuente(todos);
+      setCargando(false);
+    } else {
+      setCargando(true);
+    }
     fetchRestaurants()
       .then((l) => {
         if (!vivo) return;
         setFuente(l);
         setCargando(false);
+        setError('');
       })
       .catch((e) => {
         if (!vivo) return;
-        // Fallback a lo paginado si falla por cuota
-        if (todos.length > 0) {
-          setFuente(todos);
-          setCargando(false);
-        } else {
-          setError(e.message);
-          setCargando(false);
+        // Si ya tenemos algo (props o carga previa), no rompemos el mapa.
+        setFuente((prev) => (prev.length > 0 ? prev : Array.isArray(todos) ? todos : []));
+        if (fuente.length === 0 && (!todos || todos.length === 0)) {
+          setError(e.message || 'No se pudo cargar el mapa.');
         }
+        setCargando(false);
       });
     return () => {
       vivo = false;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reintento]);
 
   const porZona = useMemo(() => {
     const m = {};
@@ -68,19 +81,27 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   // Crear el mapa una sola vez.
   useEffect(() => {
     if (!refCont.current || refMapa.current) return undefined;
-    const mapa = L.map(refCont.current).setView(CENTRO_CAT, 8);
+    const centroInicial = CENTRO_CATALUNA;
+    const mapa = L.map(refCont.current).setView([centroInicial.lat, centroInicial.lng], centroInicial.zoom);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(mapa);
     refMapa.current = mapa;
     refCapa.current = L.layerGroup().addTo(mapa);
-    // Fix contenedor con altura 0 al montar en pestaña oculta
-    setTimeout(() => mapa.invalidateSize(), 200);
+    refCapaCentro.current = L.layerGroup().addTo(mapa);
+    // El contenedor puede montar con altura 0 en cambio de hash: revalidar varias veces.
+    const t1 = setTimeout(() => mapa.invalidateSize(), 100);
+    const t2 = setTimeout(() => mapa.invalidateSize(), 400);
+    const t3 = setTimeout(() => mapa.invalidateSize(), 900);
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       mapa.remove();
       refMapa.current = null;
       refCapa.current = null;
+      refCapaCentro.current = null;
     };
   }, []);
 
@@ -88,8 +109,25 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   useEffect(() => {
     const mapa = refMapa.current;
     const capa = refCapa.current;
+    const capaCentro = refCapaCentro.current;
     if (!mapa || !capa) return undefined;
     capa.clearLayers();
+    if (capaCentro) capaCentro.clearLayers();
+
+    // Marca del centro de la ciudad (estrella, sin usar tu ubicación).
+    const centro = centroDeZona(zona);
+    if (zona && capaCentro) {
+      const mkCentro = L.marker([centro.lat, centro.lng], {
+        title: `Centro de ${centro.nombre || nombreZona(zona)}`,
+        keyboard: false,
+      });
+      mkCentro.bindTooltip(`Centro de ${escapar(centro.nombre || nombreZona(zona))}`, {
+        permanent: false,
+        direction: 'top',
+      });
+      mkCentro.addTo(capaCentro);
+    }
+
     const puntos = [];
     visibles.forEach((r) => {
       const mk = L.circleMarker([r.coords.lat, r.coords.lng], {
@@ -100,21 +138,30 @@ export default function Mapa({ todos, total, onVerDetalle }) {
         fillOpacity: 0.85,
       });
       mk.bindPopup(
-        `<strong>${r.nombre.replace(/</g, '&lt;')}</strong><br>` +
-          `★ ${r.valoracion ?? '—'} · ${r.precio} · ${nombreZona(r.zona)}<br>` +
-          `<button data-ver-detalle="${r.id}" style="margin-top:0.4rem">Ver detalle</button>`,
+        `<strong>${escapar(r.nombre)}</strong><br>` +
+          `★ ${escapar(r.valoracion ?? '—')} · ${escapar(r.precio)} · ${escapar(nombreZona(r.zona))}<br>` +
+          `<button data-ver-detalle="${escapar(r.id)}" style="margin-top:0.4rem">Ver detalle</button>`,
       );
       mk.addTo(capa);
       puntos.push([r.coords.lat, r.coords.lng]);
     });
-    if (puntos.length) mapa.fitBounds(puntos, { padding: [30, 30], maxZoom: 13 });
-    else mapa.setView(CENTRO_CAT, 8);
+
+    if (puntos.length > 1) {
+      mapa.fitBounds(puntos, { padding: [30, 30], maxZoom: 13 });
+    } else if (puntos.length === 1) {
+      mapa.setView(puntos[0], 15);
+    } else if (zona) {
+      mapa.setView([centro.lat, centro.lng], centro.zoom || 13);
+    } else {
+      mapa.setView([CENTRO_CATALUNA.lat, CENTRO_CATALUNA.lng], CENTRO_CATALUNA.zoom);
+    }
     setTimeout(() => mapa.invalidateSize(), 100);
+
     function alAbrirPopup(e) {
       const btn = e.popup?.getElement()?.querySelector('[data-ver-detalle]');
       if (btn) {
         btn.onclick = () => {
-          const hallado = visibles.find((x) => String(x.id) === btn.dataset.verDetalle);
+          const hallado = visibles.find((x) => String(x.id) === btn.getAttribute('data-ver-detalle'));
           if (hallado) onVerDetalle(hallado);
         };
       }
@@ -123,7 +170,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     return () => {
       mapa.off('popupopen', alAbrirPopup);
     };
-  }, [visibles, onVerDetalle]);
+  }, [visibles, zona, onVerDetalle]);
 
   const zonas = useMemo(
     () => [...new Set([...ZONAS_CATALUNA, ...Object.keys(porZona)])],
@@ -135,12 +182,16 @@ export default function Mapa({ todos, total, onVerDetalle }) {
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="mapa-titulo">Mapa por zonas</h1>
         {cargando && <p>Cargando locales…</p>}
-        {error && (
-          <p className="auth-error" role="alert">
-            {error}
-          </p>
+        {error && fuente.length === 0 && (
+          <div className="error-panel" role="alert">
+            <p className="vacio-titulo">No se pudo cargar el mapa.</p>
+            <p>{error}</p>
+            <button type="button" className="btn-cta" onClick={() => setReintento((i) => i + 1)}>
+              Reintentar
+            </button>
+          </div>
         )}
-        {!cargando && !error && (
+        {(!cargando || fuente.length > 0) && !(error && fuente.length === 0) && (
           <>
             <div className="tabs" role="group" aria-label="Filtrar por zona">
               <button
@@ -149,7 +200,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
                 className={zona === '' ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
                 onClick={() => setZona('')}
               >
-                Todas ({fuente.length})
+                Todas ({fuente.length || total || 0})
               </button>
               {zonas.map((z) => (
                 <button
@@ -164,7 +215,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
               ))}
             </div>
             <p className="vacio-texto" aria-live="polite">
-              {visibles.length} locales en el mapa{zona ? ` · ${nombreZona(zona)}` : ''}.
+              {visibles.length} locales en el mapa{zona ? ` · ${nombreZona(zona)} (centrado en su centro)` : ''}.
             </p>
             <div ref={refCont} className="mapa-grande" role="application" aria-label="Mapa de restaurantes" />
           </>

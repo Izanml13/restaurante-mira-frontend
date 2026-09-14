@@ -80,8 +80,6 @@ export default function App() {
     cargarMas,
     estado,
     error,
-    geoEstado,
-    distanciaDisponible,
     cocinasDisponibles,
     zonasDisponibles,
     seleccionado,
@@ -181,8 +179,6 @@ export default function App() {
                       ordenes: ORDENES,
                     }}
                     hayFiltrosActivos={hayFiltrosActivos}
-                    distanciaDisponible={distanciaDisponible}
-                    geoEstado={geoEstado}
                     onChange={actualizarFiltro}
                     onClear={limpiarFiltros}
                   />
