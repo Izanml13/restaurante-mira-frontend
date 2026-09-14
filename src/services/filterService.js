@@ -12,8 +12,6 @@ import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APT
 export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona = '', distanciaMax = '', dia = '', franja = '', hora = '', dieta = null, accesibilidad = null } = {}) {
   const query = normalizeText(q).trim();
   const maxKm = distanciaMax === '' || distanciaMax == null ? null : Number(distanciaMax);
-  // zona especial tu-ubicación no filtra por zona, solo por cercanía (ordenado luego)
-  const esUbicacion = zona === '__tu-ubicacion';
 
   return list.filter((r) => {
     if (precio && r.precio !== precio) return false;
@@ -26,7 +24,7 @@ export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona
       const candidatas = [r.cocina, ...(r.categorias || [])].map(normalizeText);
       if (!candidatas.includes(nCocina)) return false;
     }
-    if (zona && !esUbicacion && (r.zona ?? '') !== zona) return false;
+    if (zona && (r.zona ?? '') !== zona) return false;
     if (maxKm != null && (r.distanciaKm == null || !(r.distanciaKm <= maxKm))) return false;
     if (query) {
       const haystack = normalizeText(`${r.nombre} ${r.cocina} ${r.descripcion} ${r.ciudad ?? ''} ${r.zona ?? ''}`);

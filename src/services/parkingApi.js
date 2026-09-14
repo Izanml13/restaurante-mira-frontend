@@ -1,0 +1,92 @@
+/**
+ * Parkings cercanos con Overpass API (OpenStreetMap, gratis, sin clave).
+ * Caché en memoria por coordenadas. Si falla, devuelve [] y la app
+ * sigue funcionando sin parkings. 0 lecturas de Firestore.
+ */
+
+const CACHE = new Map();
+const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+
+function haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const rad = (g) => (g * Math.PI) / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function nombreParking(tags) {
+  if (!tags) return 'Parking';
+  return tags.name || tags.operator || (tags['addr:street'] ? `Parking ${tags['addr:street']}` : 'Parking');
+}
+
+/**
+ * @param {number} lat
+ * @param {number} lng
+ * @param {{ radio?: number, limite?: number }} opts radio en metros (def 800)
+ * @returns {Promise<{ id:string, lat:number, lng:number, nombre:string, distanciaM:number }[]>}
+ */
+export async function buscarParkingsCercanos(lat, lng, { radio = 800, limite = 5 } = {}) {
+  if (lat == null || lng == null) return [];
+  const clave = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)},${radio},${limite}`;
+  if (!CACHE.has(clave)) {
+    CACHE.set(clave, consultarOverpass(lat, lng, radio, limite));
+  }
+  try {
+    return await CACHE.get(clave);
+  } catch {
+    CACHE.delete(clave);
+    return [];
+  }
+}
+
+async function consultarOverpass(lat, lng, radio, limite) {
+  const ql = `[out:json][timeout:15];(nwr["amenity"="parking"](around:${radio},${lat},${lng}););out center ${Math.min(30, limite * 6)};`;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const res = await fetch(OVERPASS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: `data=${encodeURIComponent(ql)}`,
+      signal: ctrl.signal,
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    const els = Array.isArray(json.elements) ? json.elements : [];
+    return els
+      .map((e) => {
+        const plat = e.lat ?? e.center?.lat;
+        const plng = e.lon ?? e.center?.lon;
+        if (plat == null || plng == null) return null;
+        return {
+          id: `osm-${e.type}-${e.id}`,
+          lat: plat,
+          lng: plng,
+          nombre: nombreParking(e.tags),
+          distanciaM: Math.round(haversineM(lat, lng, plat, plng)),
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.distanciaM - b.distanciaM)
+      .slice(0, limite);
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/** Texto corto "a 150 m" / "a 1,2 km". */
+export function formatoDistancia(m) {
+  if (m == null) return '';
+  if (m < 1000) return `a ${m} m`;
+  return `a ${(m / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 })} km`;
+}
+
+/** Enlace Google Maps a un punto. */
+export function mapsLink(lat, lng) {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}

@@ -78,7 +78,24 @@ export default function Mensajes({ usuario, onLeidos }) {
                     </span>
                   </span>
                 </button>
-                {esAbierto && <p className="mensaje-cuerpo">{m.cuerpo}</p>}
+                {esAbierto && (
+                  <>
+                    <p className="mensaje-cuerpo" style={{ whiteSpace: 'pre-line' }}>{m.cuerpo}</p>
+                    {(m.parkingLink || m.parkingNombre) && (
+                      <p className="mensaje-parking" style={{ fontSize: '0.88rem' }}>
+                        🅿️ Parking: {m.parkingNombre || 'recomendado'}
+                        {m.parkingDistanciaM != null
+                          ? ` a ${m.parkingDistanciaM < 1000 ? `${m.parkingDistanciaM} m` : `${(m.parkingDistanciaM / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 })} km`}`
+                          : ''}{' '}
+                        {m.parkingLink && (
+                          <a href={m.parkingLink} target="_blank" rel="noreferrer">
+                            Cómo llegar al parking
+                          </a>
+                        )}
+                      </p>
+                    )}
+                  </>
+                )}
               </li>
             );
           })}

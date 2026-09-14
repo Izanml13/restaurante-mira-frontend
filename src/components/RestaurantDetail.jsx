@@ -7,6 +7,7 @@ import { crearResena, listarResenasDeRestaurante, darLikeResena, quitarLikeResen
 import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLocal, flagsPlato } from '../models/restaurantModel.js';
 import { pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
 import { Sellos, MiniLeyenda } from './Sellos.jsx';
+import RestaurantMap from './RestaurantMap.jsx';
 
 function marcaInfo(valor) {
   if (valor === true) return 'Sí';
@@ -16,11 +17,6 @@ function marcaInfo(valor) {
 
 const MOSTRAR_INICIAL = 10;
 
-function googleEmbedUrl(coords, direccion) {
-  if (coords) return `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`;
-  if (direccion) return `https://maps.google.com/maps?q=${encodeURIComponent(direccion)}&z=16&output=embed`;
-  return null;
-}
 function googleLink(coords, direccion) {
   if (coords) return `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
   if (direccion) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
@@ -45,7 +41,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   const [verTodas, setVerTodas] = useState(false);
   const [verTodasYelp, setVerTodasYelp] = useState(false);
   const [ordenResenas, setOrdenResenas] = useState('populares'); // populares | recientes
-  const [mapaExpandido, setMapaExpandido] = useState(false);
   const [reserva, setReserva] = useState({ fecha: '', hora: '', comensales: '2', comentarios: '' });
   const [disponibilidad, setDisponibilidad] = useState(null); // { limite, ocupadas, libres } | null
   const [meteoReserva, setMeteoReserva] = useState(null); // pronóstico del día elegido | null
@@ -85,7 +80,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
       </li>
     );
   }
-  const embedUrl = googleEmbedUrl(restaurant.coords, restaurant.direccion);
   const externalMapUrl = googleLink(restaurant.coords, restaurant.direccion);
 
   // Plazas libres del slot elegido (1 lectura al doc de aforo).
@@ -113,7 +107,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   const avisoTerraza = alertaTerraza(restaurant.terraza, meteoReserva);
 
   function cerrarDesdeFondo(e) { if (e.target === e.currentTarget) onClose(); }
-  function cerrarExpandido(e) { if (e.target === e.currentTarget) setMapaExpandido(false); }
 
   useEffect(()=>{
     let vivo=true;
@@ -271,15 +264,10 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 )}
               </section>
 
-              {embedUrl ? (
-                <section className="mapa-mini-wrap" aria-label={`Mapa de ${restaurant.nombre}`}>
-                  <div className="mapa-mini" onClick={()=>setMapaExpandido(true)} role="button" tabIndex={0} onKeyDown={e=> e.key==='Enter' && setMapaExpandido(true)} aria-label="Ampliar mapa">
-                    <iframe title={`Mapa con la ubicación de ${restaurant.nombre}`} src={embedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-                    <span className="mapa-mini-ampliar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Ampliar</span>
-                  </div>
-                  <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
-                </section>
-              ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
+              <section className="mapa-mini-wrap" aria-label={`Mapa de ${restaurant.nombre}`}>
+                <h3 className="modal-sub">Dónde está · parking</h3>
+                <RestaurantMap restaurant={restaurant} />
+              </section>
 
               <section aria-labelledby="resenas-titulo">
                 <h3 id="resenas-titulo" className="modal-sub">Reseñas ({resenasMira.length + resenasYelp.length})</h3>
@@ -342,17 +330,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
         </div>
       </div>
     </div>
-    {mapaExpandido && (
-      <div className="modal-fondo mapa-expandido-fondo" onClick={cerrarExpandido} role="dialog" aria-modal="true" aria-label="Mapa ampliado">
-        <div className="mapa-expandido">
-          <button type="button" className="modal-cerrar" onClick={()=>setMapaExpandido(false)} aria-label="Cerrar mapa ampliado">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
-          <iframe title={`Mapa ampliado de ${restaurant.nombre}`} src={embedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-          <a className="btn-secundario" href={externalMapUrl} target="_blank" rel="noreferrer" style={{position:'absolute',bottom:'1rem',left:'50%',transform:'translateX(-50%)'}}>Abrir en Google Maps</a>
-        </div>
-      </div>
-    )}
     </>
   );
 }

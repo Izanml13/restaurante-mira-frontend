@@ -1,10 +1,11 @@
 /**
- * View pura: barra de búsqueda con debounce + filtros día/hora/franja + tu ubicación.
+ * View pura: barra de búsqueda con debounce + filtros día/hora/franja.
+ * Distancia = al centro de la ciudad (sin geolocalización).
  */
 import { useEffect, useState } from 'react';
 import { DIAS, FRANJAS } from '../models/restaurantModel.js';
 
-export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distanciaDisponible, geoEstado, onChange, onClear }) {
+export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChange, onClear }) {
   const [qLocal, setQLocal] = useState(filtros.q);
   // En móvil los filtros empiezan plegados (menos scroll); en desktop siempre abiertos.
   const [plegado, setPlegado] = useState(() => window.innerWidth < 768);
@@ -21,9 +22,6 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
   }, [qLocal]);
 
   function manejarEnvio(e) { e.preventDefault(); }
-
-  const tuUbicacionDisabled = geoEstado !== 'ok';
-  const tooltipUbicacion = tuUbicacionDisabled ? 'Activa la ubicación para usar esta opción' : undefined;
 
   return (
     <form role="search" aria-label="Buscar restaurantes" className={`searchbar${plegado ? ' plegada' : ''}`} onSubmit={manejarEnvio}>
@@ -75,13 +73,10 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
         </select>
       </div>
 
-      <div className="campo" title={tooltipUbicacion}>
+      <div className="campo">
         <label htmlFor="f-zona">Zona</label>
         <select id="f-zona" name="zona" value={filtros.zona} onChange={(e) => onChange('zona', e.target.value)}>
           <option value="">Toda Cataluña</option>
-          <option value="__tu-ubicacion" disabled={tuUbicacionDisabled}>
-            Tu ubicación
-          </option>
           {opciones.zonas.map((z) => (
             <option key={z} value={z}>{z.replace(', Spain','')}</option>
           ))}
@@ -89,13 +84,11 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
       </div>
 
       <div className="campo">
-        <label htmlFor="f-distancia">Distancia</label>
+        <label htmlFor="f-distancia">Distancia al centro</label>
         <select
           id="f-distancia"
           name="distanciaMax"
           value={filtros.distanciaMax}
-          disabled={!distanciaDisponible}
-          title={distanciaDisponible ? undefined : 'Activa tu ubicación para filtrar por distancia'}
           onChange={(e) => onChange('distanciaMax', e.target.value)}
         >
           {opciones.distancias.map((d) => (
