@@ -104,11 +104,11 @@ export const PRECIOS = ['€', '€€', '€€€'];
  * value '' = sin filtro.
  */
 export const DISTANCIAS = [
-  { value: '', label: 'Cualquier distancia' },
-  { value: 1, label: 'A menos de 1 km' },
-  { value: 3, label: 'A menos de 3 km' },
-  { value: 5, label: 'A menos de 5 km' },
-  { value: 10, label: 'A menos de 10 km' },
+  { value: '', label: 'Cualquier distancia al centro' },
+  { value: 1, label: 'A menos de 1 km del centro' },
+  { value: 3, label: 'A menos de 3 km del centro' },
+  { value: 5, label: 'A menos de 5 km del centro' },
+  { value: 10, label: 'A menos de 10 km del centro' },
 ];
 
 /** Criterios de ordenación del filtro. */

@@ -13,6 +13,7 @@ import {
 } from '../services/restaurantApi.js';
 import { filterRestaurants, sortRestaurants } from '../services/filterService.js';
 import { completarRestaurante, dietaActiva, accesibilidadActiva, ZONAS_CATALUNA } from '../models/restaurantModel.js';
+import { centroDeZona } from '../services/cityCenters.js';
 
 const FILTROS_INICIALES = {
   q: '',
@@ -37,8 +38,7 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
   const [error, setError] = useState('');
   const [intento, setIntento] = useState(0);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
-  const [posicion, setPosicion] = useState(null); // { lat, lng } | null
-  const [geoEstado, setGeoEstado] = useState('pendiente'); // pendiente | ok | denegado | no-soportado
+  // Sin geolocalización: la distancia es al punto más céntrico de su ciudad.
   const [seleccionado, setSeleccionado] = useState(null); // Restaurant | null (modal detalle)
   const [libro, setLibro] = useState(null); // Restaurant | null (modal carta libro)
   const [ignorarDieta, setIgnorarDieta] = useState(false); // ver todo igual (solo sesión)
@@ -86,22 +86,6 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     };
   }, [filtros, intento]);
 
-  // Ubicación del usuario (opcional, no bloquea la carga).
-  useEffect(() => {
-    if (!('geolocation' in navigator)) {
-      setGeoEstado('no-soportado');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (p) => {
-        setPosicion({ lat: p.coords.latitude, lng: p.coords.longitude });
-        setGeoEstado('ok');
-      },
-      () => setGeoEstado('denegado'),
-      { timeout: 8000, maximumAge: 600000 },
-    );
-  }, []);
-
   // Cierra el modal con Escape (si el libro está abierto, él gestiona su propio Escape).
   useEffect(() => {
     if (!seleccionado || libro) return undefined;
@@ -135,11 +119,11 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
   const obtenerRestaurante = useCallback(
     async (id) => {
       const hallado = datos.find((r) => String(r.id) === String(id));
-      if (hallado) return completarRestaurante(hallado, posicion);
+      if (hallado) return completarRestaurante(hallado, centroDeZona(hallado.zona));
       const crudo = await fetchRestaurantePorId(id);
-      return crudo ? completarRestaurante(crudo, posicion) : null;
+      return crudo ? completarRestaurante(crudo, centroDeZona(crudo.zona)) : null;
     },
-    [datos, posicion],
+    [datos],
   );
 
   /** Actualiza un solo campo del filtro (lo usa SearchBar en cada onChange). */
@@ -160,10 +144,10 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     setIntento((i) => i + 1);
   }
 
-  // Distancias reales si hay ubicación; acento y media siempre (los pinta la View).
+  // Distancia al centro de su ciudad (sin geolocalización); acento y media siempre.
   const conDistancia = useMemo(
-    () => datos.map((r) => completarRestaurante(r, posicion)),
-    [datos, posicion],
+    () => datos.map((r) => completarRestaurante(r, centroDeZona(r.zona))),
+    [datos],
   );
 
   // Opciones sacadas de los datos reales (cocinas y zonas de Yelp).
@@ -183,10 +167,6 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     const dietaEfectiva = ignorarDieta ? null : dieta;
     const accEfectiva = ignorarDieta ? null : accesibilidad;
     const base = filterRestaurants(conDistancia, { ...filtros, dieta: dietaEfectiva, accesibilidad: accEfectiva });
-    // Si zona es tu-ubicación, ordenar por distancia automáticamente si orden es Relevancia
-    if (filtros.zona === '__tu-ubicacion' && filtros.orden === 'Relevancia') {
-      return sortRestaurants(base, 'Distancia');
-    }
     return sortRestaurants(base, filtros.orden);
   }, [conDistancia, filtros, dieta, accesibilidad, ignorarDieta]);
 
@@ -222,8 +202,8 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     cargarMas,
     estado,
     error,
-    geoEstado,
-    distanciaDisponible: geoEstado === 'ok',
+    geoEstado: 'centro',
+    distanciaDisponible: true,
     cocinasDisponibles,
     zonasDisponibles,
     seleccionado,
