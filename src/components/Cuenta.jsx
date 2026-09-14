@@ -155,7 +155,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           {[
             ['vegano', 'Vegano: solo platos 100% vegetales'],
             ['vegetariano', 'Vegetariano: sin carne ni pescado'],
-            ['sinGluten', 'Sin gluten'],
+            //['sinGluten', 'Sin gluten'],
           ].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
               <input

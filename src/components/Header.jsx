@@ -77,7 +77,6 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         <nav aria-label="Navegación principal" onClick={cerrar}>
           <ul className="nav-list">
             <li><a href="#inicio">Descubrir</a></li>
-            <li><a href="#buscar">Buscar</a></li>
             <li><a href="#/mapa">Mapa</a></li>
             <li><a href="#/contacto">Contacto</a></li>
           </ul>
