@@ -1796,6 +1796,23 @@ button.btn-texto {
   -webkit-overflow-scrolling: touch;
 }
 
+/* ---------- Mapa por zonas ---------- */
+.mapa-grande {
+  height: 65vh;
+  min-height: 380px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+  background: var(--fondo-suave);
+}
+
+.mapa-grande .leaflet-container {
+  height: 100%;
+  font: inherit;
+}
+
 /* ---------- Calendario de reservas ---------- */
 .cal-cab {
   display: flex;
