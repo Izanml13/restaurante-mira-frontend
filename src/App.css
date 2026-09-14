@@ -1919,3 +1919,36 @@ button.btn-texto {
     font-size: 0.6rem;
   }
 }
+
+/* ---------- Parkings cercanos (RestaurantMap) ---------- */
+.restaurant-map {
+  height: 350px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  overflow: hidden;
+  z-index: 0;
+  background: var(--fondo-suave);
+}
+.restaurant-map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  font: inherit;
+}
+.parkings-lista {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+.parkings-lista li {
+  border-top: 1px solid var(--borde);
+  padding-top: 0.35rem;
+}
+@media (max-width: 767px) {
+  .restaurant-map {
+    height: 300px;
+  }
+}
