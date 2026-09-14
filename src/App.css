@@ -496,6 +496,10 @@
   margin-top: auto;
 }
 
+.card .btn-secundario {
+  width: 100%;
+}
+
 /* ---------- Promo ---------- */
 .promo {
   background: var(--fondo-suave);
