@@ -2,10 +2,19 @@
  * Parkings cercanos con Overpass API (OpenStreetMap, gratis, sin clave).
  * Caché en memoria por coordenadas. Si falla, devuelve [] y la app
  * sigue funcionando sin parkings. 0 lecturas de Firestore.
+ *
+ * Nota CORS: en navegador el User-Agent lo pone el propio navegador
+ * (no se puede fijar por fetch - header prohibido). En Node sí se fija.
+ * Overpass exige GET + Accept en overpass-api.de; POST da 406 sin UA.
  */
 
 const CACHE = new Map();
-const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+
+// Endpoints por orden (se prueba el siguiente si el anterior falla/504/429)
+const ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+];
 
 function haversineM(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -25,14 +34,14 @@ function nombreParking(tags) {
 /**
  * @param {number} lat
  * @param {number} lng
- * @param {{ radio?: number, limite?: number }} opts radio en metros (def 800)
+ * @param {{ radio?: number, limite?: number }} opts radio en metros (def 1000)
  * @returns {Promise<{ id:string, lat:number, lng:number, nombre:string, distanciaM:number }[]>}
  */
-export async function buscarParkingsCercanos(lat, lng, { radio = 800, limite = 5 } = {}) {
+export async function buscarParkingsCercanos(lat, lng, { radio = 1000, limite = 5 } = {}) {
   if (lat == null || lng == null) return [];
   const clave = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)},${radio},${limite}`;
   if (!CACHE.has(clave)) {
-    CACHE.set(clave, consultarOverpass(lat, lng, radio, limite));
+    CACHE.set(clave, consultarConFallback(lat, lng, radio, limite));
   }
   try {
     return await CACHE.get(clave);
@@ -42,41 +51,66 @@ export async function buscarParkingsCercanos(lat, lng, { radio = 800, limite = 5
   }
 }
 
-async function consultarOverpass(lat, lng, radio, limite) {
-  const ql = `[out:json][timeout:15];(nwr["amenity"="parking"](around:${radio},${lat},${lng}););out center ${Math.min(30, limite * 6)};`;
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 15000);
-  try {
-    const res = await fetch(OVERPASS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body: `data=${encodeURIComponent(ql)}`,
-      signal: ctrl.signal,
-    });
-    if (!res.ok) return [];
-    const json = await res.json();
-    const els = Array.isArray(json.elements) ? json.elements : [];
-    return els
-      .map((e) => {
-        const plat = e.lat ?? e.center?.lat;
-        const plng = e.lon ?? e.center?.lon;
-        if (plat == null || plng == null) return null;
-        return {
-          id: `osm-${e.type}-${e.id}`,
-          lat: plat,
-          lng: plng,
-          nombre: nombreParking(e.tags),
-          distanciaM: Math.round(haversineM(lat, lng, plat, plng)),
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.distanciaM - b.distanciaM)
-      .slice(0, limite);
-  } catch {
-    return [];
-  } finally {
-    clearTimeout(t);
+async function consultarConFallback(lat, lng, radio, limite) {
+  // Intento 1: radio pedido. Si sale vacío, reintenta más lejos (1,5 km) antes de rendirse.
+  for (const r of radio < 1000 ? [radio, 1200] : [radio, 1500]) {
+    const res = await consultarOverpass(lat, lng, r, limite);
+    if (res.length > 0) return res;
+    // si vacío y era el último radio, devuelve vacío
+    if (r !== radio) return res;
+    // si vacío y queda reintento, sigue
   }
+  return [];
+}
+
+async function consultarOverpass(lat, lng, radio, limite) {
+  const ql = `[out:json][timeout:20];(nwr["amenity"="parking"](around:${radio},${lat},${lng}););out center ${Math.min(30, limite * 6)};`;
+  const qs = `data=${encodeURIComponent(ql)}`;
+  for (const base of ENDPOINTS) {
+    const url = `${base}?${qs}`;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        signal: ctrl.signal,
+      });
+      if (res.status === 429 || res.status === 504) {
+        // probar siguiente espejo
+        continue;
+      }
+      if (!res.ok) continue;
+      const text = await res.text();
+      // Overpass a veces devuelve XML de error aunque status 200: detectarlo
+      if (text.trim().startsWith('<')) continue;
+      const json = JSON.parse(text);
+      const els = Array.isArray(json.elements) ? json.elements : [];
+      const parkings = els
+        .map((e) => {
+          const plat = e.lat ?? e.center?.lat;
+          const plng = e.lon ?? e.center?.lon;
+          if (plat == null || plng == null) return null;
+          return {
+            id: `osm-${e.type}-${e.id}`,
+            lat: plat,
+            lng: plng,
+            nombre: nombreParking(e.tags),
+            distanciaM: Math.round(haversineM(lat, lng, plat, plng)),
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.distanciaM - b.distanciaM)
+        .slice(0, limite);
+      return parkings;
+    } catch {
+      // timeout/CORS/network: probar siguiente espejo
+      continue;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+  return [];
 }
 
 /** Texto corto "a 150 m" / "a 1,2 km". */

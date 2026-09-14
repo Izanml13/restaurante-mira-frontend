@@ -23,12 +23,13 @@ export default function RestaurantMap({ restaurant }) {
   const [cargando, setCargando] = useState(true);
 
   const coords = restaurant?.coords || null;
+  const id = restaurant?.id;
 
   const puntos = useMemo(() => {
     if (!coords) return [];
     return [
-      { tipo: 'restaurante', lat: coords.lat, lng: coords.lng },
-      ...parkings.map((p) => ({ tipo: 'parking', ...p })),
+      { lat: coords.lat, lng: coords.lng },
+      ...parkings.map((p) => ({ lat: p.lat, lng: p.lng })),
     ];
   }, [coords, parkings]);
 
@@ -41,35 +42,65 @@ export default function RestaurantMap({ restaurant }) {
       setCargando(false);
       return undefined;
     }
-    buscarParkingsCercanos(coords.lat, coords.lng, { radio: 800, limite: 5 })
-      .then((l) => vivo && (setParkings(l), setCargando(false)))
+    buscarParkingsCercanos(coords.lat, coords.lng, { radio: 1000, limite: 5 })
+      .then((l) => {
+        if (!vivo) return;
+        setParkings(Array.isArray(l) ? l : []);
+        setCargando(false);
+      })
       .catch(() => vivo && setCargando(false));
     return () => {
       vivo = false;
     };
-  }, [restaurant?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-  // Crear mapa una vez.
+  // Crear mapa cuando el contenedor existe (siempre renderizado si hay coords).
   useEffect(() => {
-    if (!refCont.current || refMapa.current || !coords) return undefined;
-    const mapa = L.map(refCont.current).setView([coords.lat, coords.lng], 16);
+    if (!coords) return undefined;
+    if (refMapa.current) return undefined;
+    if (!refCont.current) return undefined;
+    const mapa = L.map(refCont.current, { zoomControl: true }).setView([coords.lat, coords.lng], 16);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(mapa);
     refMapa.current = mapa;
     refCapa.current = L.layerGroup().addTo(mapa);
-    const t1 = setTimeout(() => mapa.invalidateSize(), 100);
-    const t2 = setTimeout(() => mapa.invalidateSize(), 500);
+    const t1 = setTimeout(() => mapa.invalidateSize(), 80);
+    const t2 = setTimeout(() => mapa.invalidateSize(), 400);
+    const t3 = setTimeout(() => mapa.invalidateSize(), 900);
+    const onResize = () => mapa.invalidateSize();
+    window.addEventListener('resize', onResize);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', onResize);
       mapa.remove();
       refMapa.current = null;
       refCapa.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [restaurant?.id]);
+  }, [id, coords, cargando]);
+
+  // Fallback: si el contenedor apareció después (cargando), reintenta crear
+  useEffect(() => {
+    if (refMapa.current || !refCont.current || !coords) return;
+    const mapa = L.map(refCont.current, { zoomControl: true }).setView([coords.lat, coords.lng], 16);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mapa);
+    refMapa.current = mapa;
+    refCapa.current = L.layerGroup().addTo(mapa);
+    setTimeout(() => mapa.invalidateSize(), 80);
+    return () => {
+      mapa.remove();
+      refMapa.current = null;
+      refCapa.current = null;
+    };
+  }, [coords]);
 
   // Repintar restaurante + parkings.
   useEffect(() => {
@@ -85,7 +116,9 @@ export default function RestaurantMap({ restaurant }) {
       fillColor: '#e74c3c',
       fillOpacity: 0.95,
     });
-    mkRest.bindPopup(`<strong>${escapar(restaurant.nombre)}</strong><br>${escapar(restaurant.direccion || restaurant.ciudad || '')}`);
+    mkRest.bindPopup(
+      `<strong>${escapar(restaurant.nombre)}</strong><br>${escapar(restaurant.direccion || restaurant.ciudad || '')}`,
+    );
     mkRest.addTo(capa);
 
     parkings.forEach((p) => {
@@ -111,7 +144,8 @@ export default function RestaurantMap({ restaurant }) {
     } else {
       mapa.setView([coords.lat, coords.lng], 16);
     }
-    setTimeout(() => mapa.invalidateSize(), 100);
+    setTimeout(() => mapa.invalidateSize(), 80);
+    setTimeout(() => mapa.invalidateSize(), 300);
     return undefined;
   }, [puntos, coords, parkings, restaurant]);
 
@@ -123,14 +157,21 @@ export default function RestaurantMap({ restaurant }) {
 
   return (
     <section className="mapa-detalle-wrap" aria-label={`Mapa de ${restaurant.nombre} con parkings`}>
-      <div ref={refCont} className="mapa-detalle" role="application" aria-label={`Ubicación de ${restaurant.nombre} y parkings cercanos`} />
+      <div
+        ref={refCont}
+        className="mapa-detalle"
+        role="application"
+        aria-label={`Ubicación de ${restaurant.nombre} y parkings cercanos`}
+      />
       <p className="mapa-mini-pie">
         {restaurant.direccion || restaurant.ciudad}
         {cargando
           ? ' · Buscando parkings cercanos…'
           : mejor
             ? ` · Parking recomendado: ${mejor.nombre} (${formatoDistancia(mejor.distanciaM)})`
-            : ' · Sin parkings registrados a menos de 800 m en OpenStreetMap.'}
+            : parkings.length === 0
+              ? ' · Sin parkings registrados a menos de 1 km en OpenStreetMap.'
+              : ''}
       </p>
       {!cargando && parkings.length > 0 && (
         <ul className="parking-lista" aria-label="Parkings cercanos">
@@ -143,6 +184,12 @@ export default function RestaurantMap({ restaurant }) {
             </li>
           ))}
         </ul>
+      )}
+      {!cargando && parkings.length === 0 && (
+        <p className="vacio-texto" style={{ fontSize: '0.82rem', margin: 0 }}>
+          Consejo: si no hay parking OSM a 1 km, prueba a alejar el mapa y buscar “parking” en el centro de{' '}
+          {restaurant.ciudad || 'la ciudad'}.
+        </p>
       )}
     </section>
   );
