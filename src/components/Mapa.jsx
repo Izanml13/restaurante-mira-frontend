@@ -25,38 +25,31 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   const [zona, setZona] = useState('');
   const intentoHecho = useRef(false);
 
-  // Datos: usa lo ya cargado si hay algo; solo trae todo si realmente falta.
+  // Datos: el mapa necesita TODO el conjunto para contar por zona.
+  // Ignora la paginación del buscador y trae la colección completa 1 vez.
   useEffect(() => {
     let vivo = true;
-    if (todos.length > 0) {
-      if (total > 0 && todos.length >= total) {
-        setFuente(todos);
-        setCargando(false);
-        return undefined;
-      }
-      // Muestra lo que ya hay mientras intenta el resto (evita pantalla vacía por cuota)
-      setFuente(todos);
-      setCargando(false);
-      if (intentoHecho.current) return undefined;
-      intentoHecho.current = true;
-      fetchRestaurants()
-        .then((l) => {
-          if (vivo && l.length > todos.length) setFuente(l);
-        })
-        .catch(() => {}); // ignora cuota, mantiene lo ya mostrado
-      return () => {
-        vivo = false;
-      };
-    }
-    if (intentoHecho.current) return undefined;
-    intentoHecho.current = true;
     fetchRestaurants()
-      .then((l) => vivo && (setFuente(l), setCargando(false)))
-      .catch((e) => vivo && (setError(e.message), setCargando(false)));
+      .then((l) => {
+        if (!vivo) return;
+        setFuente(l);
+        setCargando(false);
+      })
+      .catch((e) => {
+        if (!vivo) return;
+        // Fallback a lo paginado si falla por cuota
+        if (todos.length > 0) {
+          setFuente(todos);
+          setCargando(false);
+        } else {
+          setError(e.message);
+          setCargando(false);
+        }
+      });
     return () => {
       vivo = false;
     };
-  }, [todos, total]);
+  }, []);
 
   const porZona = useMemo(() => {
     const m = {};
