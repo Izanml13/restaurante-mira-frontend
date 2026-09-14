@@ -22,6 +22,7 @@ import Negocio from './components/Negocio.jsx';
 import Favoritos from './components/Favoritos.jsx';
 import Mensajes from './components/Mensajes.jsx';
 import Mapa from './components/Mapa.jsx';
+import Privacidad from './components/Privacidad.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import Footer from './components/Footer.jsx';
@@ -41,6 +42,7 @@ function rutaActual() {
   if (h === '#/favoritos') return 'favoritos';
   if (h === '#/mensajes') return 'mensajes';
   if (h === '#/mapa') return 'mapa';
+  if (h === '#/privacidad') return 'privacidad';
   return 'home';
 }
 
@@ -144,6 +146,7 @@ export default function App() {
           />
         )}
         {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
+        {ruta === 'privacidad' && <Privacidad />}
         {ruta === 'mapa' && <Mapa todos={todos} total={total} onVerDetalle={abrirDetalle} />}
         {ruta === 'home' && (
           <>

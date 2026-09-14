@@ -6,13 +6,12 @@
  */
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
-  fetchRestaurants,
   fetchPrimeraPagina,
   fetchSiguientePagina,
   fetchRestaurantePorId,
   contarRestaurantes,
 } from '../services/restaurantApi.js';
-import { filterRestaurants, sortRestaurants, necesitaCargaTotal } from '../services/filterService.js';
+import { filterRestaurants, sortRestaurants } from '../services/filterService.js';
 import { completarRestaurante, dietaActiva, accesibilidadActiva, ZONAS_CATALUNA } from '../models/restaurantModel.js';
 
 const FILTROS_INICIALES = {
@@ -58,30 +57,23 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     };
   }, [intento]);
 
-  // Carga según filtros: todo (filtros/orden global) o primera tanda (portada).
+  // Carga paginada: siempre trae tandas de 21, sin importar filtros.
+  // Los filtros se aplican en cliente sobre lo ya cargado.
   useEffect(() => {
     let vivo = true;
     const id = ++reqId.current;
-    const todo = necesitaCargaTotal(filtros);
-    setModo(todo ? 'todo' : 'pagina');
+    setModo('pagina');
     setEstado('cargando');
     setError('');
     setCursor(null);
     setHayMas(true);
     setCargandoMas(false);
-    const promesa = todo
-      ? fetchRestaurants()
-      : fetchPrimeraPagina().then((pg) => {
-          if (vivo && id === reqId.current) {
-            setCursor(pg.cursor);
-            setHayMas(!pg.terminado);
-          }
-          return pg.items;
-        });
-    promesa
-      .then((list) => {
+    fetchPrimeraPagina()
+      .then((pg) => {
         if (!vivo || id !== reqId.current) return;
-        setDatos(list);
+        setCursor(pg.cursor);
+        setHayMas(!pg.terminado);
+        setDatos(pg.items);
         setEstado('listo');
       })
       .catch((e) => {

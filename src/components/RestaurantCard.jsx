@@ -17,7 +17,7 @@ function disponibilidadTexto(r, filtros){
   return `Disponible ${dia ? dia : ''} ${franja ? `· ${franja}` : ''} ${hora ? hora : ''}`.trim();
 }
 
-export default function RestaurantCard({ restaurant, filtros, esFavorito, onToggleFavorito, onVerCarta, onSelect }) {
+export default function RestaurantCard({ restaurant, filtros, esFavorito, onToggleFavorito, onVerCarta, onSelect, children }) {
   const {
     nombre,
     cocina,
@@ -86,6 +86,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
         </p>
         {disp && <p className="card-disponibilidad" style={{fontSize:'0.78rem',color: disp.includes('Cerrado') ? '#b42318' : 'var(--verde)', fontWeight:600, margin:'0.1rem 0 0'}}>{disp}</p>}
         <p className="card-descripcion">{descripcion}</p>
+        {children}
         <p className="card-acciones">
           <button type="button" className="btn-reservar" onClick={() => onSelect(restaurant)}>
             Ver más información

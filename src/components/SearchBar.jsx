@@ -1,5 +1,5 @@
 /**
- * View pura: barra de búsqueda con debounce + filtros día/hora/franja + tu ubicación.
+ * View pura: barra de búsqueda (Enter para buscar) + filtros día/hora/franja + tu ubicación.
  */
 import { useEffect, useState } from 'react';
 import { DIAS, FRANJAS } from '../models/restaurantModel.js';
@@ -12,13 +12,12 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
   // sincroniza si filtro se limpia externamente
   useEffect(()=> setQLocal(filtros.q), [filtros.q]);
 
-  // debounce 300ms para búsqueda por nombre
-  useEffect(()=>{
-    const t = setTimeout(()=> {
+  function buscarSiEnter(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
       if (qLocal !== filtros.q) onChange('q', qLocal);
-    }, 300);
-    return ()=> clearTimeout(t);
-  }, [qLocal]);
+    }
+  }
 
   function manejarEnvio(e) { e.preventDefault(); }
 
@@ -39,6 +38,7 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, distan
             autoComplete="off"
             value={qLocal}
             onChange={(e) => setQLocal(e.target.value)}
+            onKeyDown={buscarSiEnter}
             style={{paddingLeft:'2.2rem'}}
           />
         </div>

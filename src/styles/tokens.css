@@ -13,11 +13,17 @@
   --estrella: #00664f;
   --papel: #ffffff; /* superficie de cards y modal */
 
+  /* Superficies semitransparentes para overlays sobre fotos */
+  --badge-bg: rgba(255, 255, 255, 0.96);
+  --fav-bg: rgba(255, 255, 255, 0.92);
+
   --fuente: 'Inter', system-ui, -apple-system, sans-serif;
 
   --radio: 12px;
   --radio-peq: 8px;
   --sombra-card: 0 1px 3px rgba(45, 51, 63, 0.12);
+  --sombra-card-hover: 0 12px 32px rgba(45, 51, 63, 0.14), 0 2px 8px rgba(45, 51, 63, 0.08);
+  --sombra-card-focus: 0 0 0 3px rgba(0, 102, 79, 0.15), 0 12px 32px rgba(45, 51, 63, 0.14);
   --sombra-flotante: 0 8px 28px rgba(45, 51, 63, 0.16);
   --ancho-max: 1120px;
 }
@@ -36,6 +42,12 @@
   --rojo: #e06055;
   --estrella: #3ecf8e;
   --papel: #20242c;
+
+  --badge-bg: rgba(32, 36, 44, 0.92);
+  --fav-bg: rgba(32, 36, 44, 0.88);
+
   --sombra-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --sombra-card-hover: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --sombra-card-focus: 0 0 0 3px rgba(13, 115, 83, 0.3), 0 12px 32px rgba(0, 0, 0, 0.45);
   --sombra-flotante: 0 8px 28px rgba(0, 0, 0, 0.55);
 }

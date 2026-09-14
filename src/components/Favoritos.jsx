@@ -171,8 +171,9 @@ export default function Favoritos({
                         onToggleFavorito={onToggleFavorito}
                         onVerCarta={onVerCarta}
                         onSelect={onReservar}
-                      />
-                      <p className="vacio-texto">{motivo}</p>
+                      >
+                        <p className="card-motivo">{motivo}</p>
+                      </RestaurantCard>
                     </li>
                   ))}
                 </ul>
