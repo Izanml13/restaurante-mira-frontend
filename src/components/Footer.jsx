@@ -46,6 +46,9 @@ export default function Footer() {
       </div>
       <div className="footer-bottom">
         <p>© 2026 MIRA · Hecho con datos de Yelp y reseñas de la comunidad</p>
+        <p>
+          <a href="#/privacidad">Política de privacidad</a>
+        </p>
       </div>
     </footer>
   );
