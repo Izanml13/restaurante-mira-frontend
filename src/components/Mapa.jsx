@@ -25,13 +25,28 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   const [zona, setZona] = useState('');
   const intentoHecho = useRef(false);
 
-  // Datos: lo cargado si cubre el total; si no, 1 carga completa.
+  // Datos: usa lo ya cargado si hay algo; solo trae todo si realmente falta.
   useEffect(() => {
     let vivo = true;
-    if (todos.length > 0 && total > 0 && todos.length >= total) {
+    if (todos.length > 0) {
+      if (total > 0 && todos.length >= total) {
+        setFuente(todos);
+        setCargando(false);
+        return undefined;
+      }
+      // Muestra lo que ya hay mientras intenta el resto (evita pantalla vacía por cuota)
       setFuente(todos);
       setCargando(false);
-      return undefined;
+      if (intentoHecho.current) return undefined;
+      intentoHecho.current = true;
+      fetchRestaurants()
+        .then((l) => {
+          if (vivo && l.length > todos.length) setFuente(l);
+        })
+        .catch(() => {}); // ignora cuota, mantiene lo ya mostrado
+      return () => {
+        vivo = false;
+      };
     }
     if (intentoHecho.current) return undefined;
     intentoHecho.current = true;
@@ -67,6 +82,8 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     }).addTo(mapa);
     refMapa.current = mapa;
     refCapa.current = L.layerGroup().addTo(mapa);
+    // Fix contenedor con altura 0 al montar en pestaña oculta
+    setTimeout(() => mapa.invalidateSize(), 200);
     return () => {
       mapa.remove();
       refMapa.current = null;
@@ -98,6 +115,8 @@ export default function Mapa({ todos, total, onVerDetalle }) {
       puntos.push([r.coords.lat, r.coords.lng]);
     });
     if (puntos.length) mapa.fitBounds(puntos, { padding: [30, 30], maxZoom: 13 });
+    else mapa.setView(CENTRO_CAT, 8);
+    setTimeout(() => mapa.invalidateSize(), 100);
     function alAbrirPopup(e) {
       const btn = e.popup?.getElement()?.querySelector('[data-ver-detalle]');
       if (btn) {
