@@ -1,10 +1,12 @@
-/** Página "Mi cuenta": datos + preferencias + negocio + reservas + incidencias + reseñas. */
+/** Página "Mi cuenta": datos + preferencias + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
 import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
 import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
+import { tieneMfa, enviarCodigoMfa, enrollMfa } from '../services/authApi.js';
+import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
 
 function hoyISO() {
   const h = new Date();
@@ -18,7 +20,6 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
   const [misResenas, setMisResenas] = useState([]);
   const [misNegocios, setMisNegocios] = useState([]);
   const [cargando, setCargando] = useState(true);
-  // Borrador de dieta (se guarda con el botón).
   const [borrador, setBorrador] = useState(() => normalizarDieta(dieta));
   const [guardandoPrefs, setGuardandoPrefs] = useState(false);
   const [prefsOk, setPrefsOk] = useState('');
@@ -38,145 +39,133 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
       .then(([todas, inc, res, neg]) => {
         if (!vivo) return;
         const hoy = hoyISO();
-        setProximas(
-          todas.filter((r) => r.estado === 'activa' && r.fecha >= hoy).slice(0, 3),
-        );
+        setProximas(todas.filter((r) => r.estado === 'activa' && r.fecha >= hoy).slice(0, 3));
         setIncidencias(inc.slice(0, 5));
         setMisResenas(res.slice(0, 5));
         setMisNegocios(neg.slice(0, 5));
         setCargando(false);
       })
       .catch(() => vivo && setCargando(false));
-    return () => {
-      vivo = false;
-    };
+    return () => { vivo = false; };
   }, [usuario]);
 
   const [borradorAcc, setBorradorAcc] = useState(() => normalizarAccesibilidad(accesibilidad));
   const [guardandoAcc, setGuardandoAcc] = useState(false);
   const [accOk, setAccOk] = useState('');
 
-  // Sincroniza los borradores cuando llegan los datos guardados.
-  useEffect(() => {
-    setBorrador(normalizarDieta(dieta));
-  }, [dieta]);
+  useEffect(() => { setBorrador(normalizarDieta(dieta)); }, [dieta]);
+  useEffect(() => { setBorradorAcc(normalizarAccesibilidad(accesibilidad)); }, [accesibilidad]);
 
-  useEffect(() => {
-    setBorradorAcc(normalizarAccesibilidad(accesibilidad));
-  }, [accesibilidad]);
-
-  function toggleDieta(campo) {
-    setBorrador((prev) => ({ ...prev, [campo]: !prev[campo] }));
-    setPrefsOk('');
-  }
-
-  function toggleAlergia(key) {
-    setBorrador((prev) => ({
-      ...prev,
-      alergias: prev.alergias.includes(key)
-        ? prev.alergias.filter((x) => x !== key)
-        : [...prev.alergias, key],
-    }));
-    setPrefsOk('');
-  }
+  function toggleDieta(campo) { setBorrador((prev) => ({ ...prev, [campo]: !prev[campo] })); setPrefsOk(''); }
+  function toggleAlergia(key) { setBorrador((prev) => ({ ...prev, alergias: prev.alergias.includes(key) ? prev.alergias.filter((x) => x !== key) : [...prev.alergias, key] })); setPrefsOk(''); }
 
   async function guardarPrefs(e) {
-    e.preventDefault();
-    setGuardandoPrefs(true);
-    setPrefsOk('');
-    try {
-      await guardarDieta(borrador);
-      setPrefsOk('Dieta guardada. El buscador ya la aplica.');
-    } catch {
-      setPrefsOk('No se pudo guardar. Inténtalo de nuevo.');
-    } finally {
-      setGuardandoPrefs(false);
-    }
+    e.preventDefault(); setGuardandoPrefs(true); setPrefsOk('');
+    try { await guardarDieta(borrador); setPrefsOk('Dieta guardada.'); }
+    catch { setPrefsOk('No se pudo guardar. Inténtalo de nuevo.'); }
+    finally { setGuardandoPrefs(false); }
   }
 
-  function toggleAcc(campo) {
-    setBorradorAcc((prev) => ({ ...prev, [campo]: !prev[campo] }));
-    setAccOk('');
-  }
-
+  function toggleAcc(campo) { setBorradorAcc((prev) => ({ ...prev, [campo]: !prev[campo] })); setAccOk(''); }
   async function guardarAcc(e) {
-    e.preventDefault();
-    setGuardandoAcc(true);
-    setAccOk('');
-    try {
-      await guardarAccesibilidad(borradorAcc);
-      setAccOk('Accesibilidad guardada. El buscador ya la aplica.');
-    } catch {
-      setAccOk('No se pudo guardar. Inténtalo de nuevo.');
-    } finally {
-      setGuardandoAcc(false);
+    e.preventDefault(); setGuardandoAcc(true); setAccOk('');
+    try { await guardarAccesibilidad(borradorAcc); setAccOk('Accesibilidad guardada.'); }
+    catch { setAccOk('No se pudo guardar. Inténtalo de nuevo.'); }
+    finally { setGuardandoAcc(false); }
+  }
+
+  // --- 2FA ---
+  const [mfaActivo, setMfaActivo] = useState(false);
+  const [mfaPaso, setMfaPaso] = useState('init');
+  const [mfaTelefono, setMfaTelefono] = useState('');
+  const [mfaCodigo, setMfaCodigo] = useState('');
+  const [mfaVerificationId, setMfaVerificationId] = useState(null);
+  const [mfaOk, setMfaOk] = useState('');
+  const [mfaError, setMfaError] = useState('');
+
+  useEffect(() => {
+    setMfaActivo(tieneMfa());
+  }, [usuario]);
+
+  async function activar2FA() {
+    setMfaError(''); setMfaOk('');
+    if (!mfaTelefono.match(/^\+[1-9]\d{6,14}$/)) {
+      setMfaError('Formato internacional requerido (ej: +34612345678).');
+      return;
     }
+    setMfaPaso('enviando');
+    try {
+      const { verificationId } = await enviarCodigoMfa(mfaTelefono, 'recaptcha-cuenta');
+      setMfaVerificationId(verificationId);
+      setMfaPaso('verificando');
+    } catch (err) {
+      setMfaError(err.message || 'No se pudo enviar el SMS.');
+      setMfaPaso('init');
+    }
+  }
+
+  async function confirmar2FA() {
+    if (mfaCodigo.length !== 6) { setMfaError('El código tiene 6 dígitos.'); return; }
+    setMfaError('');
+    try {
+      await enrollMfa(mfaVerificationId, mfaCodigo);
+      setMfaActivo(true); setMfaPaso('init'); setMfaCodigo('');
+      setMfaOk('2FA activado. Tu cuenta ahora requiere código SMS al iniciar sesión.');
+    } catch {
+      setMfaError('Código incorrecto o expirado.'); setMfaPaso('verificando');
+    }
+  }
+
+  // --- Cookies ---
+  const [cookiesPrefs, setCookiesPrefs] = useState({ ...COOKIE_DEFAULT });
+  const [cookiesOk, setCookiesOk] = useState('');
+  useEffect(() => {
+    if (!usuario?.uid) return;
+    leerCookies(usuario.uid).then(setCookiesPrefs);
+  }, [usuario]);
+
+  async function guardarCookiesCuenta() {
+    setCookiesOk('');
+    await guardarCookies(cookiesPrefs, usuario?.uid);
+    setCookiesOk('Preferencias de cookies guardadas.');
   }
 
   if (!usuario) return null;
 
   const inicial = (usuario.nombre || usuario.email || '?').trim().charAt(0).toUpperCase();
   const miembroDesde = usuario.creado
-    ? new Date(usuario.creado).toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
+    ? new Date(usuario.creado).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
 
   return (
     <section className="auth-pagina" aria-labelledby="cuenta-titulo">
       <div className="auth-tarjeta">
-        <p className="cuenta-avatar" aria-hidden="true">
-          {inicial}
-        </p>
+        <p className="cuenta-avatar" aria-hidden="true">{inicial}</p>
         <h1 id="cuenta-titulo">{usuario.nombre || 'Mi cuenta'}</h1>
         <dl className="cuenta-datos">
-          <div>
-            <dt>Correo</dt>
-            <dd>{usuario.email}</dd>
-          </div>
-          <div>
-            <dt>Miembro desde</dt>
-            <dd>{miembroDesde}</dd>
-          </div>
+          <div><dt>Correo</dt><dd>{usuario.email}</dd></div>
+          <div><dt>Miembro desde</dt><dd>{miembroDesde}</dd></div>
+          {mfaActivo && <div><dt>2FA</dt><dd style={{ color: 'var(--verde)' }}>✓ Activado</dd></div>}
         </dl>
         <p className="cuenta-acciones">
-          <a href="#buscar" className="btn-cta">
-            Buscar restaurantes
-          </a>
-          <button type="button" className="btn-secundario" onClick={onSalir}>
-            Cerrar sesión
-          </button>
+          <a href="#buscar" className="btn-cta">Buscar restaurantes</a>
+          <button type="button" className="btn-secundario" onClick={onSalir}>Cerrar sesión</button>
         </p>
 
+        {/* --- DIETA --- */}
         <h2 className="cuenta-sub">Mi dieta</h2>
         <form onSubmit={guardarPrefs} className="prefs-form">
-          {[
-            ['vegano', 'Vegano: solo platos 100% vegetales'],
-            ['vegetariano', 'Vegetariano: sin carne ni pescado'],
-            //['sinGluten', 'Sin gluten'],
-          ].map(([campo, etiqueta]) => (
+          {[['vegano', 'Vegano'], ['vegetariano', 'Vegetariano'], ['sinGluten', 'Sin gluten']].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
-              <input
-                id={`pref-${campo}`}
-                type="checkbox"
-                checked={Boolean(borrador[campo])}
-                onChange={() => toggleDieta(campo)}
-              />
+              <input id={`pref-${campo}`} type="checkbox" checked={Boolean(borrador[campo])} onChange={() => toggleDieta(campo)} />
               {etiqueta}
             </label>
           ))}
           <fieldset className="prefs-alergias">
-            <legend>Mis alergias (ocultan locales sin platos seguros)</legend>
+            <legend>Mis alergias</legend>
             {ALERGENOS.map(({ key, label }) => (
               <label key={key} className="campo-check" htmlFor={`alerg-${key}`}>
-                <input
-                  id={`alerg-${key}`}
-                  type="checkbox"
-                  checked={borrador.alergias.includes(key)}
-                  onChange={() => toggleAlergia(key)}
-                />
+                <input id={`alerg-${key}`} type="checkbox" checked={borrador.alergias.includes(key)} onChange={() => toggleAlergia(key)} />
                 {label}
               </label>
             ))}
@@ -184,54 +173,88 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           <button type="submit" className="btn-secundario btn-peq" disabled={guardandoPrefs}>
             {guardandoPrefs ? 'Guardando…' : 'Guardar dieta'}
           </button>
-          {prefsOk && (
-            <p className="vacio-texto" role="status">
-              {prefsOk}
-            </p>
-          )}
+          {prefsOk && <p className="vacio-texto" role="status">{prefsOk}</p>}
         </form>
 
+        {/* --- ACCESIBILIDAD --- */}
         <h2 className="cuenta-sub">Mi accesibilidad</h2>
         <form onSubmit={guardarAcc} className="prefs-form">
-          <p className="vacio-texto">
-            Solo verás locales con accesibilidad verificada. Sin dato verificado, el local se oculta.
-          </p>
+          <p className="vacio-texto">Solo verás locales con accesibilidad verificada.</p>
           <label className="campo-check" htmlFor="acc-silla">
-            <input
-              id="acc-silla"
-              type="checkbox"
-              checked={Boolean(borradorAcc.sillaRuedas)}
-              onChange={() => toggleAcc('sillaRuedas')}
-            />
-            Voy en silla de ruedas (acceso sin escalones)
+            <input id="acc-silla" type="checkbox" checked={Boolean(borradorAcc.sillaRuedas)} onChange={() => toggleAcc('sillaRuedas')} />
+            Silla de ruedas (acceso sin escalones)
           </label>
           <label className="campo-check" htmlFor="acc-tea">
-            <input
-              id="acc-tea"
-              type="checkbox"
-              checked={Boolean(borradorAcc.tea)}
-              onChange={() => toggleAcc('tea')}
-            />
-            Estoy en el espectro autista (prefiero entornos tranquilos)
+            <input id="acc-tea" type="checkbox" checked={Boolean(borradorAcc.tea)} onChange={() => toggleAcc('tea')} />
+            Espectro autista (entornos tranquilos)
           </label>
           <button type="submit" className="btn-secundario btn-peq" disabled={guardandoAcc}>
             {guardandoAcc ? 'Guardando…' : 'Guardar accesibilidad'}
           </button>
-          {accOk && (
-            <p className="vacio-texto" role="status">
-              {accOk}
-            </p>
-          )}
+          {accOk && <p className="vacio-texto" role="status">{accOk}</p>}
         </form>
 
+        {/* --- 2FA --- */}
+        <h2 className="cuenta-sub">Seguridad (2FA)</h2>
+        {mfaActivo ? (
+          <div className="prefs-form" style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
+            <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ La verificación en dos pasos está activa.</p>
+            <p className="vacio-texto">Cada vez que inicies sesión, recibirás un código SMS en tu teléfono registrado.</p>
+          </div>
+        ) : (
+          <div className="prefs-form" id="recaptcha-cuenta">
+            <p className="vacio-texto">Protege tu cuenta con un código SMS al iniciar sesión.</p>
+            {mfaError && <p className="reserva-error" role="alert">{mfaError}</p>}
+            {mfaPaso === 'init' && (
+              <>
+                <div className="campo">
+                  <label htmlFor="mfa-tel">Teléfono (formato internacional)</label>
+                  <input id="mfa-tel" type="tel" placeholder="+34612345678" value={mfaTelefono} onChange={(e) => setMfaTelefono(e.target.value)} />
+                </div>
+                <button type="button" className="btn-secundario btn-peq" onClick={activar2FA}>Activar 2FA</button>
+              </>
+            )}
+            {mfaPaso === 'enviando' && <p className="cargando" role="status">Enviando SMS…</p>}
+            {mfaPaso === 'verificando' && (
+              <>
+                <div className="campo">
+                  <label htmlFor="mfa-cod">Código de 6 dígitos</label>
+                  <input id="mfa-cod" type="text" inputMode="numeric" maxLength={6} placeholder="123456" value={mfaCodigo} onChange={(e) => setMfaCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))} autoFocus />
+                </div>
+                <button type="button" className="btn-secundario btn-peq" onClick={confirmar2FA}>Confirmar</button>
+                <button type="button" className="btn-texto" onClick={() => { setMfaPaso('init'); setMfaCodigo(''); }}>Cancelar</button>
+              </>
+            )}
+            {mfaOk && <p className="vacio-texto" role="status" style={{ color: 'var(--verde)' }}>{mfaOk}</p>}
+          </div>
+        )}
+
+        {/* --- COOKIES --- */}
+        <h2 className="cuenta-sub">Preferencias de cookies</h2>
+        <div className="prefs-form">
+          <p className="vacio-texto">Controla qué types de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.</p>
+          {COOKIE_CATEGORIAS.filter((c) => !c.requerida).map((cat) => (
+            <label key={cat.key} className="campo-check" htmlFor={`cookie-${cat.key}`}>
+              <input
+                id={`cookie-${cat.key}`}
+                type="checkbox"
+                checked={Boolean(cookiesPrefs[cat.key])}
+                onChange={() => setCookiesPrefs((p) => ({ ...p, [cat.key]: !p[cat.key] }))}
+              />
+              {cat.label} — <span style={{ fontSize: '0.82rem', color: 'var(--gris)' }}>{cat.desc}</span>
+            </label>
+          ))}
+          <button type="button" className="btn-secundario btn-peq" onClick={guardarCookiesCuenta}>
+            Guardar cookies
+          </button>
+          {cookiesOk && <p className="vacio-texto" role="status">{cookiesOk}</p>}
+        </div>
+
+        {/* --- NEGOCIO --- */}
         {perfil?.tipo === 'empresa' && (
           <>
             <h2 className="cuenta-sub">Mi negocio</h2>
-            <p>
-              <a href="#/negocio" className="btn-cta btn-peq">
-                Añadir restaurante
-              </a>
-            </p>
+            <p><a href="#/negocio" className="btn-cta btn-peq">Añadir restaurante</a></p>
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">
                 {misNegocios.map((n) => (
@@ -249,11 +272,10 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           </>
         )}
 
+        {/* --- RESERVAS --- */}
         <h2 className="cuenta-sub">Mis próximas reservas</h2>
         {cargando && <p>Cargando…</p>}
-        {!cargando && proximas.length === 0 && (
-          <p className="vacio-texto">Sin próximas reservas.</p>
-        )}
+        {!cargando && proximas.length === 0 && <p className="vacio-texto">Sin próximas reservas.</p>}
         {!cargando && proximas.length > 0 && (
           <ul className="lista-registros">
             {proximas.map((r) => (
@@ -261,22 +283,18 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
                 <div>
                   <strong>{r.nombreRestaurante}</strong>
                   <div className="registro-detalle">
-                    {r.fecha} a las {r.hora} · {r.comensales}{' '}
-                    {Number(r.comensales) === 1 ? 'persona' : 'personas'} · <code>{r.codigo}</code>
+                    {r.fecha} a las {r.hora} · {r.comensales} {Number(r.comensales) === 1 ? 'persona' : 'personas'} · <code>{r.codigo}</code>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
         )}
-        <p>
-          <a href="#/reservas">Ver todas mis reservas</a>
-        </p>
+        <p><a href="#/reservas">Ver todas mis reservas</a></p>
 
+        {/* --- INCIDENCIAS --- */}
         <h2 className="cuenta-sub">Mis incidencias</h2>
-        {!cargando && incidencias.length === 0 && (
-          <p className="vacio-texto">Sin incidencias. Escríbenos desde Contacto.</p>
-        )}
+        {!cargando && incidencias.length === 0 && <p className="vacio-texto">Sin incidencias.</p>}
         {!cargando && incidencias.length > 0 && (
           <ul className="lista-registros">
             {incidencias.map((r) => (
@@ -290,19 +308,16 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           </ul>
         )}
 
+        {/* --- RESEÑAS --- */}
         <h2 className="cuenta-sub">Mis reseñas</h2>
-        {!cargando && misResenas.length === 0 && (
-          <p className="vacio-texto">Aún no has publicado reseñas.</p>
-        )}
+        {!cargando && misResenas.length === 0 && <p className="vacio-texto">Aún no has publicado reseñas.</p>}
         {!cargando && misResenas.length > 0 && (
           <ul className="lista-registros">
             {misResenas.map((r) => (
               <li key={r.id} className="registro">
                 <div>
                   <strong>★ {r.puntuacion}</strong>
-                  <span className="registro-detalle">
-                    {' '}· {r.fecha || (r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('es-ES') : '')} · {r.likes || 0} likes
-                  </span>
+                  <span className="registro-detalle"> · {r.fecha || ''} · {r.likes || 0} likes</span>
                   <div className="registro-detalle">{r.comentario}</div>
                 </div>
               </li>

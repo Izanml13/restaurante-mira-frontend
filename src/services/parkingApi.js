@@ -1,97 +1,149 @@
 /**
- * Parkings cercanos vía Overpass API (amenity=parking, radio 500m).
- * Caché localStorage 48h, timeout 8s, orden por distancia, máx 10.
+ * Parkings cercanos con Overpass API (OpenStreetMap, gratis, sin clave).
+ * Caché en memoria por coordenadas. Si falla, devuelve [] y la app
+ * sigue funcionando sin parkings. 0 lecturas de Firestore.
+ *
+ * Nota CORS: en navegador el User-Agent lo pone el propio navegador
+ * (no se puede fijar por fetch - header prohibido). En Node sí se fija.
+ * Overpass exige GET + Accept en overpass-api.de; POST da 406 sin UA.
  */
-import { haversineKm } from '../models/restaurantModel.js';
 
-const TTL_MS = 48 * 60 * 60 * 1000;
-const TIMEOUT_MS = 8000;
-const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+const CACHE = new Map();
 
-function claveCache(lat, lng) {
-  return `parkings_${Number(lat).toFixed(4)}_${Number(lng).toFixed(4)}`;
+// Endpoints por orden (se prueba el siguiente si el anterior falla/504/429)
+const ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.nchc.org.tw/api/interpreter',
+];
+
+function haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const rad = (g) => (g * Math.PI) / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-function leerCache(lat, lng) {
-  try {
-    const raw = localStorage.getItem(claveCache(lat, lng));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed.t !== 'number' || !Array.isArray(parsed.data)) return null;
-    if (Date.now() - parsed.t > TTL_MS) {
-      localStorage.removeItem(claveCache(lat, lng));
-      return null;
-    }
-    return parsed.data;
-  } catch {
-    return null;
-  }
-}
-
-function guardarCache(lat, lng, data) {
-  try {
-    localStorage.setItem(claveCache(lat, lng), JSON.stringify({ t: Date.now(), data }));
-  } catch {
-    // quota excedida -> ignorar
-  }
-}
-
-function construirUrl(lat, lng) {
-  const query = `[out:json][timeout:10];(node["amenity"="parking"](around:500,${lat},${lng});way["amenity"="parking"](around:500,${lat},${lng}););out center tags;`;
-  return `${OVERPASS_URL}?data=${encodeURIComponent(query)}`;
-}
-
-function normalizarElemento(el, latOrigen, lngOrigen) {
-  const plat = el.lat ?? el.center?.lat;
-  const plng = el.lon ?? el.center?.lon;
-  if (typeof plat !== 'number' || typeof plng !== 'number') return null;
-  const tags = el.tags || {};
-  const distanciaM = Math.round(haversineKm(latOrigen, lngOrigen, plat, plng) * 1000);
-  let gratuito = null;
-  if (tags.fee === 'yes') gratuito = 'yes';
-  else if (tags.fee === 'no') gratuito = 'no';
-  const plazas = tags.capacity != null && String(tags.capacity).trim() !== '' ? Number(tags.capacity) : null;
-  return {
-    id: String(el.id),
-    nombre: (tags.name && String(tags.name).trim()) || 'Parking',
-    lat: plat,
-    lng: plng,
-    gratuito,
-    plazas: Number.isFinite(plazas) ? plazas : null,
-    horario: tags.opening_hours || null,
-    distanciaM,
-  };
+function nombreParking(tags) {
+  if (!tags) return 'Parking';
+  return (
+    tags.name ||
+    tags.operator ||
+    (tags['addr:street'] ? `Parking ${tags['addr:street']}` : null) ||
+    (tags.parking ? `Parking (${tags.parking})` : 'Parking')
+  );
 }
 
 /**
- * Parkings cercanos (≤500m) ordenados por distancia.
  * @param {number} lat
  * @param {number} lng
- * @returns {Promise<Array<{id:string,nombre:string,lat:number,lng:number,gratuito:string|null,plazas:number|null,horario:string|null,distanciaM:number}>>}
+ * @param {{ radio?: number, limite?: number }} opts radio en metros (def 1000)
+ * @returns {Promise<{ id:string, lat:number, lng:number, nombre:string, distanciaM:number }[]>}
  */
-export async function fetchNearbyParkings(lat, lng) {
-  if (typeof lat !== 'number' || typeof lng !== 'number' || Number.isNaN(lat) || Number.isNaN(lng)) return [];
-
-  const cached = leerCache(lat, lng);
-  if (cached) return cached;
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(construirUrl(lat, lng), { signal: controller.signal });
-    if (!res.ok) return [];
-    const json = await res.json();
-    const elements = Array.isArray(json.elements) ? json.elements : [];
-    const lista = elements
-      .map((el) => normalizarElemento(el, lat, lng))
-      .filter(Boolean)
-      .sort((a, b) => a.distanciaM - b.distanciaM)
-      .slice(0, 10);
-    guardarCache(lat, lng, lista);
-    return lista;
-  } catch {
-    return [];
-  } finally {
-    clearTimeout(timer);
+export async function buscarParkingsCercanos(lat, lng, { radio = 1000, limite = 5 } = {}) {
+  if (lat == null || lng == null) return [];
+  const clave = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)},${radio},${limite}`;
+  if (!CACHE.has(clave)) {
+    CACHE.set(clave, consultarConFallback(lat, lng, radio, limite));
   }
+  try {
+    return await CACHE.get(clave);
+  } catch {
+    CACHE.delete(clave);
+    return [];
+  }
+}
+
+async function consultarConFallback(lat, lng, radio, limite) {
+  // Radios progresivos: si no hay nada a 1km, se abre a 2km y 3km antes de rendirse.
+  // En pueblos OSM tiene pocos parkings mapeados y el radio corto daba vacío siempre.
+  const radios = radio < 1000 ? [radio, 1200, 2000] : radio <= 1500 ? [radio, 2000, 3000] : [radio];
+  let ultimo = [];
+  for (const r of radios) {
+    const res = await consultarOverpass(lat, lng, r, limite);
+    if (res.length > 0) return res;
+    ultimo = res;
+  }
+  return ultimo;
+}
+
+async function consultarOverpass(lat, lng, radio, limite) {
+  // Búsqueda amplia: amenity=parking + parking_space + cualquier objeto con tag parking=*.
+  // Antes solo amenity="parking" y se perdían parkings subterráneos, parkings privados
+  // mapeados como parking_space y aparcamientos disuasorios.
+  const ql = `[out:json][timeout:25];(nwr["amenity"~"^(parking|parking_space)$"](around:${radio},${lat},${lng});nwr["parking"](around:${radio},${lat},${lng}););out center ${Math.min(40, limite * 8)};`;
+  const qs = `data=${encodeURIComponent(ql)}`;
+  for (const base of ENDPOINTS) {
+    const url = `${base}?${qs}`;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 25000);
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        signal: ctrl.signal,
+      });
+      if (res.status === 429 || res.status === 504) {
+        // probar siguiente espejo
+        continue;
+      }
+      if (!res.ok) continue;
+      const text = await res.text();
+      // Overpass a veces devuelve XML de error aunque status 200: detectarlo
+      if (text.trim().startsWith('<')) continue;
+      const json = JSON.parse(text);
+      const els = Array.isArray(json.elements) ? json.elements : [];
+      const parkings = els
+        .map((e) => {
+          const plat = e.lat ?? e.center?.lat;
+          const plng = e.lon ?? e.center?.lon;
+          if (plat == null || plng == null) return null;
+          return {
+            id: `osm-${e.type}-${e.id}`,
+            lat: plat,
+            lng: plng,
+            nombre: nombreParking(e.tags),
+            distanciaM: Math.round(haversineM(lat, lng, plat, plng)),
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.distanciaM - b.distanciaM)
+        .slice(0, limite);
+      return parkings;
+    } catch {
+      // timeout/CORS/network: probar siguiente espejo
+      continue;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+  return [];
+}
+
+/**
+ * Alias para RestaurantDetail: busca parkings cercanos (≤radio, defecto 1500m).
+ * Wrapper de buscarParkingsCercanos con la interfaz que espera el componente.
+ */
+export async function fetchNearbyParkings(lat, lng, radio = 1500) {
+  return buscarParkingsCercanos(lat, lng, { radio, limite: 10 });
+}
+
+/** Texto corto "a 150 m" / "a 1,2 km". */
+export function formatoDistancia(m) {
+  if (m == null) return '';
+  if (m < 1000) return `a ${m} m`;
+  return `a ${(m / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 })} km`;
+}
+
+/** Enlace Google Maps a un punto. */
+export function mapsLink(lat, lng) {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+
+/** Búsqueda de parkings en Google Maps alrededor del restaurante (fallback cuando OSM va vacío). */
+export function buscarParkingEnGoogle(lat, lng) {
+  return `https://www.google.com/maps/search/?api=1&query=parking+near+${lat},${lng}`;
 }
