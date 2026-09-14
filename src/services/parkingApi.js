@@ -14,6 +14,7 @@ const CACHE = new Map();
 const ENDPOINTS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.nchc.org.tw/api/interpreter',
 ];
 
 function haversineM(lat1, lon1, lat2, lon2) {
@@ -28,7 +29,12 @@ function haversineM(lat1, lon1, lat2, lon2) {
 
 function nombreParking(tags) {
   if (!tags) return 'Parking';
-  return tags.name || tags.operator || (tags['addr:street'] ? `Parking ${tags['addr:street']}` : 'Parking');
+  return (
+    tags.name ||
+    tags.operator ||
+    (tags['addr:street'] ? `Parking ${tags['addr:street']}` : null) ||
+    (tags.parking ? `Parking (${tags.parking})` : 'Parking')
+  );
 }
 
 /**
@@ -52,24 +58,28 @@ export async function buscarParkingsCercanos(lat, lng, { radio = 1000, limite = 
 }
 
 async function consultarConFallback(lat, lng, radio, limite) {
-  // Intento 1: radio pedido. Si sale vacío, reintenta más lejos (1,5 km) antes de rendirse.
-  for (const r of radio < 1000 ? [radio, 1200] : [radio, 1500]) {
+  // Radios progresivos: si no hay nada a 1km, se abre a 2km y 3km antes de rendirse.
+  // En pueblos OSM tiene pocos parkings mapeados y el radio corto daba vacío siempre.
+  const radios = radio < 1000 ? [radio, 1200, 2000] : radio <= 1500 ? [radio, 2000, 3000] : [radio];
+  let ultimo = [];
+  for (const r of radios) {
     const res = await consultarOverpass(lat, lng, r, limite);
     if (res.length > 0) return res;
-    // si vacío y era el último radio, devuelve vacío
-    if (r !== radio) return res;
-    // si vacío y queda reintento, sigue
+    ultimo = res;
   }
-  return [];
+  return ultimo;
 }
 
 async function consultarOverpass(lat, lng, radio, limite) {
-  const ql = `[out:json][timeout:20];(nwr["amenity"="parking"](around:${radio},${lat},${lng}););out center ${Math.min(30, limite * 6)};`;
+  // Búsqueda amplia: amenity=parking + parking_space + cualquier objeto con tag parking=*.
+  // Antes solo amenity="parking" y se perdían parkings subterráneos, parkings privados
+  // mapeados como parking_space y aparcamientos disuasorios.
+  const ql = `[out:json][timeout:25];(nwr["amenity"~"^(parking|parking_space)$"](around:${radio},${lat},${lng});nwr["parking"](around:${radio},${lat},${lng}););out center ${Math.min(40, limite * 8)};`;
   const qs = `data=${encodeURIComponent(ql)}`;
   for (const base of ENDPOINTS) {
     const url = `${base}?${qs}`;
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 20000);
+    const t = setTimeout(() => ctrl.abort(), 25000);
     try {
       const res = await fetch(url, {
         method: 'GET',
@@ -123,4 +133,9 @@ export function formatoDistancia(m) {
 /** Enlace Google Maps a un punto. */
 export function mapsLink(lat, lng) {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+
+/** Búsqueda de parkings en Google Maps alrededor del restaurante (fallback cuando OSM va vacío). */
+export function buscarParkingEnGoogle(lat, lng) {
+  return `https://www.google.com/maps/search/?api=1&query=parking+near+${lat},${lng}`;
 }

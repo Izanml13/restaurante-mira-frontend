@@ -24,6 +24,7 @@ import Mensajes from './components/Mensajes.jsx';
 import Mapa from './components/Mapa.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
+import CookieBanner from './components/CookieBanner.jsx';
 import Footer from './components/Footer.jsx';
 import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
@@ -219,6 +220,7 @@ export default function App() {
         )}
       </main>
       <Footer />
+      <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
     </>
