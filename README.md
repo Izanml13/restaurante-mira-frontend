@@ -35,6 +35,7 @@ Todo el filtrado es 100% cliente. Sin backend propio.
 | `#/contacto` | Formulario de contacto |
 | `#/reservas` | Mis reservas (calendario con meteo, próximas/pasadas/canceladas) |
 | `#/favoritos` | Guardados + comparador de cartas (máx 3) |
+| `#/mapa` | Mapa Leaflet con locales por zona (clic → detalle) |
 | `#/mensajes` | Buzón interno (avisos 24h de TEAM MIRA) |
 | `#/negocio` | Proponer restaurante (cuentas empresa) |
 | `#/admin` | Incidencias y locales pendientes (solo allowlist) |
@@ -201,6 +202,7 @@ Además, en Authentication → Método de inicio de sesión, activa
 | Seguir deslizando | 21 lecturas por tanda |
 | Filtrar / ordenar global | ~690 lecturas (1 vez, conjunto entero) |
 | Filtrar / ordenar | 0 extra (todo en cliente tras cargar) |
+| Abrir el mapa | 0 si ya está todo cargado; ~690 una vez si no |
 | Crear cuenta / entrar | 0 en Firestore (perfil: 1 lectura por sesión) |
 | Enviar contacto | 1 escritura |
 | Aviso 24h (script) | 1 query + 1 escritura por reserva |
