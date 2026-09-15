@@ -12,3 +12,4 @@ Thumbs.db
 # Entorno local
 .env
 .env.local
+.env.example
