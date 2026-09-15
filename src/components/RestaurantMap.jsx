@@ -1,204 +1,78 @@
 /**
- * Mapa del restaurante + parkings cercanos (Overpass API, sin claves).
- * Muestra el local y los parkings recomendados alrededor.
+ * Mapa Leaflet del restaurante + parkings cercanos (react-leaflet).
+ * - Marker rojo restaurante, markers azules parkings
+ * - fitBounds automático con padding 40px
+ * - OSM TileLayer con attribution
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { buscarParkingsCercanos, formatoDistancia, mapsLink, buscarParkingEnGoogle } from '../services/parkingApi.js';
 
-function escapar(s) {
-  return String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+function crearIcono(color) {
+  return L.divIcon({
+    className: '',
+    html: `<span style="display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,0.35);"><span style="width:10px;height:10px;border-radius:50%;background:#fff;display:block"></span></span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
+  });
 }
 
-export default function RestaurantMap({ restaurant }) {
-  const refCont = useRef(null);
-  const refMapa = useRef(null);
-  const refCapa = useRef(null);
-  const [parkings, setParkings] = useState([]);
-  const [cargando, setCargando] = useState(true);
+const iconoRestaurante = crearIcono('#d92d20');
+const iconoParking = crearIcono('#2563eb');
 
-  const coords = restaurant?.coords || null;
-  const id = restaurant?.id;
-
-  const puntos = useMemo(() => {
-    if (!coords) return [];
-    return [
-      { lat: coords.lat, lng: coords.lng },
-      ...parkings.map((p) => ({ lat: p.lat, lng: p.lng })),
-    ];
-  }, [coords, parkings]);
-
-  // Cargar parkings una vez por restaurante (radio base 1,5 km; el servicio
-  // amplía solo a 2-3 km si sale vacío).
+function FitBounds({ puntos }) {
+  const map = useMap();
   useEffect(() => {
-    let vivo = true;
-    setCargando(true);
-    setParkings([]);
-    if (!coords) {
-      setCargando(false);
-      return undefined;
-    }
-    buscarParkingsCercanos(coords.lat, coords.lng, { radio: 1500, limite: 5 })
-      .then((l) => {
-        if (!vivo) return;
-        setParkings(Array.isArray(l) ? l : []);
-        setCargando(false);
-      })
-      .catch(() => vivo && setCargando(false));
-    return () => {
-      vivo = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  // Crear mapa cuando el contenedor existe (siempre renderizado si hay coords).
-  useEffect(() => {
-    if (!coords) return undefined;
-    if (refMapa.current) return undefined;
-    if (!refCont.current) return undefined;
-    const mapa = L.map(refCont.current, { zoomControl: true }).setView([coords.lat, coords.lng], 16);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(mapa);
-    refMapa.current = mapa;
-    refCapa.current = L.layerGroup().addTo(mapa);
-    const t1 = setTimeout(() => mapa.invalidateSize(), 80);
-    const t2 = setTimeout(() => mapa.invalidateSize(), 400);
-    const t3 = setTimeout(() => mapa.invalidateSize(), 900);
-    const onResize = () => mapa.invalidateSize();
-    window.addEventListener('resize', onResize);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      window.removeEventListener('resize', onResize);
-      mapa.remove();
-      refMapa.current = null;
-      refCapa.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, coords, cargando]);
-
-  // Fallback: si el contenedor apareció después (cargando), reintenta crear
-  useEffect(() => {
-    if (refMapa.current || !refCont.current || !coords) return;
-    const mapa = L.map(refCont.current, { zoomControl: true }).setView([coords.lat, coords.lng], 16);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(mapa);
-    refMapa.current = mapa;
-    refCapa.current = L.layerGroup().addTo(mapa);
-    setTimeout(() => mapa.invalidateSize(), 80);
-    return () => {
-      mapa.remove();
-      refMapa.current = null;
-      refCapa.current = null;
-    };
-  }, [coords]);
-
-  // Repintar restaurante + parkings.
-  useEffect(() => {
-    const mapa = refMapa.current;
-    const capa = refCapa.current;
-    if (!mapa || !capa || !coords) return undefined;
-    capa.clearLayers();
-
-    const mkRest = L.circleMarker([coords.lat, coords.lng], {
-      radius: 10,
-      color: '#b03a2e',
-      weight: 3,
-      fillColor: '#e74c3c',
-      fillOpacity: 0.95,
-    });
-    mkRest.bindPopup(
-      `<strong>${escapar(restaurant.nombre)}</strong><br>${escapar(restaurant.direccion || restaurant.ciudad || '')}`,
-    );
-    mkRest.addTo(capa);
-
-    parkings.forEach((p) => {
-      const icono = L.divIcon({
-        className: 'parking-pin',
-        html: `<span aria-hidden="true">P</span>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-      });
-      const mk = L.marker([p.lat, p.lng], { icon: icono, title: p.nombre });
-      mk.bindPopup(
-        `<strong>${escapar(p.nombre)}</strong><br>Parking ${escapar(formatoDistancia(p.distanciaM))} del restaurante<br>` +
-          `<a href="${escapar(mapsLink(p.lat, p.lng))}" target="_blank" rel="noreferrer">Cómo llegar al parking</a>`,
-      );
-      mk.addTo(capa);
-    });
-
-    if (puntos.length > 1) {
-      mapa.fitBounds(
-        puntos.map((p) => [p.lat, p.lng]),
-        { padding: [35, 35], maxZoom: 16 },
-      );
+    if (!puntos.length) return;
+    if (puntos.length === 1) {
+      map.setView(puntos[0], 15);
     } else {
-      mapa.setView([coords.lat, coords.lng], 16);
+      map.fitBounds(puntos, { padding: [40, 40] });
     }
-    setTimeout(() => mapa.invalidateSize(), 80);
-    setTimeout(() => mapa.invalidateSize(), 300);
-    return undefined;
-  }, [puntos, coords, parkings, restaurant]);
+    setTimeout(() => map.invalidateSize(), 100);
+  }, [map, puntos]);
+  return null;
+}
 
-  if (!coords) {
-    return <p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>;
-  }
+export default function RestaurantMap({ restaurant, parkings = [] }) {
+  const coords = restaurant?.coords;
+  if (!coords) return null;
 
-  const mejor = parkings[0] || null;
+  const puntos = [[coords.lat, coords.lng], ...parkings.map((p) => [p.lat, p.lng])];
 
   return (
-    <section className="mapa-detalle-wrap" aria-label={`Mapa de ${restaurant.nombre} con parkings`}>
-      <div
-        ref={refCont}
-        className="mapa-detalle"
-        role="application"
-        aria-label={`Ubicación de ${restaurant.nombre} y parkings cercanos`}
-      />
-      <p className="mapa-mini-pie">
-        {restaurant.direccion || restaurant.ciudad}
-        {cargando
-          ? ' · Buscando parkings cercanos…'
-          : mejor
-            ? ` · Parking recomendado: ${mejor.nombre} (${formatoDistancia(mejor.distanciaM)})`
-            : parkings.length === 0
-              ? ' · Sin parkings registrados en OpenStreetMap hasta 3 km.'
-              : ''}
-      </p>
-      {!cargando && parkings.length > 0 && (
-        <ul className="parking-lista" aria-label="Parkings cercanos">
-          {parkings.slice(0, 3).map((p) => (
-            <li key={p.id}>
-              <strong>P</strong> {p.nombre} · {formatoDistancia(p.distanciaM)} ·{' '}
-              <a href={mapsLink(p.lat, p.lng)} target="_blank" rel="noreferrer">
-                Cómo llegar
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-      {!cargando && parkings.length === 0 && (
-        <p className="vacio-texto" style={{ fontSize: '0.82rem', margin: 0 }}>
-          Sin parkings OSM hasta 3 km (en pueblos hay pocos mapeados).{' '}
-          <a
-            href={buscarParkingEnGoogle(coords.lat, coords.lng)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Buscar parking en Google Maps
-          </a>
-          .
-        </p>
-      )}
-    </section>
+    <div className="restaurant-map" role="application" aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+      <MapContainer
+        center={[coords.lat, coords.lng]}
+        zoom={15}
+        scrollWheelZoom={false}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={[coords.lat, coords.lng]} icon={iconoRestaurante}>
+          <Popup>
+            <strong>{restaurant.nombre}</strong>
+            <br />
+            {restaurant.direccion || restaurant.ciudad || ''}
+          </Popup>
+        </Marker>
+        {parkings.map((p) => (
+          <Marker key={p.id} position={[p.lat, p.lng]} icon={iconoParking}>
+            <Popup>
+              <strong>{p.nombre}</strong>
+              <br />
+              {p.gratuito === 'yes' ? 'Gratis' : p.gratuito === 'no' ? 'Pago' : '—'}
+              {p.plazas != null ? ` · ${p.plazas} plazas` : ''}
+              {p.distanciaM != null ? ` · ${p.distanciaM} m` : ''}
+            </Popup>
+          </Marker>
+        ))}
+        <FitBounds puntos={puntos} />
+      </MapContainer>
+    </div>
   );
 }

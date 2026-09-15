@@ -6,8 +6,9 @@ import { crearReserva, getDisponibilidad, SLOTS } from '../services/reservaApi.j
 import { crearResena, listarResenasDeRestaurante, darLikeResena, quitarLikeResena } from '../services/resenasApi.js';
 import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLocal, flagsPlato } from '../models/restaurantModel.js';
 import { pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
-import { Sellos, MiniLeyenda } from './Sellos.jsx';
+import { fetchNearbyParkings } from '../services/parkingApi.js';
 import RestaurantMap from './RestaurantMap.jsx';
+import { Sellos, MiniLeyenda } from './Sellos.jsx';
 
 function marcaInfo(valor) {
   if (valor === true) return 'Sí';
@@ -54,6 +55,10 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   const [nuevaResena, setNuevaResena] = useState({ puntuacion:5, comentario:'' });
   const [errorResena, setErrorResena] = useState('');
   const [enviandoResena, setEnviandoResena] = useState(false);
+
+  // parkings cercanos
+  const [parkings, setParkings] = useState([]);
+  const [cargandoParkings, setCargandoParkings] = useState(false);
 
   const media = restaurant.media;
   const mockResenas = (restaurant.resenas ?? []).map((r,i)=> ({ ...r, id:`mock-${i}`, likes: (r.likes ?? semillaLikes(restaurant.id, i)), likedBy:[], esMock:true, puntuacion:r.puntuacion }));
@@ -117,6 +122,22 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     return ()=> { vivo=false; };
   }, [restaurant.id]);
 
+  // Parkings cercanos (≤500m) al tener coords
+  useEffect(() => {
+    let vivo = true;
+    const coords = restaurant.coords;
+    if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') {
+      setParkings([]);
+      setCargandoParkings(false);
+      return undefined;
+    }
+    setCargandoParkings(true);
+    fetchNearbyParkings(coords.lat, coords.lng)
+      .then((list) => { if (vivo) setParkings(list); })
+      .finally(() => { if (vivo) setCargandoParkings(false); });
+    return () => { vivo = false; };
+  }, [restaurant.coords]);
+
   async function handleReserva(e){
     e.preventDefault();
     setErrorReserva(''); setConfirmacion(null);
@@ -163,7 +184,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   }
 
   return (
-    <>
     <div className="modal-fondo" onClick={cerrarDesdeFondo}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo" style={{ '--acento': restaurant.acento }}>
         <button type="button" className="modal-cerrar" onClick={onClose} aria-label="Cerrar detalle" autoFocus>
@@ -264,10 +284,25 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 )}
               </section>
 
-              <section className="mapa-mini-wrap" aria-label={`Mapa de ${restaurant.nombre}`}>
-                <h3 className="modal-sub">Dónde está · parking</h3>
-                <RestaurantMap restaurant={restaurant} />
-              </section>
+              {restaurant.coords ? (
+                <section aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+                  <RestaurantMap restaurant={restaurant} parkings={parkings} />
+                  <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
+                  {cargandoParkings && <p role="status" style={{fontSize:'0.9rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>Cargando parkings…</p>}
+                  {!cargandoParkings && parkings.length > 0 && (
+                    <ul className="parkings-lista" aria-label="Parkings cercanos">
+                      {parkings.map((p) => (
+                        <li key={p.id}>
+                          {p.nombre} — {p.distanciaM} m — {p.gratuito === 'yes' ? 'Gratis' : p.gratuito === 'no' ? 'Pago' : '—'}{p.plazas != null ? ` · ${p.plazas} plazas` : ''}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {!cargandoParkings && parkings.length === 0 && (
+                    <p style={{fontSize:'0.92rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>No hay parkings mapeados cerca{externalMapUrl ? <> — <a href={externalMapUrl} target="_blank" rel="noreferrer">Ver en Google Maps</a></> : null}</p>
+                  )}
+                </section>
+              ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
 
               <section aria-labelledby="resenas-titulo">
                 <h3 id="resenas-titulo" className="modal-sub">Reseñas ({resenasMira.length + resenasYelp.length})</h3>
@@ -330,6 +365,5 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
         </div>
       </div>
     </div>
-    </>
   );
 }

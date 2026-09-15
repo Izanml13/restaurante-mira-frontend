@@ -10,6 +10,8 @@ import {
   updateProfile,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
   multiFactor,
   PhoneAuthProvider,
   PhoneMultiFactorGenerator,
@@ -42,8 +44,24 @@ function mensajeError(code, defecto) {
       return 'Ese usuario está deshabilitado.';
     case 'auth/reset-password-too-many-requests':
       return 'Demasiadas peticiones de recuperación. Espera unos minutos.';
+    case 'auth/expired-action-code':
+      return 'Enlace caducado, pide otro.';
+    case 'auth/invalid-action-code':
+      return 'Enlace inválido o ya usado. Pide otro.';
     default:
       return defecto;
+  }
+}
+
+/** URL de continuación tras el reset (soporta subcarpetas en el deploy). */
+export function urlContinuacionReset() {
+  try {
+    const origen = window.location.origin;
+    let base = window.location.pathname || '/';
+    if (!base.endsWith('/')) base += '/';
+    return `${origen}${base}#/login?reset=enviado`;
+  } catch {
+    return `${window.location.origin}/#/login?reset=enviado`;
   }
 }
 
@@ -80,13 +98,71 @@ export async function iniciarSesion({ email, password }) {
   }
 }
 
-/** Envía email de recuperación de contraseña (gratis, 0 coste). */
+/** Envía email de recuperación de contraseña (gratis, 0 coste). No revela si el email existe. */
 export async function recuperarContrasena(email) {
+  const limpio = email.trim();
   try {
-    await sendPasswordResetEmail(auth(), email.trim());
+    await sendPasswordResetEmail(auth(), limpio, {
+      url: urlContinuacionReset(),
+      handleCodeInApp: false,
+    });
   } catch (e) {
+    // No revelar existencia: email inexistente se trata como éxito.
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') return;
     throw new Error(mensajeError(e.code, 'No se pudo enviar el correo de recuperación.'));
   }
+}
+
+/**
+ * Verifica el oobCode del enlace y devuelve el email asociado.
+ * Lanza Error con mensaje en español (caducado / inválido).
+ */
+export async function verificarCodigoReset(oobCode) {
+  try {
+    return await verifyPasswordResetCode(auth(), oobCode);
+  } catch (e) {
+    throw new Error(mensajeError(e.code, 'Enlace inválido o caducado. Pide otro.'));
+  }
+}
+
+/** Confirma la nueva contraseña con el oobCode. Mensajes en español. */
+export async function confirmarNuevaContrasena(oobCode, nuevaPassword) {
+  try {
+    await confirmPasswordReset(auth(), oobCode, nuevaPassword);
+  } catch (e) {
+    throw new Error(mensajeError(e.code, 'No se pudo cambiar la contraseña. Pide otro enlace.'));
+  }
+}
+
+/** Enmascara un email: "maria@gmail.com" -> "m•••@gmail.com". */
+export function enmascararEmail(email) {
+  const [local = '', dominio = ''] = String(email || '').split('@');
+  if (!dominio) return 'tu correo';
+  const inicial = local.charAt(0) || '•';
+  return `${inicial}•••@${dominio}`;
+}
+
+/**
+ * Extrae el oobCode llegue como llegue:
+ * - Handler personalizado con hash: #/restablecer?mode=resetPassword&oobCode=XXX
+ * - Handler personalizado sin hash: ?oobCode=XXX (search)
+ * - Links de Firebase con ?mode=&oobCode= en search
+ */
+export function extraerOobCode() {
+  try {
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    const qHash = hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : '';
+    for (const qs of [qHash, search.replace(/^\?/, '')]) {
+      if (!qs) continue;
+      const params = new URLSearchParams(qs);
+      const code = params.get('oobCode');
+      if (code) return code;
+    }
+  } catch {
+    /* sin oobCode */
+  }
+  return '';
 }
 
 export function cerrarSesion() {

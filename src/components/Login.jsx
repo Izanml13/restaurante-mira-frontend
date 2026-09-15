@@ -1,20 +1,26 @@
-/** View pura: página de inicio de sesión con olvidé contraseña y 2FA SMS. */
+/** View pura: inicio de sesión + enlace a recuperación por email + 2FA SMS existente. */
 import { useState, useRef, useEffect } from 'react';
-import { iniciarSesionConMfa, enviarCodigoMfa, verificarMfaLogin, recuperarContrasena } from '../services/authApi.js';
+import { iniciarSesionConMfa, enviarCodigoMfa, verificarMfaLogin } from '../services/authApi.js';
 
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function avisoResetDesdeHash() {
+  try {
+    const h = window.location.hash || '';
+    if (h.includes('reset=ok')) return 'ok';
+    if (h.includes('reset=enviado')) return 'enviado';
+  } catch {
+    /* sin aviso */
+  }
+  return '';
+}
 
 export default function Login({ onLogin, yaTieneSesion }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
-
-  // Olvidé contraseña
-  const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
-  const [emailRecuperar, setEmailRecuperar] = useState('');
-  const [msgRecuperar, setMsgRecuperar] = useState('');
-  const [enviandoRecuperar, setEnviandoRecuperar] = useState(false);
+  const [avisoReset] = useState(avisoResetDesdeHash);
 
   // 2FA
   const [mfaResolver, setMfaResolver] = useState(null);
@@ -23,7 +29,6 @@ export default function Login({ onLogin, yaTieneSesion }) {
   const [mfaTelefono, setMfaTelefono] = useState('');
   const [mfaPaso, setMfaPaso] = useState('init'); // init | enviando | verificando
   const recaptchaRef = useRef(null);
-  const recaptchaContainer = useRef(null);
 
   // Limpiar recaptcha al desmontar
   useEffect(() => {
@@ -87,21 +92,6 @@ export default function Login({ onLogin, yaTieneSesion }) {
       setMfaCodigo('');
     } finally {
       setEnviando(false);
-    }
-  }
-
-  async function manejarRecuperar(e) {
-    e.preventDefault();
-    if (!EMAIL_OK.test(emailRecuperar.trim())) return setError('Escribe un correo válido.');
-    setEnviandoRecuperar(true);
-    setMsgRecuperar('');
-    try {
-      await recuperarContrasena(emailRecuperar);
-      setMsgRecuperar('Correo enviado. Revisa tu bandeja de entrada y la carpeta de spam.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setEnviandoRecuperar(false);
     }
   }
 
@@ -185,14 +175,19 @@ export default function Login({ onLogin, yaTieneSesion }) {
       <form className="auth-tarjeta" onSubmit={manejarEnvio} noValidate>
         <h1 id="login-titulo">Iniciar sesión</h1>
         <p className="auth-sub">Entra para guardar tus sitios y opinar.</p>
+        {avisoReset === 'ok' && (
+          <p className="auth-sub" role="status" aria-live="polite" style={{ color: 'var(--verde)', fontWeight: 600 }}>
+            Contraseña cambiada. Inicia sesión con tu nueva clave.
+          </p>
+        )}
+        {avisoReset === 'enviado' && (
+          <p className="auth-sub" role="status" aria-live="polite" style={{ color: 'var(--verde)', fontWeight: 600 }}>
+            Si ese correo está registrado, recibirás un enlace. Revisa también spam.
+          </p>
+        )}
         {error && (
           <p className="auth-error" role="alert">
             {error}
-          </p>
-        )}
-        {msgRecuperar && (
-          <p className="auth-sub" role="status" style={{ color: 'var(--verde)', fontWeight: 600 }}>
-            {msgRecuperar}
           </p>
         )}
         <div className="campo">
@@ -219,38 +214,9 @@ export default function Login({ onLogin, yaTieneSesion }) {
           {enviando ? 'Entrando…' : 'Entrar'}
         </button>
 
-        {!mostrarRecuperar ? (
-          <p className="auth-alt" style={{ margin: '0.6rem 0 0' }}>
-            <button type="button" className="btn-texto" onClick={() => { setMostrarRecuperar(true); setError(''); setMsgRecuperar(''); }}>
-              ¿Olvidaste tu contraseña?
-            </button>
-          </p>
-        ) : (
-          <form onSubmit={manejarRecuperar} style={{ margin: '0.8rem 0', padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)', border: '1px solid var(--borde)' }}>
-            <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: '0 0 0.5rem' }}>Recuperar contraseña</p>
-            <div className="campo">
-              <label htmlFor="recuperar-email">Tu correo</label>
-              <input
-                id="recuperar-email"
-                type="email"
-                value={emailRecuperar}
-                onChange={(e) => setEmailRecuperar(e.target.value)}
-                placeholder={email || 'tu@correo.com'}
-              />
-            </div>
-            <button type="submit" className="btn-secundario btn-peq" disabled={enviandoRecuperar}>
-              {enviandoRecuperar ? 'Enviando…' : 'Enviar correo de recuperación'}
-            </button>
-            <button
-              type="button"
-              className="btn-texto"
-              style={{ marginLeft: '0.5rem' }}
-              onClick={() => { setMostrarRecuperar(false); setMsgRecuperar(''); }}
-            >
-              Cancelar
-            </button>
-          </form>
-        )}
+        <p className="auth-alt" style={{ margin: '0.6rem 0 0' }}>
+          <a href="#/recuperar">¿Olvidaste tu contraseña? Recupérala</a>
+        </p>
 
         <p className="auth-alt">
           ¿No tienes cuenta? <a href="#/registro">Crea una gratis</a>

@@ -13,6 +13,8 @@ import SearchBar from './components/SearchBar.jsx';
 import RestaurantList from './components/RestaurantList.jsx';
 import RestaurantDetail from './components/RestaurantDetail.jsx';
 import Login from './components/Login.jsx';
+import Recuperar from './components/Recuperar.jsx';
+import Restablecer from './components/Restablecer.jsx';
 import Registro from './components/Registro.jsx';
 import Cuenta from './components/Cuenta.jsx';
 import Contacto from './components/Contacto.jsx';
@@ -22,6 +24,7 @@ import Negocio from './components/Negocio.jsx';
 import Favoritos from './components/Favoritos.jsx';
 import Mensajes from './components/Mensajes.jsx';
 import Mapa from './components/Mapa.jsx';
+import Privacidad from './components/Privacidad.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
@@ -30,9 +33,17 @@ import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
 
+function baseHash() {
+  const h = window.location.hash || '';
+  const q = h.indexOf('?');
+  return q === -1 ? h : h.slice(0, q);
+}
+
 function rutaActual() {
-  const h = window.location.hash;
+  const h = baseHash();
   if (h === '#/login') return 'login';
+  if (h === '#/recuperar') return 'recuperar';
+  if (h === '#/restablecer') return 'restablecer';
   if (h === '#/registro') return 'registro';
   if (h === '#/cuenta') return 'cuenta';
   if (h === '#/contacto') return 'contacto';
@@ -42,6 +53,7 @@ function rutaActual() {
   if (h === '#/favoritos') return 'favoritos';
   if (h === '#/mensajes') return 'mensajes';
   if (h === '#/mapa') return 'mapa';
+  if (h === '#/privacidad') return 'privacidad';
   return 'home';
 }
 
@@ -123,6 +135,8 @@ export default function App() {
       <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
       <main>
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
+        {ruta === 'recuperar' && <Recuperar yaTieneSesion={Boolean(usuario)} />}
+        {ruta === 'restablecer' && <Restablecer yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
@@ -143,6 +157,7 @@ export default function App() {
           />
         )}
         {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
+        {ruta === 'privacidad' && <Privacidad />}
         {ruta === 'mapa' && <Mapa todos={todos} total={total} onVerDetalle={abrirDetalle} />}
         {ruta === 'home' && (
           <>
