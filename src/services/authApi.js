@@ -1,6 +1,6 @@
 /**
  * Model — autenticación con Firebase Auth (email + contraseña).
- * Recuperación de contraseña y 2FA (MFA SMS) incluidos.
+ * Recuperación de contraseña y verificación de email incluidos.
  */
 import {
   getAuth,
@@ -13,12 +13,6 @@ import {
   sendEmailVerification,
   verifyPasswordResetCode,
   confirmPasswordReset,
-  multiFactor,
-  PhoneAuthProvider,
-  PhoneMultiFactorGenerator,
-  RecaptchaVerifier,
-  getMultiFactorResolver,
-  signInWithPhoneNumber,
 } from 'firebase/auth';
 import { getFirebaseApp } from './firebase.js';
 import { guardarPerfil } from './perfilApi.js';
@@ -56,7 +50,7 @@ function mensajeError(code, defecto) {
 
 /** URL de continuación tras el reset: la que Firebase usa en el enlace del email. */
 export function urlContinuacionReset() {
-  return 'https://restaurante-mira-frontend.vercel.app/#/restablecer';
+  return window.location.origin + '/#/restablecer';
 }
 
 /**
@@ -190,86 +184,4 @@ export async function recargarEmailVerified() {
   return Boolean(u.emailVerified);
 }
 
-// =====================================================
-// 2FA — MFA SMS con Firebase (gratis: 10k SMS/mes)
-// =====================================================
 
-let recaptchaVerifier = null;
-
-function getRecaptcha(containerId) {
-  if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear(); } catch { /* ya destruido */ }
-  }
-  recaptchaVerifier = new RecaptchaVerifier(auth(), containerId, { size: 'invisible' });
-  return recaptchaVerifier;
-}
-
-/**
- * Enlaza un teléfono al usuario actual (requiere 2FA SMS).
- * 1. Envia un SMS con código al teléfono.
- * 2. El usuario introduce el código → se enlaza al multiFactor.
- * @returns {{ verificationId: string }} — llévalo a enrollMfa2
- */
-export async function enviarCodigoMfa(phoneNumber, containerId) {
-  const recaptcha = getRecaptcha(containerId);
-  const session = multiFactor(auth().currentUser).session;
-  const phoneInfoOptions = { phoneNumber, session, recaptcha };
-  const provider = new PhoneAuthProvider(auth());
-  const verificationId = await provider.verifyPhoneNumber(phoneInfoOptions, recaptcha);
-  return { verificationId };
-}
-
-/**
- * Confirma el código SMS y completa el enrollment de 2FA.
- * @param {string} verificationId
- * @param {string} verificationCode - código de 6 dígitos
- */
-export async function enrollMfa(verificationId, verificationCode) {
-  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
-  await multiFactor(auth().currentUser).enroll(multiFactorAssertion, 'SMS');
-}
-
-/**
- * Verifica 2FA durante el login: resuelve el resolver de MFA y comprueba el código.
- * @param {object} resolver - error.resolver del error multi-factor
- * @param {string} verificationId
- * @param {string} verificationCode
- */
-export async function verificarMfaLogin(resolver, verificationId, verificationCode) {
-  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
-  await getMultiFactorResolver(auth(), resolver).resolveSignIn(multiFactorAssertion);
-}
-
-/**
- * Comprueba si el usuario tiene 2FA activado.
- * @returns {boolean}
- */
-export function tieneMfa() {
-  const u = auth().currentUser;
-  if (!u) return false;
-  try {
-    const factors = multiFactor(u).enrolledFactors;
-    return factors && factors.length > 0;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Inicia sesión y devuelve el error MFA si el usuario tiene 2FA activo.
- * La UI debe gestionar el flujo: si es MFA → mostrar input de código SMS.
- * @returns {{ exito: boolean, mfaRequired?: object, error?: string }}
- */
-export async function iniciarSesionConMfa({ email, password }) {
-  try {
-    await signInWithEmailAndPassword(auth(), email.trim(), password);
-    return { exito: true };
-  } catch (e) {
-    if (e.code === 'auth/multi-factor-auth-required') {
-      return { exito: false, mfaRequired: e.resolver };
-    }
-    throw new Error(mensajeError(e.code, 'No se pudo iniciar sesión.'));
-  }
-}

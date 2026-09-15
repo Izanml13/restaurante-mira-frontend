@@ -132,8 +132,8 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         <h1 id="cuenta-titulo">{usuario.nombre || 'Mi cuenta'}</h1>
         <dl className="cuenta-datos">
           <div><dt>Correo</dt><dd>{usuario.email}</dd></div>
+          <div><dt>Verificado</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? '✓ Sí' : 'No verificado'}</dd></div>
           <div><dt>Miembro desde</dt><dd>{miembroDesde}</dd></div>
-          {mfaActivo && <div><dt>2FA</dt><dd style={{ color: 'var(--verde)' }}>✓ Activado</dd></div>}
         </dl>
         <p className="cuenta-acciones">
           <a href="#buscar" className="btn-cta">Buscar restaurantes</a>
