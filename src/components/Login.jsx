@@ -14,6 +14,7 @@ export default function Login({ onLogin, yaTieneSesion }) {
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [emailRecuperar, setEmailRecuperar] = useState('');
   const [msgRecuperar, setMsgRecuperar] = useState('');
+  const [errorRecuperar, setErrorRecuperar] = useState('');
   const [enviandoRecuperar, setEnviandoRecuperar] = useState(false);
 
   // 2FA
@@ -92,14 +93,17 @@ export default function Login({ onLogin, yaTieneSesion }) {
 
   async function manejarRecuperar(e) {
     e.preventDefault();
-    if (!EMAIL_OK.test(emailRecuperar.trim())) return setError('Escribe un correo válido.');
+    const val = emailRecuperar.trim();
+    if (!val) { setErrorRecuperar('Escribe tu correo electrónico.'); return; }
+    if (!EMAIL_OK.test(val)) { setErrorRecuperar('El correo no es válido.'); return; }
+    setErrorRecuperar('');
     setEnviandoRecuperar(true);
     setMsgRecuperar('');
     try {
-      await recuperarContrasena(emailRecuperar);
+      await recuperarContrasena(val);
       setMsgRecuperar('Correo enviado. Revisa tu bandeja de entrada y la carpeta de spam.');
     } catch (err) {
-      setError(err.message);
+      setErrorRecuperar(err.message);
     } finally {
       setEnviandoRecuperar(false);
     }
@@ -233,11 +237,13 @@ export default function Login({ onLogin, yaTieneSesion }) {
               <input
                 id="recuperar-email"
                 type="email"
+                required
                 value={emailRecuperar}
-                onChange={(e) => setEmailRecuperar(e.target.value)}
+                onChange={(e) => { setEmailRecuperar(e.target.value); setErrorRecuperar(''); }}
                 placeholder={email || 'tu@correo.com'}
               />
             </div>
+            {errorRecuperar && <p className="auth-error" role="alert" style={{ margin: '0.4rem 0' }}>{errorRecuperar}</p>}
             <button type="submit" className="btn-secundario btn-peq" disabled={enviandoRecuperar}>
               {enviandoRecuperar ? 'Enviando…' : 'Enviar correo de recuperación'}
             </button>
@@ -245,7 +251,7 @@ export default function Login({ onLogin, yaTieneSesion }) {
               type="button"
               className="btn-texto"
               style={{ marginLeft: '0.5rem' }}
-              onClick={() => { setMostrarRecuperar(false); setMsgRecuperar(''); }}
+              onClick={() => { setMostrarRecuperar(false); setMsgRecuperar(''); setErrorRecuperar(''); }}
             >
               Cancelar
             </button>
