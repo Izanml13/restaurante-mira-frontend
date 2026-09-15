@@ -169,10 +169,25 @@ export function suscribirSesion(callback) {
   return onAuthStateChanged(auth(), (u) =>
     callback(
       u
-        ? { uid: u.uid, nombre: u.displayName || '', email: u.email ?? '', creado: u.metadata?.creationTime ?? null }
+        ? { uid: u.uid, nombre: u.displayName || '', email: u.email ?? '', emailVerified: Boolean(u.emailVerified), creado: u.metadata?.creationTime ?? null }
         : null,
     ),
   );
+}
+
+/** Envía email de verificación al usuario actual. */
+export async function enviarVerificacionEmail() {
+  const u = auth().currentUser;
+  if (!u) throw new Error('No hay sesión activa.');
+  await sendEmailVerification(u, { url: urlContinuacionReset() });
+}
+
+/** Recarga el usuario de Firebase para obtener el emailVerified actualizado. */
+export async function recargarEmailVerified() {
+  const u = auth().currentUser;
+  if (!u) return false;
+  await u.reload();
+  return Boolean(u.emailVerified);
 }
 
 // =====================================================
