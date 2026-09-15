@@ -1326,6 +1326,18 @@ button.btn-texto {
   padding: 0 0.4rem;
 }
 
+.cookie-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cookie-desc {
+  font-size: 0.82rem;
+  color: var(--gris);
+  margin-left: 1.7rem;
+}
+
 /* Badge "Nuevo" en cards sin nota */
 .card-nuevo {
   color: var(--verde);
@@ -2078,9 +2090,11 @@ button.btn-texto {
   }
 
   .cookie-acciones .btn-cta,
-  .cookie-acciones .btn-secundario {
+  .cookie-acciones .btn-secundario,
+  .cookie-acciones .btn-texto {
     width: 100%;
     text-align: center;
+    box-sizing: border-box;
   }
 }
 
