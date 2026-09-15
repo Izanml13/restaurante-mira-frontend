@@ -54,16 +54,9 @@ function mensajeError(code, defecto) {
   }
 }
 
-/** URL de continuación tras el reset (soporta subcarpetas en el deploy). */
+/** URL de continuación tras el reset: la que Firebase usa en el enlace del email. */
 export function urlContinuacionReset() {
-  try {
-    const origen = window.location.origin;
-    let base = window.location.pathname || '/';
-    if (!base.endsWith('/')) base += '/';
-    return `${origen}${base}#/login?reset=enviado`;
-  } catch {
-    return `${window.location.origin}/#/login?reset=enviado`;
-  }
+  return 'https://restaurante-mira-frontend.vercel.app/#/restablecer';
 }
 
 /**
