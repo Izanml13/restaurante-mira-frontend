@@ -214,10 +214,6 @@ export default function Login({ onLogin, yaTieneSesion }) {
           {enviando ? 'Entrando…' : 'Entrar'}
         </button>
 
-        <p className="auth-alt" style={{ margin: '0.6rem 0 0' }}>
-          <a href="#/recuperar">¿Olvidaste tu contraseña? Recupérala</a>
-        </p>
-
         <p className="auth-alt">
           ¿No tienes cuenta? <a href="#/registro">Crea una gratis</a>
         </p>
