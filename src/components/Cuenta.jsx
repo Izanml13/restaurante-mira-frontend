@@ -155,7 +155,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         {/* --- DIETA --- */}
         <h2 className="cuenta-sub">Mi dieta</h2>
         <form onSubmit={guardarPrefs} className="prefs-form">
-          {[['vegano', 'Vegano'], ['vegetariano', 'Vegetariano'], ['sinGluten', 'Sin gluten']].map(([campo, etiqueta]) => (
+          {[['vegano', 'Vegano'], ['vegetariano', 'Vegetariano']].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
               <input id={`pref-${campo}`} type="checkbox" checked={Boolean(borrador[campo])} onChange={() => toggleDieta(campo)} />
               {etiqueta}
@@ -232,17 +232,20 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         {/* --- COOKIES --- */}
         <h2 className="cuenta-sub">Preferencias de cookies</h2>
         <div className="prefs-form">
-          <p className="vacio-texto">Controla qué types de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.</p>
+          <p className="vacio-texto">Controla qué tipos de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.</p>
           {COOKIE_CATEGORIAS.filter((c) => !c.requerida).map((cat) => (
-            <label key={cat.key} className="campo-check" htmlFor={`cookie-${cat.key}`}>
-              <input
-                id={`cookie-${cat.key}`}
-                type="checkbox"
-                checked={Boolean(cookiesPrefs[cat.key])}
-                onChange={() => setCookiesPrefs((p) => ({ ...p, [cat.key]: !p[cat.key] }))}
-              />
-              {cat.label} — <span style={{ fontSize: '0.82rem', color: 'var(--gris)' }}>{cat.desc}</span>
-            </label>
+            <div key={cat.key} className="cookie-item">
+              <label className="campo-check" htmlFor={`cookie-${cat.key}`}>
+                <input
+                  id={`cookie-${cat.key}`}
+                  type="checkbox"
+                  checked={Boolean(cookiesPrefs[cat.key])}
+                  onChange={() => setCookiesPrefs((p) => ({ ...p, [cat.key]: !p[cat.key] }))}
+                />
+                {cat.label}
+              </label>
+              <span className="cookie-desc">{cat.desc}</span>
+            </div>
           ))}
           <button type="button" className="btn-secundario btn-peq" onClick={guardarCookiesCuenta}>
             Guardar cookies
