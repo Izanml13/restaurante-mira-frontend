@@ -10,6 +10,7 @@ import {
   updateProfile,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  sendEmailVerification,
   verifyPasswordResetCode,
   confirmPasswordReset,
   multiFactor,
@@ -82,6 +83,7 @@ export async function crearCuenta({ nombre, email, password, tipo = 'cliente', p
     if (preferencias) perfil.preferencias = preferencias;
     if (accesibilidad) perfil.accesibilidad = accesibilidad;
     await guardarPerfil(cred.user.uid, perfil);
+    sendEmailVerification(cred.user, { url: urlContinuacionReset() }).catch(() => {});
     return { nombre: nombre.trim(), email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo crear la cuenta. Inténtalo de nuevo.'));
