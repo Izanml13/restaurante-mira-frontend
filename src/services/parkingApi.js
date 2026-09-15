@@ -123,6 +123,14 @@ async function consultarOverpass(lat, lng, radio, limite) {
   return [];
 }
 
+/**
+ * Alias para RestaurantDetail: busca parkings cercanos (≤radio, defecto 1500m).
+ * Wrapper de buscarParkingsCercanos con la interfaz que espera el componente.
+ */
+export async function fetchNearbyParkings(lat, lng, radio = 1500) {
+  return buscarParkingsCercanos(lat, lng, { radio, limite: 10 });
+}
+
 /** Texto corto "a 150 m" / "a 1,2 km". */
 export function formatoDistancia(m) {
   if (m == null) return '';

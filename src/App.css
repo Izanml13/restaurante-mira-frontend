@@ -177,6 +177,7 @@
 }
 
 .btn-secundario {
+  margin-top: 0.5rem;
   background: var(--fondo);
   color: var(--tinta);
   border: 1px solid var(--borde);
@@ -383,13 +384,13 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(45, 51, 63, 0.14), 0 2px 8px rgba(45, 51, 63, 0.08);
+  box-shadow: var(--sombra-card-hover);
   border-color: rgba(0, 102, 79, 0.28);
 }
 
 .card:focus-within {
   border-color: var(--verde);
-  box-shadow: 0 0 0 3px rgba(0, 102, 79, 0.15), 0 12px 32px rgba(45, 51, 63, 0.14);
+  box-shadow: var(--sombra-card-focus);
 }
 
 .card-media {
@@ -426,7 +427,7 @@
   position: absolute;
   bottom: 0.5rem;
   right: 0.5rem;
-  background: rgba(255,255,255,0.96);
+  background: var(--badge-bg);
   color: var(--tinta);
   font-size: 0.78rem;
   font-weight: 700;
@@ -484,8 +485,19 @@
   overflow: hidden;
 }
 
+.card-motivo {
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  color: var(--verde);
+  font-weight: 600;
+}
+
 .card .btn-reservar {
   margin-top: auto;
+}
+
+.card .btn-secundario {
+  width: 100%;
 }
 
 /* ---------- Promo ---------- */
@@ -1374,7 +1386,7 @@ button.btn-texto {
   height: 2rem;
   border-radius: 50%;
   border: 1px solid var(--borde);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--fav-bg);
   color: var(--gris);
   font-size: 1rem;
   line-height: 1;
@@ -2069,5 +2081,38 @@ button.btn-texto {
   .cookie-acciones .btn-secundario {
     width: 100%;
     text-align: center;
+  }
+}
+
+/* ---------- Parkings cercanos (RestaurantMap) ---------- */
+.restaurant-map {
+  height: 350px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  overflow: hidden;
+  z-index: 0;
+  background: var(--fondo-suave);
+}
+.restaurant-map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  font: inherit;
+}
+.parkings-lista {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+.parkings-lista li {
+  border-top: 1px solid var(--borde);
+  padding-top: 0.35rem;
+}
+@media (max-width: 767px) {
+  .restaurant-map {
+    height: 300px;
   }
 }
