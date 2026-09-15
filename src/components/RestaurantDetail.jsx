@@ -8,6 +8,7 @@ import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLoc
 import { pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
 import { fetchNearbyParkings } from '../services/parkingApi.js';
 import RestaurantMap from './RestaurantMap.jsx';
+import ParkingsPanel from './ParkingsPanel.jsx';
 import { Sellos, MiniLeyenda } from './Sellos.jsx';
 
 function marcaInfo(valor) {
@@ -59,6 +60,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   // parkings cercanos
   const [parkings, setParkings] = useState([]);
   const [cargandoParkings, setCargandoParkings] = useState(false);
+  const [parkingSeleccionado, setParkingSeleccionado] = useState(null);
 
   const media = restaurant.media;
   const mockResenas = (restaurant.resenas ?? []).map((r,i)=> ({ ...r, id:`mock-${i}`, likes: (r.likes ?? semillaLikes(restaurant.id, i)), likedBy:[], esMock:true, puntuacion:r.puntuacion }));
@@ -285,22 +287,20 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               </section>
 
               {restaurant.coords ? (
-                <section aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
-                  <RestaurantMap restaurant={restaurant} parkings={parkings} />
+                <section className="parking-section" aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+                  <div className="parking-grid">
+                    <RestaurantMap
+                      restaurant={restaurant}
+                      parkings={parkings}
+                      selectedIndex={parkingSeleccionado}
+                    />
+                    <ParkingsPanel
+                      parkings={parkings}
+                      cargando={cargandoParkings}
+                      onSeleccionarParking={(i) => setParkingSeleccionado(i)}
+                    />
+                  </div>
                   <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
-                  {cargandoParkings && <p role="status" style={{fontSize:'0.9rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>Cargando parkings…</p>}
-                  {!cargandoParkings && parkings.length > 0 && (
-                    <ul className="parkings-lista" aria-label="Parkings cercanos">
-                      {parkings.map((p) => (
-                        <li key={p.id}>
-                          {p.nombre} — {p.distanciaM} m — {p.gratuito === 'yes' ? 'Gratis' : p.gratuito === 'no' ? 'Pago' : '—'}{p.plazas != null ? ` · ${p.plazas} plazas` : ''}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {!cargandoParkings && parkings.length === 0 && (
-                    <p style={{fontSize:'0.92rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>No hay parkings mapeados cerca{externalMapUrl ? <> — <a href={externalMapUrl} target="_blank" rel="noreferrer">Ver en Google Maps</a></> : null}</p>
-                  )}
                 </section>
               ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
 
