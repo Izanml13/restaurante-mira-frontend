@@ -2098,9 +2098,18 @@ button.btn-texto {
   }
 }
 
-/* ---------- Parkings cercanos (RestaurantMap) ---------- */
+/* ---------- Parkings cercanos (RestaurantMap + ParkingsPanel) ---------- */
+.parking-section {
+  margin: 1.2rem 0 0;
+}
+.parking-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0.75rem;
+  align-items: start;
+}
 .restaurant-map {
-  height: 350px;
+  height: 380px;
   border: 1px solid var(--borde);
   border-radius: var(--radio-peq);
   overflow: hidden;
@@ -2113,6 +2122,115 @@ button.btn-texto {
   z-index: 0;
   font: inherit;
 }
+
+/* --- ParkingsPanel --- */
+.parkings-panel {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  background: var(--fondo);
+  padding: 0.8rem;
+  max-height: 380px;
+  overflow-y: auto;
+}
+.parkings-panel-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.parkings-panel-cuenta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--verde);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0 0.3rem;
+}
+.parkings-panel-vacio {
+  color: var(--gris);
+  font-size: 0.88rem;
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+}
+.parkings-panel-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.parking-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--fondo-suave);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  padding: 0.55rem 0.6rem;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.parking-card:hover,
+.parking-card:focus-visible {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.parking-card-nombre {
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.parking-card-meta {
+  font-size: 0.78rem;
+  color: var(--gris);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+.parking-card-distancia {
+  font-weight: 700;
+  color: var(--tinta);
+}
+.parking-card-sep {
+  color: var(--borde);
+}
+
+/* Skeleton loading */
+.parking-skeleton {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-peq);
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.parking-skeleton-bar {
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--fondo-suave) 25%, var(--borde) 50%, var(--fondo-suave) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.parking-skeleton-nombre { height: 0.9rem; width: 60%; }
+.parking-skeleton-detalle { height: 0.7rem; width: 80%; }
+.parking-skeleton-detalle2 { height: 0.7rem; width: 45%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Legacy parking list (kept for backward compat) --- */
 .parkings-lista {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -2125,8 +2243,16 @@ button.btn-texto {
   border-top: 1px solid var(--borde);
   padding-top: 0.35rem;
 }
+
+/* --- Mobile --- */
 @media (max-width: 767px) {
+  .parking-grid {
+    grid-template-columns: 1fr;
+  }
   .restaurant-map {
     height: 300px;
+  }
+  .parkings-panel {
+    max-height: 250px;
   }
 }
