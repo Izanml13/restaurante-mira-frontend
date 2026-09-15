@@ -58,7 +58,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -134,13 +134,19 @@ export default function App() {
       </a>
       <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
       <main>
+        {usuario && !usuario.emailVerified && ruta !== 'login' && ruta !== 'registro' && ruta !== 'recuperar' && ruta !== 'restablecer' && (
+          <div className="aviso-email" role="alert" style={{ background: 'var(--naranja)', color: '#fff', padding: '0.7rem 1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span>Tu correo no está verificado.</span>
+            <a href="#/cuenta" style={{ color: '#fff', textDecoration: 'underline' }}>Verificar ahora</a>
+          </div>
+        )}
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'recuperar' && <Recuperar yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'restablecer' && <Restablecer yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacionEmail} onRecargarEmailVerified={recargarEmailVerified} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
