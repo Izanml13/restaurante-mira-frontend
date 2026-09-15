@@ -5,7 +5,6 @@ import { listarMisIncidencias } from '../services/incidenciaApi.js';
 import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
-import { tieneMfa, enviarCodigoMfa, enrollMfa } from '../services/authApi.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
 
 function hoyISO() {
@@ -14,7 +13,7 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir }) {
+export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
   const [proximas, setProximas] = useState([]);
   const [incidencias, setIncidencias] = useState([]);
   const [misResenas, setMisResenas] = useState([]);
@@ -74,45 +73,34 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
     finally { setGuardandoAcc(false); }
   }
 
-  // --- 2FA ---
-  const [mfaActivo, setMfaActivo] = useState(false);
-  const [mfaPaso, setMfaPaso] = useState('init');
-  const [mfaTelefono, setMfaTelefono] = useState('');
-  const [mfaCodigo, setMfaCodigo] = useState('');
-  const [mfaVerificationId, setMfaVerificationId] = useState(null);
-  const [mfaOk, setMfaOk] = useState('');
-  const [mfaError, setMfaError] = useState('');
+  // --- Verificación de email ---
+  const [verificando, setVerificando] = useState(false);
+  const [verOk, setVerOk] = useState('');
+  const [verError, setVerError] = useState('');
 
-  useEffect(() => {
-    setMfaActivo(tieneMfa());
-  }, [usuario]);
-
-  async function activar2FA() {
-    setMfaError(''); setMfaOk('');
-    if (!mfaTelefono.match(/^\+[1-9]\d{6,14}$/)) {
-      setMfaError('Formato internacional requerido (ej: +34612345678).');
-      return;
-    }
-    setMfaPaso('enviando');
+  async function enviarVerificacion() {
+    setVerError(''); setVerOk(''); setVerificando(true);
     try {
-      const { verificationId } = await enviarCodigoMfa(mfaTelefono, 'recaptcha-cuenta');
-      setMfaVerificationId(verificationId);
-      setMfaPaso('verificando');
+      await onEnviarVerificacion();
+      setVerOk('Correo de verificación enviado. Revisa tu bandeja de entrada y haz clic en el enlace.');
     } catch (err) {
-      setMfaError(err.message || 'No se pudo enviar el SMS.');
-      setMfaPaso('init');
+      setVerError(err.message || 'No se pudo enviar el correo de verificación.');
+    } finally {
+      setVerificando(false);
     }
   }
 
-  async function confirmar2FA() {
-    if (mfaCodigo.length !== 6) { setMfaError('El código tiene 6 dígitos.'); return; }
-    setMfaError('');
+  async function recargarVerificacion() {
+    setVerError(''); setVerOk('');
     try {
-      await enrollMfa(mfaVerificationId, mfaCodigo);
-      setMfaActivo(true); setMfaPaso('init'); setMfaCodigo('');
-      setMfaOk('2FA activado. Tu cuenta ahora requiere código SMS al iniciar sesión.');
+      const verificado = await onRecargarEmailVerified();
+      if (verificado) {
+        setVerOk('✓ Tu correo ha sido verificado correctamente.');
+      } else {
+        setVerError('Tu correo aún no está verificado. Haz clic en el enlace del email.');
+      }
     } catch {
-      setMfaError('Código incorrecto o expirado.'); setMfaPaso('verificando');
+      setVerError('No se pudo comprobar el estado. Inténtalo de nuevo.');
     }
   }
 
@@ -144,8 +132,8 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         <h1 id="cuenta-titulo">{usuario.nombre || 'Mi cuenta'}</h1>
         <dl className="cuenta-datos">
           <div><dt>Correo</dt><dd>{usuario.email}</dd></div>
+          <div><dt>Verificado</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? '✓ Sí' : 'No verificado'}</dd></div>
           <div><dt>Miembro desde</dt><dd>{miembroDesde}</dd></div>
-          {mfaActivo && <div><dt>2FA</dt><dd style={{ color: 'var(--verde)' }}>✓ Activado</dd></div>}
         </dl>
         <p className="cuenta-acciones">
           <a href="#buscar" className="btn-cta">Buscar restaurantes</a>
@@ -194,40 +182,29 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           {accOk && <p className="vacio-texto" role="status">{accOk}</p>}
         </form>
 
-        {/* --- 2FA --- */}
-        <h2 className="cuenta-sub">Seguridad (2FA)</h2>
-        {mfaActivo ? (
-          <div className="prefs-form" style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
-            <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ La verificación en dos pasos está activa.</p>
-            <p className="vacio-texto">Cada vez que inicies sesión, recibirás un código SMS en tu teléfono registrado.</p>
-          </div>
-        ) : (
-          <div className="prefs-form" id="recaptcha-cuenta">
-            <p className="vacio-texto">Protege tu cuenta con un código SMS al iniciar sesión.</p>
-            {mfaError && <p className="reserva-error" role="alert">{mfaError}</p>}
-            {mfaPaso === 'init' && (
-              <>
-                <div className="campo">
-                  <label htmlFor="mfa-tel">Teléfono (formato internacional)</label>
-                  <input id="mfa-tel" type="tel" placeholder="+34612345678" value={mfaTelefono} onChange={(e) => setMfaTelefono(e.target.value)} />
-                </div>
-                <button type="button" className="btn-secundario btn-peq" onClick={activar2FA}>Activar 2FA</button>
-              </>
-            )}
-            {mfaPaso === 'enviando' && <p className="cargando" role="status">Enviando SMS…</p>}
-            {mfaPaso === 'verificando' && (
-              <>
-                <div className="campo">
-                  <label htmlFor="mfa-cod">Código de 6 dígitos</label>
-                  <input id="mfa-cod" type="text" inputMode="numeric" maxLength={6} placeholder="123456" value={mfaCodigo} onChange={(e) => setMfaCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))} autoFocus />
-                </div>
-                <button type="button" className="btn-secundario btn-peq" onClick={confirmar2FA}>Confirmar</button>
-                <button type="button" className="btn-texto" onClick={() => { setMfaPaso('init'); setMfaCodigo(''); }}>Cancelar</button>
-              </>
-            )}
-            {mfaOk && <p className="vacio-texto" role="status" style={{ color: 'var(--verde)' }}>{mfaOk}</p>}
-          </div>
-        )}
+        {/* --- Verificación de email --- */}
+        <h2 className="cuenta-sub">Verificación de correo</h2>
+        <div className="prefs-form">
+          {usuario.emailVerified ? (
+            <div style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
+              <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ Tu correo está verificado.</p>
+            </div>
+          ) : (
+            <>
+              <p className="vacio-texto">Tu correo aún no está verificado. Verifícalo para que tu cuenta esté completamente activa.</p>
+              {verError && <p className="reserva-error" role="alert">{verError}</p>}
+              {verOk && <p className="vacio-texto" role="status" style={{ color: 'var(--verde)' }}>{verOk}</p>}
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button type="button" className="btn-secundario btn-peq" onClick={enviarVerificacion} disabled={verificando}>
+                  {verificando ? 'Enviando…' : 'Enviar correo de verificación'}
+                </button>
+                <button type="button" className="btn-texto" onClick={recargarVerificacion}>
+                  Ya verifiqué → comprobar
+                </button>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* --- COOKIES --- */}
         <h2 className="cuenta-sub">Preferencias de cookies</h2>
