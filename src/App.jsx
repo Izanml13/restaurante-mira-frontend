@@ -33,6 +33,7 @@ import Footer from './components/Footer.jsx';
 import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
+import { I18nProvider } from './i18n/index.jsx';
 
 function baseHash() {
   const h = window.location.hash || '';
@@ -59,7 +60,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -129,6 +130,7 @@ export default function App() {
   }
 
   return (
+    <I18nProvider lang={perfil.lang} onLangChange={guardarLang}>
     <>
       <a className="skip-link" href="#buscar">
         Saltar al buscador
@@ -147,7 +149,7 @@ export default function App() {
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacionEmail} onRecargarEmailVerified={recargarEmailVerified} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacion} onRecargarEmailVerified={recargarEmailVerified} onGuardarLang={guardarLang} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
@@ -248,5 +250,6 @@ export default function App() {
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
     </>
+    </I18nProvider>
   );
 }

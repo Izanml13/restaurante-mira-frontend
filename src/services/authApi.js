@@ -21,6 +21,12 @@ function auth() {
   return getAuth(getFirebaseApp());
 }
 
+/** Configura el idioma de los emails de Firebase (verificación, reset). */
+export function setEmailLang(lang) {
+  const a = auth();
+  a.languageCode = lang === 'ca' ? 'ca' : lang === 'en' ? 'en' : 'es';
+}
+
 function mensajeError(code, defecto) {
   switch (code) {
     case 'auth/email-already-in-use':
@@ -58,14 +64,16 @@ export function urlContinuacionReset() {
  * (tipo 'cliente' o 'empresa'). 1 escritura extra, solo al registrarse.
  * @returns {Promise<{nombre:string,email:string}>}
  */
-export async function crearCuenta({ nombre, email, password, tipo = 'cliente', preferencias, accesibilidad }) {
+export async function crearCuenta({ nombre, email, password, tipo = 'cliente', preferencias, accesibilidad, lang = 'es' }) {
   try {
+    setEmailLang(lang);
     const cred = await createUserWithEmailAndPassword(auth(), email.trim(), password);
     await updateProfile(cred.user, { displayName: nombre.trim() });
     const perfil = {
       tipo: tipo === 'empresa' ? 'empresa' : 'cliente',
       nombre: nombre.trim(),
       email: cred.user.email,
+      lang,
     };
     if (preferencias) perfil.preferencias = preferencias;
     if (accesibilidad) perfil.accesibilidad = accesibilidad;
@@ -88,8 +96,9 @@ export async function iniciarSesion({ email, password }) {
 }
 
 /** Envía email de recuperación de contraseña (gratis, 0 coste). No revela si el email existe. */
-export async function recuperarContrasena(email) {
+export async function recuperarContrasena(email, lang = 'es') {
   const limpio = email.trim();
+  setEmailLang(lang);
   try {
     await sendPasswordResetEmail(auth(), limpio, {
       url: urlContinuacionReset(),
@@ -170,9 +179,10 @@ export function suscribirSesion(callback) {
 }
 
 /** Envía email de verificación al usuario actual. */
-export async function enviarVerificacionEmail() {
+export async function enviarVerificacionEmail(lang = 'es') {
   const u = auth().currentUser;
   if (!u) throw new Error('No hay sesión activa.');
+  setEmailLang(lang);
   await sendEmailVerification(u, { url: urlContinuacionReset() });
 }
 

@@ -1,4 +1,4 @@
-/** Página "Mi cuenta": datos + preferencias + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
+/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
 import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
@@ -6,6 +6,12 @@ import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
+import { useI18n, AVAILABLE } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 function hoyISO() {
   const h = new Date();
@@ -13,7 +19,12 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified, onGuardarLang }) {
+  const { lang, setLang } = useI18n();
+  function t(key) {
+    const dict = TRADS[lang] || TRADS.es;
+    return key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
+  }
   const [proximas, setProximas] = useState([]);
   const [incidencias, setIncidencias] = useState([]);
   const [misResenas, setMisResenas] = useState([]);
@@ -181,6 +192,24 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           </button>
           {accOk && <p className="vacio-texto" role="status">{accOk}</p>}
         </form>
+
+        {/* --- IDIOMA --- */}
+        <h2 className="cuenta-sub">{t('cuenta.idioma')}</h2>
+        <div className="prefs-form">
+          <select
+            className="search-select"
+            value={lang}
+            onChange={(e) => {
+              const nuevo = e.target.value;
+              setLang(nuevo);
+              if (onGuardarLang) onGuardarLang(nuevo);
+            }}
+          >
+            {Object.entries(AVAILABLE).map(([code, label]) => (
+              <option key={code} value={code}>{label}</option>
+            ))}
+          </select>
+        </div>
 
         {/* --- Verificación de email --- */}
         <h2 className="cuenta-sub">Verificación de correo</h2>
