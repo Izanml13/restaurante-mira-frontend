@@ -2090,9 +2090,11 @@ button.btn-texto {
   }
 
   .cookie-acciones .btn-cta,
-  .cookie-acciones .btn-secundario {
+  .cookie-acciones .btn-secundario,
+  .cookie-acciones .btn-texto {
     width: 100%;
     text-align: center;
+    box-sizing: border-box;
   }
 }
 
