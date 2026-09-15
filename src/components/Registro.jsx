@@ -1,6 +1,7 @@
-/** View pura: página de creación de cuenta con dieta/accesibilidad en el formulario. */
+/** View pura: página de creación de cuenta con dieta/accesibilidad/idioma en el formulario. */
 import { useState } from 'react';
 import { ALERGENOS } from '../models/restaurantModel.js';
+import { AVAILABLE, detectarIdioma } from '../i18n/index.jsx';
 
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,6 +20,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
   const [alergias, setAlergias] = useState([]);
   const [sillaRuedas, setSillaRuedas] = useState(false);
   const [tea, setTea] = useState(false);
+  const [lang, setLang] = useState(detectarIdioma);
 
   function toggleAlergia(key) {
     setAlergias((prev) => (prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]));
@@ -46,6 +48,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
         tipo: esEmpresa ? 'empresa' : 'cliente',
         preferencias,
         accesibilidad,
+        lang,
       });
       window.location.hash = '#/';
     } catch (err) {
@@ -159,6 +162,17 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
               <input id="reg-tea" type="checkbox" checked={tea} onChange={() => setTea(!tea)} />
               Estoy en el espectro autista
             </label>
+
+            <h2 className="cuenta-sub" style={{ fontSize: '1.05rem', margin: '1rem 0 0.5rem' }}>Idioma</h2>
+            <select
+              className="search-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+            >
+              {Object.entries(AVAILABLE).map(([code, label]) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
 
             <p style={{ fontSize: '0.82rem', color: 'var(--gris)', margin: '0.8rem 0 0.5rem' }}>
               Puedes cambiar estos ajustes después en <a href="#/cuenta">Mi cuenta</a>.

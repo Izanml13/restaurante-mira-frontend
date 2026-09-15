@@ -1,12 +1,13 @@
 /**
- * Model — perfil en `usuarios/{uid}`: tipo de cuenta + preferencias.
+ * Model — perfil en `usuarios/{uid}`: tipo de cuenta + preferencias + idioma.
  * { tipo: 'cliente'|'empresa', nombre, email, soloVegano:bool, alergias:[],
- *   creado }. 1 lectura al entrar; 1 escritura al guardar.
+ *   lang: 'es'|'ca'|'en', creado }. 1 lectura al entrar; 1 escritura al guardar.
  */
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getDb } from './firebase.js';
+import { detectarIdioma } from '../i18n/index.jsx';
 
-export const PERFIL_VACIO = { tipo: 'cliente', soloVegano: false, alergias: [] };
+export const PERFIL_VACIO = { tipo: 'cliente', soloVegano: false, alergias: [], lang: detectarIdioma() };
 
 /** Lee el perfil (1 lectura). Si no existe, devuelve valores por defecto. */
 export async function obtenerPerfil(uid) {
@@ -14,12 +15,14 @@ export async function obtenerPerfil(uid) {
   const snap = await getDoc(doc(getDb(), 'usuarios', uid));
   if (!snap.exists()) return { ...PERFIL_VACIO };
   const d = snap.data();
+  const langs = ['es', 'ca', 'en'];
   return {
     tipo: d.tipo === 'empresa' ? 'empresa' : 'cliente',
     nombre: d.nombre || '',
     email: d.email || '',
     soloVegano: d.soloVegano === true,
     alergias: Array.isArray(d.alergias) ? d.alergias : [],
+    lang: langs.includes(d.lang) ? d.lang : detectarIdioma(),
   };
 }
 
