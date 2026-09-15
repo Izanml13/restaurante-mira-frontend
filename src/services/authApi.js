@@ -1,6 +1,6 @@
 /**
  * Model — autenticación con Firebase Auth (email + contraseña).
- * Recuperación de contraseña y 2FA (MFA SMS) incluidos.
+ * Recuperación de contraseña y verificación de email incluidos.
  */
 import {
   getAuth,
@@ -10,12 +10,9 @@ import {
   updateProfile,
   onAuthStateChanged,
   sendPasswordResetEmail,
-  multiFactor,
-  PhoneAuthProvider,
-  PhoneMultiFactorGenerator,
-  RecaptchaVerifier,
-  getMultiFactorResolver,
-  signInWithPhoneNumber,
+  sendEmailVerification,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
 } from 'firebase/auth';
 import { getFirebaseApp } from './firebase.js';
 import { guardarPerfil } from './perfilApi.js';
@@ -42,9 +39,18 @@ function mensajeError(code, defecto) {
       return 'Ese usuario está deshabilitado.';
     case 'auth/reset-password-too-many-requests':
       return 'Demasiadas peticiones de recuperación. Espera unos minutos.';
+    case 'auth/expired-action-code':
+      return 'Enlace caducado, pide otro.';
+    case 'auth/invalid-action-code':
+      return 'Enlace inválido o ya usado. Pide otro.';
     default:
       return defecto;
   }
+}
+
+/** URL de continuación tras el reset: la que Firebase usa en el enlace del email. */
+export function urlContinuacionReset() {
+  return window.location.origin + '/#/restablecer';
 }
 
 /**
@@ -64,6 +70,7 @@ export async function crearCuenta({ nombre, email, password, tipo = 'cliente', p
     if (preferencias) perfil.preferencias = preferencias;
     if (accesibilidad) perfil.accesibilidad = accesibilidad;
     await guardarPerfil(cred.user.uid, perfil);
+    sendEmailVerification(cred.user, { url: urlContinuacionReset() }).catch(() => {});
     return { nombre: nombre.trim(), email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo crear la cuenta. Inténtalo de nuevo.'));
@@ -80,13 +87,71 @@ export async function iniciarSesion({ email, password }) {
   }
 }
 
-/** Envía email de recuperación de contraseña (gratis, 0 coste). */
+/** Envía email de recuperación de contraseña (gratis, 0 coste). No revela si el email existe. */
 export async function recuperarContrasena(email) {
+  const limpio = email.trim();
   try {
-    await sendPasswordResetEmail(auth(), email.trim());
+    await sendPasswordResetEmail(auth(), limpio, {
+      url: urlContinuacionReset(),
+      handleCodeInApp: false,
+    });
   } catch (e) {
+    // No revelar existencia: email inexistente se trata como éxito.
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') return;
     throw new Error(mensajeError(e.code, 'No se pudo enviar el correo de recuperación.'));
   }
+}
+
+/**
+ * Verifica el oobCode del enlace y devuelve el email asociado.
+ * Lanza Error con mensaje en español (caducado / inválido).
+ */
+export async function verificarCodigoReset(oobCode) {
+  try {
+    return await verifyPasswordResetCode(auth(), oobCode);
+  } catch (e) {
+    throw new Error(mensajeError(e.code, 'Enlace inválido o caducado. Pide otro.'));
+  }
+}
+
+/** Confirma la nueva contraseña con el oobCode. Mensajes en español. */
+export async function confirmarNuevaContrasena(oobCode, nuevaPassword) {
+  try {
+    await confirmPasswordReset(auth(), oobCode, nuevaPassword);
+  } catch (e) {
+    throw new Error(mensajeError(e.code, 'No se pudo cambiar la contraseña. Pide otro enlace.'));
+  }
+}
+
+/** Enmascara un email: "maria@gmail.com" -> "m•••@gmail.com". */
+export function enmascararEmail(email) {
+  const [local = '', dominio = ''] = String(email || '').split('@');
+  if (!dominio) return 'tu correo';
+  const inicial = local.charAt(0) || '•';
+  return `${inicial}•••@${dominio}`;
+}
+
+/**
+ * Extrae el oobCode llegue como llegue:
+ * - Handler personalizado con hash: #/restablecer?mode=resetPassword&oobCode=XXX
+ * - Handler personalizado sin hash: ?oobCode=XXX (search)
+ * - Links de Firebase con ?mode=&oobCode= en search
+ */
+export function extraerOobCode() {
+  try {
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    const qHash = hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : '';
+    for (const qs of [qHash, search.replace(/^\?/, '')]) {
+      if (!qs) continue;
+      const params = new URLSearchParams(qs);
+      const code = params.get('oobCode');
+      if (code) return code;
+    }
+  } catch {
+    /* sin oobCode */
+  }
+  return '';
 }
 
 export function cerrarSesion() {
@@ -98,92 +163,25 @@ export function suscribirSesion(callback) {
   return onAuthStateChanged(auth(), (u) =>
     callback(
       u
-        ? { uid: u.uid, nombre: u.displayName || '', email: u.email ?? '', creado: u.metadata?.creationTime ?? null }
+        ? { uid: u.uid, nombre: u.displayName || '', email: u.email ?? '', emailVerified: Boolean(u.emailVerified), creado: u.metadata?.creationTime ?? null }
         : null,
     ),
   );
 }
 
-// =====================================================
-// 2FA — MFA SMS con Firebase (gratis: 10k SMS/mes)
-// =====================================================
-
-let recaptchaVerifier = null;
-
-function getRecaptcha(containerId) {
-  if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear(); } catch { /* ya destruido */ }
-  }
-  recaptchaVerifier = new RecaptchaVerifier(auth(), containerId, { size: 'invisible' });
-  return recaptchaVerifier;
+/** Envía email de verificación al usuario actual. */
+export async function enviarVerificacionEmail() {
+  const u = auth().currentUser;
+  if (!u) throw new Error('No hay sesión activa.');
+  await sendEmailVerification(u, { url: urlContinuacionReset() });
 }
 
-/**
- * Enlaza un teléfono al usuario actual (requiere 2FA SMS).
- * 1. Envia un SMS con código al teléfono.
- * 2. El usuario introduce el código → se enlaza al multiFactor.
- * @returns {{ verificationId: string }} — llévalo a enrollMfa2
- */
-export async function enviarCodigoMfa(phoneNumber, containerId) {
-  const recaptcha = getRecaptcha(containerId);
-  const session = multiFactor(auth().currentUser).session;
-  const phoneInfoOptions = { phoneNumber, session, recaptcha };
-  const provider = new PhoneAuthProvider(auth());
-  const verificationId = await provider.verifyPhoneNumber(phoneInfoOptions, recaptcha);
-  return { verificationId };
-}
-
-/**
- * Confirma el código SMS y completa el enrollment de 2FA.
- * @param {string} verificationId
- * @param {string} verificationCode - código de 6 dígitos
- */
-export async function enrollMfa(verificationId, verificationCode) {
-  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
-  await multiFactor(auth().currentUser).enroll(multiFactorAssertion, 'SMS');
-}
-
-/**
- * Verifica 2FA durante el login: resuelve el resolver de MFA y comprueba el código.
- * @param {object} resolver - error.resolver del error multi-factor
- * @param {string} verificationId
- * @param {string} verificationCode
- */
-export async function verificarMfaLogin(resolver, verificationId, verificationCode) {
-  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
-  await getMultiFactorResolver(auth(), resolver).resolveSignIn(multiFactorAssertion);
-}
-
-/**
- * Comprueba si el usuario tiene 2FA activado.
- * @returns {boolean}
- */
-export function tieneMfa() {
+/** Recarga el usuario de Firebase para obtener el emailVerified actualizado. */
+export async function recargarEmailVerified() {
   const u = auth().currentUser;
   if (!u) return false;
-  try {
-    const factors = multiFactor(u).enrolledFactors;
-    return factors && factors.length > 0;
-  } catch {
-    return false;
-  }
+  await u.reload();
+  return Boolean(u.emailVerified);
 }
 
-/**
- * Inicia sesión y devuelve el error MFA si el usuario tiene 2FA activo.
- * La UI debe gestionar el flujo: si es MFA → mostrar input de código SMS.
- * @returns {{ exito: boolean, mfaRequired?: object, error?: string }}
- */
-export async function iniciarSesionConMfa({ email, password }) {
-  try {
-    await signInWithEmailAndPassword(auth(), email.trim(), password);
-    return { exito: true };
-  } catch (e) {
-    if (e.code === 'auth/multi-factor-auth-required') {
-      return { exito: false, mfaRequired: e.resolver };
-    }
-    throw new Error(mensajeError(e.code, 'No se pudo iniciar sesión.'));
-  }
-}
+
