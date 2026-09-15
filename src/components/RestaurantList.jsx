@@ -4,8 +4,11 @@
  */
 import { useEffect, useRef } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
+import RestaurantSkeleton from './RestaurantSkeleton.jsx';
 
-export default function RestaurantList({ restaurants, filtros, onClear, onSelect, hayMas, cargandoMas, onLoadMore, esFavorito, onToggleFavorito, onVerCarta }) {
+const SKELETONS_CARGANDO_MAS = 3;
+
+export default function RestaurantList({ restaurants, filtros, onClear, onSelect, hayMas, cargandoMas, onLoadMore, esFavorito, onToggleFavorito, onVerCarta, cargandoInicial }) {
   const centinela = useRef(null);
 
   useEffect(() => {
@@ -22,7 +25,7 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
     return () => obs.disconnect();
   }, [hayMas, onLoadMore]);
 
-  if (restaurants.length === 0 && !hayMas) {
+  if (restaurants.length === 0 && !hayMas && !cargandoInicial) {
     const hayBusqueda = filtros?.q?.trim();
     return (
       <div className="vacio" role="status">
@@ -43,10 +46,13 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
             <RestaurantCard restaurant={r} filtros={filtros} onSelect={onSelect} esFavorito={esFavorito ? esFavorito(r.id) : false} onToggleFavorito={onToggleFavorito} onVerCarta={onVerCarta} />
           </li>
         ))}
+        {cargandoMas && Array.from({ length: SKELETONS_CARGANDO_MAS }, (_, i) => (
+          <li key={`skeleton-mas-${i}`}><RestaurantSkeleton /></li>
+        ))}
       </ul>
       {hayMas && (
-        <div ref={centinela} style={{ textAlign: 'center', padding: '1.2rem', color: 'var(--gris)' }} aria-hidden={!cargandoMas}>
-          {cargandoMas ? 'Cargando más restaurantes…' : ''}
+        <div ref={centinela} aria-hidden={!cargandoMas}>
+          {cargandoMas && <span className="sr-only">Cargando más restaurantes…</span>}
         </div>
       )}
     </>

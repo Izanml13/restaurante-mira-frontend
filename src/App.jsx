@@ -27,6 +27,7 @@ import Mapa from './components/Mapa.jsx';
 import Privacidad from './components/Privacidad.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
+import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
 import Footer from './components/Footer.jsx';
 import { enviarContacto } from './services/contactoApi.js';
@@ -174,9 +175,11 @@ export default function App() {
               </h2>
 
               {estado === 'cargando' && (
-                <p className="cargando" role="status">
-                  Cargando restaurantes…
-                </p>
+                <div className="grid" role="status" aria-label="Cargando restaurantes">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <RestaurantSkeleton key={`skel-${i}`} />
+                  ))}
+                </div>
               )}
 
               {estado === 'error' && (
