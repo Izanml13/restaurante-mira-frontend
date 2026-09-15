@@ -1,6 +1,11 @@
 /** View pura: inicio de sesión + enlace a recuperación por email. */
 import { useState } from 'react';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
+const TRADS = { es, ca, en };
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function avisoResetDesdeHash() {
@@ -15,6 +20,7 @@ function avisoResetDesdeHash() {
 }
 
 export default function Login({ onLogin, yaTieneSesion }) {
+  const t = useT(TRADS);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,8 +29,8 @@ export default function Login({ onLogin, yaTieneSesion }) {
 
   async function manejarEnvio(e) {
     e.preventDefault();
-    if (!EMAIL_OK.test(email.trim())) return setError('Escribe un correo válido.');
-    if (password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
+    if (!EMAIL_OK.test(email.trim())) return setError(t('auth.correoInvalido'));
+    if (password.length < 6) return setError(t('auth.contrasenaCorta'));
     setError('');
     setEnviando(true);
     try {
@@ -45,8 +51,8 @@ export default function Login({ onLogin, yaTieneSesion }) {
   return (
     <section className="auth-pagina" aria-labelledby="login-titulo">
       <form className="auth-tarjeta" onSubmit={manejarEnvio} noValidate>
-        <h1 id="login-titulo">Iniciar sesión</h1>
-        <p className="auth-sub">Entra para guardar tus sitios y opinar.</p>
+        <h1 id="login-titulo">{t('auth.iniciarSesion')}</h1>
+        <p className="auth-sub">{t('auth.entraParaGuardar')}</p>
         {avisoReset === 'ok' && (
           <p className="auth-sub" role="status" aria-live="polite" style={{ color: 'var(--verde)', fontWeight: 600 }}>
             Contraseña cambiada. Inicia sesión con tu nueva clave.
@@ -63,7 +69,7 @@ export default function Login({ onLogin, yaTieneSesion }) {
           </p>
         )}
         <div className="campo">
-          <label htmlFor="login-email">Correo</label>
+          <label htmlFor="login-email">{t('auth.correo')}</label>
           <input
             id="login-email"
             type="email"
@@ -73,7 +79,7 @@ export default function Login({ onLogin, yaTieneSesion }) {
           />
         </div>
         <div className="campo">
-          <label htmlFor="login-pass">Contraseña</label>
+          <label htmlFor="login-pass">{t('auth.contrasena')}</label>
           <input
             id="login-pass"
             type="password"
@@ -83,15 +89,15 @@ export default function Login({ onLogin, yaTieneSesion }) {
           />
         </div>
         <button type="submit" className="btn-cta btn-grande auth-boton" disabled={enviando}>
-          {enviando ? 'Entrando…' : 'Entrar'}
+          {enviando ? t('auth.entrando') : t('auth.entrar')}
         </button>
 
         <p className="auth-alt" style={{ margin: '0.6rem 0 0' }}>
-          <a href="#/recuperar">He olvidado mi contraseña</a>
+          <a href="#/recuperar">{t('auth.olvidasteContrasena')}</a>
         </p>
 
         <p className="auth-alt">
-          ¿No tienes cuenta? <a href="#/registro">Crea una gratis</a>
+          {t('auth.noTienesCuenta')} <a href="#/registro">{t('auth.creaUnaGratis')}</a>
         </p>
       </form>
     </section>
