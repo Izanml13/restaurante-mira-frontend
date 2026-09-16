@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { useRestaurantController } from './controllers/useRestaurantController.js';
 import { useAuth } from './controllers/useAuth.js';
+import { useI18n } from './i18n/index.jsx';
 import { PRECIOS, DISTANCIAS, ORDENES } from './models/restaurantModel.js';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
@@ -60,7 +61,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = useAuth();
+  const auth = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -83,6 +84,23 @@ export default function App() {
       /* sin almacenamiento: solo sesión */
     }
   }, [tema]);
+
+  return (
+    <I18nProvider onLangChange={auth.guardarLang}>
+      <AppContent auth={auth} tema={tema} setTema={setTema} />
+    </I18nProvider>
+  );
+}
+
+function AppContent({ auth, tema, setTema }) {
+  const { lang, setLang } = useI18n();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = auth;
+
+  useEffect(() => {
+    if (perfil?.lang && perfil.lang !== lang) {
+      setLang(perfil.lang);
+    }
+  }, [perfil?.lang]);
 
   const {
     filtros,
@@ -130,7 +148,6 @@ export default function App() {
   }
 
   return (
-    <I18nProvider lang={perfil.lang} onLangChange={guardarLang}>
     <>
       <a className="skip-link" href="#buscar">
         Saltar al buscador
@@ -149,7 +166,7 @@ export default function App() {
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacion} onRecargarEmailVerified={recargarEmailVerified} onGuardarLang={guardarLang} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacion} onRecargarEmailVerified={recargarEmailVerified} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
@@ -250,6 +267,5 @@ export default function App() {
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
     </>
-    </I18nProvider>
   );
 }

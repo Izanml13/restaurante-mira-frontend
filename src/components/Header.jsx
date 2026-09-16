@@ -3,7 +3,7 @@
  * En móvil el menú colapsa tras el botón hamburguesa (estado solo visual).
  */
 import { useEffect, useState } from 'react';
-import { useT } from '../i18n/index.jsx';
+import { useT, useI18n } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
@@ -12,6 +12,7 @@ const TRADS = { es, ca, en };
 
 export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, tema, onCambiarTema, onSalir }) {
   const t = useT(TRADS);
+  const { lang, cycleLang, available } = useI18n();
   const [abierto, setAbierto] = useState(false);
   const [oculto, setOculto] = useState(false);
 
@@ -69,6 +70,15 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         title={tema === 'oscuro' ? t('nav.modoClaro') : t('nav.modoOscuro')}
       >
         ◐
+      </button>
+      <button
+        type="button"
+        className="lang-boton"
+        onClick={cycleLang}
+        aria-label={available[lang]}
+        title={available[lang]}
+      >
+        {lang.toUpperCase()}
       </button>
       <button
         type="button"
