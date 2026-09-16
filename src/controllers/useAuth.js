@@ -6,7 +6,7 @@
  * Las Views reciben todo por props.
  */
 import { useEffect, useState } from 'react';
-import { suscribirSesion, crearCuenta, iniciarSesion, cerrarSesion, enviarVerificacionEmail, recargarEmailVerified } from '../services/authApi.js';
+import { suscribirSesion, crearCuenta, iniciarSesion, iniciarSesionGoogle as iniciarSesionGoogleFn, cerrarSesion, enviarVerificacionEmail, recargarEmailVerified } from '../services/authApi.js';
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
 import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
@@ -217,6 +217,7 @@ export function useAuth() {
     toggleFavorito,
     crearCuenta,
     iniciarSesion,
+    iniciarSesionGoogle: iniciarSesionGoogleFn,
     cerrarSesion,
     enviarVerificacionEmail,
     recargarEmailVerified,

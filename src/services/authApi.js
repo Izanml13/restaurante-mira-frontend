@@ -6,6 +6,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   updateProfile,
   onAuthStateChanged,
@@ -84,6 +86,17 @@ export async function iniciarSesion({ email, password }) {
     return { nombre: cred.user.displayName || '', email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo iniciar sesión. Inténtalo de nuevo.'));
+  }
+}
+
+/** @returns {Promise<{nombre:string,email:string}>} */
+export async function iniciarSesionGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    const cred = await signInWithPopup(auth(), provider);
+    return { nombre: cred.user.displayName || '', email: cred.user.email };
+  } catch (e) {
+    throw new Error(mensajeError(e.code, 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.'));
   }
 }
 
