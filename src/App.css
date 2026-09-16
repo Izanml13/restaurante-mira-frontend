@@ -144,6 +144,83 @@
   color: var(--verde);
 }
 
+/* Selector de idioma en Cuenta */
+.lang-selector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio-med, 12px);
+  background: var(--papel);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--tinta);
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 100px;
+}
+
+.lang-option:hover {
+  border-color: var(--primary-container);
+  background: color-mix(in srgb, var(--primary-container) 6%, var(--papel));
+}
+
+.lang-option.lang-activo {
+  border-color: var(--primary-container);
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-container) 30%, transparent);
+}
+
+.lang-flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.lang-code {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.lang-activo .lang-code {
+  opacity: 1;
+}
+
+.lang-name {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.lang-activo .lang-name {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .lang-selector {
+    gap: 0.35rem;
+  }
+  .lang-option {
+    padding: 0.45rem 0.65rem;
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+  .lang-name {
+    display: none;
+  }
+}
+
 @media (max-width: 767px) {
   .menu-boton {
     display: block;

@@ -89,14 +89,14 @@ export default function App() {
 
   return (
     <I18nProvider onLangChange={perfil?.guardarLang}>
-      <AppContent auth={{ usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion: enviarVerificacionEmail, enviarVerificacionEmail, recargarEmailVerified, guardarLang: perfil?.guardarLang }} tema={tema} setTema={setTema} />
+      <AppContent auth={{ usuario, crearCuenta, iniciarSesion, iniciarSesionGoogle, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion: enviarVerificacionEmail, enviarVerificacionEmail, recargarEmailVerified, guardarLang: perfil?.guardarLang }} tema={tema} setTema={setTema} />
     </I18nProvider>
   );
 }
 
 function AppContent({ auth, tema, setTema }) {
   const { lang, setLang } = useI18n();
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = auth;
+  const { usuario, crearCuenta, iniciarSesion, iniciarSesionGoogle, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = auth;
 
   useEffect(() => {
     if (perfil?.lang && perfil.lang !== lang) {
