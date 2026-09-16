@@ -1,23 +1,30 @@
 /**
  * View pura: ficha de restaurante minimalista con hover elevación + zoom.
  */
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
+
+const TRADS = { es, ca, en };
+
 function estrellas(valoracion) {
   const llenas = Math.round(valoracion);
   return '★'.repeat(llenas) + '☆'.repeat(Math.max(0, 5 - llenas));
 }
 
-function disponibilidadTexto(r, filtros){
+function disponibilidadTexto(r, filtros, t){
   if (!filtros) return null;
   const { dia, franja, hora } = filtros;
   if (!dia && !franja && !hora) return null;
-  // lógica simple: comprobar cierres simulados
-  if (dia === 'Lunes' && r.cocina === 'Asador') return 'Cerrado el lunes';
-  if (dia === 'Martes' && r.cocina === 'Fusión') return 'Cerrado el martes';
-  if (franja === 'cena' && r.cocina === 'Vegana' && r.precio === '€') return 'Solo desayuno/comida';
-  return `Disponible ${dia ? dia : ''} ${franja ? `· ${franja}` : ''} ${hora ? hora : ''}`.trim();
+  if (dia === 'Lunes' && r.cocina === 'Asador') return t('card.cerradoLunes');
+  if (dia === 'Martes' && r.cocina === 'Fusión') return t('card.cerradoMartes');
+  if (franja === 'cena' && r.cocina === 'Vegana' && r.precio === '€') return t('card.soloDesayuno');
+  return `${t('card.disponible')} ${dia ? dia : ''} ${franja ? `· ${franja}` : ''} ${hora ? hora : ''}`.trim();
 }
 
 export default function RestaurantCard({ restaurant, filtros, esFavorito, onToggleFavorito, onVerCarta, onSelect, children }) {
+  const t = useT(TRADS);
   const {
     nombre,
     cocina,
@@ -30,7 +37,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
     ciudad,
   } = restaurant;
   const destacado = valoracion >= 4.7;
-  const disp = disponibilidadTexto(restaurant, filtros);
+  const disp = disponibilidadTexto(restaurant, filtros, t);
 
   return (
     <article className="card">
@@ -41,15 +48,15 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
           alt={`${nombre} — cocina ${cocina}`}
           loading="lazy"
         />
-        {destacado && <span className="card-top">Recomendado</span>}
+        {destacado && <span className="card-top">{t('card.recomendado')}</span>}
         <span className="card-precio-badge">{precio}</span>
         {onToggleFavorito && (
           <button
             type="button"
             className={`card-fav${esFavorito ? ' card-fav-activo' : ''}`}
             aria-pressed={Boolean(esFavorito)}
-            aria-label={esFavorito ? `Quitar ${nombre} de favoritos` : `Guardar ${nombre} en favoritos`}
-            title={esFavorito ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+            aria-label={esFavorito ? `${t('card.quitarFavoritos')} ${nombre}` : `${t('card.guardarFavoritos')} ${nombre}`}
+            title={esFavorito ? t('card.quitarFavoritos') : t('card.guardarFavoritos')}
             onClick={() => onToggleFavorito(restaurant.id)}
           >
             ♥
@@ -65,35 +72,35 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
                 {estrellas(valoracion)} {valoracion.toLocaleString('es-ES')}
               </span>{' '}
               <span className="card-opiniones">
-                ({(totalResenasYelp ?? 0).toLocaleString('es-ES')} opiniones)
+                ({(totalResenasYelp ?? 0).toLocaleString('es-ES')} {t('card.opiniones')})
               </span>
             </>
           ) : (
-            <span className="card-nuevo">Nuevo · sin valoraciones aún</span>
+            <span className="card-nuevo">{t('card.nuevo')}</span>
           )}
         </p>
         <p className="card-gris">
           {cocina} · {ciudad}
           {restaurant.accesoDiscapacidad === true && (
-            <span className="card-accesible" title="Acceso adaptado verificado">
-              {' '}· Accesible
+            <span className="card-accesible" title={t('card.accesible')}>
+              {' '}{t('card.accesible')}
             </span>
           )}
         </p>
         <p className="card-gris" style={{display:'flex',alignItems:'center',gap:'0.3rem'}}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="3"/></svg>
-          {distanciaKm == null ? 'Centro no disponible' : `A ${distanciaKm.toLocaleString('es-ES', { maximumFractionDigits: 1 })} km del centro`}
+          {distanciaKm == null ? t('card.centroNoDisponible') : t('card.kmCentro', { km: distanciaKm.toLocaleString('es-ES', { maximumFractionDigits: 1 }) })}
         </p>
-        {disp && <p className="card-disponibilidad" style={{fontSize:'0.78rem',color: disp.includes('Cerrado') ? '#b42318' : 'var(--verde)', fontWeight:600, margin:'0.1rem 0 0'}}>{disp}</p>}
+        {disp && <p className="card-disponibilidad" style={{fontSize:'0.78rem',color: disp.includes(t('card.cerradoLunes')) || disp.includes(t('card.cerradoMartes')) ? '#b42318' : 'var(--verde)', fontWeight:600, margin:'0.1rem 0 0'}}>{disp}</p>}
         <p className="card-descripcion">{descripcion}</p>
         {children}
         <p className="card-acciones">
           <button type="button" className="btn-reservar" onClick={() => onSelect(restaurant)}>
-            Ver más información
+            {t('card.verMas')}
           </button>
           {onVerCarta && (
             <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
-              Ver carta
+              {t('card.verCarta')}
             </button>
           )}
         </p>
