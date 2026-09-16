@@ -60,7 +60,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, iniciarSesionGoogle, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -155,6 +155,47 @@ export default function App() {
     closeFloatingSheet();
   }
 
+  // Google login handler
+  async function handleLoginGoogle() {
+    await iniciarSesionGoogle();
+    window.location.hash = '#/';
+  }
+
+  useEffect(() => {
+    function alCambiarHash() {
+      setRuta(rutaActual());
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener('hashchange', alCambiarHash);
+    return () => window.removeEventListener('hashchange', alCambiarHash);
+  }, []);
+
+  async function salir() {
+    await cerrarSesion();
+    window.location.hash = '#/';
+  }
+
+  function openFloatingSheet(restaurant, hora, comensales) {
+    setSheetRestaurante(restaurant);
+    setSheetReserva({ fecha: sheetReserva.fecha, hora, comensales, ahorro: Math.round(parseInt(comensales, 10) * 18 * 0.15) });
+    setSheetVisible(true);
+  }
+
+  function closeFloatingSheet() {
+    setSheetVisible(false);
+    setTimeout(() => {
+      setSheetRestaurante(null);
+      setSheetReserva({ fecha: '', hora: '', comensales: '2', ahorro: 0 });
+    }, 350);
+  }
+
+  function handleFloatingConfirm() {
+    if (sheetRestaurante) {
+      abrirDetalle(sheetRestaurante);
+    }
+    closeFloatingSheet();
+  }
+
   return (
     <>
       <a className="skip-link" href="#buscar">
@@ -168,7 +209,7 @@ export default function App() {
             <a href="#/cuenta" style={{ color: '#fff', textDecoration: 'underline' }}>Verificar ahora</a>
           </div>
         )}
-        {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
+        {ruta === 'login' && <Login onLogin={iniciarSesion} onLoginGoogle={handleLoginGoogle} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'recuperar' && <Recuperar yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'restablecer' && <Restablecer yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
