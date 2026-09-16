@@ -1,4 +1,4 @@
-/** View pura: hero fotográfico con cifras (sin atajos). */
+/** View pura: hero editorial con imagen del template y cifras. */
 export default function Hero({ total, numZonas }) {
   return (
     <section id="inicio" className="hero" aria-labelledby="hero-titulo">

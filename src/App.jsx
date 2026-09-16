@@ -29,6 +29,8 @@ import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
 import Footer from './components/Footer.jsx';
+import BottomNav from './components/BottomNav.jsx';
+import FloatingReservation from './components/FloatingReservation.jsx';
 import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
@@ -58,7 +60,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes } = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -113,6 +115,11 @@ export default function App() {
   } = useRestaurantController({ dieta, accesibilidad });
   const [ruta, setRuta] = useState(rutaActual);
 
+  // Floating reservation sheet state
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const [sheetRestaurante, setSheetRestaurante] = useState(null);
+  const [sheetReserva, setSheetReserva] = useState({ fecha: '', hora: '', comensales: '2', ahorro: 0 });
+
   useEffect(() => {
     function alCambiarHash() {
       setRuta(rutaActual());
@@ -127,6 +134,27 @@ export default function App() {
     window.location.hash = '#/';
   }
 
+  function openFloatingSheet(restaurant, hora, comensales) {
+    setSheetRestaurante(restaurant);
+    setSheetReserva({ fecha: sheetReserva.fecha, hora, comensales, ahorro: Math.round(parseInt(comensales, 10) * 18 * 0.15) });
+    setSheetVisible(true);
+  }
+
+  function closeFloatingSheet() {
+    setSheetVisible(false);
+    setTimeout(() => {
+      setSheetRestaurante(null);
+      setSheetReserva({ fecha: '', hora: '', comensales: '2', ahorro: 0 });
+    }, 350);
+  }
+
+  function handleFloatingConfirm() {
+    if (sheetRestaurante) {
+      abrirDetalle(sheetRestaurante);
+    }
+    closeFloatingSheet();
+  }
+
   return (
     <>
       <a className="skip-link" href="#buscar">
@@ -134,13 +162,19 @@ export default function App() {
       </a>
       <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
       <main>
+        {usuario && !usuario.emailVerified && ruta !== 'login' && ruta !== 'registro' && ruta !== 'recuperar' && ruta !== 'restablecer' && (
+          <div className="aviso-email" role="alert" style={{ background: 'var(--naranja)', color: '#fff', padding: '0.7rem 1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span>Tu correo no está verificado.</span>
+            <a href="#/cuenta" style={{ color: '#fff', textDecoration: 'underline' }}>Verificar ahora</a>
+          </div>
+        )}
         {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'recuperar' && <Recuperar yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'restablecer' && <Restablecer yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacionEmail} onRecargarEmailVerified={recargarEmailVerified} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
@@ -238,6 +272,14 @@ export default function App() {
       <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
+      <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} />
+      <FloatingReservation
+        visible={sheetVisible}
+        restaurant={sheetRestaurante}
+        reserva={sheetReserva}
+        onConfirm={handleFloatingConfirm}
+        onClose={closeFloatingSheet}
+      />
     </>
   );
 }

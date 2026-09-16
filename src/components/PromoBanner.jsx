@@ -1,4 +1,4 @@
-/** View pura: franja de ventajas (estática, sin props ni lógica). */
+/** View pura: franja de ventajas con diseño editorial. */
 const VENTAJAS = [
   { titulo: 'Notas reales', texto: 'Medias de Yelp y de nuestra comunidad.' },
   { titulo: 'Cerca de ti', texto: 'Distancia real desde tu ubicación.' },
