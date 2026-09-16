@@ -49,7 +49,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
   return (
     <header className={`site-header${oculto ? ' oculto' : ''}`}>
       <a href="#/" className="logo logo-imagen" aria-label="MIRA - inicio" onClick={cerrar}>
-        <img src="/logotipo.png" alt="MIRA" />
+        <img src="/logo.png" alt="MIRA" />
       </a>
       <button
         type="button"
