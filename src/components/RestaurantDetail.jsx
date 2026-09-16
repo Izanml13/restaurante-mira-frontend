@@ -1,5 +1,5 @@
 /**
- * Modal detalle: info + reservas Firestore + mapa horizontal + reseñas con likes.
+ * Modal detalle premium: info + reservas + mapa + reseñas con likes.
  */
 import { useEffect, useState } from 'react';
 import { crearReserva, getDisponibilidad, SLOTS } from '../services/reservaApi.js';
@@ -8,6 +8,7 @@ import { semillaLikes, parseFechaLocal, hoyLocalISO, ordenarResenas, cartaDelLoc
 import { pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
 import { fetchNearbyParkings } from '../services/parkingApi.js';
 import RestaurantMap from './RestaurantMap.jsx';
+import ParkingsPanel from './ParkingsPanel.jsx';
 import { Sellos, MiniLeyenda } from './Sellos.jsx';
 
 function marcaInfo(valor) {
@@ -26,11 +27,11 @@ function googleLink(coords, direccion) {
 
 function StarPicker({ value, onChange }) {
   return (
-    <div style={{display:'flex',gap:'0.15rem'}} role="radiogroup" aria-label="Puntuación">
-      {[1,2,3,4,5].map(n=> (
-        <button key={n} type="button" role="radio" aria-checked={value===n} aria-label={`${n} estrellas`}
-          onClick={()=> onChange(n)}
-          style={{background:'none',border:'none',cursor:'pointer',padding:0,color: n<=value ? 'var(--verde)' : 'var(--borde)',fontSize:'1.45rem',lineHeight:1}}>
+    <div style={{ display: 'flex', gap: '0.15rem' }} role="radiogroup" aria-label="Puntuación">
+      {[1, 2, 3, 4, 5].map(n => (
+        <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} estrellas`}
+          onClick={() => onChange(n)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: n <= value ? 'var(--estrella)' : 'var(--borde)', fontSize: '1.45rem', lineHeight: 1 }}>
           ★
         </button>
       ))}
@@ -41,28 +42,26 @@ function StarPicker({ value, onChange }) {
 export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta }) {
   const [verTodas, setVerTodas] = useState(false);
   const [verTodasYelp, setVerTodasYelp] = useState(false);
-  const [ordenResenas, setOrdenResenas] = useState('populares'); // populares | recientes
+  const [ordenResenas, setOrdenResenas] = useState('populares');
   const [reserva, setReserva] = useState({ fecha: '', hora: '', comensales: '2', comentarios: '' });
-  const [disponibilidad, setDisponibilidad] = useState(null); // { limite, ocupadas, libres } | null
-  const [meteoReserva, setMeteoReserva] = useState(null); // pronóstico del día elegido | null
+  const [disponibilidad, setDisponibilidad] = useState(null);
+  const [meteoReserva, setMeteoReserva] = useState(null);
   const [confirmacion, setConfirmacion] = useState(null);
   const [errorReserva, setErrorReserva] = useState('');
   const [cargandoReserva, setCargandoReserva] = useState(false);
 
-  // reseñas
   const [resenasFs, setResenasFs] = useState([]);
   const [cargandoResenas, setCargandoResenas] = useState(true);
-  const [nuevaResena, setNuevaResena] = useState({ puntuacion:5, comentario:'' });
+  const [nuevaResena, setNuevaResena] = useState({ puntuacion: 5, comentario: '' });
   const [errorResena, setErrorResena] = useState('');
   const [enviandoResena, setEnviandoResena] = useState(false);
 
-  // parkings cercanos
   const [parkings, setParkings] = useState([]);
   const [cargandoParkings, setCargandoParkings] = useState(false);
+  const [parkingSeleccionado, setParkingSeleccionado] = useState(null);
 
   const media = restaurant.media;
-  const mockResenas = (restaurant.resenas ?? []).map((r,i)=> ({ ...r, id:`mock-${i}`, likes: (r.likes ?? semillaLikes(restaurant.id, i)), likedBy:[], esMock:true, puntuacion:r.puntuacion }));
-  // Secciones separadas: MIRA (usuarios, con likes) y Yelp (ficha, ordenables igual).
+  const mockResenas = (restaurant.resenas ?? []).map((r, i) => ({ ...r, id: `mock-${i}`, likes: (r.likes ?? semillaLikes(restaurant.id, i)), likedBy: [], esMock: true, puntuacion: r.puntuacion }));
   const resenasMira = ordenarResenas(resenasFs, ordenResenas);
   const resenasYelp = ordenarResenas(mockResenas, ordenResenas);
   const visiblesMira = verTodas ? resenasMira : resenasMira.slice(0, MOSTRAR_INICIAL);
@@ -74,10 +73,10 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
       <li>
         <p className="resena-cab">
           <strong>{r.usuarioNombre || r.usuario}</strong> · {r.fecha || (r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('es-ES') : '')} · <span aria-label={`${r.puntuacion} de 5`}>★ {r.puntuacion}</span>
-          <span style={{float:'right',display:'flex',alignItems:'center',gap:'0.3rem'}}>
-            <button type="button" onClick={()=> handleLike(r)} disabled={r.esMock} title={r.esMock ? 'Solo reseñas MIRA se pueden likear' : liked ? 'Quitar like' : 'Dar like'} style={{display:'inline-flex',alignItems:'center',gap:'0.25rem',background: liked ? 'var(--verde)' : 'var(--fondo)', color: liked ? '#fff' : 'var(--tinta)', border:'1px solid var(--borde)', borderRadius:'999px', padding:'0.15rem 0.5rem', cursor: r.esMock ? 'not-allowed' : 'pointer', fontSize:'0.78rem', fontWeight:700, opacity: r.esMock?0.5:1}}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-              {r.likes||0}
+          <span style={{ float: 'right', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <button type="button" onClick={() => handleLike(r)} disabled={r.esMock} title={r.esMock ? 'Solo reseñas MIRA se pueden likear' : liked ? 'Quitar like' : 'Dar like'} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', background: liked ? 'var(--primary-container)' : 'var(--papel)', color: liked ? '#fff' : 'var(--tinta)', border: '1px solid var(--borde)', borderRadius: '999px', padding: '0.15rem 0.5rem', cursor: r.esMock ? 'not-allowed' : 'pointer', fontSize: '0.78rem', fontWeight: 700, opacity: r.esMock ? 0.5 : 1 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" /></svg>
+              {r.likes || 0}
             </button>
           </span>
         </p>
@@ -87,7 +86,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   }
   const externalMapUrl = googleLink(restaurant.coords, restaurant.direccion);
 
-  // Plazas libres del slot elegido (1 lectura al doc de aforo).
   useEffect(() => {
     let vivo = true;
     setDisponibilidad(null);
@@ -98,7 +96,6 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     return () => { vivo = false; };
   }, [restaurant, reserva.fecha, reserva.hora]);
 
-  // Meteo del día elegido (solo si el local tiene terraza; gratis y con caché).
   useEffect(() => {
     let vivo = true;
     setMeteoReserva(null);
@@ -113,16 +110,15 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
 
   function cerrarDesdeFondo(e) { if (e.target === e.currentTarget) onClose(); }
 
-  useEffect(()=>{
-    let vivo=true;
+  useEffect(() => {
+    let vivo = true;
     setCargandoResenas(true);
-    listarResenasDeRestaurante(restaurant.id).then(list=>{
-      if(vivo) { setResenasFs(list); setCargandoResenas(false); }
-    }).catch(()=> vivo && setCargandoResenas(false));
-    return ()=> { vivo=false; };
+    listarResenasDeRestaurante(restaurant.id).then(list => {
+      if (vivo) { setResenasFs(list); setCargandoResenas(false); }
+    }).catch(() => vivo && setCargandoResenas(false));
+    return () => { vivo = false; };
   }, [restaurant.id]);
 
-  // Parkings cercanos (≤500m) al tener coords
   useEffect(() => {
     let vivo = true;
     const coords = restaurant.coords;
@@ -138,48 +134,46 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     return () => { vivo = false; };
   }, [restaurant.coords]);
 
-  async function handleReserva(e){
+  async function handleReserva(e) {
     e.preventDefault();
     setErrorReserva(''); setConfirmacion(null);
-    if (!usuario?.uid){ window.location.hash = '#/login'; return; }
-    if (!reserva.fecha || !reserva.hora || !reserva.comensales){ setErrorReserva('Elige fecha, hora y comensales.'); return; }
+    if (!usuario?.uid) { window.location.hash = '#/login'; return; }
+    if (!reserva.fecha || !reserva.hora || !reserva.comensales) { setErrorReserva('Elige fecha, hora y comensales.'); return; }
     const hoy = parseFechaLocal(hoyLocalISO());
-    if (parseFechaLocal(reserva.fecha) < hoy){ setErrorReserva('La fecha no puede ser anterior a hoy.'); return; }
+    if (parseFechaLocal(reserva.fecha) < hoy) { setErrorReserva('La fecha no puede ser anterior a hoy.'); return; }
     setCargandoReserva(true);
-    try{
+    try {
       const r = await crearReserva({ restaurante: restaurant, usuario, fecha: reserva.fecha, hora: reserva.hora, comensales: reserva.comensales, comentarios: reserva.comentarios });
       setConfirmacion(r);
       const d = await getDisponibilidad(restaurant, reserva.fecha, reserva.hora);
       setDisponibilidad(d);
-    } catch(err){ setErrorReserva(err.message); }
-    finally{ setCargandoReserva(false); }
+    } catch (err) { setErrorReserva(err.message); }
+    finally { setCargandoReserva(false); }
   }
 
-  async function handleCrearResena(e){
+  async function handleCrearResena(e) {
     e.preventDefault();
     setErrorResena('');
-    if(!usuario?.uid){ setErrorResena('Debes iniciar sesión para reseñar.'); return; }
+    if (!usuario?.uid) { setErrorResena('Debes iniciar sesión para reseñar.'); return; }
     setEnviandoResena(true);
-    try{
+    try {
       await crearResena({ restauranteId: restaurant.id, usuario, puntuacion: nuevaResena.puntuacion, comentario: nuevaResena.comentario });
-      setNuevaResena({ puntuacion:5, comentario:'' });
+      setNuevaResena({ puntuacion: 5, comentario: '' });
       const list = await listarResenasDeRestaurante(restaurant.id);
       setResenasFs(list);
-    }catch(err){ setErrorResena(err.message); }
-    finally{ setEnviandoResena(false); }
+    } catch (err) { setErrorResena(err.message); }
+    finally { setEnviandoResena(false); }
   }
 
-  async function handleLike(r){
-    if(!usuario?.uid){ setErrorResena('Inicia sesión para dar like.'); return; }
-    const ya = (r.likedBy||[]).includes(usuario.uid);
-    // optimista
-    setResenasFs(prev=> prev.map(x=> x.id===r.id ? { ...x, likes: (x.likes||0)+(ya?-1:1), likedBy: ya ? x.likedBy.filter(id=>id!==usuario.uid) : [...(x.likedBy||[]), usuario.uid] } : x));
-    try{
-      if(ya) await quitarLikeResena(r.id, usuario.uid);
+  async function handleLike(r) {
+    if (!usuario?.uid) { setErrorResena('Inicia sesión para dar like.'); return; }
+    const ya = (r.likedBy || []).includes(usuario.uid);
+    setResenasFs(prev => prev.map(x => x.id === r.id ? { ...x, likes: (x.likes || 0) + (ya ? -1 : 1), likedBy: ya ? x.likedBy.filter(id => id !== usuario.uid) : [...(x.likedBy || []), usuario.uid] } : x));
+    try {
+      if (ya) await quitarLikeResena(r.id, usuario.uid);
       else await darLikeResena(r.id, usuario.uid);
-    }catch{
-      // revertir
-      setResenasFs(prev=> prev.map(x=> x.id===r.id ? { ...x, likes: (x.likes||0)+(ya?1:-1), likedBy: ya ? [...(x.likedBy||[]), usuario.uid] : x.likedBy.filter(id=>id!==usuario.uid) } : x));
+    } catch {
+      setResenasFs(prev => prev.map(x => x.id === r.id ? { ...x, likes: (x.likes || 0) + (ya ? 1 : -1), likedBy: ya ? [...(x.likedBy || []), usuario.uid] : x.likedBy.filter(id => id !== usuario.uid) } : x));
     }
   }
 
@@ -187,181 +181,179 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     <div className="modal-fondo" onClick={cerrarDesdeFondo}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo" style={{ '--acento': restaurant.acento }}>
         <button type="button" className="modal-cerrar" onClick={onClose} aria-label="Cerrar detalle" autoFocus>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <img className="modal-foto" src={restaurant.imagen} alt={`${restaurant.nombre} — cocina ${restaurant.cocina}`} />
         <div className="modal-cuerpo">
-              <p className="card-meta" style={{color:'var(--gris)',fontSize:'0.85rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.04em',margin:'0 0 0.3rem'}}>{restaurant.cocina}</p>
-              <h2 id="detalle-titulo" className="modal-titulo">{restaurant.nombre}</h2>
-              {(restaurant.categorias?.length > 1) && (
-                <ul className="modal-chips" aria-label="Especialidades">
-                  {restaurant.categorias.map((c) => (<li key={c}>{c}</li>))}
-                </ul>
+          <p className="card-meta" style={{ color: 'var(--gris)', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 0.3rem' }}>{restaurant.cocina}</p>
+          <h2 id="detalle-titulo" className="modal-titulo">{restaurant.nombre}</h2>
+          {(restaurant.categorias?.length > 1) && (
+            <ul className="modal-chips" aria-label="Especialidades">
+              {restaurant.categorias.map((c) => (<li key={c}>{c}</li>))}
+            </ul>
+          )}
+          <dl className="modal-datos">
+            <div><dt>Nota Yelp</dt><dd>★ {restaurant.valoracion.toLocaleString('es-ES')} ({restaurant.totalResenasYelp ?? 0} reseñas)</dd></div>
+            {media != null && (<div><dt>Nota MIRA</dt><dd>★ {media.toLocaleString('es-ES')}</dd></div>)}
+            <div><dt>Precio</dt><dd>{restaurant.precio}</dd></div>
+            {restaurant.direccion && (<div><dt>Dirección</dt><dd>{restaurant.direccion}</dd></div>)}
+            {restaurant.telefono && (<div><dt>Teléfono</dt><dd><a href={`tel:${restaurant.telefono.replace(/\s/g, '')}`}>{restaurant.telefono}</a></dd></div>)}
+            <div><dt>Acceso adaptado</dt><dd>{marcaInfo(restaurant.accesoDiscapacidad)}</dd></div>
+            <div><dt>Menú infantil</dt><dd>{marcaInfo(restaurant.menuInfantil)}</dd></div>
+            <div><dt>Tronas / sillas de bebé</dt><dd>{marcaInfo(restaurant.tronas)}</dd></div>
+            <div><dt>Terraza</dt><dd>{marcaInfo(restaurant.terraza)}</dd></div>
+            <div><dt>Entorno tranquilo</dt><dd>{marcaInfo(restaurant.entornoTranquilo)}</dd></div>
+            <div><dt>Alérgenos</dt><dd>{restaurant.alergenos || 'Sin información: confirma con el local'}</dd></div>
+          </dl>
+          <p className="modal-acciones">
+            {onVerCarta && (
+              <button type="button" className="btn-cta btn-peq" onClick={() => onVerCarta(restaurant)}>
+                Ver carta
+              </button>
+            )}
+            {externalMapUrl && (<a className="btn-secundario" href={externalMapUrl} target="_blank" rel="noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ verticalAlign: '-2px', marginRight: 6 }}><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" /><circle cx="12" cy="10" r="3" /></svg>Cómo llegar</a>)}
+            {restaurant.yelpUrl && (<a className="btn-secundario" href={restaurant.yelpUrl} target="_blank" rel="noreferrer">Ver en Yelp</a>)}
+          </p>
+
+          <section aria-labelledby="carta-titulo">
+            <h3 id="carta-titulo" className="modal-sub">La carta</h3>
+            <MiniLeyenda />
+            <ul className="carta-lista">
+              {cartaDelLocal(restaurant).map((p) => (
+                <li key={p.nombre}>
+                  <span>{p.nombre} <Sellos plato={{ ...p, ...flagsPlato(p.nombre) }} /></span>
+                  <span className="carta-precio">{p.precio} €</span>
+                </li>
+              ))}
+            </ul>
+            {onVerCarta && (
+              <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
+                Ver carta completa
+              </button>
+            )}
+          </section>
+
+          <section className="reserva-bloque" aria-labelledby="reserva-titulo">
+            <h3 id="reserva-titulo" className="modal-sub" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+              Reservar mesa
+            </h3>
+            <form className="reserva-form" onSubmit={handleReserva} noValidate>
+              <div className="reserva-grid">
+                <label className="campo"><span>Fecha</span><input type="date" value={reserva.fecha} onChange={e => setReserva(s => ({ ...s, fecha: e.target.value }))} min={hoyLocalISO()} /></label>
+                <label className="campo"><span>Hora</span>
+                  <select value={reserva.hora} onChange={e => setReserva(s => ({ ...s, hora: e.target.value }))}>
+                    <option value="">Elige hora</option>
+                    {SLOTS.map(h => <option key={h} value={h}>{h}</option>)}
+                  </select>
+                </label>
+                <label className="campo"><span>Comensales</span><select value={reserva.comensales} onChange={e => setReserva(s => ({ ...s, comensales: e.target.value }))}>{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n} {n === 1 ? 'persona' : 'personas'}</option>)}</select></label>
+              </div>
+              <label className="campo" style={{ marginTop: '0.6rem' }}><span>Comentarios (opcional, máx. 500)</span><textarea value={reserva.comentarios} onChange={e => setReserva(s => ({ ...s, comentarios: e.target.value }))} maxLength={500} rows={2} placeholder="Trona, cumpleaños, alergias…" /></label>
+              {reserva.fecha && reserva.hora && disponibilidad && (
+                <p className="reserva-plazas" role="status">
+                  {disponibilidad.libres > 0
+                    ? `${disponibilidad.libres} de ${disponibilidad.limite} plazas libres`
+                    : 'Completo a esa hora. Prueba otra franja.'}
+                </p>
               )}
-              <dl className="modal-datos">
-                <div><dt>Nota Yelp</dt><dd>★ {restaurant.valoracion.toLocaleString('es-ES')} ({restaurant.totalResenasYelp ?? 0} reseñas)</dd></div>
-                {media != null && (<div><dt>Nota MIRA</dt><dd>★ {media.toLocaleString('es-ES')}</dd></div>)}
-                <div><dt>Precio</dt><dd>{restaurant.precio}</dd></div>
-                {restaurant.direccion && (<div><dt>Dirección</dt><dd>{restaurant.direccion}</dd></div>)}
-                {restaurant.telefono && (<div><dt>Teléfono</dt><dd><a href={`tel:${restaurant.telefono.replace(/\s/g,'')}`}>{restaurant.telefono}</a></dd></div>)}
-                <div><dt>Acceso adaptado</dt><dd>{marcaInfo(restaurant.accesoDiscapacidad)}</dd></div>
-                <div><dt>Menú infantil</dt><dd>{marcaInfo(restaurant.menuInfantil)}</dd></div>
-                <div><dt>Tronas / sillas de bebé</dt><dd>{marcaInfo(restaurant.tronas)}</dd></div>
-                <div><dt>Terraza</dt><dd>{marcaInfo(restaurant.terraza)}</dd></div>
-                <div><dt>Entorno tranquilo</dt><dd>{marcaInfo(restaurant.entornoTranquilo)}</dd></div>
-                <div><dt>Alérgenos</dt><dd>{restaurant.alergenos || 'Sin información: confirma con el local'}</dd></div>
-              </dl>
-              <p className="modal-acciones">
-                {onVerCarta && (
-                  <button type="button" className="btn-cta btn-peq" onClick={() => onVerCarta(restaurant)}>
-                    Ver carta
-                  </button>
-                )}
-                {externalMapUrl && (<a className="btn-secundario" href={externalMapUrl} target="_blank" rel="noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign:'-2px',marginRight:6}}><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="3"/></svg>Cómo llegar</a>)}
-                {restaurant.yelpUrl && (<a className="btn-secundario" href={restaurant.yelpUrl} target="_blank" rel="noreferrer">Ver en Yelp</a>)}
-              </p>
+              {avisoTerraza && (
+                <p className="reserva-aviso-meteo" role="status">
+                  {avisoTerraza}
+                  {meteoReserva && ` (${meteoReserva.resumen})`}
+                </p>
+              )}
+              {errorReserva && <p className="reserva-error" role="alert">{errorReserva}</p>}
+              <button type="submit" className="btn-cta" style={{ width: '100%', marginTop: '0.7rem' }} disabled={cargandoReserva || (disponibilidad && disponibilidad.libres <= 0)}>
+                {cargandoReserva ? 'Reservando…' : 'Reservar ahora'}
+              </button>
+              {!usuario && <p style={{ fontSize: '0.82rem', color: 'var(--gris)', margin: '0.5rem 0 0' }}>Debes <a href="#/login">iniciar sesión</a> para reservar.</p>}
+            </form>
+            {confirmacion && (
+              <div className="reserva-confirm" role="status">
+                <strong>¡Reserva confirmada!</strong>
+                <p>Código: <code>{confirmacion.codigo}</code> — {confirmacion.fecha} a las {confirmacion.hora} para {confirmacion.comensales} personas en <em>{confirmacion.restauranteNombre}</em>.</p>
+                <p><a href="#/reservas">Ver mis reservas</a></p>
+              </div>
+            )}
+          </section>
 
-              <section aria-labelledby="carta-titulo">
-                <h3 id="carta-titulo" className="modal-sub">La carta</h3>
-                <MiniLeyenda />
-                <ul className="carta-lista">
-                  {cartaDelLocal(restaurant).map((p) => (
-                    <li key={p.nombre}>
-                      <span>{p.nombre} <Sellos plato={{ ...p, ...flagsPlato(p.nombre) }} /></span>
-                      <span className="carta-precio">{p.precio} €</span>
-                    </li>
-                  ))}
-                </ul>
-                {onVerCarta && (
-                  <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
-                    Ver carta completa
-                  </button>
-                )}
-              </section>
+          {restaurant.coords ? (
+            <section className="parking-section" aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+              <div className="parking-grid">
+                <RestaurantMap
+                  restaurant={restaurant}
+                  parkings={parkings}
+                  selectedIndex={parkingSeleccionado}
+                />
+                <ParkingsPanel
+                  parkings={parkings}
+                  cargando={cargandoParkings}
+                  onSeleccionarParking={(i) => setParkingSeleccionado(i)}
+                />
+              </div>
+              <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
+            </section>
+          ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
 
-              <section className="reserva-bloque" aria-labelledby="reserva-titulo">
-                <h3 id="reserva-titulo" className="modal-sub" style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  Reservar mesa
-                </h3>
-                <form className="reserva-form" onSubmit={handleReserva} noValidate>
-                  <div className="reserva-grid">
-                    <label className="campo"><span>Fecha</span><input type="date" value={reserva.fecha} onChange={e=>setReserva(s=>({...s,fecha:e.target.value}))} min={hoyLocalISO()} /></label>
-                    <label className="campo"><span>Hora</span>
-                      <select value={reserva.hora} onChange={e=>setReserva(s=>({...s,hora:e.target.value}))}>
-                        <option value="">Elige hora</option>
-                        {SLOTS.map(h=><option key={h} value={h}>{h}</option>)}
-                      </select>
-                    </label>
-                    <label className="campo"><span>Comensales</span><select value={reserva.comensales} onChange={e=>setReserva(s=>({...s,comensales:e.target.value}))}>{[1,2,3,4,5,6,7,8,9,10].map(n=><option key={n} value={n}>{n} {n===1?'persona':'personas'}</option>)}</select></label>
-                  </div>
-                  <label className="campo" style={{marginTop:'0.6rem'}}><span>Comentarios (opcional, máx. 500)</span><textarea value={reserva.comentarios} onChange={e=>setReserva(s=>({...s,comentarios:e.target.value}))} maxLength={500} rows={2} placeholder="Trona, cumpleaños, alergias…" /></label>
-                  {reserva.fecha && reserva.hora && disponibilidad && (
-                    <p className="reserva-plazas" role="status">
-                      {disponibilidad.libres > 0
-                        ? `${disponibilidad.libres} de ${disponibilidad.limite} plazas libres`
-                        : 'Completo a esa hora. Prueba otra franja.'}
-                    </p>
-                  )}
-                  {avisoTerraza && (
-                    <p className="reserva-aviso-meteo" role="status">
-                      {avisoTerraza}
-                      {meteoReserva && ` (${meteoReserva.resumen})`}
-                    </p>
-                  )}
-                  {errorReserva && <p className="reserva-error" role="alert">{errorReserva}</p>}
-                  <button type="submit" className="btn-cta" style={{width:'100%',marginTop:'0.7rem'}} disabled={cargandoReserva || (disponibilidad && disponibilidad.libres <= 0)}>
-                    {cargandoReserva ? 'Reservando…' : 'Reservar'}
-                  </button>
-                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>Debes <a href="#/login">iniciar sesión</a> para reservar.</p>}
-                </form>
-                {confirmacion && (
-                  <div className="reserva-confirm" role="status">
-                    <strong>¡Reserva confirmada!</strong>
-                    <p>Código: <code>{confirmacion.codigo}</code> — {confirmacion.fecha} a las {confirmacion.hora} para {confirmacion.comensales} personas en <em>{confirmacion.restauranteNombre}</em>.</p>
-                    <p><a href="#/reservas">Ver mis reservas</a></p>
-                  </div>
-                )}
-              </section>
+          <section aria-labelledby="resenas-titulo">
+            <h3 id="resenas-titulo" className="modal-sub">Reseñas ({resenasMira.length + resenasYelp.length})</h3>
+            <div className="tabs" role="group" aria-label="Ordenar reseñas" style={{ marginBottom: '1rem' }}>
+              {[
+                ['populares', 'Populares'],
+                ['recientes', 'Más recientes'],
+              ].map(([valor, etiqueta]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  aria-pressed={ordenResenas === valor}
+                  className={ordenResenas === valor ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
+                  onClick={() => setOrdenResenas(valor)}
+                >
+                  {etiqueta}
+                </button>
+              ))}
+            </div>
 
-              {restaurant.coords ? (
-                <section aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
-                  <RestaurantMap restaurant={restaurant} parkings={parkings} />
-                  <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
-                  {cargandoParkings && <p role="status" style={{fontSize:'0.9rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>Cargando parkings…</p>}
-                  {!cargandoParkings && parkings.length > 0 && (
-                    <ul className="parkings-lista" aria-label="Parkings cercanos">
-                      {parkings.map((p) => (
-                        <li key={p.id}>
-                          {p.nombre} — {p.distanciaM} m — {p.gratuito === 'yes' ? 'Gratis' : p.gratuito === 'no' ? 'Pago' : '—'}{p.plazas != null ? ` · ${p.plazas} plazas` : ''}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {!cargandoParkings && parkings.length === 0 && (
-                    <p style={{fontSize:'0.92rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>No hay parkings mapeados cerca{externalMapUrl ? <> — <a href={externalMapUrl} target="_blank" rel="noreferrer">Ver en Google Maps</a></> : null}</p>
-                  )}
-                </section>
-              ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
+            <h4 className="modal-sub2">Reseñas MIRA ({resenasMira.length})</h4>
+            <form onSubmit={handleCrearResena} className="resena-form" style={{ background: 'var(--fondo-suave)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radio-peq)', padding: '0.9rem', marginBottom: '1rem' }}>
+              <StarPicker value={nuevaResena.puntuacion} onChange={v => setNuevaResena(s => ({ ...s, puntuacion: v }))} />
+              <label className="campo" style={{ marginTop: '0.5rem' }}><span>Tu comentario</span><textarea value={nuevaResena.comentario} onChange={e => setNuevaResena(s => ({ ...s, comentario: e.target.value }))} placeholder="Cuenta tu experiencia..." rows={3} /></label>
+              {errorResena && <p className="reserva-error">{errorResena}</p>}
+              <button type="submit" className="btn-secundario" disabled={enviandoResena} style={{ marginTop: '0.5rem', width: '100%' }}>{enviandoResena ? 'Enviando…' : 'Publicar reseña'}</button>
+              {!usuario && <p style={{ fontSize: '0.82rem', color: 'var(--gris)', margin: '0.4rem 0 0' }}>Debes iniciar sesión para reseñar.</p>}
+            </form>
 
-              <section aria-labelledby="resenas-titulo">
-                <h3 id="resenas-titulo" className="modal-sub">Reseñas ({resenasMira.length + resenasYelp.length})</h3>
-                <div className="tabs" role="group" aria-label="Ordenar reseñas" style={{marginBottom:'1rem'}}>
-                  {[
-                    ['populares', 'Populares'],
-                    ['recientes', 'Más recientes'],
-                  ].map(([valor, etiqueta]) => (
-                    <button
-                      key={valor}
-                      type="button"
-                      aria-pressed={ordenResenas === valor}
-                      className={ordenResenas === valor ? 'btn-cta btn-peq' : 'btn-secundario btn-peq'}
-                      onClick={() => setOrdenResenas(valor)}
-                    >
-                      {etiqueta}
-                    </button>
-                  ))}
-                </div>
+            {cargandoResenas && <p>Cargando reseñas…</p>}
+            {!cargandoResenas && resenasMira.length === 0 && (
+              <p className="vacio-texto">Aún no hay reseñas MIRA. ¡Sé la primera persona en opinar!</p>
+            )}
+            <ul className="modal-resenas">
+              {visiblesMira.map((r) => (
+                <ItemResena key={r.id} r={r} />
+              ))}
+            </ul>
+            {resenasMira.length > MOSTRAR_INICIAL && (
+              <button type="button" className="btn-secundario" onClick={() => setVerTodas((v) => !v)}>
+                {verTodas ? 'Ver menos' : `Ver las ${resenasMira.length} reseñas MIRA`}
+              </button>
+            )}
 
-                <h4 className="modal-sub2">Reseñas MIRA ({resenasMira.length})</h4>
-                <form onSubmit={handleCrearResena} className="resena-form" style={{background:'var(--fondo-suave)',border:'1px solid var(--borde)',borderRadius:'var(--radio-peq)',padding:'0.9rem',marginBottom:'1rem'}}>
-                  <StarPicker value={nuevaResena.puntuacion} onChange={v=> setNuevaResena(s=>({...s,puntuacion:v}))} />
-                  <label className="campo" style={{marginTop:'0.5rem'}}><span>Tu comentario</span><textarea value={nuevaResena.comentario} onChange={e=> setNuevaResena(s=>({...s,comentario:e.target.value}))} placeholder="Cuenta tu experiencia..." rows={3} /></label>
-                  {errorResena && <p className="reserva-error">{errorResena}</p>}
-                  <button type="submit" className="btn-secundario" disabled={enviandoResena} style={{marginTop:'0.5rem',width:'100%'}}>{enviandoResena ? 'Enviando…' : 'Publicar reseña'}</button>
-                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.4rem 0 0'}}>Debes iniciar sesión para reseñar.</p>}
-                </form>
-
-                {cargandoResenas && <p>Cargando reseñas…</p>}
-                {!cargandoResenas && resenasMira.length === 0 && (
-                  <p className="vacio-texto">Aún no hay reseñas MIRA. ¡Sé la primera persona en opinar!</p>
-                )}
-                <ul className="modal-resenas">
-                  {visiblesMira.map((r) => (
-                    <ItemResena key={r.id} r={r} />
-                  ))}
-                </ul>
-                {resenasMira.length > MOSTRAR_INICIAL && (
-                  <button type="button" className="btn-secundario" onClick={() => setVerTodas((v) => !v)}>
-                    {verTodas ? 'Ver menos' : `Ver las ${resenasMira.length} reseñas MIRA`}
-                  </button>
-                )}
-
-                <h4 className="modal-sub2">Reseñas de Yelp ({resenasYelp.length})</h4>
-                {resenasYelp.length === 0 && (
-                  <p className="vacio-texto">Aún no hay reseñas de Yelp para este local.</p>
-                )}
-                <ul className="modal-resenas">
-                  {visiblesYelp.map((r) => (
-                    <ItemResena key={r.id} r={r} />
-                  ))}
-                </ul>
-                {resenasYelp.length > MOSTRAR_INICIAL && (
-                  <button type="button" className="btn-secundario" onClick={() => setVerTodasYelp((v) => !v)}>
-                    {verTodasYelp ? 'Ver menos' : `Ver las ${resenasYelp.length} reseñas de Yelp`}
-                  </button>
-                )}
-              </section>
+            <h4 className="modal-sub2">Reseñas de Yelp ({resenasYelp.length})</h4>
+            {resenasYelp.length === 0 && (
+              <p className="vacio-texto">Aún no hay reseñas de Yelp para este local.</p>
+            )}
+            <ul className="modal-resenas">
+              {visiblesYelp.map((r) => (
+                <ItemResena key={r.id} r={r} />
+              ))}
+            </ul>
+            {resenasYelp.length > MOSTRAR_INICIAL && (
+              <button type="button" className="btn-secundario" onClick={() => setVerTodasYelp((v) => !v)}>
+                {verTodasYelp ? 'Ver menos' : `Ver las ${resenasYelp.length} reseñas de Yelp`}
+              </button>
+            )}
+          </section>
         </div>
       </div>
     </div>

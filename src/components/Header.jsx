@@ -1,5 +1,5 @@
 /**
- * View pura: cabecera con sesión (todo por props, sin lógica de negocio).
+ * View pura: cabecera glassmorphic con sesión (todo por props, sin lógica de negocio).
  * En móvil el menú colapsa tras el botón hamburguesa (estado solo visual).
  */
 import { useEffect, useState } from 'react';
@@ -17,7 +17,6 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
     return () => window.removeEventListener('keydown', alTeclar);
   }, [abierto]);
 
-  // En móvil el header se esconde al bajar y vuelve al subir.
   useEffect(() => {
     let ultimo = window.scrollY;
     let turno = false;
@@ -39,7 +38,6 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
     setAbierto(false);
   }
 
-  // El icono del mail conmuta: si ya estás en el buzón, lo cierra (vuelve al inicio).
   function conmutarMensajes(e) {
     if (window.location.hash === '#/mensajes') {
       e.preventDefault();
@@ -51,7 +49,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
   return (
     <header className={`site-header${oculto ? ' oculto' : ''}`}>
       <a href="#/" className="logo logo-imagen" aria-label="MIRA - inicio" onClick={cerrar}>
-        <img src="/logo.png" alt="MIRA" />
+        <img src="/logotipo.png" alt="MIRA" />
       </a>
       <button
         type="button"
@@ -76,17 +74,15 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
       <div id="menu-movil" className={`header-menu${abierto ? ' abierto' : ''}`}>
         <nav aria-label="Navegación principal" onClick={cerrar}>
           <ul className="nav-list">
-            <li><a href="#inicio">Descubrir</a></li>
+            <li><a href="#inicio">Explorar</a></li>
             <li><a href="#/mapa">Mapa</a></li>
+            <li><a href="#/reservas">Reservas</a></li>
             <li><a href="#/contacto">Contacto</a></li>
           </ul>
         </nav>
         <div className="header-cuentas" onClick={cerrar}>
           {usuario ? (
             <>
-              <a href="#/reservas" className="btn-texto">
-                Mis reservas
-              </a>
               <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>

@@ -5,34 +5,22 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-col">
           <p className="logo">MIRA</p>
-          <p>La guía de barrio para decidir dónde comer sin dar vueltas.</p>
+          <p>El club culinario para reservar las mejores mesas de Cataluña.</p>
         </div>
-        <nav className="footer-col" aria-label="Descubrir">
-          <h2>Descubrir</h2>
+        <nav className="footer-col" aria-label="Explorar">
+          <h2>Explorar</h2>
           <ul>
-            <li>
-              <a href="#buscar">Buscar restaurantes</a>
-            </li>
-            <li>
-              <a href="#/reservas">Mis reservas</a>
-            </li>
-            <li>
-              <a href="#/contacto">Contacto</a>
-            </li>
+            <li><a href="#buscar">Buscar restaurantes</a></li>
+            <li><a href="#/mapa">Mapa de zonas</a></li>
+            <li><a href="#/reservas">Mis reservas</a></li>
           </ul>
         </nav>
         <nav className="footer-col" aria-label="Cuenta">
           <h2>Cuenta</h2>
           <ul>
-            <li>
-              <a href="#/login">Iniciar sesión</a>
-            </li>
-            <li>
-              <a href="#/registro">Crear cuenta</a>
-            </li>
-            <li>
-              <a href="#/cuenta">Mi cuenta</a>
-            </li>
+            <li><a href="#/login">Iniciar sesión</a></li>
+            <li><a href="#/registro">Crear cuenta</a></li>
+            <li><a href="#/cuenta">Mi cuenta</a></li>
           </ul>
         </nav>
         <div className="footer-col">

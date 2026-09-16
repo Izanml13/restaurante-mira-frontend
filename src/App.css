@@ -1,32 +1,36 @@
-/* Sistema visual limpio tipo guía de reservas: header blanco, hero foto, cards blancas. */
+/* ===== Epicure Fork Design System — MIRA ===== */
 
 /* ---------- Header ---------- */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--fondo);
-  border-bottom: 1px solid var(--borde);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 0.7rem 1.25rem;
+  padding: 0.65rem 1.5rem;
 }
 
 .logo {
-  font-weight: 800;
+  font-family: var(--fuente-display);
+  font-weight: 700;
   font-size: 1.4rem;
-  letter-spacing: 0.1em;
-  color: var(--verde);
+  letter-spacing: 0.02em;
+  color: var(--primary-container);
   text-decoration: none;
 }
 
 .logo-imagen {
   background: #fff;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   padding: 0.25rem 0.9rem;
   display: inline-block;
+  box-shadow: var(--sombra-card);
 }
 
 .logo-imagen img {
@@ -37,7 +41,7 @@
 
 .nav-list {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -45,12 +49,31 @@
 
 .nav-list a {
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gris);
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.nav-list a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--dorado);
+  border-radius: 1px;
+  transition: width 0.2s ease;
 }
 
 .nav-list a:hover {
-  color: var(--verde);
+  color: var(--primary-container);
+}
+
+.nav-list a:hover::after {
+  width: 100%;
 }
 
 .header-cuentas {
@@ -60,12 +83,12 @@
   gap: 0.8rem;
 }
 
-/* Botón hamburguesa: solo móvil. En desktop el menú va en línea. */
+/* Hamburger — mobile only */
 .menu-boton {
   display: none;
   margin-left: auto;
   background: none;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   font-size: 1.2rem;
   line-height: 1;
@@ -78,10 +101,10 @@
   display: contents;
 }
 
-/* Botón de tema claro/oscuro, siempre visible junto al logo */
+/* Theme toggle */
 .tema-boton {
   background: none;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   width: 2.1rem;
   height: 2.1rem;
@@ -91,11 +114,12 @@
   line-height: 1;
   cursor: pointer;
   color: var(--tinta);
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .tema-boton:hover {
-  border-color: var(--verde);
-  color: var(--verde);
+  border-color: var(--dorado);
+  color: var(--dorado);
 }
 
 @media (max-width: 767px) {
@@ -105,6 +129,7 @@
 
   .site-header {
     flex-wrap: wrap;
+    padding: 0.6rem 1rem;
   }
 
   .header-menu {
@@ -115,7 +140,7 @@
     align-items: stretch;
     gap: 0.9rem;
     padding: 0.9rem 0 0.4rem;
-    border-top: 1px solid var(--borde);
+    border-top: 1px solid var(--glass-border);
   }
 
   .header-menu.abierto {
@@ -144,52 +169,57 @@
   text-decoration: none;
   font-weight: 600;
   font-size: 0.92rem;
+  color: var(--tinta);
+  transition: color 0.2s;
 }
 
 .btn-texto:hover {
-  color: var(--verde);
+  color: var(--primary-container);
 }
 
 .btn-cta {
   display: inline-block;
-  background: var(--verde);
+  background: var(--primary-container);
   color: #fff;
   font-weight: 700;
   text-decoration: none;
   border: 1px solid transparent;
-  border-radius: var(--radio-peq);
-  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.5rem;
   cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
 }
 
 .btn-cta:hover {
-  background: var(--verde-oscuro);
+  background: var(--primary);
+  transform: translateY(-1px);
 }
 
 .btn-peq {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.88rem;
 }
 
 .btn-grande {
   font-size: 1.05rem;
-  padding: 0.85rem 1.8rem;
+  padding: 0.85rem 2rem;
 }
 
 .btn-secundario {
   margin-top: 0.5rem;
-  background: var(--fondo);
+  background: var(--papel);
   color: var(--tinta);
   border: 1px solid var(--borde);
-  border-radius: var(--radio-peq);
-  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
   font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .btn-secundario:hover:not(:disabled) {
-  border-color: var(--verde);
-  color: var(--verde);
+  border-color: var(--primary-container);
+  color: var(--primary-container);
 }
 
 .btn-secundario:disabled {
@@ -198,60 +228,78 @@
 }
 
 .btn-reservar {
-  background: var(--verde);
+  background: var(--primary-container);
   color: #fff;
   border: none;
-  border-radius: var(--radio-peq);
-  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
   font-weight: 700;
   cursor: pointer;
   width: 100%;
+  transition: background 0.2s, transform 0.15s;
 }
 
 .btn-reservar:hover {
-  background: var(--verde-oscuro);
+  background: var(--primary);
+  transform: translateY(-1px);
 }
 
-/* ---------- Hero fotográfico ---------- */
+/* ---------- Hero ---------- */
 .hero {
   background:
-    linear-gradient(rgba(20, 30, 25, 0.55), rgba(20, 30, 25, 0.55)),
-    url('https://picsum.photos/seed/mira-hero/1600/700') center / cover no-repeat;
+    linear-gradient(rgba(0, 34, 24, 0.6), rgba(0, 34, 24, 0.6)),
+    url('/hero-dining.jpg') center / cover no-repeat;
   color: #fff;
-  padding: 4rem 1.25rem;
+  padding: 5rem 1.5rem;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
 }
 
 .hero-contenido {
   max-width: var(--ancho-max);
   margin: 0 auto;
+  width: 100%;
 }
 
 .hero h1 {
-  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
-  font-weight: 800;
+  font-family: var(--fuente-display);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
   margin-bottom: 0.4em;
-  max-width: 16ch;
+  max-width: 18ch;
+  line-height: 1.1;
+  color: #fff;
 }
 
 .hero-sub {
   max-width: 52ch;
   margin: 0 0 1.5rem;
-  font-size: 1.08rem;
-  color: #f0f0ee;
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 .hero-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.6rem;
+  gap: 1.2rem;
   list-style: none;
-  margin: 1.6rem 0;
+  margin: 2rem 0;
   padding: 0;
 }
 
+.hero-stats li {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+}
+
 .hero-stats strong {
-  display: block;
-  font-size: 1.5rem;
   font-weight: 800;
 }
 
@@ -265,43 +313,44 @@
 }
 
 .chip {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 999px;
-  padding: 0.4rem 1rem;
+  padding: 0.45rem 1.1rem;
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, transform 0.15s;
 }
 
 .chip:hover {
-  background: #fff;
-  color: #1b1e18;
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
 }
 
-/* ---------- Buscador (tarjeta flotante) ---------- */
+/* ---------- Buscador (search bar) ---------- */
 .buscar {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 0 1.25rem 3rem;
+  padding: 0 1.5rem 3rem;
 }
 
 .buscar-titulo {
-  font-size: 1.7rem;
-  /* Margen inferior amplio: la tarjeta del buscador sube -2.5rem y no debe taparlo. */
-  margin: 2rem 0 3.75rem;
+  font-family: var(--fuente-display);
+  font-size: 1.75rem;
+  margin: 2rem 0 3.5rem;
 }
 
 .searchbar {
-  background: var(--fondo);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   box-shadow: var(--sombra-flotante);
   display: grid;
   gap: 0.9rem;
-  padding: 1.1rem;
+  padding: 1.2rem;
   margin-top: -2.5rem;
   position: relative;
 }
@@ -313,11 +362,11 @@
 }
 
 .campo label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--gris);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .campo input,
@@ -326,8 +375,9 @@
   background: var(--fondo);
   border: 1px solid var(--borde);
   border-radius: var(--radio-peq);
-  padding: 0.6rem 0.7rem;
+  padding: 0.6rem 0.75rem;
   width: 100%;
+  transition: border-color 0.2s;
 }
 
 .campo textarea {
@@ -337,7 +387,9 @@
 
 .campo input:focus,
 .campo select:focus {
-  border-color: var(--verde);
+  border-color: var(--primary-container);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 56, 44, 0.1);
 }
 
 .campo-acciones {
@@ -349,12 +401,13 @@
 .contador {
   font-weight: 600;
   margin: 1.1rem 0 1rem;
+  font-size: 0.95rem;
 }
 
 .aviso {
   background: var(--verde-suave);
-  border-left: 4px solid var(--verde);
-  padding: 0.6rem 0.9rem;
+  border-left: 4px solid var(--primary-container);
+  padding: 0.65rem 1rem;
   font-size: 0.88rem;
   margin: 1rem 0 0;
   border-radius: 0 var(--radio-peq) var(--radio-peq) 0;
@@ -363,7 +416,7 @@
 /* ---------- Grid de fichas ---------- */
 .grid {
   display: grid;
-  gap: 1.1rem;
+  gap: 1.25rem;
   grid-template-columns: 1fr;
   list-style: none;
   margin: 0;
@@ -372,32 +425,32 @@
 
 .card {
   background: var(--papel);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   box-shadow: var(--sombra-card);
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--sombra-card-hover);
-  border-color: rgba(0, 102, 79, 0.28);
+  border-color: rgba(22, 56, 44, 0.15);
 }
 
 .card:focus-within {
-  border-color: var(--verde);
+  border-color: var(--primary-container);
   box-shadow: var(--sombra-card-focus);
 }
 
 .card-media {
   position: relative;
   overflow: hidden;
-  flex: 0 0 190px;
-  min-height: 190px;
+  flex: 0 0 200px;
+  min-height: 200px;
   background: var(--fondo-suave);
 }
 
@@ -405,48 +458,52 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 200ms ease;
+  transition: transform 300ms ease;
 }
 
 .card:hover .card-foto {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .card-top {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  background: var(--rojo);
+  top: 0.6rem;
+  left: 0.6rem;
+  background: var(--tertiary-container);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
-  border-radius: 4px;
-  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  padding: 0.25rem 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
+
 .card-precio-badge {
   position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
+  bottom: 0.6rem;
+  right: 0.6rem;
   background: var(--badge-bg);
   color: var(--tinta);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  border: 1px solid var(--borde);
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--glass-border);
 }
 
 .card-cuerpo {
   display: flex;
   flex-direction: column;
-  gap: 0.22rem;
-  padding: 0.95rem 1rem 1rem;
+  gap: 0.25rem;
+  padding: 1rem 1.1rem 1.1rem;
   flex: 1;
   min-width: 0;
 }
 
 .card-titulo {
-  font-size: 1.05rem;
+  font-family: var(--fuente-display);
+  font-size: 1.15rem;
   margin: 0;
   line-height: 1.25;
   display: -webkit-box;
@@ -461,12 +518,13 @@
 
 .card-estrellas {
   color: var(--estrella);
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 0.95rem;
 }
 
 .card-opiniones {
   color: var(--gris);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .card-gris {
@@ -483,12 +541,13 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.5;
 }
 
 .card-motivo {
   margin: 0 0 0.4rem;
   font-size: 0.82rem;
-  color: var(--verde);
+  color: var(--primary-container);
   font-weight: 600;
 }
 
@@ -503,9 +562,9 @@
 /* ---------- Promo ---------- */
 .promo {
   background: var(--fondo-suave);
-  border-top: 1px solid var(--borde);
-  border-bottom: 1px solid var(--borde);
-  padding: 1.6rem 1.25rem;
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 2rem 1.5rem;
 }
 
 .promo-lista {
@@ -514,24 +573,24 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .promo-item {
   display: flex;
-  gap: 0.7rem;
+  gap: 0.8rem;
   align-items: flex-start;
-  font-size: 0.93rem;
+  font-size: 0.95rem;
 }
 
 .promo-check {
   display: inline-grid;
   place-items: center;
-  flex: 0 0 1.6rem;
-  width: 1.6rem;
-  height: 1.6rem;
+  flex: 0 0 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
   border-radius: 50%;
-  background: var(--verde);
+  background: var(--dorado);
   color: #fff;
   font-weight: 700;
   font-size: 0.85rem;
@@ -540,21 +599,22 @@
 /* ---------- Estados ---------- */
 .vacio {
   border: 1px dashed var(--borde);
-  border-radius: var(--radio);
-  padding: 2rem 1.5rem;
+  border-radius: var(--radio-xl);
+  padding: 2.5rem 1.5rem;
   text-align: center;
   background: var(--fondo-suave);
 }
 
 .vacio-titulo {
-  font-size: 1.3rem;
+  font-family: var(--fuente-display);
+  font-size: 1.4rem;
   margin: 0 0 0.4rem;
 }
 
 .cargando {
   background: var(--fondo-suave);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   padding: 1.5rem;
   text-align: center;
 }
@@ -562,7 +622,7 @@
 .error-panel {
   background: var(--fondo-suave);
   border: 1px solid var(--rojo);
-  border-radius: var(--radio);
+  border-radius: var(--radio-xl);
   padding: 1.5rem;
   text-align: center;
 }
@@ -575,7 +635,8 @@
 .modal-fondo {
   position: fixed;
   inset: 0;
-  background: rgba(45, 51, 63, 0.6);
+  background: rgba(0, 34, 24, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -586,11 +647,12 @@
 
 .modal {
   background: var(--papel);
-  border-top: 6px solid var(--verde);
-  border-radius: var(--radio);
+  border-top: 6px solid var(--dorado);
+  border-radius: var(--radio-xl);
   max-width: 640px;
   width: 100%;
   position: relative;
+  box-shadow: var(--sombra-flotante);
 }
 
 .modal-cerrar {
@@ -601,28 +663,34 @@
   height: 2.2rem;
   border-radius: 50%;
   border: none;
-  background: var(--tinta);
+  background: var(--primary-container);
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
   z-index: 1;
   display: inline-grid;
   place-items: center;
+  transition: background 0.2s;
+}
+
+.modal-cerrar:hover {
+  background: var(--primary);
 }
 
 .modal-foto {
   width: 100%;
-  max-height: 260px;
+  max-height: 280px;
   object-fit: cover;
-  border-radius: var(--radio) var(--radio) 0 0;
+  border-radius: var(--radio-xl) var(--radio-xl) 0 0;
 }
 
 .modal-cuerpo {
-  padding: 1.1rem 1.4rem 1.6rem;
+  padding: 1.2rem 1.5rem 1.8rem;
 }
 
 .modal-titulo {
-  font-size: 1.7rem;
+  font-family: var(--fuente-display);
+  font-size: 1.8rem;
   margin: 0 0 0.5rem;
 }
 
@@ -637,9 +705,9 @@
 
 .modal-chips li {
   background: var(--verde-suave);
-  color: var(--verde-oscuro);
+  color: var(--primary-container);
   border-radius: 999px;
-  padding: 0.2rem 0.75rem;
+  padding: 0.25rem 0.85rem;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -678,13 +746,15 @@
 }
 
 .modal-sub {
-  font-size: 1.2rem;
+  font-family: var(--fuente-display);
+  font-size: 1.25rem;
   margin: 1.2rem 0 0.6rem;
 }
 
 .modal-sub2 {
   font-size: 1.02rem;
   margin: 1.1rem 0 0.6rem;
+  font-weight: 700;
 }
 
 .modal-resenas {
@@ -696,7 +766,7 @@
 }
 
 .modal-resenas li {
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--glass-border);
   padding-top: 0.6rem;
 }
 
@@ -710,101 +780,113 @@
   font-size: 0.93rem;
 }
 
-/* Mapa mini horizontal sobre reseñas */
+/* Mapa mini */
 .mapa-mini-wrap {
   margin: 1.2rem 0 0;
   display: grid;
   gap: 0.45rem;
   justify-items: stretch;
 }
+
 .mapa-mini {
   position: relative;
   width: 100%;
   height: 220px;
   border-radius: var(--radio-peq);
   overflow: hidden;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   cursor: pointer;
   background: var(--fondo-suave);
   box-shadow: var(--sombra-card);
-  transition: box-shadow 200ms ease, border-color 200ms ease;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
+
 .mapa-mini:hover {
-  box-shadow: 0 8px 20px rgba(45,51,63,0.16);
-  border-color: var(--verde);
+  box-shadow: var(--sombra-card-hover);
+  border-color: var(--primary-container);
 }
+
 .mapa-mini iframe {
   width: 100%;
   height: 100%;
   border: none;
   pointer-events: none;
 }
+
 .mapa-mini-ampliar {
   position: absolute;
   bottom: 0.4rem;
   right: 0.4rem;
-  background: rgba(45,51,63,0.92);
+  background: rgba(0, 34, 24, 0.92);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 700;
   border-radius: 999px;
-  padding: 0.22rem 0.55rem;
+  padding: 0.22rem 0.6rem;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
 }
+
 .mapa-mini-pie {
   font-size: 0.82rem;
   color: var(--gris);
   margin: 0;
 }
+
 .modal-mapa-vacio {
   margin: 1rem 0;
   text-align: left;
   font-size: 0.92rem;
   color: var(--gris);
 }
-/* Mapa expandido fullscreen */
+
+/* Mapa expandido */
 .mapa-expandido-fondo {
   z-index: 300;
   align-items: center;
   padding: 2vh 1rem;
 }
+
 .mapa-expandido {
   position: relative;
   width: min(880px, 96vw);
   height: min(72vh, 640px);
   background: var(--papel);
-  border-radius: var(--radio);
+  border-radius: var(--radio-xl);
   overflow: hidden;
   box-shadow: var(--sombra-flotante);
 }
+
 .mapa-expandido iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* Reservas */
+/* ---------- Reservas ---------- */
 .reserva-bloque {
   background: var(--fondo-suave);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   padding: 1rem 1rem 1.1rem;
   margin: 1rem 0 0;
 }
+
 .reserva-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.6rem;
 }
+
 .reserva-bloque .campo span {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--gris);
 }
+
 .reserva-error {
   margin: 0.5rem 0 0;
   background: #fdecea;
@@ -814,14 +896,16 @@
   font-size: 0.88rem;
   color: #8f1d14;
 }
+
 .reserva-confirm {
   margin-top: 0.8rem;
   background: var(--verde-suave);
-  border: 1px solid #a8d5c2;
+  border: 1px solid var(--primary-container);
   border-radius: var(--radio-peq);
   padding: 0.7rem 0.85rem;
   font-size: 0.9rem;
 }
+
 .reserva-confirm code {
   background: var(--fondo);
   color: var(--tinta);
@@ -830,59 +914,60 @@
   border-radius: 4px;
   font-weight: 700;
 }
+
 .reserva-buscar {
   margin-top: 0.9rem;
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--glass-border);
   padding-top: 0.7rem;
 }
+
 .reserva-buscar summary {
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--verde);
+  color: var(--primary-container);
 }
+
 .reserva-buscar-form {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.6rem;
 }
+
 .reserva-buscar-form input {
   flex: 1;
   border: 1px solid var(--borde);
   border-radius: var(--radio-peq);
   padding: 0.55rem 0.7rem;
 }
-@media (max-width: 560px){
+
+@media (max-width: 560px) {
   .reserva-grid { grid-template-columns: 1fr; }
   .mapa-mini { height: 180px; }
-  /* Ficha del modal: etiqueta encima del valor */
   .modal-datos > div { grid-template-columns: 1fr; gap: 0.1rem; }
   .modal-cuerpo { padding: 1rem 1rem 1.4rem; }
   .modal-titulo { font-size: 1.4rem; }
-  /* Cuenta: filas apiladas */
   .cuenta-datos > div { grid-template-columns: 1fr; gap: 0.1rem; }
-  /* Registros: botón debajo en pantallas estrechas */
   .registro { flex-wrap: wrap; }
 }
 
-@media (max-width: 400px){
-  /* Cards: foto más estrecha para dejar aire al texto */
+@media (max-width: 400px) {
   .card-media { flex-basis: 108px; }
   .card-titulo { font-size: 0.98rem; }
   .card-cuerpo { padding: 0.65rem 0.7rem 0.75rem; }
 }
 
-/* ---------- Filtros colapsables (solo móvil) ---------- */
+/* ---------- Filtros colapsables ---------- */
 .filtros-toggle {
   display: none;
   width: 100%;
-  background: var(--fondo);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-peq);
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
   padding: 0.6rem;
   font-weight: 700;
   cursor: pointer;
-  color: var(--verde);
+  color: var(--primary-container);
 }
 
 .filtros-plegables {
@@ -904,12 +989,11 @@
     grid-column: 1 / -1;
   }
 
-  /* Hero compacto en móvil */
   .hero {
-    padding: 2.2rem 1.25rem;
+    padding: 3rem 1rem;
+    min-height: 360px;
   }
 
-  /* Modal casi a pantalla completa en móvil */
   .modal-fondo {
     padding: 2vh 0.6rem;
   }
@@ -918,7 +1002,6 @@
     padding: 1rem 1rem 1.4rem;
   }
 
-  /* Auth y cuenta con menos aire */
   .auth-pagina {
     padding: 2rem 1rem 3rem;
   }
@@ -927,42 +1010,43 @@
     padding: 1.4rem 1.1rem;
   }
 
-  /* Cuenta: filas apiladas */
   .cuenta-datos > div {
     grid-template-columns: 1fr;
     gap: 0.1rem;
   }
 
-  /* Listas admin/reservas: botón debajo */
   .registro {
     flex-wrap: wrap;
   }
 }
 
-/* ---------- Footer oscuro ---------- */
+/* ---------- Footer ---------- */
 .site-footer {
-  background: #1f2421;
+  background: var(--primary);
   color: #e8e8e6;
 }
 
 .footer-inner {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 2.4rem 1.25rem 1.6rem;
+  padding: 2.5rem 1.5rem 1.6rem;
   display: grid;
   gap: 1.8rem;
 }
 
 .site-footer .logo {
   color: #fff;
+  font-family: var(--fuente-display);
 }
 
 .site-footer h2 {
-  font-size: 0.85rem;
+  font-family: var(--fuente);
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #b9bdb9;
+  letter-spacing: 0.08em;
+  color: #a0a8a2;
   margin-bottom: 0.6rem;
+  font-weight: 700;
 }
 
 .site-footer p,
@@ -984,27 +1068,28 @@
   text-decoration: none;
   font-size: 0.92rem;
   color: #e8e8e6;
+  transition: color 0.2s;
 }
 
 .site-footer ul a:hover {
-  color: #fff;
+  color: var(--secondary-container);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-bottom p {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.5rem;
   font-size: 0.82rem;
-  color: #b9bdb9;
+  color: #a0a8a2;
 }
 
-/* Los textos largos (reseñas, códigos, direcciones) nunca rompen el layout. */
+/* Text overflow */
 .resena-texto,
 .registro-detalle,
 .modal-datos dd,
@@ -1070,7 +1155,7 @@ code {
 .auth-pagina {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 3rem 1.25rem 4rem;
+  padding: 3rem 1.5rem 4rem;
   display: grid;
   justify-items: center;
 }
@@ -1078,17 +1163,18 @@ code {
 .auth-tarjeta {
   width: 100%;
   max-width: 430px;
-  background: var(--fondo);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   box-shadow: var(--sombra-flotante);
-  padding: 1.8rem 1.6rem;
+  padding: 2rem 1.8rem;
   display: grid;
   gap: 0.9rem;
 }
 
 .auth-tarjeta h1 {
-  font-size: 1.7rem;
+  font-family: var(--fuente-display);
+  font-size: 1.8rem;
   margin: 0;
 }
 
@@ -1119,7 +1205,7 @@ code {
 }
 
 .auth-alt a {
-  color: var(--verde);
+  color: var(--primary-container);
   font-weight: 600;
 }
 
@@ -1131,16 +1217,18 @@ code {
   font-weight: 600;
   color: var(--tinta);
   text-decoration: none;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   padding: 0.4rem 0.85rem;
-  transition: border-color 200ms ease, background 200ms ease;
+  transition: border-color 0.2s, background 0.2s;
 }
+
 .header-cuenta-link:hover {
-  border-color: var(--verde);
+  border-color: var(--primary-container);
   background: var(--verde-suave);
-  color: var(--verde-oscuro);
+  color: var(--primary-container);
 }
+
 .header-cuenta-nombre {
   max-width: 8rem;
   white-space: nowrap;
@@ -1150,6 +1238,7 @@ code {
   font-weight: 500;
   font-size: 0.85rem;
 }
+
 .header-logout, .header-login {
   display: inline-flex;
   align-items: center;
@@ -1157,16 +1246,19 @@ code {
   font-weight: 600;
   font-size: 0.9rem;
 }
+
 .header-logout {
   border: 1px solid transparent;
   border-radius: var(--radio-peq);
   padding: 0.4rem 0.6rem;
-  transition: background 200ms ease, color 200ms ease;
+  transition: background 0.2s, color 0.2s;
 }
+
 .header-logout:hover {
   background: var(--fondo-suave);
-  color: var(--verde);
+  color: var(--primary-container);
 }
+
 .header-login {
   text-decoration: none;
   display: inline-flex;
@@ -1175,18 +1267,22 @@ code {
   font-weight: 600;
   font-size: 0.92rem;
 }
-.header-login:hover { color: var(--verde); }
+
+.header-login:hover { color: var(--primary-container); }
+
 .header-usuario {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--verde);
+  color: var(--primary-container);
   text-decoration: none;
   max-width: 12rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .header-usuario:hover { text-decoration: underline; }
+
 button.btn-texto {
   background: none;
   border: none;
@@ -1199,7 +1295,7 @@ button.btn-texto {
   width: 4rem;
   height: 4rem;
   border-radius: 50%;
-  background: var(--verde);
+  background: var(--primary-container);
   color: #fff;
   display: grid;
   place-items: center;
@@ -1219,7 +1315,7 @@ button.btn-texto {
   display: grid;
   grid-template-columns: 8rem 1fr;
   gap: 0.5rem;
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--glass-border);
   padding-top: 0.6rem;
 }
 
@@ -1257,7 +1353,8 @@ button.btn-texto {
 }
 
 .cuenta-sub {
-  font-size: 1.1rem;
+  font-family: var(--fuente-display);
+  font-size: 1.15rem;
   margin: 1.4rem 0 0.6rem;
 }
 
@@ -1266,7 +1363,7 @@ button.btn-texto {
   font-size: 0.92rem;
 }
 
-/* Carta del restaurante (detalle) */
+/* Carta del restaurante */
 .carta-lista {
   list-style: none;
   margin: 0 0 0.5rem;
@@ -1289,7 +1386,7 @@ button.btn-texto {
   white-space: nowrap;
 }
 
-/* Checks (registro empresa, preferencias) */
+/* Checks */
 .campo-check {
   display: flex !important;
   flex-direction: row !important;
@@ -1301,7 +1398,7 @@ button.btn-texto {
 .campo-check input[type='checkbox'] {
   width: 1.1rem;
   height: 1.1rem;
-  accent-color: var(--verde);
+  accent-color: var(--primary-container);
 }
 
 .prefs-form {
@@ -1311,7 +1408,7 @@ button.btn-texto {
 }
 
 .prefs-alergias {
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   padding: 0.7rem 0.9rem;
   display: grid;
@@ -1326,16 +1423,28 @@ button.btn-texto {
   padding: 0 0.4rem;
 }
 
-/* Badge "Nuevo" en cards sin nota */
+.cookie-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cookie-desc {
+  font-size: 0.82rem;
+  color: var(--gris);
+  margin-left: 1.7rem;
+}
+
+/* Badge "Nuevo" */
 .card-nuevo {
-  color: var(--verde);
+  color: var(--primary-container);
   font-weight: 700;
   font-size: 0.88rem;
 }
 
-/* Badge "Accesible" en cards verificadas */
+/* Badge "Accesible" */
 .card-accesible {
-  color: var(--verde);
+  color: var(--primary-container);
   font-weight: 700;
 }
 
@@ -1355,7 +1464,7 @@ button.btn-texto {
 }
 
 .registro {
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   padding: 0.8rem;
   display: flex;
@@ -1373,19 +1482,19 @@ button.btn-texto {
 .reserva-plazas {
   font-weight: 700;
   font-size: 0.92rem;
-  color: var(--verde);
+  color: var(--primary-container);
   margin: 0.6rem 0 0;
 }
 
-/* ---------- Corazón de favoritos (arriba a la derecha de la foto) ---------- */
+/* ---------- Corazón de favoritos ---------- */
 .card-fav {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 2rem;
-  height: 2rem;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2.1rem;
+  height: 2.1rem;
   border-radius: 50%;
-  border: 1px solid var(--borde);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   background: var(--fav-bg);
   color: var(--gris);
   font-size: 1rem;
@@ -1393,6 +1502,11 @@ button.btn-texto {
   cursor: pointer;
   display: grid;
   place-items: center;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.card-fav:hover {
+  transform: scale(1.15);
 }
 
 .card-fav-activo {
@@ -1400,9 +1514,8 @@ button.btn-texto {
   border-color: var(--rojo);
 }
 
-/* Botón "Mis likes" del header con contorno */
 .btn-fav {
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   padding: 0.3rem 0.75rem;
 }
@@ -1415,7 +1528,7 @@ button.btn-texto {
 /* ---------- Buzón interno ---------- */
 .badge-noleidos {
   display: inline-block;
-  background: var(--rojo);
+  background: var(--tertiary-container);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
@@ -1431,7 +1544,7 @@ button.btn-texto {
 }
 
 .registro-mensaje.no-leido {
-  border-color: var(--verde);
+  border-color: var(--primary-container);
   border-width: 2px;
 }
 
@@ -1450,7 +1563,7 @@ button.btn-texto {
 }
 
 .mensaje-punto {
-  color: var(--verde);
+  color: var(--primary-container);
   font-size: 0.8rem;
   flex: 0 0 auto;
 }
@@ -1465,14 +1578,14 @@ button.btn-texto {
   white-space: pre-line;
 }
 
-/* Mini-leyenda bajo la carta plana del detalle */
+/* Mini-leyenda */
 .mini-leyenda {
   font-size: 0.82rem;
   color: var(--gris);
   margin: 0 0 0.6rem;
 }
 
-/* Header que se esconde al bajar en móvil */
+/* Header oculto al bajar */
 @media (max-width: 767px) {
   .site-header {
     transition: transform 0.25s ease;
@@ -1495,7 +1608,7 @@ button.btn-texto {
   background: var(--libro-fondo);
   color: var(--libro-tinta);
   border-top: 6px solid var(--libro-acento);
-  border-radius: var(--radio);
+  border-radius: var(--radio-xl);
   max-width: 880px;
   width: 100%;
   position: relative;
@@ -1538,6 +1651,7 @@ button.btn-texto {
 }
 
 .libro-portada-titulo {
+  font-family: var(--fuente-display);
   font-size: 1.9rem;
   margin: 0 0 0.4rem;
 }
@@ -1553,6 +1667,7 @@ button.btn-texto {
 }
 
 .libro-seccion-titulo {
+  font-family: var(--fuente-display);
   font-size: 1.15rem;
   border-bottom: 2px solid var(--libro-acento);
   padding-bottom: 0.3rem;
@@ -1644,7 +1759,6 @@ button.btn-texto {
   font-weight: 600;
 }
 
-/* Barra de leyenda fija al pie del libro (siempre visible, con scroll si no cabe) */
 .libro-leyenda-barra {
   display: flex;
   gap: 0.9rem;
@@ -1661,7 +1775,6 @@ button.btn-texto {
   font-weight: 800;
 }
 
-/* Página final de Leyenda: rejilla icono + nombre + frase */
 .libro-leyenda-lista {
   list-style: none;
   margin: 0;
@@ -1689,7 +1802,7 @@ button.btn-texto {
   font-weight: 800;
 }
 
-/* Insignias de alérgenos en plato + texto solo-lectores */
+/* Allergen badges */
 .mini-sello {
   display: inline-grid;
   place-items: center;
@@ -1732,7 +1845,7 @@ button.btn-texto {
 .comparar-check input {
   width: 1.1rem;
   height: 1.1rem;
-  accent-color: var(--verde);
+  accent-color: var(--primary-container);
 }
 
 .comparar-acciones {
@@ -1748,13 +1861,13 @@ button.btn-texto {
   border-collapse: collapse;
   width: 100%;
   min-width: 560px;
-  background: var(--fondo);
+  background: var(--papel);
   font-size: 0.9rem;
 }
 
 .comparador-tabla th,
 .comparador-tabla td {
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   padding: 0.6rem 0.7rem;
   text-align: left;
   vertical-align: top;
@@ -1802,7 +1915,6 @@ button.btn-texto {
   clip: rect(0, 0, 0, 0);
 }
 
-/* La tabla conjunta desliza en horizontal en pantallas estrechas. */
 .comparador-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -1812,8 +1924,8 @@ button.btn-texto {
 .mapa-grande {
   height: 65vh;
   min-height: 380px;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   overflow: hidden;
   position: relative;
   z-index: 0;
@@ -1824,10 +1936,11 @@ button.btn-texto {
   height: 100%;
   font: inherit;
 }
+
 .mapa-centro-pin {
   background: #fff;
-  color: #1a56db;
-  border: 2px solid #1a56db;
+  color: var(--primary-container);
+  border: 2px solid var(--primary-container);
   border-radius: 999px;
   font-weight: 900;
   font-size: 16px;
@@ -1837,28 +1950,31 @@ button.btn-texto {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* ---------- Mapa detalle restaurante + parkings ---------- */
+/* Mapa detalle + parkings */
 .mapa-detalle-wrap {
   margin: 1.2rem 0 0;
   display: grid;
   gap: 0.45rem;
 }
+
 .mapa-detalle {
   width: 100%;
   height: 280px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   overflow: hidden;
   position: relative;
   z-index: 0;
   background: var(--fondo-suave);
 }
+
 .mapa-detalle .leaflet-container {
   height: 100%;
   font: inherit;
 }
+
 .parking-pin {
-  background: #1a56db;
+  background: var(--primary-container);
   color: #fff;
   border: 2px solid #fff;
   border-radius: 999px;
@@ -1869,6 +1985,7 @@ button.btn-texto {
   justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
+
 .parking-lista {
   margin: 0;
   padding: 0;
@@ -1877,6 +1994,7 @@ button.btn-texto {
   gap: 0.3rem;
   font-size: 0.88rem;
 }
+
 .parking-lista strong {
   display: inline-flex;
   align-items: center;
@@ -1884,7 +2002,7 @@ button.btn-texto {
   width: 1.3rem;
   height: 1.3rem;
   border-radius: 999px;
-  background: #1a56db;
+  background: var(--primary-container);
   color: #fff;
   font-size: 0.75rem;
   margin-right: 0.3rem;
@@ -1910,16 +2028,16 @@ button.btn-texto {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--gris);
   padding: 0.2rem 0;
 }
 
 .cal-dia {
   aspect-ratio: 1;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
-  background: var(--fondo);
+  background: var(--papel);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -1928,10 +2046,11 @@ button.btn-texto {
   gap: 0.1rem;
   padding: 0.15rem;
   min-width: 0;
+  transition: border-color 0.2s;
 }
 
 .cal-dia:hover {
-  border-color: var(--verde);
+  border-color: var(--primary-container);
 }
 
 .cal-vacio {
@@ -1951,7 +2070,7 @@ button.btn-texto {
 }
 
 .cal-sel {
-  border: 2px solid var(--verde);
+  border: 2px solid var(--primary-container);
 }
 
 .cal-num {
@@ -1968,7 +2087,7 @@ button.btn-texto {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--verde);
+  background: var(--primary-container);
 }
 
 .cal-temp {
@@ -2012,18 +2131,19 @@ button.btn-texto {
 }
 
 .cookie-banner {
-  background: var(--fondo);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
   max-width: 600px;
   width: 100%;
   padding: 1.2rem 1.5rem;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--sombra-flotante);
   margin-bottom: 0.5rem;
 }
 
 .cookie-titulo {
-  font-size: 1.1rem;
+  font-family: var(--fuente-display);
+  font-size: 1.15rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
 }
@@ -2035,7 +2155,7 @@ button.btn-texto {
 .cookie-texto p {
   margin: 0.3rem 0 0;
   font-size: 0.88rem;
-  color: var(--texto-sec);
+  color: var(--gris);
   line-height: 1.5;
 }
 
@@ -2050,7 +2170,7 @@ button.btn-texto {
   gap: 0.6rem;
   align-items: flex-start;
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--borde);
+  border-bottom: 1px solid var(--glass-border);
   font-size: 0.9rem;
 }
 
@@ -2078,27 +2198,162 @@ button.btn-texto {
   }
 
   .cookie-acciones .btn-cta,
-  .cookie-acciones .btn-secundario {
+  .cookie-acciones .btn-secundario,
+  .cookie-acciones .btn-texto {
     width: 100%;
     text-align: center;
+    box-sizing: border-box;
   }
 }
 
-/* ---------- Parkings cercanos (RestaurantMap) ---------- */
+/* ---------- Parkings cercanos ---------- */
+.parking-section {
+  margin: 1.2rem 0 0;
+}
+
+.parking-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0.75rem;
+  align-items: start;
+}
+
 .restaurant-map {
-  height: 350px;
-  border: 1px solid var(--borde);
+  height: 380px;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   overflow: hidden;
   z-index: 0;
   background: var(--fondo-suave);
 }
+
 .restaurant-map .leaflet-container {
   height: 100%;
   width: 100%;
   z-index: 0;
   font: inherit;
 }
+
+/* ParkingsPanel */
+.parkings-panel {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-peq);
+  background: var(--papel);
+  padding: 0.8rem;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.parkings-panel-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.parkings-panel-cuenta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--primary-container);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0 0.3rem;
+}
+
+.parkings-panel-vacio {
+  color: var(--gris);
+  font-size: 0.88rem;
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.parkings-panel-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.parking-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--fondo-suave);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-peq);
+  padding: 0.55rem 0.6rem;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.parking-card:hover,
+.parking-card:focus-visible {
+  border-color: var(--primary-container);
+  box-shadow: 0 0 0 2px rgba(22, 56, 44, 0.12);
+}
+
+.parking-card-nombre {
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.parking-card-meta {
+  font-size: 0.78rem;
+  color: var(--gris);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.parking-card-distancia {
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.parking-card-sep {
+  color: var(--borde);
+}
+
+/* Skeleton loading */
+.parking-skeleton {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-peq);
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.parking-skeleton-bar {
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--fondo-suave) 25%, var(--borde) 50%, var(--fondo-suave) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.parking-skeleton-nombre { height: 0.9rem; width: 60%; }
+.parking-skeleton-detalle { height: 0.7rem; width: 80%; }
+.parking-skeleton-detalle2 { height: 0.7rem; width: 45%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Legacy parking list */
 .parkings-lista {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -2107,12 +2362,189 @@ button.btn-texto {
   gap: 0.35rem;
   font-size: 0.92rem;
 }
+
 .parkings-lista li {
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--glass-border);
   padding-top: 0.35rem;
 }
+
+/* Mobile parking */
 @media (max-width: 767px) {
+  .parking-grid {
+    grid-template-columns: 1fr;
+  }
   .restaurant-map {
     height: 300px;
   }
+  .parkings-panel {
+    max-height: 250px;
+  }
+}
+
+/* ---------- Bottom Navigation (mobile) ---------- */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border);
+  padding: 0.4rem 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem 0.6rem;
+  text-decoration: none;
+  color: var(--gris);
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary-container);
+}
+
+.bottom-nav-item .badge {
+  position: absolute;
+  top: 0;
+  right: 0.1rem;
+  min-width: 1rem;
+  height: 1rem;
+  background: var(--tertiary-container);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  padding: 0 0.2rem;
+}
+
+@media (max-width: 767px) {
+  .bottom-nav {
+    display: block;
+  }
+
+  body {
+    padding-bottom: 70px;
+  }
+}
+
+/* ---------- Floating Reservation Sheet ---------- */
+.floating-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 34, 24, 0.4);
+  z-index: 250;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.floating-sheet-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.floating-sheet {
+  background: var(--papel);
+  border-radius: var(--radio-xl) var(--radio-xl) 0 0;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem 1.5rem;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.floating-sheet-overlay.visible .floating-sheet {
+  transform: translateY(0);
+}
+
+.floating-sheet-handle {
+  width: 2rem;
+  height: 4px;
+  background: var(--borde);
+  border-radius: 2px;
+  margin: 0 auto 1rem;
+}
+
+.floating-sheet-title {
+  font-family: var(--fuente-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+}
+
+.floating-sheet-meta {
+  font-size: 0.88rem;
+  color: var(--gris);
+  margin: 0 0 1rem;
+}
+
+.floating-sheet-details {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.floating-sheet-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+}
+
+.floating-sheet-row span:first-child {
+  color: var(--gris);
+}
+
+.floating-sheet-row span:last-child {
+  font-weight: 700;
+}
+
+.floating-sheet-total {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 0.6rem;
+  font-size: 1rem;
+}
+
+.floating-sheet-total span:last-child {
+  color: var(--primary-container);
+  font-size: 1.1rem;
+}
+
+.floating-sheet-btn {
+  width: 100%;
+  margin-top: 0.8rem;
+  padding: 0.85rem;
+  font-size: 1rem;
 }
