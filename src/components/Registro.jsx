@@ -1,11 +1,12 @@
 /** View pura: página de creación de cuenta con dieta/accesibilidad/idioma en el formulario. */
 import { useState } from 'react';
 import { ALERGENOS } from '../models/restaurantModel.js';
-import { AVAILABLE, detectarIdioma } from '../i18n/index.jsx';
+import { useI18n } from '../i18n/index.jsx';
 
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Registro({ onRegistro, yaTieneSesion }) {
+  const { lang, setLang, available } = useI18n();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +21,6 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
   const [alergias, setAlergias] = useState([]);
   const [sillaRuedas, setSillaRuedas] = useState(false);
   const [tea, setTea] = useState(false);
-  const [lang, setLang] = useState(detectarIdioma);
 
   function toggleAlergia(key) {
     setAlergias((prev) => (prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]));
@@ -169,7 +169,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
               value={lang}
               onChange={(e) => setLang(e.target.value)}
             >
-              {Object.entries(AVAILABLE).map(([code, label]) => (
+              {Object.entries(available).map(([code, label]) => (
                 <option key={code} value={code}>{label}</option>
               ))}
             </select>

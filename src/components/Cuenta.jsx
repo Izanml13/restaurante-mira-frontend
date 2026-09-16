@@ -6,7 +6,7 @@ import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
-import { useI18n, AVAILABLE } from '../i18n/index.jsx';
+import { useI18n } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
@@ -19,8 +19,8 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified, onGuardarLang }) {
-  const { lang, setLang } = useI18n();
+export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+  const { lang, setLang, available } = useI18n();
   function t(key) {
     const dict = TRADS[lang] || TRADS.es;
     return key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
@@ -199,13 +199,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           <select
             className="search-select"
             value={lang}
-            onChange={(e) => {
-              const nuevo = e.target.value;
-              setLang(nuevo);
-              if (onGuardarLang) onGuardarLang(nuevo);
-            }}
+            onChange={(e) => setLang(e.target.value)}
           >
-            {Object.entries(AVAILABLE).map(([code, label]) => (
+            {Object.entries(available).map(([code, label]) => (
               <option key={code} value={code}>{label}</option>
             ))}
           </select>

@@ -14,6 +14,8 @@ const AVAILABLE = {
   en: 'English',
 };
 
+const LANG_ORDER = ['es', 'ca', 'en'];
+
 function detectarIdioma() {
   const guardado = localStorage.getItem(STORAGE_KEY);
   if (guardado && AVAILABLE[guardado]) return guardado;
@@ -21,6 +23,11 @@ function detectarIdioma() {
   if (nav.startsWith('ca')) return 'ca';
   if (nav.startsWith('en')) return 'en';
   return 'es';
+}
+
+function siguienteIdioma(current) {
+  const idx = LANG_ORDER.indexOf(current);
+  return LANG_ORDER[(idx + 1) % LANG_ORDER.length];
 }
 
 function get(obj, path) {
@@ -32,18 +39,21 @@ function interp(str, params) {
   return str.replace(/\{\{(\w+)\}\}/g, (_, k) => (params[k] != null ? params[k] : `{{${k}}}`));
 }
 
-export function I18nProvider({ children, lang: langProp, onLangChange }) {
-  const [langInterno, setLangInterno] = useState(detectarIdioma);
-  const lang = langProp || langInterno;
+export function I18nProvider({ children, onLangChange }) {
+  const [lang, setLangState] = useState(detectarIdioma);
 
   const setLang = useCallback((l) => {
     if (!AVAILABLE[l]) return;
     localStorage.setItem(STORAGE_KEY, l);
-    setLangInterno(l);
+    setLangState(l);
     if (onLangChange) onLangChange(l);
   }, [onLangChange]);
 
-  const value = useMemo(() => ({ lang, setLang, available: AVAILABLE }), [lang, setLang]);
+  const cycleLang = useCallback(() => {
+    setLang(siguienteIdioma(lang));
+  }, [lang, setLang]);
+
+  const value = useMemo(() => ({ lang, setLang, cycleLang, available: AVAILABLE }), [lang, setLang, cycleLang]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 

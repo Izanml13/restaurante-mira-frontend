@@ -98,6 +98,28 @@
   color: var(--verde);
 }
 
+/* Botón de cambio de idioma, junto al tema */
+.lang-boton {
+  background: none;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--tinta);
+}
+
+.lang-boton:hover {
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
 @media (max-width: 767px) {
   .menu-boton {
     display: block;
