@@ -10,17 +10,15 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-function traducirFranja(f) {
-  const map = { 'Cualquier hora': t('busqueda.cualquierHora'), 'Desayuno (09:00-12:00)': t('busqueda.desayuno'), 'Comida (13:00-16:00)': t('busqueda.comida'), 'Cena (20:00-23:30)': t('busqueda.cena') };
-  return map[f.label] || f.label;
-}
-
 export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChange, onClear }) {
   const t = useT(TRADS);
   const [qLocal, setQLocal] = useState(filtros.q);
   const [plegado, setPlegado] = useState(() => window.innerWidth < 768);
 
-  // sincroniza si filtro se limpia externamente
+  function traducirFranja(f) {
+    const map = { 'Cualquier hora': t('busqueda.cualquierHora'), 'Desayuno (09:00-12:00)': t('busqueda.desayuno'), 'Comida (13:00-16:00)': t('busqueda.comida'), 'Cena (20:00-23:30)': t('busqueda.cena') };
+    return map[f.label] || f.label;
+  }
   useEffect(()=> setQLocal(filtros.q), [filtros.q]);
 
   function buscarSiEnter(e) {
