@@ -34,6 +34,12 @@ import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
 import { I18nProvider } from './i18n/index.jsx';
+import { useT } from './i18n/index.jsx';
+import es from './i18n/es.js';
+import ca from './i18n/ca.js';
+import en from './i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 function baseHash() {
   const h = window.location.hash || '';
@@ -60,6 +66,7 @@ function rutaActual() {
 }
 
 export default function App() {
+  const t = useT(TRADS);
   const { usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
@@ -173,7 +180,7 @@ export default function App() {
             <Hero total={total} numZonas={zonasDisponibles.length} />
             <section id="buscar" className="buscar" aria-labelledby="buscar-titulo">
               <h2 id="buscar-titulo" className="buscar-titulo">
-                Busca tu sitio
+                {t('busqueda.titulo')}
               </h2>
 
               {estado === 'cargando' && (
@@ -210,19 +217,19 @@ export default function App() {
                     onClear={limpiarFiltros}
                   />
 
-                  <p aria-live="polite" className="contador">
-                    {modo === 'pagina'
-                      ? `Mostrando ${filtrados.length} de ${total} restaurantes`
-                      : `${filtrados.length} de ${total} ${filtrados.length === 1 ? 'restaurante' : 'restaurantes'}`}
-                    {filtros.q && ` para "${filtros.q}"`}
-                  </p>
-                  {ocultosDieta > 0 && !ignorarDieta && (
-                    <p className="aviso">
-                      {ocultosDieta} {ocultosDieta === 1 ? 'local oculto' : 'locales ocultos'} por tu
-                      dieta o accesibilidad.{' '}
-                      <a href="#/cuenta">Cambiar en Mi cuenta</a> ·{' '}
-                      <button type="button" className="btn-texto" onClick={verTodosIgual}>
-                        Ver todos igual
+                   <p aria-live="polite" className="contador">
+                     {modo === 'pagina'
+                       ? t('lista.mostrando', { n: filtrados.length, total })
+                       : `${filtrados.length} de ${total} ${filtrados.length === 1 ? t('lista.restaurante') : t('lista.restaurantesPlural')}`}
+                     {filtros.q && ` para "${filtros.q}"`}
+                   </p>
+                   {ocultosDieta > 0 && !ignorarDieta && (
+                     <p className="aviso">
+                       {ocultosDieta} {ocultosDieta === 1 ? t('lista.localOculto') : t('lista.localesOcultos')} por tu
+                       dieta o accesibilidad.{' '}
+                       <a href="#/cuenta">{t('lista.cambiarCuenta')}</a> ·{' '}
+                       <button type="button" className="btn-texto" onClick={verTodosIgual}>
+                         {t('lista.verTodos')}
                       </button>
                     </p>
                   )}
