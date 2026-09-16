@@ -6,6 +6,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   updateProfile,
   onAuthStateChanged,
@@ -92,6 +94,38 @@ export async function iniciarSesion({ email, password }) {
     return { nombre: cred.user.displayName || '', email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo iniciar sesión. Inténtalo de nuevo.'));
+  }
+}
+
+/** @returns {Promise<{nombre:string,email:string}>} */
+export async function iniciarSesionGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    const cred = await signInWithPopup(auth(), provider);
+    return { nombre: cred.user.displayName || '', email: cred.user.email };
+  } catch (e) {
+    console.error('[Google Sign-In] Error:', e.code, e.message);
+    const msg = mensajeErrorGoogle(e.code);
+    throw new Error(msg);
+  }
+}
+
+function mensajeErrorGoogle(code) {
+  switch (code) {
+    case 'auth/popup-closed-by-user':
+      return 'La ventana de autenticación se cerró. Inténtalo de nuevo.';
+    case 'auth/popup-blocked':
+      return 'La ventana emergente fue bloqueada. Habilita las ventanas emergentes e intenta de nuevo.';
+    case 'auth/account-exists-with-different-credential':
+      return 'Este correo ya está registrado con otro método. Inicia sesión con ese método.';
+    case 'auth/operation-not-allowed':
+      return 'Google no está habilitado como método de inicio de sesión. Contacta al administrador.';
+    case 'auth/network-request-failed':
+      return 'Error de red. Comprueba tu conexión.';
+    default:
+      return 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
   }
 }
 
@@ -193,5 +227,3 @@ export async function recargarEmailVerified() {
   await u.reload();
   return Boolean(u.emailVerified);
 }
-
-

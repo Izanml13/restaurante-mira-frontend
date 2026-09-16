@@ -154,7 +154,11 @@ export default {
     "volver": "Back",
     "yaTienesCuenta": "Already have an account?",
     "iniciaSesion": "Log in",
-    "soyEmpresa": "I'm a business: I want to add my restaurant"
+    "soyEmpresa": "I'm a business: I want to add my restaurant",
+    "contrasenaCambiada": "Password changed. Sign in with your new password.",
+    "revisaSpam": "If that email is registered, you'll receive a link. Also check spam.",
+    "googleEntrando": "Logging in with Google…",
+    "googleContinuar": "Continue with Google"
   },
   "cuenta": {
     "miCuenta": "My account",

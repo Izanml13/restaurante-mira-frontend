@@ -140,19 +140,19 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
     <section className="auth-pagina" aria-labelledby="cuenta-titulo">
       <div className="auth-tarjeta">
         <p className="cuenta-avatar" aria-hidden="true">{inicial}</p>
-        <h1 id="cuenta-titulo">{usuario.nombre || 'Mi cuenta'}</h1>
+        <h1 id="cuenta-titulo">{usuario.nombre || t('cuenta.miCuenta')}</h1>
         <dl className="cuenta-datos">
-          <div><dt>Correo</dt><dd>{usuario.email}</dd></div>
-          <div><dt>Verificado</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? '✓ Sí' : 'No verificado'}</dd></div>
-          <div><dt>Miembro desde</dt><dd>{miembroDesde}</dd></div>
+          <div><dt>{t('cuenta.email')}</dt><dd>{usuario.email}</dd></div>
+          <div><dt>{t('cuenta.verificado')}</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? '✓ Sí' : 'No verificado'}</dd></div>
+          <div><dt>{t('cuenta.miembroDesde')}</dt><dd>{miembroDesde}</dd></div>
         </dl>
         <p className="cuenta-acciones">
-          <a href="#buscar" className="btn-cta">Buscar restaurantes</a>
-          <button type="button" className="btn-secundario" onClick={onSalir}>Cerrar sesión</button>
+          <a href="#buscar" className="btn-cta">{t('cuenta.buscarRestaurantes')}</a>
+          <button type="button" className="btn-secundario" onClick={onSalir}>{t('cuenta.cerrarSesion')}</button>
         </p>
 
         {/* --- DIETA --- */}
-        <h2 className="cuenta-sub">Mi dieta</h2>
+        <h2 className="cuenta-sub">{t('cuenta.miDieta')}</h2>
         <form onSubmit={guardarPrefs} className="prefs-form">
           {[['vegano', 'Vegano'], ['vegetariano', 'Vegetariano']].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
@@ -161,7 +161,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
             </label>
           ))}
           <fieldset className="prefs-alergias">
-            <legend>Mis alergias</legend>
+            <legend>{t('cuenta.misAlergias')}</legend>
             {ALERGENOS.map(({ key, label }) => (
               <label key={key} className="campo-check" htmlFor={`alerg-${key}`}>
                 <input id={`alerg-${key}`} type="checkbox" checked={borrador.alergias.includes(key)} onChange={() => toggleAlergia(key)} />
@@ -176,9 +176,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </form>
 
         {/* --- ACCESIBILIDAD --- */}
-        <h2 className="cuenta-sub">Mi accesibilidad</h2>
+        <h2 className="cuenta-sub">{t('cuenta.miAccesibilidad')}</h2>
         <form onSubmit={guardarAcc} className="prefs-form">
-          <p className="vacio-texto">Solo verás locales con accesibilidad verificada.</p>
+          <p className="vacio-texto">{t('cuenta.soloAccesibilidad')}</p>
           <label className="campo-check" htmlFor="acc-silla">
             <input id="acc-silla" type="checkbox" checked={Boolean(borradorAcc.sillaRuedas)} onChange={() => toggleAcc('sillaRuedas')} />
             Silla de ruedas (acceso sin escalones)
@@ -208,7 +208,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </div>
 
         {/* --- Verificación de email --- */}
-        <h2 className="cuenta-sub">Verificación de correo</h2>
+        <h2 className="cuenta-sub">{t('cuenta.verificacionCorreo')}</h2>
         <div className="prefs-form">
           {usuario.emailVerified ? (
             <div style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
@@ -232,7 +232,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </div>
 
         {/* --- COOKIES --- */}
-        <h2 className="cuenta-sub">Preferencias de cookies</h2>
+        <h2 className="cuenta-sub">{t('cuenta.preferenciasCookies')}</h2>
         <div className="prefs-form">
           <p className="vacio-texto">Controla qué tipos de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.</p>
           {COOKIE_CATEGORIAS.filter((c) => !c.requerida).map((cat) => (
@@ -258,8 +258,8 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         {/* --- NEGOCIO --- */}
         {perfil?.tipo === 'empresa' && (
           <>
-            <h2 className="cuenta-sub">Mi negocio</h2>
-            <p><a href="#/negocio" className="btn-cta btn-peq">Añadir restaurante</a></p>
+            <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
+            <p><a href="#/negocio" className="btn-cta btn-peq">{t('cuenta.anadirRestaurante')}</a></p>
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">
                 {misNegocios.map((n) => (
@@ -278,7 +278,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         )}
 
         {/* --- RESERVAS --- */}
-        <h2 className="cuenta-sub">Mis próximas reservas</h2>
+        <h2 className="cuenta-sub">{t('cuenta.proximasReservas')}</h2>
         {cargando && <p>Cargando…</p>}
         {!cargando && proximas.length === 0 && <p className="vacio-texto">Sin próximas reservas.</p>}
         {!cargando && proximas.length > 0 && (
@@ -298,7 +298,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         <p><a href="#/reservas">Ver todas mis reservas</a></p>
 
         {/* --- INCIDENCIAS --- */}
-        <h2 className="cuenta-sub">Mis incidencias</h2>
+        <h2 className="cuenta-sub">{t('cuenta.misIncidencias')}</h2>
         {!cargando && incidencias.length === 0 && <p className="vacio-texto">Sin incidencias.</p>}
         {!cargando && incidencias.length > 0 && (
           <ul className="lista-registros">
@@ -314,7 +314,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         )}
 
         {/* --- RESEÑAS --- */}
-        <h2 className="cuenta-sub">Mis reseñas</h2>
+        <h2 className="cuenta-sub">{t('cuenta.misResenas')}</h2>
         {!cargando && misResenas.length === 0 && <p className="vacio-texto">Aún no has publicado reseñas.</p>}
         {!cargando && misResenas.length > 0 && (
           <ul className="lista-registros">
