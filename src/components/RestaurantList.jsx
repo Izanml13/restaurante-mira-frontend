@@ -5,10 +5,16 @@
 import { useEffect, useRef } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
 import RestaurantSkeleton from './RestaurantSkeleton.jsx';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
+const TRADS = { es, ca, en };
 const SKELETONS_CARGANDO_MAS = 3;
 
 export default function RestaurantList({ restaurants, filtros, onClear, onSelect, hayMas, cargandoMas, onLoadMore, esFavorito, onToggleFavorito, onVerCarta, cargandoInicial }) {
+  const t = useT(TRADS);
   const centinela = useRef(null);
 
   useEffect(() => {
@@ -29,10 +35,10 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
     const hayBusqueda = filtros?.q?.trim();
     return (
       <div className="vacio" role="status">
-        <p className="vacio-titulo">No se encontraron restaurantes</p>
-        <p>{hayBusqueda ? `Sin resultados para "${filtros.q}". Prueba con otro nombre o ajusta los filtros.` : 'Prueba con otra zona, cocina, precio, día u hora.'}</p>
+        <p className="vacio-titulo">{t('lista.noResultados')}</p>
+        <p>{hayBusqueda ? t('lista.sinResultados', { q: filtros.q }) : t('lista.pruebaOtra')}</p>
         <button type="button" className="btn-cta" onClick={onClear}>
-          Limpiar filtros
+          {t('lista.limpiarFiltros')}
         </button>
       </div>
     );
@@ -52,7 +58,7 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
       </ul>
       {hayMas && (
         <div ref={centinela} aria-hidden={!cargandoMas}>
-          {cargandoMas && <span className="sr-only">Cargando más restaurantes…</span>}
+          {cargandoMas && <span className="sr-only">{t('lista.cargando')}</span>}
         </div>
       )}
     </>

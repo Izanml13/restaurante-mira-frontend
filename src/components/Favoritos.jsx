@@ -7,7 +7,12 @@ import { useEffect, useMemo, useState } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
 import Comparador from './Comparador.jsx';
 import { recomendarPara } from '../models/restaurantModel.js';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
+const TRADS = { es, ca, en };
 const MAX_COMPARAR = 3;
 const MAX_RECOMENDADOS = 6;
 
@@ -20,6 +25,7 @@ export default function Favoritos({
   onReservar,
   onToggleFavorito,
 }) {
+  const t = useT(TRADS);
   const [locales, setLocales] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [comparar, setComparar] = useState([]);
@@ -48,7 +54,7 @@ export default function Favoritos({
       setComparar(comparar.filter((x) => x !== id));
       setAviso('');
     } else if (comparar.length >= MAX_COMPARAR) {
-      setAviso(`Máximo ${MAX_COMPARAR} para comparar. Quita uno primero.`);
+      setAviso(t('favoritos.compararMaximo', { max: MAX_COMPARAR }));
     } else {
       setComparar([...comparar, id]);
       setAviso('');
@@ -82,14 +88,14 @@ export default function Favoritos({
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="favoritos-titulo">
       <div className="auth-tarjeta tarjeta-ancha">
-        <h1 id="favoritos-titulo">Mis favoritos ({locales.length})</h1>
+        <h1 id="favoritos-titulo">{t('favoritos.misFavoritos', { count: locales.length })}</h1>
         {cargando && <p>Cargando…</p>}
         {!cargando && locales.length === 0 && (
           <div role="status">
-            <p className="vacio-texto">Aún no tienes favoritos. Guarda locales con el corazón ♥.</p>
+            <p className="vacio-texto">{t('favoritos.vacio')}</p>
             <p>
               <a href="#buscar" className="btn-cta btn-peq">
-                Buscar restaurantes
+                {t('favoritos.buscarRestaurantes')}
               </a>
             </p>
           </div>
@@ -105,7 +111,7 @@ export default function Favoritos({
                       checked={comparar.includes(r.id)}
                       onChange={() => toggleComparar(r.id)}
                     />
-                    Añadir a comparar
+                    {t('favoritos.anadirComparar')}
                   </label>
                   <RestaurantCard
                     restaurant={r}
@@ -127,10 +133,10 @@ export default function Favoritos({
                 type="button"
                 className="btn-cta"
                 disabled={seleccionados.length < 2}
-                title={seleccionados.length < 2 ? 'Elige al menos 2 para comparar' : undefined}
+                title={seleccionados.length < 2 ? t('favoritos.compararMinimo') : undefined}
                 onClick={empezarComparar}
               >
-                Comparar ({seleccionados.length})
+                {t('favoritos.comparar', { count: seleccionados.length })}
               </button>
             </p>
           </>
@@ -139,7 +145,7 @@ export default function Favoritos({
           <>
             <p>
               <button type="button" className="btn-secundario btn-peq" onClick={volverAFavoritos}>
-                ← Volver a mis favoritos
+                {t('favoritos.volverFavoritos')}
               </button>
             </p>
             <div id="comparador">
@@ -153,15 +159,15 @@ export default function Favoritos({
         )}
         {!cargando && !enComparativa && locales.length > 0 && recomendados.length === 0 && (
           <p className="vacio-texto">
-            Sin recomendaciones por ahora: guarda más cocinas o carga más restaurantes deslizando en el buscador.
+            {t('favoritos.sinRecomendaciones')}
           </p>
         )}
         {!cargando && !enComparativa && recomendados.length > 0 && (
           <section aria-labelledby="reco-titulo">
                 <h2 id="reco-titulo" className="cuenta-sub">
-                  Recomendados para ti
+                  {t('favoritos.recomendados')}
                 </h2>
-                <p className="vacio-texto">De tu misma cocina, según tus likes.</p>
+                <p className="vacio-texto">{t('favoritos.deTuCocina')}</p>
                 <ul className="grid">
                   {recomendados.map(({ restaurante: r, motivo }) => (
                     <li key={r.id}>
