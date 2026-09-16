@@ -96,10 +96,10 @@ export default function CookieBanner({ usuario }) {
                     disabled={cat.requerida}
                   />
                   <span>
-                    <strong>{cat.label}</strong>
+                    <strong>{t(`cookie.${cat.key}`)}</strong>
                     {cat.requerida && <span className="cookie-oblig"> ({t('cookie.obligatoria')})</span>}
                     <br />
-                    <span className="cookie-desc">{cat.desc}</span>
+                    <span className="cookie-desc">{t(`cookie.${cat.key}Desc`)}</span>
                   </span>
                 </label>
               ))}

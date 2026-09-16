@@ -210,7 +210,13 @@ export default {
     "resuelta": "Resuelta",
     "pendiente": "Pendiente",
     "resenas": "Mis reseñas",
-    "sinResenas": "Aún no has publicado reseñas."
+    "sinResenas": "Aún no has publicado reseñas.",
+    "email": "Correo",
+    "misResenas": "Mis reseñas",
+    "misIncidencias": "Mis incidencias",
+    "soloAccesibilidad": "Solo verás locales con accesibilidad verificada.",
+    "cookiesDescripcion": "Controla qué tipos de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.",
+    "enviando": "Enviando…"
   },
   "registro": {
     "crearCuenta": "Crear cuenta",
@@ -238,6 +244,11 @@ export default {
     "iniciaSesion": "Inicia sesión"
   },
   "modelos": {
+    "locale": "es-ES",
+    "persona": "persona",
+    "personas": "personas",
+    "meses": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "diasSemana": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
     "cualquiera": "Cualquiera",
     "todas": "Todas",
     "lunes": "Lunes",
@@ -362,7 +373,18 @@ export default {
     "configurarCookies": "Configurar cookies",
     "obligatoria": "obligatoria",
     "guardarPreferencias": "Guardar preferencias",
-    "volver": "← Volver"
+    "volver": "← Volver",
+    "necesarias": "Necesarias",
+    "necesariasDesc": "Imprescindibles para que la web funcione (sesión, cookies). No se pueden desactivar.",
+    "preferencias": "Preferencias",
+    "preferenciasDesc": "Recuerdan tu tema (claro/oscuro), filtros y ajustes de la web.",
+    "analiticas": "Analíticas",
+    "analiticasDesc": "Nos ayudan a entender qué páginas visitas y cómo usas la web para mejorarla.",
+    "marketing": "Marketing",
+    "marketingDesc": "Permiten mostrarte publicidad relevante en otros sitios web.",
+    "cuentaDescripcion": "Controla qué tipos de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.",
+    "guardarCookies": "Guardar cookies",
+    "cookiesGuardadas": "Preferencias de cookies guardadas."
   },
   "contacto": {
     "titulo": "Contacto",
@@ -507,5 +529,12 @@ export default {
     "parking": "Parking",
     "recomendado": "recomendado",
     "comoLlegarParking": "Cómo llegar al parking"
+  },
+  "footer": {
+    "titulo": "MIRA — Restaurantes reales, reservas reales.",
+    "copyright": "© 2026 MIRA. Todos los derechos reservados.",
+    "hecho": "España",
+    "avisoPrivacidad": "Aviso de privacidad",
+    "avisoCookies": "Política de cookies"
   }
 }

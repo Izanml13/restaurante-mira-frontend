@@ -210,7 +210,13 @@ export default {
     "resuelta": "Resolved",
     "pendiente": "Pending",
     "resenas": "My reviews",
-    "sinResenas": "You haven't posted any reviews yet."
+    "sinResenas": "You haven't posted any reviews yet.",
+    "email": "Email",
+    "misResenas": "My reviews",
+    "misIncidencias": "My incidents",
+    "soloAccesibilidad": "You'll only see places with verified accessibility.",
+    "cookiesDescripcion": "Control which types of cookies you accept. They're saved to your profile and apply across all sessions.",
+    "enviando": "Sending…"
   },
   "registro": {
     "crearCuenta": "Sign up",
@@ -238,6 +244,11 @@ export default {
     "iniciaSesion": "Log in"
   },
   "modelos": {
+    "locale": "en-US",
+    "persona": "person",
+    "personas": "people",
+    "meses": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "diasSemana": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     "cualquiera": "Any",
     "todas": "All",
     "lunes": "Monday",
@@ -362,7 +373,18 @@ export default {
     "configurarCookies": "Configure cookies",
     "obligatoria": "required",
     "guardarPreferencias": "Save preferences",
-    "volver": "← Back"
+    "volver": "← Back",
+    "necesarias": "Required",
+    "necesariasDesc": "Essential for the website to function (session, cookies). Cannot be disabled.",
+    "preferencias": "Preferences",
+    "preferenciasDesc": "Remember your theme (light/dark), filters and site settings.",
+    "analiticas": "Analytics",
+    "analiticasDesc": "Help us understand which pages you visit and how you use the site to improve it.",
+    "marketing": "Marketing",
+    "marketingDesc": "Allow us to show you relevant advertising on other websites.",
+    "cuentaDescripcion": "Control which types of cookies you accept. They're saved to your profile and apply across all sessions.",
+    "guardarCookies": "Save cookies",
+    "cookiesGuardadas": "Cookie preferences saved."
   },
   "contacto": {
     "titulo": "Contact",
@@ -507,5 +529,12 @@ export default {
     "parking": "Parking",
     "recomendado": "recommended",
     "comoLlegarParking": "Directions to parking"
+  },
+  "footer": {
+    "titulo": "MIRA — Real restaurants, real reservations.",
+    "copyright": "© 2026 MIRA. All rights reserved.",
+    "hecho": "Spain",
+    "avisoPrivacidad": "Privacy policy",
+    "avisoCookies": "Cookie policy"
   }
 }
