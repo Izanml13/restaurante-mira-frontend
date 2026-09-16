@@ -1026,6 +1026,14 @@
   color: #e8e8e6;
 }
 
+[data-theme='dark'] .site-footer {
+  background: #111411;
+}
+
+[data-theme='dark'] .site-footer ul a:hover {
+  color: var(--secondary-container);
+}
+
 .footer-inner {
   max-width: var(--ancho-max);
   margin: 0 auto;
