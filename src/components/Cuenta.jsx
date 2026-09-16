@@ -13,7 +13,7 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-const LANG_FLAGS = { es: '🇪🇸', ca: '🏴\uFE0F', en: '🇬🇧' };
+const LANG_FLAGS = { es: 'ES', ca: 'CA', en: 'EN' };
 
 function hoyISO() {
   const h = new Date();
@@ -203,10 +203,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
               className={`lang-option${lang === code ? ' lang-activo' : ''}`}
               onClick={() => setLang(code)}
               aria-pressed={lang === code}
+              title={label}
             >
-              <span className="lang-flag">{LANG_FLAGS[code] || ''}</span>
-              <span className="lang-code">{code.toUpperCase()}</span>
-              <span className="lang-name">{label}</span>
+              {code.toUpperCase()}
             </button>
           ))}
         </div>
