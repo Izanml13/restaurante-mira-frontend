@@ -13,8 +13,14 @@ import {
   leyendaSellos,
 } from '../models/restaurantModel.js';
 import { Sellos, ConflictosAlergenos } from './Sellos.jsx';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
-function PaginaSeccion({ seccion, dieta, mostrarConflictos }) {
+const TRADS = { es, ca, en };
+
+function PaginaSeccion({ seccion, dieta, mostrarConflictos, t }) {
   return (
     <div className="libro-pagina">
       <h4 className="libro-seccion-titulo">{seccion.titulo}</h4>
@@ -42,10 +48,10 @@ function PaginaSeccion({ seccion, dieta, mostrarConflictos }) {
   );
 }
 
-function PaginaLeyenda({ leyenda }) {
+function PaginaLeyenda({ leyenda, t }) {
   return (
     <div className="libro-pagina">
-      <h4 className="libro-seccion-titulo">Leyenda</h4>
+      <h4 className="libro-seccion-titulo">{t('libro.leyenda')}</h4>
       <ul className="libro-leyenda-lista">
         {leyenda.map((e) => (
           <li key={e.nombre}>
@@ -63,6 +69,7 @@ function PaginaLeyenda({ leyenda }) {
 }
 
 export default function LibroCarta({ restaurant, dieta, onClose }) {
+  const t = useT(TRADS);
   const [pagina, setPagina] = useState(0);
   const [doble, setDoble] = useState(
     () => typeof window !== 'undefined' && window.innerWidth >= 720,
@@ -121,17 +128,17 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
             {restaurant.cocina} · {restaurant.precio}
           </p>
                 <p className="libro-portada-datos">
-                  {libro.secciones.length} secciones · {totalPlatos} platos
-                  {conDieta && ` · Aptos para ti: ${aptos}`}
-                  {restaurant.menuInfantil === true && ' · Menú infantil'}
+                  {libro.secciones.length} {t('libro.secciones')} · {totalPlatos} {t('libro.platos')}
+                  {conDieta && ` · ${t('libro.aptosParaTi')}: ${aptos}`}
+                  {restaurant.menuInfantil === true && ` · ${t('libro.menuInfantil')}`}
                 </p>
         </div>
       );
     }
     if (pg.tipo === 'leyenda') {
-      return <PaginaLeyenda key={i} leyenda={leyenda} />;
+      return <PaginaLeyenda key={i} leyenda={leyenda} t={t} />;
     }
-    return <PaginaSeccion key={i} seccion={pg} dieta={dieta} mostrarConflictos={conDieta} />;
+    return <PaginaSeccion key={i} seccion={pg} dieta={dieta} mostrarConflictos={conDieta} t={t} />;
   }
 
   return (
@@ -140,14 +147,14 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
         className="libro"
         role="dialog"
         aria-modal="true"
-        aria-label={`Carta de ${restaurant.nombre}`}
+        aria-label={t('libro.cartaDe', { nombre: restaurant.nombre })}
         style={{ '--libro-fondo': tema.fondo, '--libro-tinta': tema.tinta, '--libro-acento': tema.acento }}
       >
-        <button type="button" className="modal-cerrar" onClick={onClose} aria-label="Cerrar carta" autoFocus>
+        <button type="button" className="modal-cerrar" onClick={onClose} aria-label={t('libro.cerrarCarta')} autoFocus>
           ✕
         </button>
         <div className="libro-hojas">{visibles.map((i) => pintarPagina(i))}</div>
-        <div className="libro-leyenda-barra" aria-label="Leyenda de la carta" role="note">
+        <div className="libro-leyenda-barra" aria-label={t('libro.leyendaCarta')} role="note">
           {leyenda.map((e) => (
             <span key={e.nombre} className="libro-leyenda-item">
               <strong aria-hidden="true">{e.simbolo}</strong> {e.nombre}
@@ -161,7 +168,7 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
             disabled={inicio <= 0}
             onClick={() => setPagina((p) => Math.max(p - 1, 0))}
           >
-            ← Anterior
+            {t('libro.anterior')}
           </button>
           <span className="libro-paginacion" aria-live="polite">
             {inicio + 1} / {paginas.length}
@@ -172,7 +179,7 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
             disabled={inicio >= maxInicio}
             onClick={() => setPagina((p) => Math.min(p + 1, maxInicio))}
           >
-            Siguiente →
+            {t('libro.siguiente')}
           </button>
         </div>
       </div>

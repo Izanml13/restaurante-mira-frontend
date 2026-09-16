@@ -10,11 +10,17 @@ import { fetchNearbyParkings } from '../services/parkingApi.js';
 import RestaurantMap from './RestaurantMap.jsx';
 import ParkingsPanel from './ParkingsPanel.jsx';
 import { Sellos, MiniLeyenda } from './Sellos.jsx';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
-function marcaInfo(valor) {
-  if (valor === true) return 'Sí';
-  if (valor === false) return 'No';
-  return 'Sin información';
+const TRADS = { es, ca, en };
+
+function marcaInfo(valor, t) {
+  if (valor === true) return t('detail.si');
+  if (valor === false) return t('detail.no');
+  return t('detail.sinInfo');
 }
 
 const MOSTRAR_INICIAL = 10;
@@ -40,6 +46,7 @@ function StarPicker({ value, onChange }) {
 }
 
 export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta }) {
+  const t = useT(TRADS);
   const [verTodas, setVerTodas] = useState(false);
   const [verTodasYelp, setVerTodasYelp] = useState(false);
   const [ordenResenas, setOrdenResenas] = useState('populares'); // populares | recientes
@@ -75,9 +82,9 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     return (
       <li>
         <p className="resena-cab">
-          <strong>{r.usuarioNombre || r.usuario}</strong> · {r.fecha || (r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('es-ES') : '')} · <span aria-label={`${r.puntuacion} de 5`}>★ {r.puntuacion}</span>
+          <strong>{r.usuarioNombre || r.usuario}</strong> · {r.fecha || (r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString(t('modelos.locale')) : '')} · <span aria-label={`${r.puntuacion} de 5`}>★ {r.puntuacion}</span>
           <span style={{float:'right',display:'flex',alignItems:'center',gap:'0.3rem'}}>
-            <button type="button" onClick={()=> handleLike(r)} disabled={r.esMock} title={r.esMock ? 'Solo reseñas MIRA se pueden likear' : liked ? 'Quitar like' : 'Dar like'} style={{display:'inline-flex',alignItems:'center',gap:'0.25rem',background: liked ? 'var(--verde)' : 'var(--fondo)', color: liked ? '#fff' : 'var(--tinta)', border:'1px solid var(--borde)', borderRadius:'999px', padding:'0.15rem 0.5rem', cursor: r.esMock ? 'not-allowed' : 'pointer', fontSize:'0.78rem', fontWeight:700, opacity: r.esMock?0.5:1}}>
+            <button type="button" onClick={()=> handleLike(r)} disabled={r.esMock} title={r.esMock ? t('detail.soloLikeMira') : liked ? t('detail.quitarLike') : t('detail.darLike')} style={{display:'inline-flex',alignItems:'center',gap:'0.25rem',background: liked ? 'var(--verde)' : 'var(--fondo)', color: liked ? '#fff' : 'var(--tinta)', border:'1px solid var(--borde)', borderRadius:'999px', padding:'0.15rem 0.5rem', cursor: r.esMock ? 'not-allowed' : 'pointer', fontSize:'0.78rem', fontWeight:700, opacity: r.esMock?0.5:1}}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
               {r.likes||0}
             </button>
@@ -188,7 +195,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   return (
     <div className="modal-fondo" onClick={cerrarDesdeFondo}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo" style={{ '--acento': restaurant.acento }}>
-        <button type="button" className="modal-cerrar" onClick={onClose} aria-label="Cerrar detalle" autoFocus>
+        <button type="button" className="modal-cerrar" onClick={onClose} aria-label={t('otros.cerrar')} autoFocus>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <img className="modal-foto" src={restaurant.imagen} alt={`${restaurant.nombre} — cocina ${restaurant.cocina}`} />
@@ -201,30 +208,30 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </ul>
               )}
               <dl className="modal-datos">
-                <div><dt>Nota Yelp</dt><dd>★ {restaurant.valoracion.toLocaleString('es-ES')} ({restaurant.totalResenasYelp ?? 0} reseñas)</dd></div>
-                {media != null && (<div><dt>Nota MIRA</dt><dd>★ {media.toLocaleString('es-ES')}</dd></div>)}
-                <div><dt>Precio</dt><dd>{restaurant.precio}</dd></div>
-                {restaurant.direccion && (<div><dt>Dirección</dt><dd>{restaurant.direccion}</dd></div>)}
-                {restaurant.telefono && (<div><dt>Teléfono</dt><dd><a href={`tel:${restaurant.telefono.replace(/\s/g,'')}`}>{restaurant.telefono}</a></dd></div>)}
-                <div><dt>Acceso adaptado</dt><dd>{marcaInfo(restaurant.accesoDiscapacidad)}</dd></div>
-                <div><dt>Menú infantil</dt><dd>{marcaInfo(restaurant.menuInfantil)}</dd></div>
-                <div><dt>Tronas / sillas de bebé</dt><dd>{marcaInfo(restaurant.tronas)}</dd></div>
-                <div><dt>Terraza</dt><dd>{marcaInfo(restaurant.terraza)}</dd></div>
-                <div><dt>Entorno tranquilo</dt><dd>{marcaInfo(restaurant.entornoTranquilo)}</dd></div>
-                <div><dt>Alérgenos</dt><dd>{restaurant.alergenos || 'Sin información: confirma con el local'}</dd></div>
+                <div><dt>{t('detail.notaYelp')}</dt><dd>★ {restaurant.valoracion.toLocaleString(t('modelos.locale'))} ({restaurant.totalResenasYelp ?? 0} {t('card.resenas')})</dd></div>
+                {media != null && (<div><dt>{t('detail.notaMira')}</dt><dd>★ {media.toLocaleString(t('modelos.locale'))}</dd></div>)}
+                <div><dt>{t('detail.precio')}</dt><dd>{restaurant.precio}</dd></div>
+                {restaurant.direccion && (<div><dt>{t('detail.direccion')}</dt><dd>{restaurant.direccion}</dd></div>)}
+                {restaurant.telefono && (<div><dt>{t('detail.telefono')}</dt><dd><a href={`tel:${restaurant.telefono.replace(/\s/g,'')}`}>{restaurant.telefono}</a></dd></div>)}
+                <div><dt>{t('detail.accesoAdaptado')}</dt><dd>{marcaInfo(restaurant.accesoDiscapacidad, t)}</dd></div>
+                <div><dt>{t('detail.menuInfantil')}</dt><dd>{marcaInfo(restaurant.menuInfantil, t)}</dd></div>
+                <div><dt>{t('detail.tronas')}</dt><dd>{marcaInfo(restaurant.tronas, t)}</dd></div>
+                <div><dt>{t('detail.terraza')}</dt><dd>{marcaInfo(restaurant.terraza, t)}</dd></div>
+                <div><dt>{t('detail.entornoTranquilo')}</dt><dd>{marcaInfo(restaurant.entornoTranquilo, t)}</dd></div>
+                <div><dt>{t('detail.alergenos')}</dt><dd>{restaurant.alergenos || t('detail.sinInfoAlrgenos')}</dd></div>
               </dl>
               <p className="modal-acciones">
                 {onVerCarta && (
                   <button type="button" className="btn-cta btn-peq" onClick={() => onVerCarta(restaurant)}>
-                    Ver carta
+                    {t('detail.verCarta')}
                   </button>
                 )}
-                {externalMapUrl && (<a className="btn-secundario" href={externalMapUrl} target="_blank" rel="noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign:'-2px',marginRight:6}}><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="3"/></svg>Cómo llegar</a>)}
-                {restaurant.yelpUrl && (<a className="btn-secundario" href={restaurant.yelpUrl} target="_blank" rel="noreferrer">Ver en Yelp</a>)}
+                {externalMapUrl && (<a className="btn-secundario" href={externalMapUrl} target="_blank" rel="noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign:'-2px',marginRight:6}}><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="3"/></svg>{t('detail.comoLlegar')}</a>)}
+                {restaurant.yelpUrl && (<a className="btn-secundario" href={restaurant.yelpUrl} target="_blank" rel="noreferrer">{t('detail.verEnYelp')}</a>)}
               </p>
 
               <section aria-labelledby="carta-titulo">
-                <h3 id="carta-titulo" className="modal-sub">La carta</h3>
+                <h3 id="carta-titulo" className="modal-sub">{t('detail.laCarta')}</h3>
                 <MiniLeyenda />
                 <ul className="carta-lista">
                   {cartaDelLocal(restaurant).map((p) => (
@@ -236,7 +243,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </ul>
                 {onVerCarta && (
                   <button type="button" className="btn-secundario" onClick={() => onVerCarta(restaurant)}>
-                    Ver carta completa
+                    {t('detail.verCartaCompleta')}
                   </button>
                 )}
               </section>
@@ -248,21 +255,21 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </h3>
                 <form className="reserva-form" onSubmit={handleReserva} noValidate>
                   <div className="reserva-grid">
-                    <label className="campo"><span>Fecha</span><input type="date" value={reserva.fecha} onChange={e=>setReserva(s=>({...s,fecha:e.target.value}))} min={hoyLocalISO()} /></label>
-                    <label className="campo"><span>Hora</span>
+                    <label className="campo"><span>{t('detail.fecha')}</span><input type="date" value={reserva.fecha} onChange={e=>setReserva(s=>({...s,fecha:e.target.value}))} min={hoyLocalISO()} /></label>
+                    <label className="campo"><span>{t('detail.hora')}</span>
                       <select value={reserva.hora} onChange={e=>setReserva(s=>({...s,hora:e.target.value}))}>
-                        <option value="">Elige hora</option>
+                        <option value="">{t('detail.eligeHora')}</option>
                         {SLOTS.map(h=><option key={h} value={h}>{h}</option>)}
                       </select>
                     </label>
-                    <label className="campo"><span>Comensales</span><select value={reserva.comensales} onChange={e=>setReserva(s=>({...s,comensales:e.target.value}))}>{[1,2,3,4,5,6,7,8,9,10].map(n=><option key={n} value={n}>{n} {n===1?'persona':'personas'}</option>)}</select></label>
+                    <label className="campo"><span>{t('detail.comensales')}</span><select value={reserva.comensales} onChange={e=>setReserva(s=>({...s,comensales:e.target.value}))}>{[1,2,3,4,5,6,7,8,9,10].map(n=><option key={n} value={n}>{n} {n===1?t('modelos.persona'):t('modelos.personas')}</option>)}</select></label>
                   </div>
-                  <label className="campo" style={{marginTop:'0.6rem'}}><span>Comentarios (opcional, máx. 500)</span><textarea value={reserva.comentarios} onChange={e=>setReserva(s=>({...s,comentarios:e.target.value}))} maxLength={500} rows={2} placeholder="Trona, cumpleaños, alergias…" /></label>
+                  <label className="campo" style={{marginTop:'0.6rem'}}><span>{t('detail.comentarios')}</span><textarea value={reserva.comentarios} onChange={e=>setReserva(s=>({...s,comentarios:e.target.value}))} maxLength={500} rows={2} placeholder="Trona, cumpleaños, alergias…" /></label>
                   {reserva.fecha && reserva.hora && disponibilidad && (
                     <p className="reserva-plazas" role="status">
                       {disponibilidad.libres > 0
-                        ? `${disponibilidad.libres} de ${disponibilidad.limite} plazas libres`
-                        : 'Completo a esa hora. Prueba otra franja.'}
+                        ? t('detail.plazasLibres', { libres: disponibilidad.libres, limite: disponibilidad.limite })
+                        : t('detail.completo')}
                     </p>
                   )}
                   {avisoTerraza && (
@@ -273,15 +280,15 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                   )}
                   {errorReserva && <p className="reserva-error" role="alert">{errorReserva}</p>}
                   <button type="submit" className="btn-cta" style={{width:'100%',marginTop:'0.7rem'}} disabled={cargandoReserva || (disponibilidad && disponibilidad.libres <= 0)}>
-                    {cargandoReserva ? 'Reservando…' : 'Reservar'}
+                  {cargandoReserva ? t('detail.reservando') : t('detail.reservar')}
                   </button>
-                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>Debes <a href="#/login">iniciar sesión</a> para reservar.</p>}
+                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.5rem 0 0'}}>{t('otros.debes')} <a href="#/login">{t('otros.iniciarSesion')}</a> {t('detail.reservar')}.</p>}
                 </form>
                 {confirmacion && (
                   <div className="reserva-confirm" role="status">
-                    <strong>¡Reserva confirmada!</strong>
-                    <p>Código: <code>{confirmacion.codigo}</code> — {confirmacion.fecha} a las {confirmacion.hora} para {confirmacion.comensales} personas en <em>{confirmacion.restauranteNombre}</em>.</p>
-                    <p><a href="#/reservas">Ver mis reservas</a></p>
+                    <strong>{t('detail.reservaConfirmada')}</strong>
+                    <p>{t('detail.codigo')}: <code>{confirmacion.codigo}</code> — {confirmacion.fecha} a las {confirmacion.hora} para {confirmacion.comensales} {t('modelos.personas')} en <em>{confirmacion.restauranteNombre}</em>.</p>
+                    <p><a href="#/reservas">{t('detail.verMisReservas')}</a></p>
                   </div>
                 )}
               </section>
@@ -302,14 +309,14 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                   </div>
                   <p className="mapa-mini-pie">{restaurant.direccion || restaurant.ciudad}</p>
                 </section>
-              ) : (<p className="modal-mapa-vacio">Este local no tiene coordenadas disponibles.</p>)}
+              ) : (<p className="modal-mapa-vacio">{t('detail.esteLocalSinCoord')}</p>)}
 
               <section aria-labelledby="resenas-titulo">
-                <h3 id="resenas-titulo" className="modal-sub">Reseñas ({resenasMira.length + resenasYelp.length})</h3>
-                <div className="tabs" role="group" aria-label="Ordenar reseñas" style={{marginBottom:'1rem'}}>
+                <h3 id="resenas-titulo" className="modal-sub">{t('detail.resenas', { count: resenasMira.length + resenasYelp.length })}</h3>
+                <div className="tabs" role="group" aria-label={t('detail.resenas', { count: resenasMira.length + resenasYelp.length })} style={{marginBottom:'1rem'}}>
                   {[
-                    ['populares', 'Populares'],
-                    ['recientes', 'Más recientes'],
+                    ['populares', t('detail.populares')],
+                    ['recientes', t('detail.masRecientes')],
                   ].map(([valor, etiqueta]) => (
                     <button
                       key={valor}
@@ -323,18 +330,18 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                   ))}
                 </div>
 
-                <h4 className="modal-sub2">Reseñas MIRA ({resenasMira.length})</h4>
+                <h4 className="modal-sub2">{t('detail.resenasMira', { count: resenasMira.length })}</h4>
                 <form onSubmit={handleCrearResena} className="resena-form" style={{background:'var(--fondo-suave)',border:'1px solid var(--borde)',borderRadius:'var(--radio-peq)',padding:'0.9rem',marginBottom:'1rem'}}>
                   <StarPicker value={nuevaResena.puntuacion} onChange={v=> setNuevaResena(s=>({...s,puntuacion:v}))} />
-                  <label className="campo" style={{marginTop:'0.5rem'}}><span>Tu comentario</span><textarea value={nuevaResena.comentario} onChange={e=> setNuevaResena(s=>({...s,comentario:e.target.value}))} placeholder="Cuenta tu experiencia..." rows={3} /></label>
+                  <label className="campo" style={{marginTop:'0.5rem'}}><span>{t('detail.tuComentario')}</span><textarea value={nuevaResena.comentario} onChange={e=> setNuevaResena(s=>({...s,comentario:e.target.value}))} placeholder={t('detail.cuentaExperiencia')} rows={3} /></label>
                   {errorResena && <p className="reserva-error">{errorResena}</p>}
-                  <button type="submit" className="btn-secundario" disabled={enviandoResena} style={{marginTop:'0.5rem',width:'100%'}}>{enviandoResena ? 'Enviando…' : 'Publicar reseña'}</button>
-                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.4rem 0 0'}}>Debes iniciar sesión para reseñar.</p>}
+                  <button type="submit" className="btn-secundario" disabled={enviandoResena} style={{marginTop:'0.5rem',width:'100%'}}>{enviandoResena ? t('detail.enviando') : t('detail.publicarResena')}</button>
+                  {!usuario && <p style={{fontSize:'0.82rem',color:'var(--gris)',margin:'0.4rem 0 0'}}>{t('detail.debesLoginResena')}</p>}
                 </form>
 
-                {cargandoResenas && <p>Cargando reseñas…</p>}
+                {cargandoResenas && <p>{t('detail.cargandoResenas')}</p>}
                 {!cargandoResenas && resenasMira.length === 0 && (
-                  <p className="vacio-texto">Aún no hay reseñas MIRA. ¡Sé la primera persona en opinar!</p>
+                  <p className="vacio-texto">{t('detail.resenasMiraVacias')}</p>
                 )}
                 <ul className="modal-resenas">
                   {visiblesMira.map((r) => (
@@ -343,13 +350,13 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </ul>
                 {resenasMira.length > MOSTRAR_INICIAL && (
                   <button type="button" className="btn-secundario" onClick={() => setVerTodas((v) => !v)}>
-                    {verTodas ? 'Ver menos' : `Ver las ${resenasMira.length} reseñas MIRA`}
+                    {verTodas ? t('detail.verMenos') : t('detail.verResenasMira', { count: resenasMira.length })}
                   </button>
                 )}
 
-                <h4 className="modal-sub2">Reseñas de Yelp ({resenasYelp.length})</h4>
+                <h4 className="modal-sub2">{t('detail.resenasYelp', { count: resenasYelp.length })}</h4>
                 {resenasYelp.length === 0 && (
-                  <p className="vacio-texto">Aún no hay reseñas de Yelp para este local.</p>
+                  <p className="vacio-texto">{t('detail.resenasYelpVacias')}</p>
                 )}
                 <ul className="modal-resenas">
                   {visiblesYelp.map((r) => (
@@ -358,7 +365,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </ul>
                 {resenasYelp.length > MOSTRAR_INICIAL && (
                   <button type="button" className="btn-secundario" onClick={() => setVerTodasYelp((v) => !v)}>
-                    {verTodasYelp ? 'Ver menos' : `Ver las ${resenasYelp.length} reseñas de Yelp`}
+                    {verTodasYelp ? t('detail.verMenos') : t('detail.verResenasYelp', { count: resenasYelp.length })}
                   </button>
                 )}
               </section>
