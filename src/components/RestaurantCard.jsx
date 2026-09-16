@@ -1,5 +1,5 @@
 /**
- * View pura: ficha de restaurante minimalista con hover elevación + zoom.
+ * View pura: ficha de restaurante estilo editorial con hover elevación + zoom.
  */
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
@@ -87,11 +87,11 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
             </span>
           )}
         </p>
-        <p className="card-gris" style={{display:'flex',alignItems:'center',gap:'0.3rem'}}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="3"/></svg>
+        <p className="card-gris" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gris)" strokeWidth="2"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" /><circle cx="12" cy="10" r="3" /></svg>
           {distanciaKm == null ? t('card.centroNoDisponible') : t('card.kmCentro', { km: distanciaKm.toLocaleString('es-ES', { maximumFractionDigits: 1 }) })}
         </p>
-        {disp && <p className="card-disponibilidad" style={{fontSize:'0.78rem',color: disp.includes(t('card.cerradoLunes')) || disp.includes(t('card.cerradoMartes')) ? '#b42318' : 'var(--verde)', fontWeight:600, margin:'0.1rem 0 0'}}>{disp}</p>}
+        {disp && <p className="card-disponibilidad" style={{ fontSize: '0.78rem', color: disp.includes(t('card.cerradoLunes')) || disp.includes(t('card.cerradoMartes')) ? 'var(--rojo)' : 'var(--primary-container)', fontWeight: 600, margin: '0.1rem 0 0' }}>{disp}</p>}
         <p className="card-descripcion">{descripcion}</p>
         {children}
         <p className="card-acciones">

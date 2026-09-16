@@ -154,7 +154,11 @@ export default {
     "volver": "Tornar",
     "yaTienesCuenta": "Ja tens compte?",
     "iniciaSesion": "Inicia sessió",
-    "soyEmpresa": "Soc empresa: vull afegir el meu restaurant"
+    "soyEmpresa": "Soc empresa: vull afegir el meu restaurant",
+    "contrasenaCambiada": "Contrasenya canviada. Inicia sessió amb la teva nova clau.",
+    "revisaSpam": "Si aquest correu està registrat, rebràs un enllaç. Revisa també spam.",
+    "googleEntrando": "Entrant amb Google…",
+    "googleContinuar": "Continuar amb Google"
   },
   "cuenta": {
     "miCuenta": "El meu compte",

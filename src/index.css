@@ -1,4 +1,4 @@
-/* Base global: reset mínimo, tipografía y foco visible. */
+/* Base global: reset mínimo, tipografía editorial y foco visible. */
 @import './styles/tokens.css';
 
 *,
@@ -16,8 +16,10 @@ body {
   background: var(--fondo);
   color: var(--tinta);
   font-family: var(--fuente);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img {
@@ -25,7 +27,7 @@ img {
   max-width: 100%;
 }
 
-/* Barra lateral minimalista y fina (se adapta al tema vía --borde) */
+/* Scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--borde) transparent;
@@ -45,14 +47,26 @@ img {
   background: transparent;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--fuente);
+/* Headlines — Playfair Display (editorial display) */
+h1, h2, h3 {
+  font-family: var(--fuente-display);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   margin: 0 0 0.5em;
   letter-spacing: -0.01em;
+  color: var(--tinta);
+}
+
+h1 {
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+h3 {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
 }
 
 a {

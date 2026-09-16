@@ -1,4 +1,4 @@
-/** View pura: hero fotográfico con cifras (sin atajos). */
+/** View pura: hero editorial con imagen del template y cifras. */
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';

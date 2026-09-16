@@ -13,34 +13,22 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-col">
           <p className="logo">MIRA</p>
-          <p>Guía de restaurantes reales, notas reales.</p>
+          <p>{t('footer.titulo')}</p>
         </div>
         <nav className="footer-col" aria-label={t('nav.descubrir')}>
           <h2>{t('nav.descubrir')}</h2>
           <ul>
-            <li>
-              <a href="#buscar">{t('hero.buscar')}</a>
-            </li>
-            <li>
-              <a href="#/reservas">{t('nav.reservas')}</a>
-            </li>
-            <li>
-              <a href="#/contacto">{t('nav.contacto')}</a>
-            </li>
+            <li><a href="#buscar">{t('hero.buscar')}</a></li>
+            <li><a href="#/mapa">{t('nav.mapa')}</a></li>
+            <li><a href="#/reservas">{t('nav.reservas')}</a></li>
           </ul>
         </nav>
         <nav className="footer-col" aria-label={t('nav.miCuenta')}>
           <h2>{t('nav.miCuenta')}</h2>
           <ul>
-            <li>
-              <a href="#/login">{t('nav.iniciarSesion')}</a>
-            </li>
-            <li>
-              <a href="#/registro">{t('nav.crearCuenta')}</a>
-            </li>
-            <li>
-              <a href="#/cuenta">{t('nav.miCuenta')}</a>
-            </li>
+            <li><a href="#/login">{t('nav.iniciarSesion')}</a></li>
+            <li><a href="#/registro">{t('nav.crearCuenta')}</a></li>
+            <li><a href="#/cuenta">{t('nav.miCuenta')}</a></li>
           </ul>
         </nav>
         <div className="footer-col">
@@ -53,9 +41,9 @@ export default function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>© 2026 MIRA · Hecho con datos de Yelp y reseñas de la comunidad</p>
+        <p>{t('footer.copyright')} · {t('footer.hecho')}</p>
         <p>
-          <a href="#/privacidad">Política de privacidad</a>
+          <a href="#/privacidad">{t('footer.avisoPrivacidad')}</a>
         </p>
       </div>
     </footer>

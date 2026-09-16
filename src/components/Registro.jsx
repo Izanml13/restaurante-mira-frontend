@@ -138,9 +138,9 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
               <input id="reg-sinGluten" type="checkbox" checked={sinGluten} onChange={() => setSinGluten(!sinGluten)} />
               Sin gluten
             </label>
-            <fieldset className="prefs-alergias" style={{ border: 'none', padding: 0 }}>
-              <legend style={{ fontWeight: 600, fontSize: '0.95rem' }}>Mis alergias</legend>
-              {ALERGENOS.map(({ key, label }) => (
+<fieldset className="prefs-alergias" style={{ border: 'none', padding: 0 }}>
+               <legend style={{ fontWeight: 600, fontSize: '0.95rem' }}>Mis alergias</legend>
+               {ALERGENOS.filter((a) => a.key !== 'gluten').map(({ key, label }) => (
                 <label key={key} className="campo-check" htmlFor={`reg-alerg-${key}`}>
                   <input
                     id={`reg-alerg-${key}`}

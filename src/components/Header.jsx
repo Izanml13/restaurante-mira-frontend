@@ -1,5 +1,5 @@
 /**
- * View pura: cabecera con sesión (todo por props, sin lógica de negocio).
+ * View pura: cabecera glassmorphic con sesión (todo por props, sin lógica de negocio).
  * En móvil el menú colapsa tras el botón hamburguesa (estado solo visual).
  */
 import { useEffect, useState } from 'react';
@@ -25,7 +25,6 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
     return () => window.removeEventListener('keydown', alTeclar);
   }, [abierto]);
 
-  // En móvil el header se esconde al bajar y vuelve al subir.
   useEffect(() => {
     let ultimo = window.scrollY;
     let turno = false;
@@ -47,7 +46,6 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
     setAbierto(false);
   }
 
-  // El icono del mail conmuta: si ya estás en el buzón, lo cierra (vuelve al inicio).
   function conmutarMensajes(e) {
     if (window.location.hash === '#/mensajes') {
       e.preventDefault();
@@ -95,15 +93,13 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
           <ul className="nav-list">
             <li><a href="#inicio">{t('nav.descubrir')}</a></li>
             <li><a href="#/mapa">{t('nav.mapa')}</a></li>
+            <li><a href="#/reservas">{t('nav.reservas')}</a></li>
             <li><a href="#/contacto">{t('nav.contacto')}</a></li>
           </ul>
         </nav>
         <div className="header-cuentas" onClick={cerrar}>
           {usuario ? (
             <>
-              <a href="#/reservas" className="btn-texto">
-                {t('nav.reservas')}
-              </a>
               <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>

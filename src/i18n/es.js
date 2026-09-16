@@ -154,7 +154,11 @@ export default {
     "volver": "Volver",
     "yaTienesCuenta": "¿Ya tienes cuenta?",
     "iniciaSesion": "Inicia sesión",
-    "soyEmpresa": "Soy empresa: quiero añadir mi restaurante"
+    "soyEmpresa": "Soy empresa: quiero añadir mi restaurante",
+    "contrasenaCambiada": "Contraseña cambiada. Inicia sesión con tu nueva clave.",
+    "revisaSpam": "Si ese correo está registrado, recibirás un enlace. Revisa también spam.",
+    "googleEntrando": "Entrando con Google…",
+    "googleContinuar": "Continuar con Google"
   },
   "cuenta": {
     "miCuenta": "Mi cuenta",

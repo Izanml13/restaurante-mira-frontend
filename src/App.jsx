@@ -31,6 +31,8 @@ import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
 import CookieBanner from './components/CookieBanner.jsx';
 import Footer from './components/Footer.jsx';
+import BottomNav from './components/BottomNav.jsx';
+import FloatingReservation from './components/FloatingReservation.jsx';
 import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
 import './App.css';
@@ -61,7 +63,7 @@ function rutaActual() {
 }
 
 export default function App() {
-  const auth = useAuth();
+  const { usuario, crearCuenta, iniciarSesion, iniciarSesionGoogle, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacionEmail, recargarEmailVerified } = useAuth();
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('mira:tema');
@@ -86,8 +88,8 @@ export default function App() {
   }, [tema]);
 
   return (
-    <I18nProvider onLangChange={auth.guardarLang}>
-      <AppContent auth={auth} tema={tema} setTema={setTema} />
+    <I18nProvider onLangChange={perfil?.guardarLang}>
+      <AppContent auth={{ usuario, crearCuenta, iniciarSesion, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion: enviarVerificacionEmail, enviarVerificacionEmail, recargarEmailVerified, guardarLang: perfil?.guardarLang }} tema={tema} setTema={setTema} />
     </I18nProvider>
   );
 }
@@ -133,6 +135,11 @@ function AppContent({ auth, tema, setTema }) {
   } = useRestaurantController({ dieta, accesibilidad });
   const [ruta, setRuta] = useState(rutaActual);
 
+  // Floating reservation sheet state
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const [sheetRestaurante, setSheetRestaurante] = useState(null);
+  const [sheetReserva, setSheetReserva] = useState({ fecha: '', hora: '', comensales: '2', ahorro: 0 });
+
   useEffect(() => {
     function alCambiarHash() {
       setRuta(rutaActual());
@@ -144,6 +151,33 @@ function AppContent({ auth, tema, setTema }) {
 
   async function salir() {
     await cerrarSesion();
+    window.location.hash = '#/';
+  }
+
+  function openFloatingSheet(restaurant, hora, comensales) {
+    setSheetRestaurante(restaurant);
+    setSheetReserva({ fecha: sheetReserva.fecha, hora, comensales, ahorro: Math.round(parseInt(comensales, 10) * 18 * 0.15) });
+    setSheetVisible(true);
+  }
+
+  function closeFloatingSheet() {
+    setSheetVisible(false);
+    setTimeout(() => {
+      setSheetRestaurante(null);
+      setSheetReserva({ fecha: '', hora: '', comensales: '2', ahorro: 0 });
+    }, 350);
+  }
+
+  function handleFloatingConfirm() {
+    if (sheetRestaurante) {
+      abrirDetalle(sheetRestaurante);
+    }
+    closeFloatingSheet();
+  }
+
+  // Google login handler
+  async function handleLoginGoogle() {
+    await iniciarSesionGoogle();
     window.location.hash = '#/';
   }
 
@@ -160,13 +194,13 @@ function AppContent({ auth, tema, setTema }) {
             <a href="#/cuenta" style={{ color: '#fff', textDecoration: 'underline' }}>Verificar ahora</a>
           </div>
         )}
-        {ruta === 'login' && <Login onLogin={iniciarSesion} yaTieneSesion={Boolean(usuario)} />}
+        {ruta === 'login' && <Login onLogin={iniciarSesion} onLoginGoogle={handleLoginGoogle} yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'recuperar' && <Recuperar yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'restablecer' && <Restablecer yaTieneSesion={Boolean(usuario)} />}
         {ruta === 'registro' && (
           <Registro onRegistro={crearCuenta} yaTieneSesion={Boolean(usuario)} />
         )}
-        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacion} onRecargarEmailVerified={recargarEmailVerified} />}
+        {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacionEmail} onRecargarEmailVerified={recargarEmailVerified} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
         {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
@@ -240,9 +274,9 @@ function AppContent({ auth, tema, setTema }) {
                         <a href="#/cuenta">Cambiar en Mi cuenta</a> ·{' '}
                         <button type="button" className="btn-texto" onClick={verTodosIgual}>
                           Ver todos igual
-                      </button>
-                    </p>
-                  )}
+                        </button>
+                      </p>
+                    )}
                   <RestaurantList
                     restaurants={filtrados}
                     filtros={filtros}
@@ -266,6 +300,14 @@ function AppContent({ auth, tema, setTema }) {
       <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
+      <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} />
+      <FloatingReservation
+        visible={sheetVisible}
+        restaurant={sheetRestaurante}
+        reserva={sheetReserva}
+        onConfirm={handleFloatingConfirm}
+        onClose={closeFloatingSheet}
+      />
     </>
   );
 }
