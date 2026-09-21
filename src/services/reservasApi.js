@@ -1,6 +1,6 @@
 /**
  * Reservas — colección 'reservas' en Firestore.
- * Campos: restauranteId, restauranteNombre, usuarioId, usuarioEmail, fecha, hora, comensales, codigo, createdAt
+ * Campos: restauranteId, restauranteNombre, uid, usuarioEmail, fecha, hora, comensales, codigo, estado, createdAt
  * Controla choques de horario (ventana 90min) y capacidad por mesas.
  */
 import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, deleteDoc, orderBy } from 'firebase/firestore';
@@ -48,18 +48,18 @@ export async function crearReserva({ restaurante, usuario, fecha, hora, comensal
   const docRef = await addDoc(collection(getDb(),'reservas'), {
     restauranteId: String(restaurante.id),
     restauranteNombre: restaurante.nombre,
-    usuarioId: usuario.uid,
+    uid: usuario.uid,
     usuarioEmail: usuario.email,
-    fecha, hora, comensales: String(comensales),
+    fecha, hora, comensales: Number(comensales),
     codigo,
-    estado: 'confirmada',
+    estado: 'pendiente',
     createdAt: serverTimestamp(),
   });
   return { id: docRef.id, codigo, restauranteNombre: restaurante.nombre, fecha, hora, comensales };
 }
 
 export async function listarReservasDeUsuario(usuarioId){
-  const snap = await getDocs(query(collection(getDb(),'reservas'), where('usuarioId','==', usuarioId)));
+  const snap = await getDocs(query(collection(getDb(),'reservas'), where('uid','==', usuarioId)));
   const list = snap.docs.map(d=> ({ id:d.id, ...d.data() }));
   list.sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.hora||'').localeCompare(a.hora||''));
   return list;

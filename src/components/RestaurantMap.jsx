@@ -8,6 +8,12 @@
 import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 function crearIcono(color, selected) {
   const size = selected ? 34 : 28;
@@ -48,6 +54,7 @@ function FlyToPunto({ punto }) {
 }
 
 export default function RestaurantMap({ restaurant, parkings = [], selectedIndex, onMapReady }) {
+  const t = useT(TRADS);
   const coords = restaurant?.coords;
   const mapRef = useRef(null);
 
@@ -61,7 +68,7 @@ export default function RestaurantMap({ restaurant, parkings = [], selectedIndex
   const seleccionado = selectedIndex != null ? parkings[selectedIndex] : null;
 
   return (
-    <div className="restaurant-map" role="application" aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+    <div className="restaurant-map" role="application" aria-label={`${t('otros.mapaPorZonas')} — ${restaurant.nombre}`}>
       <MapContainer
         center={[coords.lat, coords.lng]}
         zoom={15}
@@ -91,7 +98,7 @@ export default function RestaurantMap({ restaurant, parkings = [], selectedIndex
               <br />
               {p.direccion}
               <br />
-              {p.gratuito === 'yes' ? 'Gratis' : 'Pago'}
+              {p.gratuito === 'yes' ? t('otros.gratis') : t('otros.pago')}
               {p.tipo !== '—' ? ` · ${p.tipo}` : ''}
               {p.distanciaMetros != null ? ` · ${p.distanciaMetros} m` : ''}
             </Popup>

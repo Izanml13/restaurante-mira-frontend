@@ -1,4 +1,4 @@
-/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
+/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas + puntos. */
 import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
@@ -7,6 +7,7 @@ import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
 import { useI18n } from '../i18n/index.jsx';
+import usePointsStore from '../stores/usePointsStore.js';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
@@ -21,8 +22,9 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
   const { lang, setLang, available } = useI18n();
+  const { saldoActual, rachaLogin, rachaReservas, fetchBalance } = usePointsStore();
   function t(key) {
     const dict = TRADS[lang] || TRADS.es;
     return key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
@@ -41,6 +43,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
       window.location.hash = '#/login';
       return;
     }
+    fetchBalance();
     let vivo = true;
     Promise.all([
       listarMisReservas(usuario.uid),
@@ -151,6 +154,48 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           <button type="button" className="btn-secundario" onClick={onSalir}>{t('cuenta.cerrarSesion')}</button>
         </p>
 
+        {/* --- DASHBOARD PANEL --- */}
+        {(esAdmin || perfil?.tipo === 'empresa') && (
+          <div className="cuenta-dashboard-banner">
+            <h2 className="cuenta-sub">{esAdmin ? 'Panel de Administración' : 'Panel de Restaurante'}</h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.8rem' }}>
+              {esAdmin
+                ? 'Gestiona usuarios, restaurantes, reservas, comisiones y analytics de la plataforma.'
+                : 'Gestiona tu restaurante: información, reservas, facturación y tickets.'}
+            </p>
+            <a href={esAdmin ? '#/admin' : '#/dashboard'} className="btn-cta">
+              {esAdmin ? 'Abrir Panel Admin' : 'Abrir Mi Panel'}
+            </a>
+          </div>
+        )}
+
+        {/* --- MIRA POINTS --- */}
+        <h2 className="cuenta-sub">{t('points.title')}</h2>
+        <div className="cuenta-points">
+          <div className="cuenta-points__saldo">
+            <span className="cuenta-points__amount">{saldoActual}</span>
+            <span className="cuenta-points__label">{t('points.balance')}</span>
+          </div>
+          {rachaLogin?.dias > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--gris)', marginBottom: '0.5rem' }}>
+              🔥 {rachaLogin.dias} {t('points.days')} {t('points.streak')} — +{Math.min(5 + 3 * Math.max(0, rachaLogin.dias - 1), 15)} pts/día
+            </p>
+          )}
+          {rachaReservas?.semanasConsecutivas > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--dorado)', marginBottom: '0.5rem' }}>
+              ⭐ x{rachaReservas.multiplicador} multiplicador activo
+            </p>
+          )}
+          <div className="cuenta-points__actions">
+            <a href="#/puntos" className="btn-cta btn-peq">{t('points.history')}</a>
+            <a href="#/puntos/historial" className="btn-secundario btn-peq">{t('points.redeem')}</a>
+            <a href="#/invitar" className="btn-secundario btn-peq">{t('points.invite')}</a>
+          </div>
+          <div className="cuenta-redemption">
+            💰 100 pts = 1,00 € · Sin caducidad
+          </div>
+        </div>
+
         {/* --- DIETA --- */}
         <h2 className="cuenta-sub">{t('cuenta.miDieta')}</h2>
         <form onSubmit={guardarPrefs} className="prefs-form">
@@ -259,10 +304,15 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </div>
 
         {/* --- NEGOCIO --- */}
-        {perfil?.tipo === 'empresa' && (
+        {(perfil?.tipo === 'empresa' || esAdmin) && (
           <>
             <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
-            <p><a href="#/negocio" className="btn-cta btn-peq">{t('cuenta.anadirRestaurante')}</a></p>
+            {perfil?.tipo === 'empresa' && (
+              <p><a href="#/dashboard" className="btn-cta">{t('cuenta.anadirRestaurante')}</a></p>
+            )}
+            {esAdmin && (
+              <p><a href="#/admin" className="btn-cta">Panel de Administracion</a></p>
+            )}
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">
                 {misNegocios.map((n) => (

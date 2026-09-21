@@ -31,22 +31,22 @@ function googleLink(coords, direccion) {
   return null;
 }
 
-function StarPicker({ value, onChange }) {
-  return (
-    <div style={{ display: 'flex', gap: '0.15rem' }} role="radiogroup" aria-label="Puntuación">
-      {[1, 2, 3, 4, 5].map(n => (
-        <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} estrellas`}
-          onClick={() => onChange(n)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: n <= value ? 'var(--estrella)' : 'var(--borde)', fontSize: '1.45rem', lineHeight: 1 }}>
-          ★
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta }) {
   const t = useT(TRADS);
+
+  function StarPicker({ value, onChange }) {
+    return (
+      <div style={{ display: 'flex', gap: '0.15rem' }} role="radiogroup" aria-label={t('detail.puntuacion')}>
+        {[1, 2, 3, 4, 5].map(n => (
+          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} ${t('detail.estrellas')}`}
+            onClick={() => onChange(n)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: n <= value ? 'var(--estrella)' : 'var(--borde)', fontSize: '1.45rem', lineHeight: 1 }}>
+            ★
+          </button>
+        ))}
+      </div>
+    );
+  }
   const [verTodas, setVerTodas] = useState(false);
   const [verTodasYelp, setVerTodasYelp] = useState(false);
   const [ordenResenas, setOrdenResenas] = useState('populares');
@@ -127,6 +127,13 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   }, [restaurant.id]);
 
   useEffect(() => {
+    if (!usuario?.uid) return;
+    import('../services/api.js').then(({ interactionsApi }) => {
+      interactionsApi.track(restaurant.id, 'view').catch(() => {});
+    });
+  }, [restaurant.id, usuario?.uid]);
+
+  useEffect(() => {
     let vivo = true;
     const coords = restaurant.coords;
     if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') {
@@ -145,9 +152,9 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     e.preventDefault();
     setErrorReserva(''); setConfirmacion(null);
     if (!usuario?.uid) { window.location.hash = '#/login'; return; }
-    if (!reserva.fecha || !reserva.hora || !reserva.comensales) { setErrorReserva('Elige fecha, hora y comensales.'); return; }
+    if (!reserva.fecha || !reserva.hora || !reserva.comensales) { setErrorReserva(t('detail.eligeFechaHora')); return; }
     const hoy = parseFechaLocal(hoyLocalISO());
-    if (parseFechaLocal(reserva.fecha) < hoy) { setErrorReserva('La fecha no puede ser anterior a hoy.'); return; }
+    if (parseFechaLocal(reserva.fecha) < hoy) { setErrorReserva(t('detail.fechaNoAnterior')); return; }
     setCargandoReserva(true);
     try {
       const r = await crearReserva({ restaurante: restaurant, usuario, fecha: reserva.fecha, hora: reserva.hora, comensales: reserva.comensales, comentarios: reserva.comentarios });
@@ -161,7 +168,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   async function handleCrearResena(e) {
     e.preventDefault();
     setErrorResena('');
-    if (!usuario?.uid) { setErrorResena('Debes iniciar sesión para reseñar.'); return; }
+    if (!usuario?.uid) { setErrorResena(t('detail.debesLoginResena')); return; }
     setEnviandoResena(true);
     try {
       await crearResena({ restauranteId: restaurant.id, usuario, puntuacion: nuevaResena.puntuacion, comentario: nuevaResena.comentario });
@@ -173,7 +180,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   }
 
   async function handleLike(r) {
-    if (!usuario?.uid) { setErrorResena('Inicia sesión para dar like.'); return; }
+    if (!usuario?.uid) { setErrorResena(t('detail.iniciaParaLike')); return; }
     const ya = (r.likedBy || []).includes(usuario.uid);
     setResenasFs(prev => prev.map(x => x.id === r.id ? { ...x, likes: (x.likes || 0) + (ya ? -1 : 1), likedBy: ya ? x.likedBy.filter(id => id !== usuario.uid) : [...(x.likedBy || []), usuario.uid] } : x));
     try {
@@ -195,7 +202,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
           <p className="card-meta" style={{ color: 'var(--gris)', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 0.3rem' }}>{restaurant.cocina}</p>
           <h2 id="detalle-titulo" className="modal-titulo">{restaurant.nombre}</h2>
           {(restaurant.categorias?.length > 1) && (
-            <ul className="modal-chips" aria-label="Especialidades">
+            <ul className="modal-chips" aria-label={t('detail.especialidades')}>
               {restaurant.categorias.map((c) => (<li key={c}>{c}</li>))}
             </ul>
           )}
@@ -243,8 +250,13 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
           <section className="reserva-bloque" aria-labelledby="reserva-titulo">
             <h3 id="reserva-titulo" className="modal-sub" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-              Reservar mesa
+              {t('detail.reservarMesa')}
             </h3>
+            <div className="detail-points-preview">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v12M6 12h12" /></svg>
+              +100 pts por reserva
+              <span className="detail-points-preview__racha">x1.2 si mantienes racha</span>
+            </div>
             <form className="reserva-form" onSubmit={handleReserva} noValidate>
               <div className="reserva-grid">
                 <label className="campo"><span>{t('detail.fecha')}</span><input type="date" value={reserva.fecha} onChange={e => setReserva(s => ({ ...s, fecha: e.target.value }))} min={hoyLocalISO()} /></label>
@@ -256,7 +268,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </label>
                 <label className="campo"><span>{t('detail.comensales')}</span><select value={reserva.comensales} onChange={e => setReserva(s => ({ ...s, comensales: e.target.value }))}>{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n} {n === 1 ? t('modelos.persona') : t('modelos.personas')}</option>)}</select></label>
               </div>
-              <label className="campo" style={{ marginTop: '0.6rem' }}><span>{t('detail.comentarios')}</span><textarea value={reserva.comentarios} onChange={e => setReserva(s => ({ ...s, comentarios: e.target.value }))} maxLength={500} rows={2} placeholder="Trona, cumpleaños, alergias…" /></label>
+              <label className="campo" style={{ marginTop: '0.6rem' }}><span>{t('detail.comentarios')}</span><textarea value={reserva.comentarios} onChange={e => setReserva(s => ({ ...s, comentarios: e.target.value }))} maxLength={500} rows={2} placeholder={t('detail.placeholderComentarios')} /></label>
               {reserva.fecha && reserva.hora && disponibilidad && (
                 <p className="reserva-plazas" role="status">
                   {disponibilidad.libres > 0
@@ -286,7 +298,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
           </section>
 
           {restaurant.coords ? (
-            <section className="parking-section" aria-label={`Mapa de ${restaurant.nombre} con parkings cercanos`}>
+            <section className="parking-section" aria-label={`${t('otros.mapaPorZonas')} — ${restaurant.nombre}`}>
               <div className="parking-grid">
                 <RestaurantMap
                   restaurant={restaurant}

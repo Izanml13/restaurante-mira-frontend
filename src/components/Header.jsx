@@ -10,7 +10,7 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, tema, onCambiarTema, onSalir }) {
+export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, puntosSaldo, tema, onCambiarTema, onSalir }) {
   const t = useT(TRADS);
   const { lang, cycleLang, available } = useI18n();
   const [abierto, setAbierto] = useState(false);
@@ -89,7 +89,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         {abierto ? '✕' : '☰'}
       </button>
       <div id="menu-movil" className={`header-menu${abierto ? ' abierto' : ''}`}>
-        <nav aria-label="Navegación principal" onClick={cerrar}>
+        <nav aria-label={t('nav.navegacion')} onClick={cerrar}>
           <ul className="nav-list">
             <li><a href="#inicio">{t('nav.descubrir')}</a></li>
             <li><a href="#/mapa">{t('nav.mapa')}</a></li>
@@ -100,20 +100,32 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         <div className="header-cuentas" onClick={cerrar}>
           {usuario ? (
             <>
-              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/puntos" className="header-points-pill" title={t('points.title')}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 6v12M6 12h12" />
+                </svg>
+                {puntosSaldo || 0}
+              </a>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`${t('nav.favoritos')} (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
-              <a href="#/mensajes" className="btn-texto btn-fav" onClick={conmutarMensajes} aria-label={`Mensajes${noLeidos > 0 ? `, ${noLeidos} sin leer` : ''}`}>
+              <a href="#/mensajes" className="btn-texto btn-fav" onClick={conmutarMensajes} aria-label={`${t('mensajes.titulo')}${noLeidos > 0 ? `, ${noLeidos} ${t('mensajes.sinLeer')}` : ''}`}>
                 ✉{noLeidos > 0 ? ` ${noLeidos}` : ''}
               </a>
               {esAdmin && (
-                <a href="#/admin" className="btn-texto">
-                  {t('nav.admin')}
+                <a href="#/admin" className="header-dashboard-link header-dashboard-admin" title="Panel de Administracion">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>Panel Admin</span>
                 </a>
               )}
               {perfil?.tipo === 'empresa' && (
-                <a href="#/negocio" className="btn-texto">
-                  {t('nav.miRestaurante')}
+                <a href="#/dashboard" className="header-dashboard-link header-dashboard-restaurante" title="Mi Panel de Restaurante">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>Mi Panel</span>
                 </a>
               )}
               <a href="#/cuenta" className="header-cuenta-link" title={usuario.email}>
@@ -135,7 +147,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
             </>
           ) : (
             <>
-              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`${t('nav.favoritos')} (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
               <a href="#/login" className="header-login">

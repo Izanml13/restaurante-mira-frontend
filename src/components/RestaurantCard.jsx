@@ -2,6 +2,7 @@
  * View pura: ficha de restaurante estilo editorial con hover elevación + zoom.
  */
 import { useT } from '../i18n/index.jsx';
+import PromoBadge from './promotions/PromoBadge.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
@@ -35,6 +36,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
     imagen,
     descripcion,
     ciudad,
+    promoActiva,
   } = restaurant;
   const destacado = valoracion >= 4.7;
   const disp = disponibilidadTexto(restaurant, filtros, t);
@@ -50,6 +52,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
         />
         {destacado && <span className="card-top">{t('card.recomendado')}</span>}
         <span className="card-precio-badge">{precio}</span>
+        {promoActiva && <PromoBadge promoActiva={promoActiva} />}
         {onToggleFavorito && (
           <button
             type="button"
@@ -68,11 +71,11 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
         <p className="card-nota">
           {valoracion > 0 ? (
             <>
-              <span className="card-estrellas" aria-label={`Valoración ${valoracion} de 5`}>
-                {estrellas(valoracion)} {valoracion.toLocaleString('es-ES')}
+              <span className="card-estrellas" aria-label={`${t('busqueda.valoracion')} ${valoracion} ${t('lista.de')} 5`}>
+                {estrellas(valoracion)} {valoracion.toLocaleString(t('modelos.locale'))}
               </span>{' '}
               <span className="card-opiniones">
-                ({(totalResenasYelp ?? 0).toLocaleString('es-ES')} {t('card.opiniones')})
+                ({(totalResenasYelp ?? 0).toLocaleString(t('modelos.locale'))} {t('card.opiniones')})
               </span>
             </>
           ) : (
@@ -89,7 +92,7 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
         </p>
         <p className="card-gris" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gris)" strokeWidth="2"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" /><circle cx="12" cy="10" r="3" /></svg>
-          {distanciaKm == null ? t('card.centroNoDisponible') : t('card.kmCentro', { km: distanciaKm.toLocaleString('es-ES', { maximumFractionDigits: 1 }) })}
+          {distanciaKm == null ? t('card.centroNoDisponible') : t('card.kmCentro', { km: distanciaKm.toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 }) })}
         </p>
         {disp && <p className="card-disponibilidad" style={{ fontSize: '0.78rem', color: disp.includes(t('card.cerradoLunes')) || disp.includes(t('card.cerradoMartes')) ? 'var(--rojo)' : 'var(--primary-container)', fontWeight: 600, margin: '0.1rem 0 0' }}>{disp}</p>}
         <p className="card-descripcion">{descripcion}</p>
