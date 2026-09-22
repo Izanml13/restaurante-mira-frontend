@@ -1649,14 +1649,15 @@ button.btn-texto {
 }
 
 /* Header oculto al bajar */
-@media (max-width: 767px) {
-  .site-header {
-    transition: transform 0.25s ease;
-  }
+.site-header {
+  transition: transform 0.25s ease;
+}
 
-  .site-header.oculto {
-    transform: translateY(-100%);
-  }
+.site-header.oculto {
+  transform: translateY(-100%);
+}
+
+@media (max-width: 767px) {
 }
 
 /* ---------- Libro de carta ---------- */

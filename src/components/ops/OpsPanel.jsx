@@ -28,23 +28,6 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   const [menuMovil, setMenuMovil] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [criticas, setCriticas] = useState(0);
-  const [headerOculto, setHeaderOculto] = useState(false);
-
-  // Auto-hide header: se oculta si el cursor no está en la zona superior.
-  useEffect(() => {
-    if (!esAdmin) return;
-    function alMover(e) {
-      setHeaderOculto(e.clientY > 72);
-    }
-    function alEntrarZona() { setHeaderOculto(false); }
-    window.addEventListener('mousemove', alMover, { passive: true });
-    const zona = document.querySelector('.ops-header-trigger');
-    if (zona) zona.addEventListener('mouseenter', alEntrarZona);
-    return () => {
-      window.removeEventListener('mousemove', alMover);
-      if (zona) zona.removeEventListener('mouseenter', alEntrarZona);
-    };
-  }, [esAdmin]);
 
   useEffect(() => {
     if (!esAdmin) return;
@@ -144,8 +127,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
         </aside>
 
         <div className="ops-main">
-          <div className="ops-header-trigger" />
-          <header className={`ops-header${headerOculto ? ' ops-header-hidden' : ''}`}>
+          <header className="ops-header">
             <button type="button" className="ops-icon-btn ops-menu-btn" onClick={() => setMenuMovil((v) => !v)} aria-label="Abrir menú">
               <span className="material-symbols-outlined">menu</span>
             </button>
