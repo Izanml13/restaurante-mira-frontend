@@ -1,12 +1,11 @@
 // firestore.rules - MIRA (COPIA FIEL de las reglas en vigor, solo referencia)
 // NO pegar este fichero si ya tienes reglas propias en la consola.
-// El acceso de operador lo da el documento admins/{UID} (ver NOTA ADMIN abajo).
+// El acceso de operador lo da el campo `tipo` en `usuarios/{UID}`.
 //
-// NOTA ADMIN: para que un usuario vea el panel #/admin con datos, debe existir
-// el documento admins/{SU_UID} (ID = UID de Authentication, p. ej. {rol:'admin'}).
-// Se crea desde la consola (Firestore > admins > anadir documento) o con el backend:
-//   node setup-colecciones.js --admin UID_DE_TU_USUARIO
-// (allow write: if false impide crearlo desde la web: es intencionado.)
+// NOTA ADMIN: para que un usuario vea el panel #/admin con datos, su doc
+// `usuarios/{SU_UID}` debe tener el campo `tipo` = `admin`.
+// Se cambia desde la consola (Firestore > usuarios > tu doc > editar tipo)
+// o con el backend: node setup-colecciones.js --admin UID_DE_TU_USUARIO
 
 rules_version = '2';
 service cloud.firestore {
@@ -15,7 +14,7 @@ service cloud.firestore {
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
     function isAdmin() {
       return isSignedIn()
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.tipo == 'admin';
     }
     function isEmpresa() {
       return isSignedIn()
