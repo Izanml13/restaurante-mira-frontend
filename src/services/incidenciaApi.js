@@ -7,15 +7,27 @@
 import { collection, addDoc, getDocs, getDoc, doc, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getDb } from './firebase.js';
 
-/** ¿Es admin? 1 lectura al doc allowlist `admins/{uid}`. */
+/** ¿Es admin? Revisa `usuarios/{uid}.tipo` Y la allowlist `admins/{uid}`.
+ * Cada lectura se evalúa por separado: si las reglas deniegan una,
+ * la otra sigue valiendo (un solo fallo ya no tumba todo el chequeo). */
 export async function esAdmin(uid) {
   if (!uid) return false;
-  try {
-    const snap = await getDoc(doc(getDb(), 'admins', uid));
-    return snap.exists();
-  } catch {
-    return false;
+  const [userSnap, adminSnap] = await Promise.allSettled([
+    getDoc(doc(getDb(), 'usuarios', uid)),
+    getDoc(doc(getDb(), 'admins', uid)),
+  ]);
+  if (
+    userSnap.status === 'fulfilled' &&
+    userSnap.value.exists() &&
+    userSnap.value.data().tipo === 'admin'
+  ) {
+    return true;
   }
+  if (adminSnap.status === 'fulfilled' && adminSnap.value.exists()) {
+    const data = adminSnap.value.data() || {};
+    return data.rol === 'admin' || data.tipo === 'admin' || true;
+  }
+  return false;
 }
 
 /** Mis incidencias: por uid y (compat) por email, orden en cliente. */
