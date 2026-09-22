@@ -354,21 +354,18 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                 <div className="op-rest-selector-wrap" ref={restDropdownRef}>
                   <div
                     className="op-rest-selector"
-                    onClick={()=> {
-                      if (listaRests.length > 1) setShowRestDropdown(v => !v);
-                      else setShowFicha(true);
-                    }}
-                    title={listaRests.length > 1 ? "Cambiar restaurante" : "Ver ficha"}
-                    role={listaRests.length > 1 ? 'button' : undefined}
+                    onClick={()=> setShowRestDropdown(v => !v)}
+                    title="Cambiar restaurante"
+                    role="button"
                   >
                     <div className="op-rest-avatar">{initials(nombreCorto)}</div>
                     <div>
                       <div className="op-rest-name">{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:12, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>verified</span></div>
                       <div className="op-rest-sub">ID {restId} · {dir.slice(0,28)}</div>
                     </div>
-                    <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>{listaRests.length > 1 && showRestDropdown ? 'expand_less' : 'unfold_more'}</span>
+                    <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>{showRestDropdown ? 'expand_less' : 'unfold_more'}</span>
                   </div>
-                  {listaRests.length > 1 && showRestDropdown && (
+                  {showRestDropdown && (
                     <div className="op-rest-dropdown" role="listbox">
                       <div className="op-rest-dropdown-title">Tus restaurantes ({listaRests.length})</div>
                       {listaRests.map(r => (
