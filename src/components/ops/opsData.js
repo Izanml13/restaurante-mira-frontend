@@ -80,7 +80,7 @@ export async function abonarPuntos(uid, cantidad, motivo) {
 export function mensajeErrorFirestore(e, coleccion) {
   const m = String(e?.message || e || '');
   if (/permission|insufficient|permiso denegado/i.test(m)) {
-    return `Sin permiso de lectura en '${coleccion}'. Hay que publicar las reglas de firestore.rules del repo (PARCHE OPS: lectura de operador).`;
+    return `Sin permiso en '${coleccion}'. Verifica que el documento admins/{TU_UID} existe en Firestore (proyecto restaurante-mira-18e0c) y que el ID coincide con tu UID de Authentication.`;
   }
   return m;
 }

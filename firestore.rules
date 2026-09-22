@@ -1,8 +1,12 @@
-// firestore.rules - MIRA (copia de referencia para la consola)
-// Incluye el PARCHE OPS: lectura de operador en `usuarios` y `tickets`,
-// sin el cual el panel #/admin falla con "missing or insufficient permissions".
-// Para aplicarlo: Firebase Console > Firestore > Reglas > pegar > Publicar.
-// (O via backend: el bloque REGLAS de setup-colecciones.js debe igualar este fichero.)
+// firestore.rules - MIRA (COPIA FIEL de las reglas en vigor, solo referencia)
+// NO pegar este fichero si ya tienes reglas propias en la consola.
+// El acceso de operador lo da el documento admins/{UID} (ver NOTA ADMIN abajo).
+//
+// NOTA ADMIN: para que un usuario vea el panel #/admin con datos, debe existir
+// el documento admins/{SU_UID} (ID = UID de Authentication, p. ej. {rol:'admin'}).
+// Se crea desde la consola (Firestore > admins > anadir documento) o con el backend:
+//   node setup-colecciones.js --admin UID_DE_TU_USUARIO
+// (allow write: if false impide crearlo desde la web: es intencionado.)
 
 rules_version = '2';
 service cloud.firestore {
@@ -13,23 +17,26 @@ service cloud.firestore {
       return isSignedIn()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
+    function isEmpresa() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.tipo == 'empresa';
+    }
 
     match /restaurants/{id} {
       allow read: if true;
-      // Crear: cualquier logueado con forma valida (lo usa Aprobar del admin).
       allow create: if isSignedIn()
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
         && request.resource.data.ciudad is string
         && request.resource.data.precio in ['€','€€','€€€'];
-      allow update, delete: if false;
+      allow update: if isAdmin() || isEmpresa();
+      allow delete: if false;
     }
 
-    // PARCHE OPS: el operador necesita LEER usuarios (panel, contadores).
-    // La escritura sigue siendo solo del dueno.
     match /usuarios/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      allow write: if isOwner(uid);
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isOwner(uid) || isAdmin();
     }
 
     match /negocios/{id} {
@@ -53,16 +60,15 @@ service cloud.firestore {
     }
 
     match /reservas/{id} {
-      allow read: if isOwner(resource.data.uid) || isAdmin();
+      allow read: if isSignedIn();
       allow create: if isSignedIn()
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.hora in ['13:00','14:00','15:00','20:00','21:00','22:00']
+        && request.resource.data.fecha is string
+        && request.resource.data.hora is string
         && request.resource.data.comensales >= 1
-        && request.resource.data.comensales <= 10
-        && request.resource.data.estado == 'activa';
-      allow update: if (isOwner(resource.data.uid) || isAdmin())
-        && request.resource.data.estado == 'cancelada';
-      allow delete: if false;
+        && request.resource.data.comensales <= 10;
+      allow update: if isOwner(resource.data.uid) || isAdmin() || isEmpresa();
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
     }
 
     match /aforo/{id} {
@@ -72,13 +78,6 @@ service cloud.firestore {
         && request.resource.data.limite >= 4
         && request.resource.data.limite <= 12;
       allow delete: if false;
-    }
-
-    // PARCHE OPS: `tickets` no tenia bloque (denegacion por defecto) y tumbaba
-    // Finanzas. Lectura solo operador.
-    match /tickets/{id} {
-      allow read: if isAdmin();
-      allow write: if false;
     }
 
     match /resenas/{id} {
@@ -98,7 +97,48 @@ service cloud.firestore {
     }
 
     match /admins/{uid} {
-      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /tickets/{id} {
+      allow read: if isOwner(resource.data.uid) || isAdmin() || isEmpresa();
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || isEmpresa();
+      allow delete: if false;
+    }
+
+    match /puntos_movimientos/{id} {
+      allow read: if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /invitaciones/{id} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.creadorUid == request.auth.uid;
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    match /promociones/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isEmpresa();
+      allow update: if isSignedIn() && (isEmpresa() || isAdmin());
+      allow delete: if false;
+    }
+
+    match /interacciones/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /auditLog/{id} {
+      allow read: if isAdmin();
       allow write: if false;
     }
   }
