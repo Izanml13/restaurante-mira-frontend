@@ -239,6 +239,7 @@ export function ordenarResenas(lista, orden = 'populares') {
  * Se usan para el filtro aunque la portada aún no las haya cargado todas.
  */
 export const ZONAS_CATALUNA = ['Barcelona, Spain', 'Tarragona, Spain', 'Girona, Spain', 'Lleida, Spain'];
+export const CIUDADES_CATALUNA = ['Tarragona', 'Girona', 'Barcelona', 'Lleida'];
 
 // =====================================================
 // Dieta, alérgenos y carta libro (todo determinista, 0 lecturas)

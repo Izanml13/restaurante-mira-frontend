@@ -5,6 +5,7 @@ import { RevenueLineChart, ReservationsPieChart, RevenueBarChart } from "./Chart
 import ReservationActions from "./ReservationActions.jsx";
 import TicketUpload from "./TicketUpload.jsx";
 import { useT } from "../../i18n/index.jsx";
+import { CIUDADES_CATALUNA } from "../../models/restaurantModel.js";
 import es from "../../i18n/es.js";
 import ca from "../../i18n/ca.js";
 import en from "../../i18n/en.js";
@@ -55,14 +56,31 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
   const [selectedMonth, setSelectedMonth] = useState('este-mes');
   const [fechaFiltro, setFechaFiltro] = useState(()=> new Date().toISOString().split('T')[0]);
   const [filtroTodas, setFiltroTodas] = useState(false);
+  const [listaRests, setListaRests] = useState([]);
   const fileRef = useRef(null);
+
+  useEffect(() => {
+    if (!usuario?.uid) return;
+    try {
+      if (sessionStorage.getItem('mira_abrir_crear')) {
+        sessionStorage.removeItem('mira_abrir_crear');
+        setShowCreateForm(true);
+      }
+    } catch { /* ignore */ }
+  }, [usuario]);
 
   useEffect(() => {
     if (!usuario?.uid) return;
     let vivo = true;
     setLoading(true);
+    const cargarExtra = (restId) => {
+      dashboardApi.listMyRestaurants().then(l => { if (vivo) setListaRests(l); }).catch(()=>{});
+      if (restId && typeof sessionStorage !== 'undefined') {
+        try { sessionStorage.setItem('mira_rest_activo', restId); } catch { /* ignore */ }
+      }
+    };
     dashboardApi.getMyRestaurant()
-      .then(d => { if (vivo){ setData(d); setFormData(d.restaurante); setLoading(false); }})
+      .then(d => { if (vivo){ setData(d); setFormData(d.restaurante); setLoading(false); cargarExtra(d.restaurante.id); }})
       .catch(e => {
         if (!vivo) return;
         const msg = e.message || "Error al cargar";
@@ -72,11 +90,22 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
             const pendiente = negocios.find(n=> n.estado==="pendiente");
             if (pendiente) setPendingNegocio(pendiente); else setNoRestaurant(true);
             setLoading(false);
-          }).catch(()=>{ if(vivo){ setNoRestaurant(true); setLoading(false); }});
+            cargarExtra(null);
+          }).catch(()=>{ if(vivo){ setNoRestaurant(true); setLoading(false); cargarExtra(null); }});
         } else { setError(msg); setLoading(false); }
       });
     return ()=>{ vivo=false; };
   }, [usuario]);
+
+  async function handleSwitchRest(id){
+    if (!id || id === data?.restaurante?.id) return;
+    setLoading(true); setError("");
+    try {
+      const d = await dashboardApi.getMyRestaurant(id);
+      setData(d); setFormData(d.restaurante); setEditing(false); setShowFicha(false);
+      try { sessionStorage.setItem('mira_rest_activo', id); } catch { /* ignore */ }
+    } catch(e){ setError(e.message); } finally { setLoading(false); }
+  }
 
   function handleEditChange(field, value){ setFormData(prev=> ({...prev,[field]:value})); }
   async function handleSave(){
@@ -138,7 +167,13 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
       await proponerNegocio({ usuario, datos:{...newRest, categorias: categoriasArr}});
       setCreateSuccess(true);
       setTimeout(()=>{
-        setShowCreateForm(false); setCreateSuccess(false); setLoading(true);
+        setShowCreateForm(false); setCreateSuccess(false); setNewRest({ ...EMPTY_REST });
+        if (data) {
+          // Already has a restaurant: keep current panel, proposal goes to admin queue
+          dashboardApi.listMyRestaurants().then(l=> setListaRests(l)).catch(()=>{});
+          return;
+        }
+        setLoading(true);
         dashboardApi.getMyRestaurant().then(d=>{ setData(d); setFormData(d.restaurante); setNoRestaurant(false); setLoading(false);})
         .catch(()=>{
           listarMisNegocios(usuario.uid).then(negocios=>{
@@ -148,15 +183,15 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
           }).catch(()=>{ setNoRestaurant(true); setLoading(false);});
         });
       },2000);
-    }catch(e){ setError(e.message);} finally{ setCreating(false); }
+    }catch(e){ setError(e.message); } finally{ setCreating(false); }
   }
 
   // —— loading / empty states (keep MIRA web consistency but with op tokens) ——
   if (loading) return <section className="auth-pagina"><div className="auth-tarjeta tarjeta-ancha"><p>{t("otros.cargando")}</p></div></section>;
   if (error && !data && !noRestaurant && !pendingNegocio) return <section className="auth-pagina"><div className="auth-tarjeta tarjeta-ancha"><h1>{t("dashboard.miRestaurante")}</h1><p className="auth-error">{error}</p></div></section>;
-  if (!data && !noRestaurant && !pendingNegocio) return null;
+  if (!data && !noRestaurant && !pendingNegocio && !showCreateForm) return null;
 
-  if (pendingNegocio){
+  if (pendingNegocio && !showCreateForm && !data){
     return (
       <section className="auth-pagina pagina-ancha"><div className="auth-tarjeta tarjeta-ancha" style={{maxWidth:760, margin:'0 auto', width:'100%'}}>
         <div className="op-hub" style={{padding: '1rem'}}>
@@ -175,7 +210,7 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
       </div></section>
     );
   }
-  if (noRestaurant && !showCreateForm){
+  if (noRestaurant && !showCreateForm && !data){
     return (
       <section className="auth-pagina pagina-ancha"><div className="auth-tarjeta tarjeta-ancha" style={{maxWidth:760, margin:'0 auto', width:'100%'}}>
         <div className="op-hub" style={{alignItems:'center', textAlign:'center'}}>
@@ -187,11 +222,12 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
       </div></section>
     );
   }
-  if (noRestaurant && showCreateForm){
+  if (showCreateForm){
     return (
       <section className="auth-pagina pagina-ancha"><div className="auth-tarjeta tarjeta-ancha" style={{maxWidth:760, margin:'0 auto', width:'100%'}}>
         <div className="op-hub">
-          <h2 style={{fontWeight:800, fontSize:'1.1rem'}}>Crear restaurante</h2>
+          <h2 style={{fontWeight:800, fontSize:'1.1rem'}}>{data ? 'Añadir otro restaurante' : 'Crear restaurante'}</h2>
+          {data && <p style={{fontSize:'0.82rem', color:'var(--op-on-variant)', marginTop:'-0.35rem'}}>Se enviará como nueva propuesta. Tu restaurante actual no cambia hasta que el admin la apruebe.</p>}
           {createSuccess ? (
             <div style={{background:'#d1fae5', color:'#065f46', padding:'1rem', borderRadius:'0.75rem', textAlign:'center'}}>
               <p style={{fontWeight:800}}>Restaurante creado correctamente</p>
@@ -202,7 +238,12 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
               {error && <p className="auth-error" role="alert">{error}</p>}
               <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:'0.75rem'}}>
                 <label className="op-field"><span>Nombre *</span><input className="op-input" value={newRest.nombre} onChange={e=> setNewRest(p=>({...p, nombre:e.target.value}))} required /></label>
-                <label className="op-field"><span>Ciudad *</span><input className="op-input" value={newRest.ciudad} onChange={e=> setNewRest(p=>({...p, ciudad:e.target.value}))} required /></label>
+                <label className="op-field"><span>Ciudad *</span>
+                  <select className="op-select" value={newRest.ciudad} onChange={e=> setNewRest(p=>({...p, ciudad:e.target.value}))} required>
+                    <option value="">Elige ciudad</option>
+                    {CIUDADES_CATALUNA.map(c=> <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </label>
                 <label className="op-field"><span>Zona *</span><input className="op-input" value={newRest.zona} onChange={e=> setNewRest(p=>({...p, zona:e.target.value}))} required /></label>
                 <label className="op-field"><span>Dirección *</span><input className="op-input" value={newRest.direccion} onChange={e=> setNewRest(p=>({...p, direccion:e.target.value}))} required /></label>
                 <label className="op-field"><span>Teléfono</span><input className="op-input" value={newRest.telefono} onChange={e=> setNewRest(p=>({...p, telefono:e.target.value}))} /></label>
@@ -221,6 +262,7 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
       </div></section>
     );
   }
+  if (!data) return null;
 
   const { restaurante, stats, proximasReservas, reservasHoy: reservasHoyList = [], ingresosPorMes, ticketsRecientes, finanzas, reservasParaTicket = [] } = data;
   const hoyISO = new Date().toISOString().split('T')[0];
@@ -295,13 +337,29 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                 <span style={{fontSize:'0.68rem', fontWeight:600, color:'var(--op-on-variant)'}}>Gestión de Restaurantes &amp; Rendimiento Operativo</span>
               </div>
               <div className="op-topbar-meta">
-                <div className="op-rest-selector" onClick={()=> setShowFicha(true)} title="Ver ficha">
+                <div
+                  className="op-rest-selector"
+                  onClick={()=> { if (listaRests.length <= 1) setShowFicha(true); }}
+                  title={listaRests.length > 1 ? "Cambiar restaurante / ver ficha" : "Ver ficha"}
+                >
                   <div className="op-rest-avatar">{initials(nombreCorto)}</div>
                   <div>
                     <div className="op-rest-name">{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:12, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>verified</span></div>
                     <div className="op-rest-sub">ID {restId} · {dir.slice(0,28)}</div>
                   </div>
-                  <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>unfold_more</span>
+                  {listaRests.length > 1 ? (
+                    <select
+                      className="op-select"
+                      style={{maxWidth:160, fontSize:'0.72rem', padding:'0.2rem 0.4rem', marginLeft:'0.35rem'}}
+                      value={data.restaurante.id}
+                      onClick={e=> e.stopPropagation()}
+                      onChange={e=> { e.stopPropagation(); handleSwitchRest(e.target.value); }}
+                    >
+                      {listaRests.map(r=> <option key={r.id} value={r.id}>{r.nombre}</option>)}
+                    </select>
+                  ) : (
+                    <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>unfold_more</span>
+                  )}
                 </div>
                 <div className="op-date-chip"><span className="material-symbols-outlined" style={{fontSize:16}}>date_range</span>
                   <select value={selectedMonth} onChange={e=> setSelectedMonth(e.target.value)}>
@@ -333,13 +391,22 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                   ['direccion','Dirección','text'],
                   ['telefono','Teléfono','tel'],
                   ['email','Email','email'],
-                  ['ciudad','Ciudad','text'],
+                  ['ciudad','Ciudad','select'],
                   ['precio','Rango precio','text'],
                   ['cocina','Cocina','text'],
                   ['comisionPct','Comisión %','number']
                 ].map(([field,label,type])=>(
                   <label key={field} className="op-field"><span>{label}</span>
-                    {editing ? <input type={type} className="op-input" value={formData[field]||''} onChange={e=>handleEditChange(field,e.target.value)} /> : <span style={{fontSize:'0.85rem', padding:'0.35rem 0'}}>{restaurante[field]||'-'}</span>}
+                    {editing ? (
+                      type === 'select' ? (
+                        <select className="op-select" value={formData[field]||''} onChange={e=>handleEditChange(field,e.target.value)}>
+                          <option value="">Elige ciudad</option>
+                          {CIUDADES_CATALUNA.map(c=> <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      ) : (
+                        <input type={type} className="op-input" value={formData[field]||''} onChange={e=>handleEditChange(field,e.target.value)} />
+                      )
+                    ) : <span style={{fontSize:'0.85rem', padding:'0.35rem 0'}}>{restaurante[field]||'-'}</span>}
                   </label>
                 ))}
                 <label className="op-field"><span>Activo</span>

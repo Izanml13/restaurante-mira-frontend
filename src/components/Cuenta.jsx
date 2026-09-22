@@ -308,7 +308,11 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           <>
             <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
             {perfil?.tipo === 'empresa' && (
-              <p><a href="#/dashboard" className="btn-cta">{t('cuenta.anadirRestaurante')}</a></p>
+              <p><a
+                href="#/dashboard"
+                className="btn-cta"
+                onClick={() => { try { sessionStorage.setItem('mira_abrir_crear', '1'); } catch { /* ignore */ } }}
+              >{t('cuenta.anadirRestaurante')}</a></p>
             )}
             {esAdmin && (
               <p><a href="#/admin" className="btn-cta">Panel de Administracion</a></p>

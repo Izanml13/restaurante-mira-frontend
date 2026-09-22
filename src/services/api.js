@@ -309,11 +309,36 @@ const isCancelada = (s) => String(s||'').toLowerCase() === 'cancelada';
 const isNoShow = (s) => ['no_show','no-show','no show'].includes(String(s||'').toLowerCase());
 
 export const dashboardApi = {
-  getMyRestaurant: async () => {
+  listMyRestaurants: async () => {
+    const u = await requireUser();
+    const userDoc = await getDoc(doc(db, 'usuarios', u.uid)).catch(() => null);
+    const userData = userDoc && userDoc.exists() ? userDoc.data() : {};
+    const ids = new Set();
+    if (Array.isArray(userData.restaurantIds)) userData.restaurantIds.forEach((id) => id && ids.add(id));
+    if (userData.restaurantId) ids.add(userData.restaurantId);
+    try {
+      const snap = await getDocs(query(collection(db, 'restaurants'), where('uid', '==', u.uid)));
+      snap.docs.forEach((d) => ids.add(d.id));
+    } catch { /* index/rules optional */ }
+    const docs = await Promise.all([...ids].map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null)));
+    return docs
+      .filter((d) => d && d.exists())
+      .map((d) => ({ id: d.id, nombre: d.data().nombre || '', ciudad: d.data().ciudad || '' }));
+  },
+  getMyRestaurant: async (restaurantIdOverride) => {
     const u = await requireUser();
     const userDoc = await getDoc(doc(db, 'usuarios', u.uid));
-    const userData = userDoc.data();
-    let restaurantId = userData?.restaurantId || null;
+    const userData = userDoc.exists() ? userDoc.data() : {};
+    let restaurantId = restaurantIdOverride || null;
+
+    if (!restaurantId) {
+      const stored = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('mira_rest_activo') : null;
+      if (stored) {
+        const check = await getDoc(doc(db, 'restaurants', stored)).catch(() => null);
+        if (check && check.exists()) restaurantId = stored;
+      }
+    }
+    if (!restaurantId) restaurantId = userData?.restaurantId || null;
 
     if (!restaurantId) {
       const q = query(collection(db, 'restaurants'), where('uid', '==', u.uid), limit(1));

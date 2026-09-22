@@ -111,7 +111,15 @@ export async function aprobarNegocio(negocioId) {
     creado: serverTimestamp(),
   });
   const userRef = doc(db, 'usuarios', n.uid);
-  batch.update(userRef, { restaurantId: restRef.id, tipo: 'empresa' });
+  const userSnap = await getDoc(userRef).catch(() => null);
+  const userData = userSnap && userSnap.exists() ? userSnap.data() : {};
+  const restaurantIds = Array.isArray(userData.restaurantIds) ? [...userData.restaurantIds] : [];
+  if (userData.restaurantId && !restaurantIds.includes(userData.restaurantId)) restaurantIds.push(userData.restaurantId);
+  if (!restaurantIds.includes(restRef.id)) restaurantIds.push(restRef.id);
+  const userUpdate = { tipo: 'empresa', restaurantIds };
+  // Keep first restaurant as active; only set restaurantId if user has none yet
+  if (!userData.restaurantId) userUpdate.restaurantId = restRef.id;
+  batch.update(userRef, userUpdate);
   batch.update(ref, { estado: 'aprobada', restaurantId: restRef.id });
   await batch.commit();
   return restRef.id;
