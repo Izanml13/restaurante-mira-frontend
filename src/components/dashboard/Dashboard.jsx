@@ -578,21 +578,20 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
             </div>
             <div className="op-table-wrap">
               <table className="op-table">
-                <thead><tr><th>Restaurante &amp; ID</th><th>Ciudad / Zona</th><th style={{textAlign:'right'}}>Ingresos Mes (Bruto)</th><th style={{textAlign:'right'}}>Comisión MIRA</th><th style={{textAlign:'center'}}>Tickets Subidos</th><th style={{textAlign:'right'}}>Próx. Reservas</th><th style={{textAlign:'center'}}>Estado Conciliación</th><th style={{textAlign:'right'}}>Acciones</th></tr></thead>
+                <thead><tr><th>Restaurante &amp; ID</th><th>Ciudad / Zona</th><th style={{textAlign:'right'}}>Ingresos Mes (Bruto)</th><th style={{textAlign:'right'}}>Comisión MIRA</th><th style={{textAlign:'center'}}>Tickets Subidos</th><th style={{textAlign:'right'}}>Próx. Reservas</th><th style={{textAlign:'right'}}>Acciones</th></tr></thead>
                 <tbody>
                   {dirFilter==='incidencias' ? (
-                    <tr><td colSpan={8} className="op-empty">Sin incidencias críticas · Buen trabajo <span className="material-symbols-outlined" style={{fontSize:14, color:'var(--op-secondary)'}}>verified</span></td></tr>
+                    <tr><td colSpan={7} className="op-empty">Sin incidencias críticas · Buen trabajo <span className="material-symbols-outlined" style={{fontSize:14, color:'var(--op-secondary)'}}>verified</span></td></tr>
                   ) : dirFilter==='pendiente' && ticketsPendientesSubir<=0 ? (
-                    <tr><td colSpan={8} className="op-empty">Al día — no hay tickets pendientes de subir</td></tr>
+                    <tr><td colSpan={7} className="op-empty">Al día — no hay tickets pendientes de subir</td></tr>
                   ) : (
                   <tr className="op-dir-row active">
                     <td><div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}><span style={{width:'0.45rem', height:'0.45rem', borderRadius:'50%', background:'var(--op-primary)'}}></span><div><div style={{fontWeight:800, fontSize:'0.78rem', color:'var(--op-primary)', display:'flex', gap:'0.2rem', alignItems:'center'}}>{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:10, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>star</span></div><span style={{fontFamily:'ui-monospace', fontSize:'0.62rem', color:'var(--op-outline)'}}>{restId} · {restaurante.ciudad||'-'}</span></div></div></td>
                     <td style={{fontSize:'0.72rem'}}>{restaurante.ciudad||'-'} {restaurante.zona? `· ${restaurante.zona}`:''}</td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:800}}>{euro(totalFacturacion)}</td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:700, color:'var(--op-secondary)'}}>{euro(totalComisiones)}</td>
-                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0.3rem', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>{totalTickets} / {reservasNoCanceladas}</span></td>
+                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0.3rem', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>1 / 1</span></td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace'}}>{stats.totalReservas} res.</td>
-                    <td style={{textAlign:'center'}}><span className={`op-dir-status ${ticketsPendientesSubir>0?'warn':'ok'}`}>{ticketsPendientesSubir>0? `Pendientes ${ticketsPendientesSubir}` : 'Al día (100%)'}</span></td>
                     <td style={{textAlign:'right'}}><button onClick={()=> window.scrollTo({top:0, behavior:'smooth'})} className="op-btn-primary" style={{padding:'0.25rem 0.5rem', fontSize:'0.68rem'}}>Panel Activo</button></td>
                   </tr>
                   )}
