@@ -20,7 +20,7 @@ import Registro from './components/Registro.jsx';
 import Cuenta from './components/Cuenta.jsx';
 import Contacto from './components/Contacto.jsx';
 import Reservas from './components/Reservas.jsx';
-import Admin from './components/Admin.jsx';
+import OpsPanel from './components/ops/OpsPanel.jsx';
 import Negocio from './components/Negocio.jsx';
 import Favoritos from './components/Favoritos.jsx';
 import Mensajes from './components/Mensajes.jsx';
@@ -203,7 +203,7 @@ function AppContent({ auth, tema, setTema }) {
         {ruta === 'cuenta' && <Cuenta usuario={usuario} perfil={perfil} dieta={dieta} guardarDieta={guardarDieta} accesibilidad={accesibilidad} guardarAccesibilidad={guardarAccesibilidad} onSalir={salir} onEnviarVerificacion={enviarVerificacionEmail} onRecargarEmailVerified={recargarEmailVerified} />}
         {ruta === 'contacto' && <Contacto usuario={usuario} onEnviar={enviarContacto} />}
         {ruta === 'reservas' && <Reservas usuario={usuario} esAdmin={esAdmin} />}
-        {ruta === 'admin' && <Admin usuario={usuario} esAdmin={esAdmin} />}
+        {ruta === 'admin' && <OpsPanel usuario={usuario} esAdmin={esAdmin} perfil={perfil} tema={tema} onCambiarTema={() => setTema((v) => (v === 'oscuro' ? 'claro' : 'oscuro'))} todos={todos} />}
         {ruta === 'negocio' && <Negocio usuario={usuario} perfil={perfil} onProponer={proponerNegocio} />}
         {ruta === 'favoritos' && (
           <Favoritos
