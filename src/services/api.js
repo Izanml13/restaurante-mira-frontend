@@ -312,10 +312,11 @@ export const dashboardApi = {
   listMyRestaurants: async (currentId) => {
     const u = await requireUser();
     const ids = new Set();
-    const fallback = new Map(); // id -> {nombre, ciudad} from negocios when restaurant doc missing
+    const meta = new Map(); // id -> {nombre, ciudad} from negocios
+    const seenIds = new Set();
     if (currentId) ids.add(currentId);
 
-    const [userDoc, restSnap, negSnap] = await Promise.all([
+    const [userDoc, restByUid, negSnap, restByEmail] = await Promise.all([
       getDoc(doc(db, 'usuarios', u.uid)).catch(() => null),
       getDocs(query(collection(db, 'restaurants'), where('uid', '==', u.uid))).catch((e) => {
         console.warn('listMyRestaurants restaurants/uid', e?.code || e?.message);
@@ -325,51 +326,111 @@ export const dashboardApi = {
         console.warn('listMyRestaurants negocios/uid', e?.code || e?.message);
         return null;
       }),
+      u.email
+        ? getDocs(query(collection(db, 'restaurants'), where('email', '==', u.email))).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
     const userData = userDoc && userDoc.exists() ? userDoc.data() : {};
     if (Array.isArray(userData.restaurantIds)) userData.restaurantIds.forEach((id) => id && ids.add(id));
     if (userData.restaurantId) ids.add(userData.restaurantId);
+    if (restByUid) restByUid.docs.forEach((d) => ids.add(d.id));
+    if (restByEmail) restByEmail.docs.forEach((d) => ids.add(d.id));
 
-    if (restSnap) restSnap.docs.forEach((d) => ids.add(d.id));
-
-    // Same source as Cuenta: every proposal (approved ones link to restaurants)
+    // Aprobadas: siempre entran (misma fuente que Cuenta). Si no traen restaurantId, se resuelven por nombre.
+    const aprobadas = [];
     if (negSnap) {
       negSnap.docs.forEach((d) => {
         const n = d.data();
-        if (n?.restaurantId) {
-          ids.add(n.restaurantId);
-          fallback.set(n.restaurantId, { nombre: n.nombre || '', ciudad: n.ciudad || '' });
-        }
+        if (n?.estado !== 'aprobada') return;
+        aprobadas.push(n);
+        meta.set(n.restaurantId || `neg:${d.id}`, { nombre: n.nombre || '', ciudad: n.ciudad || '' });
+        if (n.restaurantId) ids.add(n.restaurantId);
       });
     }
 
-    const idList = [...ids].filter(Boolean);
-    const docs = await Promise.all(
-      idList.map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null))
-    );
+    // Resolve aprobadas sin restaurantId por nombre (cruce con restaurants)
+    const sinId = aprobadas.filter((n) => !n.restaurantId);
+    if (sinId.length) {
+      await Promise.all(sinId.map(async (n) => {
+        try {
+          const snap = await getDocs(query(collection(db, 'restaurants'), where('nombre', '==', n.nombre)));
+          const match = snap.docs.find((d) => {
+            const r = d.data();
+            return r.uid === u.uid || (n.email && r.email === n.email) || (!r.uid && !r.email);
+          }) || snap.docs[0];
+          if (match) {
+            ids.add(match.id);
+            meta.set(match.id, { nombre: n.nombre || '', ciudad: n.ciudad || '' });
+            // self-heal: stamp uid if missing (rules allow isEmpresa)
+            const rd = match.data();
+            if (!rd.uid && (rd.email === u.email || rd.email === n.email)) {
+              updateDoc(doc(db, 'restaurants', match.id), { uid: u.uid, email: rd.email || u.email || '' }).catch(() => {});
+            }
+          } else {
+            // placeholder entry so it still shows (id synthetic won't switch — skip)
+            console.warn('listMyRestaurants: aprobada sin restaurants doc', n.nombre);
+          }
+        } catch (e) {
+          console.warn('listMyRestaurants resolve nombre', n.nombre, e?.code || e?.message);
+        }
+      }));
+    }
+
+    const idList = [...ids].filter((id) => id && !String(id).startsWith('neg:'));
+    const docs = await Promise.all(idList.map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null)));
 
     const lista = [];
     const seen = new Set();
     idList.forEach((id, i) => {
       if (seen.has(id)) return;
       const d = docs[i];
+      const m = meta.get(id);
       if (d && d.exists()) {
         seen.add(id);
-        lista.push({ id, nombre: d.data().nombre || '', ciudad: d.data().ciudad || '' });
-      } else if (fallback.has(id)) {
-        // Approved proposal without readable restaurants doc — still show it
+        const rd = d.data();
+        lista.push({ id, nombre: rd.nombre || m?.nombre || '', ciudad: rd.ciudad || m?.ciudad || '' });
+        // self-heal uid on owned restaurants (email match)
+        if (!rd.uid && u.email && rd.email === u.email) {
+          updateDoc(doc(db, 'restaurants', id), { uid: u.uid }).catch(() => {});
+        }
+      } else if (m) {
         seen.add(id);
-        const fb = fallback.get(id);
-        lista.push({ id, nombre: fb.nombre || 'Restaurante', ciudad: fb.ciudad || '' });
+        lista.push({ id, nombre: m.nombre || 'Restaurante', ciudad: m.ciudad || '' });
+      }
+    });
+
+    // Fallback final: negocios aprobadas que no cuajaron en restaurants — igual que en Cuenta
+    aprobadas.forEach((n) => {
+      const already = lista.some((r) => r.nombre === n.nombre && (!n.restaurantId || r.id === n.restaurantId));
+      if (!already && n.restaurantId && !seen.has(n.restaurantId)) {
+        lista.push({ id: n.restaurantId, nombre: n.nombre || 'Restaurante', ciudad: n.ciudad || '' });
       }
     });
 
     if (currentId && !lista.some((r) => r.id === currentId)) {
-      const fb = fallback.get(currentId);
-      lista.unshift({ id: currentId, nombre: fb?.nombre || 'Restaurante activo', ciudad: fb?.ciudad || '' });
+      const d = docs[idList.indexOf(currentId)];
+      const m = meta.get(currentId);
+      lista.unshift({
+        id: currentId,
+        nombre: (d && d.exists() && d.data().nombre) || m?.nombre || 'Restaurante activo',
+        ciudad: (d && d.exists() && d.data().ciudad) || m?.ciudad || '',
+      });
     }
-    console.info('listMyRestaurants', { ids: idList, count: lista.length, lista });
+
+    console.info('listMyRestaurants', {
+      uid: u.uid,
+      sources: {
+        restaurantIds: userData.restaurantIds || null,
+        restaurantId: userData.restaurantId || null,
+        byUid: restByUid?.docs?.length ?? 'err',
+        byEmail: restByEmail?.docs?.length ?? 'err',
+        negocios: negSnap?.docs?.length ?? 'err',
+        aprobadas: aprobadas.length,
+      },
+      count: lista.length,
+      lista,
+    });
     return lista;
   },
   getMyRestaurant: async (restaurantIdOverride) => {
