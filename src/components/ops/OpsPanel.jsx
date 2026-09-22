@@ -72,7 +72,8 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   return (
     <div className="ops-shell">
       <div className="ops-body">
-        <aside className={`ops-sidebar${menuMovil ? ' open' : ''}`} aria-label="Navegación del panel">
+          <div className="ops-sidebar-trigger" />
+          <aside className={`ops-sidebar${menuMovil ? ' open' : ''}`} aria-label="Navegación del panel">
           <div>
             <div className="ops-brand">
               <img src="/logo.png" alt="MIRA" onError={(e) => { e.currentTarget.src = '/logotipo.png'; }} />
