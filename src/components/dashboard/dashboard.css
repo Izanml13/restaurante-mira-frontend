@@ -116,6 +116,7 @@
 .op-rest-dropdown-info { display:flex; flex-direction:column; gap:0.1rem; min-width:0; }
 .op-rest-dropdown-nombre { font-weight:700; font-size:0.82rem; color:#111827; }
 .op-rest-dropdown-meta { font-family:ui-monospace, monospace; font-size:0.65rem; color:#6b7280; }
+.op-rest-dropdown-empty { font-size:0.78rem; color:#6b7280; padding:0.5rem; }
 @media (max-width:640px){ .op-rest-dropdown { left:auto; right:0; } }
 .op-rest-avatar { width:2rem; height:2rem; border-radius:0.4rem; background: var(--op-primary-container); color: var(--op-on-primary); display:grid; place-items:center; font-weight:800; font-size:0.8rem; }
 .op-rest-name { font-weight:700; font-size:0.95rem; line-height:1.1; color: var(--op-on-surface); display:flex; align-items:center; gap:0.25rem; }

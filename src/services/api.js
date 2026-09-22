@@ -309,21 +309,48 @@ const isCancelada = (s) => String(s||'').toLowerCase() === 'cancelada';
 const isNoShow = (s) => ['no_show','no-show','no show'].includes(String(s||'').toLowerCase());
 
 export const dashboardApi = {
-  listMyRestaurants: async () => {
+  listMyRestaurants: async (currentId) => {
     const u = await requireUser();
+    const ids = new Set();
+    if (currentId) ids.add(currentId);
+
     const userDoc = await getDoc(doc(db, 'usuarios', u.uid)).catch(() => null);
     const userData = userDoc && userDoc.exists() ? userDoc.data() : {};
-    const ids = new Set();
     if (Array.isArray(userData.restaurantIds)) userData.restaurantIds.forEach((id) => id && ids.add(id));
     if (userData.restaurantId) ids.add(userData.restaurantId);
+
+    // All restaurants owned by this user
     try {
       const snap = await getDocs(query(collection(db, 'restaurants'), where('uid', '==', u.uid)));
       snap.docs.forEach((d) => ids.add(d.id));
-    } catch { /* index/rules optional */ }
-    const docs = await Promise.all([...ids].map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null)));
-    return docs
+    } catch (e) {
+      console.warn('listMyRestaurants restaurants/uid', e?.code || e?.message);
+    }
+
+    // Approved proposals linked to restaurants (covers legacy docs without restaurantIds)
+    try {
+      const negSnap = await getDocs(query(collection(db, 'negocios'), where('uid', '==', u.uid)));
+      negSnap.docs.forEach((d) => {
+        const data = d.data();
+        if (data?.restaurantId) ids.add(data.restaurantId);
+      });
+    } catch (e) {
+      console.warn('listMyRestaurants negocios/uid', e?.code || e?.message);
+    }
+
+    const idList = [...ids].filter(Boolean);
+    const docs = await Promise.all(
+      idList.map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null))
+    );
+    const lista = docs
       .filter((d) => d && d.exists())
       .map((d) => ({ id: d.id, nombre: d.data().nombre || '', ciudad: d.data().ciudad || '' }));
+
+    // Guarantee current appears even if lookups failed elsewhere
+    if (currentId && !lista.some((r) => r.id === currentId)) {
+      lista.unshift({ id: currentId, nombre: userData?.nombreRestaurante || 'Restaurante activo', ciudad: '' });
+    }
+    return lista;
   },
   getMyRestaurant: async (restaurantIdOverride) => {
     const u = await requireUser();

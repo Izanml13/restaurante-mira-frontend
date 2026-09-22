@@ -58,8 +58,27 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
   const [filtroTodas, setFiltroTodas] = useState(false);
   const [listaRests, setListaRests] = useState([]);
   const [showRestDropdown, setShowRestDropdown] = useState(false);
+  const [loadingRestList, setLoadingRestList] = useState(false);
   const fileRef = useRef(null);
   const restDropdownRef = useRef(null);
+
+  async function refreshRestList(currentId) {
+    setLoadingRestList(true);
+    try {
+      const l = await dashboardApi.listMyRestaurants(currentId || data?.restaurante?.id);
+      setListaRests(l);
+    } catch (e) {
+      console.warn('refreshRestList', e);
+    } finally {
+      setLoadingRestList(false);
+    }
+  }
+
+  function toggleRestDropdown() {
+    const next = !showRestDropdown;
+    setShowRestDropdown(next);
+    if (next) refreshRestList(data?.restaurante?.id);
+  }
 
   useEffect(() => {
     if (!usuario?.uid) return;
@@ -87,7 +106,9 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
     let vivo = true;
     setLoading(true);
     const cargarExtra = (restId) => {
-      dashboardApi.listMyRestaurants().then(l => { if (vivo) setListaRests(l); }).catch(()=>{});
+      dashboardApi.listMyRestaurants(restId)
+        .then(l => { if (vivo) setListaRests(l); })
+        .catch(err => { console.warn('listMyRestaurants', err); });
       if (restId && typeof sessionStorage !== 'undefined') {
         try { sessionStorage.setItem('mira_rest_activo', restId); } catch { /* ignore */ }
       }
@@ -184,7 +205,7 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
         setShowCreateForm(false); setCreateSuccess(false); setNewRest({ ...EMPTY_REST });
         if (data) {
           // Already has a restaurant: keep current panel, proposal goes to admin queue
-          dashboardApi.listMyRestaurants().then(l=> setListaRests(l)).catch(()=>{});
+          dashboardApi.listMyRestaurants(data?.restaurante?.id).then(l=> setListaRests(l)).catch(()=>{});
           return;
         }
         setLoading(true);
@@ -354,7 +375,7 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                 <div className="op-rest-selector-wrap" ref={restDropdownRef}>
                   <div
                     className="op-rest-selector"
-                    onClick={()=> setShowRestDropdown(v => !v)}
+                    onClick={toggleRestDropdown}
                     title="Cambiar restaurante"
                     role="button"
                   >
@@ -367,8 +388,13 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                   </div>
                   {showRestDropdown && (
                     <div className="op-rest-dropdown" role="listbox">
-                      <div className="op-rest-dropdown-title">Tus restaurantes ({listaRests.length})</div>
-                      {listaRests.map(r => (
+                      <div className="op-rest-dropdown-title">
+                        {loadingRestList ? 'Cargando…' : `Tus restaurantes (${listaRests.length})`}
+                      </div>
+                      {!loadingRestList && listaRests.length === 0 && (
+                        <div className="op-rest-dropdown-empty">Sin restaurantes</div>
+                      )}
+                      {!loadingRestList && listaRests.map(r => (
                         <button
                           key={r.id}
                           type="button"
