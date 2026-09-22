@@ -28,6 +28,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   const [menuMovil, setMenuMovil] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [criticas, setCriticas] = useState(0);
+  const [sidebarFija, setSidebarFija] = useState(false);
 
   useEffect(() => {
     if (!esAdmin) return;
@@ -72,8 +73,10 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   return (
     <div className="ops-shell">
       <div className="ops-body">
-          <div className="ops-sidebar-trigger" />
-          <aside className={`ops-sidebar${menuMovil ? ' open' : ''}`} aria-label="Navegación del panel">
+          <div className="ops-sidebar-trigger" onMouseEnter={() => setSidebarFija(true)} />
+          <aside className={`ops-sidebar${menuMovil ? ' open' : ''}${sidebarFija ? ' pinned' : ''}`}
+            onMouseLeave={() => setSidebarFija(false)}
+            aria-label="Navegación del panel">
           <div>
             <div className="ops-brand">
               <img src="/logo.png" alt="MIRA" onError={(e) => { e.currentTarget.src = '/logotipo.png'; }} />

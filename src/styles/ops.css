@@ -65,23 +65,25 @@
 
 /* ---------- Sidebar (oculta, aparece al hover en borde izquierdo) ---------- */
 .ops-sidebar-trigger {
-  position: fixed; left: 0; top: 0; bottom: 0; width: 8px; z-index: 71;
+  position: fixed; left: 0; top: 0; bottom: 0; width: 16px; z-index: 71; cursor: default;
 }
 .ops-sidebar {
   position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
   background: var(--ops-surface-lowest);
   border-right: 1px solid var(--ops-surface-container);
   display: flex; flex-direction: column; justify-content: space-between;
-  z-index: 70; box-shadow: var(--ops-shadow-lg);
+  z-index: 72; box-shadow: var(--ops-shadow-lg);
   overflow: hidden;
   transform: translateX(-100%);
   transition: transform 0.25s ease;
 }
-.ops-sidebar:hover, .ops-sidebar:focus-within, .ops-sidebar.pinned, .ops-sidebar.open {
+.ops-sidebar-trigger:hover ~ .ops-sidebar,
+.ops-sidebar:hover,
+.ops-sidebar:focus-within,
+.ops-sidebar.pinned,
+.ops-sidebar.open {
   transform: translateX(0);
 }
-.ops-sidebar-trigger:hover + .ops-sidebar,
-.ops-sidebar-trigger:hover + .ops-sidebar .ops-nav-item { justify-content: flex-start; gap: 12px; }
 .ops-brand { display: flex; align-items: center; gap: 10px; padding: 0 0 0 22px; height: var(--ops-header-h); border-bottom: 1px solid var(--ops-surface-low); overflow: hidden; }
 .ops-brand img { height: 32px; width: 32px; object-fit: contain; border-radius: 8px; flex-shrink: 0; }
 .ops-brand-name { font-size: 16px; font-weight: 700; color: var(--ops-primary); line-height: 1.1; letter-spacing: -0.01em; }
