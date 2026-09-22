@@ -1,8 +1,8 @@
-# firestore.rules — MIRA (copia de referencia para la consola)
-# Incluye el PARCHE OPS: lectura de operador en `usuarios` y `tickets`,
-# sin el cual el panel #/admin falla con "missing or insufficient permissions".
-# Para aplicarlo: Firebase Console > Firestore > Reglas > pegar > Publicar.
-# (O vía backend: el bloque REGLAS de setup-colecciones.js debe igualar este fichero.)
+// firestore.rules - MIRA (copia de referencia para la consola)
+// Incluye el PARCHE OPS: lectura de operador en `usuarios` y `tickets`,
+// sin el cual el panel #/admin falla con "missing or insufficient permissions".
+// Para aplicarlo: Firebase Console > Firestore > Reglas > pegar > Publicar.
+// (O via backend: el bloque REGLAS de setup-colecciones.js debe igualar este fichero.)
 
 rules_version = '2';
 service cloud.firestore {
@@ -16,7 +16,7 @@ service cloud.firestore {
 
     match /restaurants/{id} {
       allow read: if true;
-      # Crear: cualquier logueado con forma válida (lo usa Aprobar del admin).
+      // Crear: cualquier logueado con forma valida (lo usa Aprobar del admin).
       allow create: if isSignedIn()
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
@@ -25,8 +25,8 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    # PARCHE OPS: el operador necesita LEER usuarios (panel, contadores).
-    # La escritura sigue siendo solo del dueño.
+    // PARCHE OPS: el operador necesita LEER usuarios (panel, contadores).
+    // La escritura sigue siendo solo del dueno.
     match /usuarios/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       allow write: if isOwner(uid);
@@ -74,9 +74,8 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    # PARCHE OPS: `tickets` no tenía bloque (denegación por defecto) y tumbaba
-    # Finanzas. Lectura solo operador; la escritura la hace el flujo de tickets
-    # existente (mantén tu regla de escritura si ya tienes una: NO la pises con false).
+    // PARCHE OPS: `tickets` no tenia bloque (denegacion por defecto) y tumbaba
+    // Finanzas. Lectura solo operador.
     match /tickets/{id} {
       allow read: if isAdmin();
       allow write: if false;
