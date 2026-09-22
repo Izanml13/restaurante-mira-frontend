@@ -19,18 +19,22 @@ function diferenciaMin(h1,h2){ return Math.abs(minutosDeHora(h1)-minutosDeHora(h
  * Si hay >= mesas ocupadas en ventana de 90min, no hay sitio.
  */
 export async function verificarDisponibilidad(restaurante, fecha, hora, comensales){
-  // horario / festivo
   if (!estaAbierto(restaurante, fecha, hora)){
     const fest = esFestivo(fecha) ? 'Festivo: local cerrado.' : 'Restaurante cerrado en ese horario.';
     return { ok:false, motivo: fest };
   }
   const mesas = mesasDelLocal(restaurante);
-  const snap = await getDocs(query(collection(getDb(),'reservas'), where('restauranteId','==', String(restaurante.id)), where('fecha','==', fecha)));
+  const rid = String(restaurante.id);
+  let snapA, snapB;
+  try{ snapA = await getDocs(query(collection(getDb(),'reservas'), where('restauranteId','==', rid), where('fecha','==', fecha))); }catch{ snapA={docs:[]}; }
+  try{ snapB = await getDocs(query(collection(getDb(),'reservas'), where('restaurantId','==', rid), where('fecha','==', fecha))); }catch{ snapB={docs:[]}; }
+  const seen = new Set();
   let coincidencias = 0;
-  for (const d of snap.docs){
+  for (const d of [...snapA.docs, ...snapB.docs]){
+    if (seen.has(d.id)) continue; seen.add(d.id);
     const r = d.data();
-    if (r.estado === 'cancelada') continue;
-    if (diferenciaMin(r.hora, hora) < 90) coincidencias += 1; // cada reserva = 1 mesa
+    if (String(r.estado).toLowerCase() === 'cancelada') continue;
+    if (diferenciaMin(r.hora, hora) < 90) coincidencias += 1;
   }
   // estimar mesas necesarias: 1 mesa por cada 4 comensales
   const mesasNecesarias = Math.ceil(Number(comensales)/4) || 1;
@@ -45,8 +49,10 @@ export async function crearReserva({ restaurante, usuario, fecha, hora, comensal
   const verif = await verificarDisponibilidad(restaurante, fecha, hora, comensales);
   if (!verif.ok) throw new Error(verif.motivo);
   const codigo = `MIRA-${String(restaurante.id).padStart(3,'0')}-${Date.now().toString(36).toUpperCase().slice(-5)}`;
+  const rid = String(restaurante.id);
   const docRef = await addDoc(collection(getDb(),'reservas'), {
-    restauranteId: String(restaurante.id),
+    restauranteId: rid,
+    restaurantId: rid,
     restauranteNombre: restaurante.nombre,
     uid: usuario.uid,
     usuarioEmail: usuario.email,

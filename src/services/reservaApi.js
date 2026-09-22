@@ -105,7 +105,9 @@ export async function crearReserva({ restaurante, usuario, fecha, hora, comensal
         hora,
         comensales: Number(comensales),
         comentarios: (comentarios || '').trim(),
-        estado: 'activa',
+        estado: 'pendiente',
+        // compat: alias para queries antiguas que buscan restauranteId
+        restauranteId: restaurantId,
         codigo,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

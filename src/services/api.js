@@ -127,8 +127,10 @@ export const reservationsApi = {
   create: async (data) => {
     const u = await requireUser();
     const codigo = genCodigo();
+    const rId = String(data.restauranteId || data.restaurante?.id || '');
     const docRef = await addDoc(collection(db, 'reservas'), {
-      restaurantId: data.restauranteId || data.restaurante?.id,
+      restaurantId: rId,
+      restauranteId: rId,
       nombreRestaurante: data.restaurante?.nombre || data.nombreRestaurante,
       uid: u.uid,
       usuarioNombre: u.displayName || u.email,
@@ -272,6 +274,40 @@ export const adminApi = {
 
 /* ────────────── DASHBOARD (restaurante + admin) ────────────── */
 
+async function fetchReservasForRestaurant(restaurantId) {
+  const tryQuery = async (field) => {
+    try {
+      const q = query(collection(db, 'reservas'), where(field, '==', restaurantId), orderBy('fecha', 'desc'), limit(500));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+      if (e?.code === 'failed-precondition' || String(e?.message || '').includes('index')) {
+        try {
+          const q2 = query(collection(db, 'reservas'), where(field, '==', restaurantId), limit(500));
+          const snap2 = await getDocs(q2);
+          const arr = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+          arr.sort((a, b) => `${b.fecha||''} ${b.hora||''}`.localeCompare(`${a.fecha||''} ${a.hora||''}`));
+          return arr;
+        } catch { return []; }
+      }
+      throw e;
+    }
+  };
+  const [a, b] = await Promise.all([tryQuery('restaurantId'), tryQuery('restauranteId')]);
+  const map = new Map();
+  for (const r of a) map.set(r.id, r);
+  for (const r of b) if (!map.has(r.id)) map.set(r.id, r);
+  const merged = Array.from(map.values());
+  merged.sort((x, y) => `${y.fecha||''} ${y.hora||''}`.localeCompare(`${x.fecha||''} ${x.hora||''}`));
+  return merged;
+}
+
+const ESTADOS_PENDIENTES = new Set(['pendiente', 'confirmada', 'activa', 'en_mesa', 'en mesa']);
+const isPendiente = (s) => ESTADOS_PENDIENTES.has(String(s||'').toLowerCase());
+const isCompletada = (s) => ['completada','pagado','pagada'].includes(String(s||'').toLowerCase());
+const isCancelada = (s) => String(s||'').toLowerCase() === 'cancelada';
+const isNoShow = (s) => ['no_show','no-show','no show'].includes(String(s||'').toLowerCase());
+
 export const dashboardApi = {
   getMyRestaurant: async () => {
     const u = await requireUser();
@@ -290,27 +326,52 @@ export const dashboardApi = {
     if (!restDoc.exists()) throw new Error('Restaurante no encontrado');
     const restaurante = { id: restDoc.id, ...restDoc.data() };
 
-    const [reservasSnap, ticketsSnap] = await Promise.all([
-      getDocs(query(collection(db, 'reservas'), where('restaurantId', '==', restaurantId), orderBy('fecha', 'desc'), limit(500))),
-      getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), orderBy('createdAt', 'desc'), limit(500))),
+    const [reservas, ticketsSnap, finanzasSnap] = await Promise.all([
+      fetchReservasForRestaurant(restaurantId),
+      getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), orderBy('createdAt', 'desc'), limit(500))).catch(async (e) => {
+        if (e?.code === 'failed-precondition') {
+          const s = await getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), limit(500)));
+          return s;
+        }
+        throw e;
+      }),
+      getDoc(doc(db, 'finanzas_restaurante', restaurantId)).catch(()=> ({ exists: ()=> false, data: ()=> null })),
     ]);
-    const reservas = reservasSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const tickets = ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const tickets = ticketsSnap.docs ? ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : ticketsSnap;
+    const finanzas = finanzasSnap && finanzasSnap.exists ? (finanzasSnap.exists() ? finanzasSnap.data() : null) : null;
 
     const hoy = new Date().toISOString().split('T')[0];
     const totalReservas = reservas.length;
-    const reservasCompletadas = reservas.filter(r => r.estado === 'completada').length;
-    const reservasCanceladas = reservas.filter(r => r.estado === 'cancelada').length;
-    const reservasNoShow = reservas.filter(r => r.estado === 'no_show').length;
-    const reservasPendientes = reservas.filter(r => r.estado === 'confirmada' || r.estado === 'pendiente').length;
-    const reservasHoy = reservas.filter(r => r.fecha === hoy && r.estado !== 'cancelada').length;
-    const totalFacturacion = tickets.reduce((s, t) => s + (t.totalPagado || 0), 0);
-    const totalComisiones = tickets.reduce((s, t) => s + (t.importeComision || 0), 0);
+    const reservasCompletadas = reservas.filter(r => isCompletada(r.estado)).length;
+    const reservasCanceladas = reservas.filter(r => isCancelada(r.estado)).length;
+    const reservasNoShow = reservas.filter(r => isNoShow(r.estado)).length;
+    const reservasPendientes = reservas.filter(r => isPendiente(r.estado)).length;
+    const reservasHoy = reservas.filter(r => r.fecha === hoy && !isCancelada(r.estado)).length;
+    // Si existe finanzas persistida, úsala (no es texto plano); si no, calcula de tickets
+    const totalFacturacion = finanzas ? (Number(finanzas.ingresosBrutos)||0) : tickets.reduce((s, t) => s + (t.totalPagado || 0), 0);
+    const totalComisiones = finanzas ? (Number(finanzas.comisiones)||0) : tickets.reduce((s, t) => s + (t.importeComision || 0), 0);
+    const totalTicketsFin = finanzas ? (Number(finanzas.totalTickets)|| tickets.length) : tickets.length;
+    const comensalesFin = finanzas ? (Number(finanzas.comensalesAtendidos)||0) : 0;
 
     const proximasReservas = reservas
-      .filter(r => r.fecha >= hoy && (r.estado === 'confirmada' || r.estado === 'pendiente'))
+      .filter(r => r.fecha >= hoy && isPendiente(r.estado))
       .sort((a, b) => `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`))
       .slice(0, 20);
+
+    // Reservas de hoy para la tabla del día (incluye todos los no cancelados)
+    const reservasHoyList = reservas
+      .filter(r => r.fecha === hoy && !isCancelada(r.estado))
+      .sort((a,b)=> String(a.hora||'').localeCompare(String(b.hora||'')));
+
+    // Reservas que aún pueden/pueden recibir ticket: no canceladas y sin ticketId
+    // (incluye pasadas completadas sin ticket, hoy y futuras pendientes)
+    const reservasParaTicket = reservas
+      .filter(r => !isCancelada(r.estado) && !r.ticketId)
+      .sort((a,b)=> `${b.fecha||''} ${b.hora||''}`.localeCompare(`${a.fecha||''} ${a.hora||''}`))
+      .slice(0, 50);
+
+    // Denominador "Tickets Subidos": reservas no canceladas (las canceladas no requieren ticket)
+    const reservasNoCanceladas = reservas.filter(r => !isCancelada(r.estado)).length;
 
     const ingresosPorMes = {};
     tickets.forEach(t => {
@@ -324,8 +385,11 @@ export const dashboardApi = {
 
     return {
       restaurante,
-      stats: { totalReservas, reservasCompletadas, reservasCanceladas, reservasNoShow, reservasPendientes, reservasHoy, totalFacturacion: Math.round(totalFacturacion * 100) / 100, totalComisiones: Math.round(totalComisiones * 100) / 100, ticketPromedio: tickets.length > 0 ? Math.round(totalFacturacion / tickets.length * 100) / 100 : 0 },
+      finanzas,
+      stats: { totalReservas, reservasCompletadas, reservasCanceladas, reservasNoShow, reservasPendientes, reservasHoy, totalFacturacion: Math.round(totalFacturacion * 100) / 100, totalComisiones: Math.round(totalComisiones * 100) / 100, ticketPromedio: totalTicketsFin > 0 ? Math.round(totalFacturacion / totalTicketsFin * 100) / 100 : 0, totalTicketsFin, comensalesFin, reservasNoCanceladas },
       proximasReservas,
+      reservasHoy: reservasHoyList,
+      reservasParaTicket,
       ingresosPorMes,
       ticketsRecientes: tickets.slice(0, 20),
     };
@@ -336,21 +400,28 @@ export const dashboardApi = {
     if (!restDoc.exists()) throw new Error('Restaurante no encontrado');
     const restaurante = { id: restDoc.id, ...restDoc.data() };
 
-    const [reservasSnap, ticketsSnap] = await Promise.all([
-      getDocs(query(collection(db, 'reservas'), where('restaurantId', '==', restaurantId), orderBy('fecha', 'desc'), limit(500))),
-      getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), orderBy('createdAt', 'desc'), limit(500))),
+    const [reservas, ticketsSnap, finanzasSnap] = await Promise.all([
+      fetchReservasForRestaurant(restaurantId),
+      getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), orderBy('createdAt', 'desc'), limit(500))).catch(async (e) => {
+        if (e?.code === 'failed-precondition') {
+          const s = await getDocs(query(collection(db, 'tickets'), where('restaurantId', '==', restaurantId), limit(500)));
+          return s;
+        }
+        throw e;
+      }),
+      getDoc(doc(db, 'finanzas_restaurante', restaurantId)).catch(()=> ({ exists: ()=> false, data: ()=> null })),
     ]);
-    const reservas = reservasSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const tickets = ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const tickets = ticketsSnap.docs ? ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : ticketsSnap;
+    const finanzas = finanzasSnap && finanzasSnap.exists ? (finanzasSnap.exists() ? finanzasSnap.data() : null) : null;
 
     const hoy = new Date().toISOString().split('T')[0];
     const totalReservas = reservas.length;
-    const reservasCompletadas = reservas.filter(r => r.estado === 'completada').length;
-    const reservasCanceladas = reservas.filter(r => r.estado === 'cancelada').length;
-    const reservasNoShow = reservas.filter(r => r.estado === 'no_show').length;
-    const reservasPendientes = reservas.filter(r => r.estado === 'confirmada' || r.estado === 'pendiente').length;
-    const totalFacturacion = tickets.reduce((s, t) => s + (t.totalPagado || 0), 0);
-    const totalComisiones = tickets.reduce((s, t) => s + (t.importeComision || 0), 0);
+    const reservasCompletadas = reservas.filter(r => isCompletada(r.estado)).length;
+    const reservasCanceladas = reservas.filter(r => isCancelada(r.estado)).length;
+    const reservasNoShow = reservas.filter(r => isNoShow(r.estado)).length;
+    const reservasPendientes = reservas.filter(r => isPendiente(r.estado)).length;
+    const totalFacturacion = finanzas ? (Number(finanzas.ingresosBrutos)||0) : tickets.reduce((s, t) => s + (t.totalPagado || 0), 0);
+    const totalComisiones = finanzas ? (Number(finanzas.comisiones)||0) : tickets.reduce((s, t) => s + (t.importeComision || 0), 0);
 
     const ingresosPorMes = {};
     tickets.forEach(t => {
@@ -365,7 +436,8 @@ export const dashboardApi = {
     return {
       restaurante,
       stats: { totalReservas, reservasCompletadas, reservasCanceladas, reservasNoShow, reservasPendientes, totalFacturacion: Math.round(totalFacturacion * 100) / 100, totalComisiones: Math.round(totalComisiones * 100) / 100, ticketPromedio: tickets.length > 0 ? Math.round(totalFacturacion / tickets.length * 100) / 100 : 0 },
-      proximasReservas: reservas.filter(r => r.fecha >= hoy && (r.estado === 'confirmada' || r.estado === 'pendiente')).slice(0, 20),
+      proximasReservas: reservas.filter(r => r.fecha >= hoy && isPendiente(r.estado)).slice(0, 20),
+      reservasHoy: reservas.filter(r => r.fecha === hoy && !isCancelada(r.estado)).sort((a,b)=> String(a.hora||'').localeCompare(String(b.hora||''))),
       ingresosPorMes,
       ticketsRecientes: tickets.slice(0, 20),
     };
@@ -444,7 +516,7 @@ export const dashboardApi = {
   },
 
   updateRestaurant: async (restaurantId, data) => {
-    const allowed = ['nombre', 'direccion', 'telefono', 'email', 'horarios', 'activo', 'ciudad', 'zona', 'precio', 'cocina', 'descripcion', 'comisionPct'];
+    const allowed = ['nombre', 'direccion', 'telefono', 'email', 'horarios', 'activo', 'ciudad', 'zona', 'precio', 'cocina', 'descripcion', 'comisionPct', 'maxReservasPorHora'];
     const update = {};
     allowed.forEach(k => { if (data[k] !== undefined) update[k] = data[k]; });
     update.updatedAt = Timestamp.now();
@@ -457,13 +529,68 @@ export const dashboardApi = {
     return { updated: true, status };
   },
 
-  confirmAttendance: async (reservaId, data) => {
-    await updateDoc(doc(db, 'reservas', reservaId), { estado: 'completada', updatedAt: Timestamp.now() });
+  // Nuevo: subir ticket con precio + comisión 8% + confirmación asistencia en una transacción
+  subirTicket: async (reservaId, { totalPagado, asistio = true, fileName = "", tipoDocumento = "Ticket TPV" } = {}) => {
+    const u = await requireUser();
+    const reservaRef = doc(db, 'reservas', reservaId);
+    const snap = await getDoc(reservaRef);
+    if (!snap.exists()) throw new Error('Reserva no encontrada');
+    const r = snap.data();
+    const rid = String(r.restaurantId || r.restauranteId || "");
+    if (!rid) throw new Error('Reserva sin restaurante vinculado');
+    const total = Number(totalPagado);
+    if (!(total > 0)) throw new Error('Importe inválido');
+    const comision = Math.round(total * 0.08 * 100) / 100;
+    const neto = Math.round((total - comision) * 100) / 100;
+    const batch = writeBatch(db);
+    const ticketRef = doc(collection(db, 'tickets'));
+    batch.set(ticketRef, {
+      restaurantId: rid,
+      restauranteId: rid,
+      reservaId,
+      codigoReserva: r.codigo || reservaId.slice(0, 6).toUpperCase(),
+      totalPagado: total,
+      importeComision: comision,
+      netoRestaurante: neto,
+      comisionPct: 8,
+      asistio: Boolean(asistio),
+      fileName: String(fileName || ""),
+      tipoDocumento: String(tipoDocumento || "Ticket TPV"),
+      fecha: r.fecha || new Date().toISOString().split('T')[0],
+      clienteNombre: r.usuarioNombre || r.usuarioEmail || r.email || "",
+      clienteUid: r.uid || "",
+      restauranteNombre: r.nombreRestaurante || r.restaurantName || r.nombre || "",
+      createdAt: Timestamp.now(),
+      createdBy: u.uid,
+      uid: r.uid || u.uid,
+    });
+    const nuevoEstado = asistio ? 'completada' : 'no_show';
+    batch.update(reservaRef, { estado: nuevoEstado, totalPagado: total, importeComision: comision, netoRestaurante: neto, ticketId: ticketRef.id, updatedAt: Timestamp.now(), asistio: Boolean(asistio) });
+    // Finanzas acumuladas (no toca restaurants): se guarda en colección dedicada
+    const finanzasRef = doc(db, 'finanzas_restaurante', rid);
+    const comensales = Number(r.comensales) || 0;
+    batch.set(finanzasRef, {
+      restaurantId: rid,
+      ingresosBrutos: increment(total),
+      comisiones: increment(comision),
+      neto: increment(neto),
+      totalTickets: increment(1),
+      comensalesAtendidos: increment(asistio ? comensales : 0),
+      baseImponible: increment(Math.round(total/1.10*100)/100),
+      updatedAt: Timestamp.now(),
+      createdAt: Timestamp.now(),
+    }, { merge: true });
+    await batch.commit();
+    return { ticketId: ticketRef.id, comision, neto, estado: nuevoEstado };
+  },
+
+  confirmAttendance: async (reservaId, data = {}) => {
+    await updateDoc(doc(db, 'reservas', reservaId), { estado: 'completada', updatedAt: Timestamp.now(), asistio: true, ...(data?.precioBase? { totalPagado: Number(data.precioBase), importeComision: Math.round(Number(data.precioBase)*0.08*100)/100 } : {}) });
     return { updated: true, status: 'completada' };
   },
 
   markNoShow: async (reservaId) => {
-    await updateDoc(doc(db, 'reservas', reservaId), { estado: 'no_show', updatedAt: Timestamp.now() });
+    await updateDoc(doc(db, 'reservas', reservaId), { estado: 'no_show', updatedAt: Timestamp.now(), asistio: false });
     return { updated: true, status: 'no_show' };
   },
 
