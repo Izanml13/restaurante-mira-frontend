@@ -57,7 +57,9 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
   const [fechaFiltro, setFechaFiltro] = useState(()=> new Date().toISOString().split('T')[0]);
   const [filtroTodas, setFiltroTodas] = useState(false);
   const [listaRests, setListaRests] = useState([]);
+  const [showRestDropdown, setShowRestDropdown] = useState(false);
   const fileRef = useRef(null);
+  const restDropdownRef = useRef(null);
 
   useEffect(() => {
     if (!usuario?.uid) return;
@@ -68,6 +70,17 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
       }
     } catch { /* ignore */ }
   }, [usuario]);
+
+  useEffect(() => {
+    if (!showRestDropdown) return;
+    function onDocClick(e) {
+      if (restDropdownRef.current && !restDropdownRef.current.contains(e.target)) {
+        setShowRestDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [showRestDropdown]);
 
   useEffect(() => {
     if (!usuario?.uid) return;
@@ -99,6 +112,7 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
 
   async function handleSwitchRest(id){
     if (!id || id === data?.restaurante?.id) return;
+    setShowRestDropdown(false);
     setLoading(true); setError("");
     try {
       const d = await dashboardApi.getMyRestaurant(id);
@@ -337,28 +351,45 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                 <span style={{fontSize:'0.68rem', fontWeight:600, color:'var(--op-on-variant)'}}>Gestión de Restaurantes &amp; Rendimiento Operativo</span>
               </div>
               <div className="op-topbar-meta">
-                <div
-                  className="op-rest-selector"
-                  onClick={()=> { if (listaRests.length <= 1) setShowFicha(true); }}
-                  title={listaRests.length > 1 ? "Cambiar restaurante / ver ficha" : "Ver ficha"}
-                >
-                  <div className="op-rest-avatar">{initials(nombreCorto)}</div>
-                  <div>
-                    <div className="op-rest-name">{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:12, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>verified</span></div>
-                    <div className="op-rest-sub">ID {restId} · {dir.slice(0,28)}</div>
+                <div className="op-rest-selector-wrap" ref={restDropdownRef}>
+                  <div
+                    className="op-rest-selector"
+                    onClick={()=> {
+                      if (listaRests.length > 1) setShowRestDropdown(v => !v);
+                      else setShowFicha(true);
+                    }}
+                    title={listaRests.length > 1 ? "Cambiar restaurante" : "Ver ficha"}
+                    role={listaRests.length > 1 ? 'button' : undefined}
+                  >
+                    <div className="op-rest-avatar">{initials(nombreCorto)}</div>
+                    <div>
+                      <div className="op-rest-name">{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:12, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>verified</span></div>
+                      <div className="op-rest-sub">ID {restId} · {dir.slice(0,28)}</div>
+                    </div>
+                    <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>{listaRests.length > 1 && showRestDropdown ? 'expand_less' : 'unfold_more'}</span>
                   </div>
-                  {listaRests.length > 1 ? (
-                    <select
-                      className="op-select"
-                      style={{maxWidth:160, fontSize:'0.72rem', padding:'0.2rem 0.4rem', marginLeft:'0.35rem'}}
-                      value={data.restaurante.id}
-                      onClick={e=> e.stopPropagation()}
-                      onChange={e=> { e.stopPropagation(); handleSwitchRest(e.target.value); }}
-                    >
-                      {listaRests.map(r=> <option key={r.id} value={r.id}>{r.nombre}</option>)}
-                    </select>
-                  ) : (
-                    <span className="material-symbols-outlined" style={{fontSize:16, color:'var(--op-on-variant)'}}>unfold_more</span>
+                  {listaRests.length > 1 && showRestDropdown && (
+                    <div className="op-rest-dropdown" role="listbox">
+                      <div className="op-rest-dropdown-title">Tus restaurantes ({listaRests.length})</div>
+                      {listaRests.map(r => (
+                        <button
+                          key={r.id}
+                          type="button"
+                          role="option"
+                          aria-selected={r.id === data.restaurante.id}
+                          className={`op-rest-dropdown-item ${r.id === data.restaurante.id ? 'active' : ''}`}
+                          onClick={()=> handleSwitchRest(r.id)}
+                        >
+                          <span className="op-rest-dropdown-check material-symbols-outlined" style={{fontSize:16}}>
+                            {r.id === data.restaurante.id ? 'check_circle' : 'radio_button_unchecked'}
+                          </span>
+                          <span className="op-rest-dropdown-info">
+                            <span className="op-rest-dropdown-nombre">{r.nombre}</span>
+                            <span className="op-rest-dropdown-meta">{r.ciudad || '—'} · ID {`#RES-${String(r.id).slice(-4).toUpperCase()}`}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <div className="op-date-chip"><span className="material-symbols-outlined" style={{fontSize:16}}>date_range</span>
