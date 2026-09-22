@@ -312,44 +312,64 @@ export const dashboardApi = {
   listMyRestaurants: async (currentId) => {
     const u = await requireUser();
     const ids = new Set();
+    const fallback = new Map(); // id -> {nombre, ciudad} from negocios when restaurant doc missing
     if (currentId) ids.add(currentId);
 
-    const userDoc = await getDoc(doc(db, 'usuarios', u.uid)).catch(() => null);
+    const [userDoc, restSnap, negSnap] = await Promise.all([
+      getDoc(doc(db, 'usuarios', u.uid)).catch(() => null),
+      getDocs(query(collection(db, 'restaurants'), where('uid', '==', u.uid))).catch((e) => {
+        console.warn('listMyRestaurants restaurants/uid', e?.code || e?.message);
+        return null;
+      }),
+      getDocs(query(collection(db, 'negocios'), where('uid', '==', u.uid))).catch((e) => {
+        console.warn('listMyRestaurants negocios/uid', e?.code || e?.message);
+        return null;
+      }),
+    ]);
+
     const userData = userDoc && userDoc.exists() ? userDoc.data() : {};
     if (Array.isArray(userData.restaurantIds)) userData.restaurantIds.forEach((id) => id && ids.add(id));
     if (userData.restaurantId) ids.add(userData.restaurantId);
 
-    // All restaurants owned by this user
-    try {
-      const snap = await getDocs(query(collection(db, 'restaurants'), where('uid', '==', u.uid)));
-      snap.docs.forEach((d) => ids.add(d.id));
-    } catch (e) {
-      console.warn('listMyRestaurants restaurants/uid', e?.code || e?.message);
-    }
+    if (restSnap) restSnap.docs.forEach((d) => ids.add(d.id));
 
-    // Approved proposals linked to restaurants (covers legacy docs without restaurantIds)
-    try {
-      const negSnap = await getDocs(query(collection(db, 'negocios'), where('uid', '==', u.uid)));
+    // Same source as Cuenta: every proposal (approved ones link to restaurants)
+    if (negSnap) {
       negSnap.docs.forEach((d) => {
-        const data = d.data();
-        if (data?.restaurantId) ids.add(data.restaurantId);
+        const n = d.data();
+        if (n?.restaurantId) {
+          ids.add(n.restaurantId);
+          fallback.set(n.restaurantId, { nombre: n.nombre || '', ciudad: n.ciudad || '' });
+        }
       });
-    } catch (e) {
-      console.warn('listMyRestaurants negocios/uid', e?.code || e?.message);
     }
 
     const idList = [...ids].filter(Boolean);
     const docs = await Promise.all(
       idList.map((id) => getDoc(doc(db, 'restaurants', id)).catch(() => null))
     );
-    const lista = docs
-      .filter((d) => d && d.exists())
-      .map((d) => ({ id: d.id, nombre: d.data().nombre || '', ciudad: d.data().ciudad || '' }));
 
-    // Guarantee current appears even if lookups failed elsewhere
+    const lista = [];
+    const seen = new Set();
+    idList.forEach((id, i) => {
+      if (seen.has(id)) return;
+      const d = docs[i];
+      if (d && d.exists()) {
+        seen.add(id);
+        lista.push({ id, nombre: d.data().nombre || '', ciudad: d.data().ciudad || '' });
+      } else if (fallback.has(id)) {
+        // Approved proposal without readable restaurants doc — still show it
+        seen.add(id);
+        const fb = fallback.get(id);
+        lista.push({ id, nombre: fb.nombre || 'Restaurante', ciudad: fb.ciudad || '' });
+      }
+    });
+
     if (currentId && !lista.some((r) => r.id === currentId)) {
-      lista.unshift({ id: currentId, nombre: userData?.nombreRestaurante || 'Restaurante activo', ciudad: '' });
+      const fb = fallback.get(currentId);
+      lista.unshift({ id: currentId, nombre: fb?.nombre || 'Restaurante activo', ciudad: fb?.ciudad || '' });
     }
+    console.info('listMyRestaurants', { ids: idList, count: lista.length, lista });
     return lista;
   },
   getMyRestaurant: async (restaurantIdOverride) => {

@@ -389,12 +389,14 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                   {showRestDropdown && (
                     <div className="op-rest-dropdown" role="listbox">
                       <div className="op-rest-dropdown-title">
-                        {loadingRestList ? 'Cargando…' : `Tus restaurantes (${listaRests.length})`}
+                        {loadingRestList && listaRests.length === 0
+                          ? 'Cargando…'
+                          : `Tus restaurantes (${listaRests.length})`}
                       </div>
-                      {!loadingRestList && listaRests.length === 0 && (
+                      {listaRests.length === 0 && !loadingRestList && (
                         <div className="op-rest-dropdown-empty">Sin restaurantes</div>
                       )}
-                      {!loadingRestList && listaRests.map(r => (
+                      {listaRests.map(r => (
                         <button
                           key={r.id}
                           type="button"
@@ -407,11 +409,14 @@ export default function Dashboard({ usuario, esAdmin, perfil }) {
                             {r.id === data.restaurante.id ? 'check_circle' : 'radio_button_unchecked'}
                           </span>
                           <span className="op-rest-dropdown-info">
-                            <span className="op-rest-dropdown-nombre">{r.nombre}</span>
+                            <span className="op-rest-dropdown-nombre">{r.nombre || 'Restaurante'}</span>
                             <span className="op-rest-dropdown-meta">{r.ciudad || '—'} · ID {`#RES-${String(r.id).slice(-4).toUpperCase()}`}</span>
                           </span>
                         </button>
                       ))}
+                      {loadingRestList && listaRests.length > 0 && (
+                        <div className="op-rest-dropdown-empty">Actualizando…</div>
+                      )}
                     </div>
                   )}
                 </div>
