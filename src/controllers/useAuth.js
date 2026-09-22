@@ -201,6 +201,25 @@ export function useAuth() {
     return !tiene;
   }
 
+  /** Guarda idioma (remoto si logueado, localStorage siempre). */
+  async function guardarLang(nuevoLang) {
+    localStorage.setItem('mira_lang', nuevoLang);
+    if (usuario?.uid) {
+      try { await guardarPerfil(usuario.uid, { lang: nuevoLang }); } catch { /* offline */ }
+    }
+  }
+
+  /** Envía verificación de correo con el idioma actual. */
+  async function enviarVerificacion() {
+    return enviarVerificacionEmail(perfil.lang || 'es');
+  }
+
+  /** Envía email de recuperación con el idioma actual. */
+  async function recuperarContrasenaConLang(email) {
+    const { recuperarContrasena } = await import('../services/authApi.js');
+    return recuperarContrasena(email, perfil.lang || 'es');
+  }
+
   return {
     usuario,
     cargandoSesion,
@@ -219,7 +238,10 @@ export function useAuth() {
     iniciarSesion,
     iniciarSesionGoogle: iniciarSesionGoogleFn,
     cerrarSesion,
+    enviarVerificacion,
     enviarVerificacionEmail,
     recargarEmailVerified,
+    guardarLang,
+    recuperarContrasenaConLang,
   };
 }

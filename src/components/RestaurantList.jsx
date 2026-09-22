@@ -4,8 +4,17 @@
  */
 import { useEffect, useRef } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
+import RestaurantSkeleton from './RestaurantSkeleton.jsx';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
-export default function RestaurantList({ restaurants, filtros, onClear, onSelect, hayMas, cargandoMas, onLoadMore, esFavorito, onToggleFavorito, onVerCarta }) {
+const TRADS = { es, ca, en };
+const SKELETONS_CARGANDO_MAS = 3;
+
+export default function RestaurantList({ restaurants, filtros, onClear, onSelect, hayMas, cargandoMas, onLoadMore, esFavorito, onToggleFavorito, onVerCarta, cargandoInicial }) {
+  const t = useT(TRADS);
   const centinela = useRef(null);
 
   useEffect(() => {
@@ -22,14 +31,14 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
     return () => obs.disconnect();
   }, [hayMas, onLoadMore]);
 
-  if (restaurants.length === 0 && !hayMas) {
+  if (restaurants.length === 0 && !hayMas && !cargandoInicial) {
     const hayBusqueda = filtros?.q?.trim();
     return (
       <div className="vacio" role="status">
-        <p className="vacio-titulo">No se encontraron restaurantes</p>
-        <p>{hayBusqueda ? `Sin resultados para "${filtros.q}". Prueba con otro nombre o ajusta los filtros.` : 'Prueba con otra zona, cocina, precio, día u hora.'}</p>
+        <p className="vacio-titulo">{t('lista.noResultados')}</p>
+        <p>{hayBusqueda ? t('lista.sinResultados', { q: filtros.q }) : t('lista.pruebaOtra')}</p>
         <button type="button" className="btn-cta" onClick={onClear}>
-          Limpiar filtros
+          {t('lista.limpiarFiltros')}
         </button>
       </div>
     );
@@ -43,10 +52,13 @@ export default function RestaurantList({ restaurants, filtros, onClear, onSelect
             <RestaurantCard restaurant={r} filtros={filtros} onSelect={onSelect} esFavorito={esFavorito ? esFavorito(r.id) : false} onToggleFavorito={onToggleFavorito} onVerCarta={onVerCarta} />
           </li>
         ))}
+        {cargandoMas && Array.from({ length: SKELETONS_CARGANDO_MAS }, (_, i) => (
+          <li key={`skeleton-mas-${i}`}><RestaurantSkeleton /></li>
+        ))}
       </ul>
       {hayMas && (
-        <div ref={centinela} style={{ textAlign: 'center', padding: '1.2rem', color: 'var(--gris)' }} aria-hidden={!cargandoMas}>
-          {cargandoMas ? 'Cargando más restaurantes…' : ''}
+        <div ref={centinela} aria-hidden={!cargandoMas}>
+          {cargandoMas && <span className="sr-only">{t('lista.cargando')}</span>}
         </div>
       )}
     </>

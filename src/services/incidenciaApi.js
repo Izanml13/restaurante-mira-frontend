@@ -7,32 +7,30 @@
 import { collection, addDoc, getDocs, getDoc, doc, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getDb } from './firebase.js';
 
-/** ¿Es admin? 1 lectura al doc allowlist `admins/{uid}`. */
+/** ¿Es admin? Revisa `usuarios/{uid}.tipo` y la colección `admins/{uid}`. */
 export async function esAdmin(uid) {
   if (!uid) return false;
   try {
-    const snap = await getDoc(doc(getDb(), 'admins', uid));
-    return snap.exists();
+    const [userSnap, adminSnap] = await Promise.all([
+      getDoc(doc(getDb(), 'usuarios', uid)),
+      getDoc(doc(getDb(), 'admins', uid)),
+    ]);
+    if (userSnap.exists() && userSnap.data().tipo === 'admin') return true;
+    if (adminSnap.exists()) {
+      const data = adminSnap.data();
+      return data.rol === 'admin' || data.tipo === 'admin' || true;
+    }
+    return false;
   } catch {
     return false;
   }
 }
 
-/** Mis incidencias: por uid y (compat) por email, orden en cliente. */
-export async function listarMisIncidencias({ uid, email }) {
-  const promesas = [];
-  if (uid) promesas.push(getDocs(query(collection(getDb(), 'contactos'), where('uid', '==', uid))));
-  if (email) promesas.push(getDocs(query(collection(getDb(), 'contactos'), where('email', '==', email))));
-  const snaps = await Promise.all(promesas);
-  const vistos = new Set();
-  const list = [];
-  for (const snap of snaps) {
-    for (const d of snap.docs) {
-      if (vistos.has(d.id)) continue;
-      vistos.add(d.id);
-      list.push({ id: d.id, ...d.data() });
-    }
-  }
+/** Mis incidencias: por uid. */
+export async function listarMisIncidencias({ uid }) {
+  if (!uid) return [];
+  const snap = await getDocs(query(collection(getDb(), 'contactos'), where('uid', '==', uid)));
+  const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   list.sort((a, b) => (b.creado?.seconds ?? 0) - (a.creado?.seconds ?? 0));
   return list;
 }

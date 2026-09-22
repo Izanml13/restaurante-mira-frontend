@@ -104,8 +104,15 @@ export async function aprobarNegocio(negocioId) {
     terraza: n.terraza ?? null,
     alergenos: n.alergenos || '',
     resenas: [],
+    uid: n.uid,
+    email: n.email || '',
+    activo: true,
+    comisionPct: 10,
+    creado: serverTimestamp(),
   });
-  batch.update(ref, { estado: 'aprobada' });
+  const userRef = doc(db, 'usuarios', n.uid);
+  batch.update(userRef, { restaurantId: restRef.id, tipo: 'empresa' });
+  batch.update(ref, { estado: 'aprobada', restaurantId: restRef.id });
   await batch.commit();
   return restRef.id;
 }

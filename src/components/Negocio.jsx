@@ -1,15 +1,21 @@
 /** View pura: formulario para que una cuenta empresa proponga su local. */
 import { useState } from 'react';
 import { ZONAS_CATALUNA } from '../models/restaurantModel.js';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
-const TRI = [
-  { value: '', label: 'No lo sé' },
-  { value: 'si', label: 'Sí' },
-  { value: 'no', label: 'No' },
-];
+const TRADS = { es, ca, en };
 const triABooleano = (v) => (v === 'si' ? true : v === 'no' ? false : null);
 
 export default function Negocio({ usuario, perfil, onProponer }) {
+  const t = useT(TRADS);
+  const TRI = [
+    { value: '', label: t('otros.noSe') },
+    { value: 'si', label: t('detail.si') },
+    { value: 'no', label: t('detail.no') },
+  ];
   const [form, setForm] = useState({
     nombre: '',
     ciudad: '',
@@ -43,12 +49,12 @@ export default function Negocio({ usuario, perfil, onProponer }) {
     return (
       <section className="auth-pagina" aria-labelledby="negocio-no">
         <div className="auth-tarjeta" role="status">
-          <h1 id="negocio-no">Solo empresas</h1>
+          <h1 id="negocio-no">{t('otros.soloEmpresas')}</h1>
           <p className="auth-sub">
-            Esta página es para cuentas de empresa. Tienes cuenta de cliente.
+            {t('otros.estaPaginaEsParaEmpresas')}
           </p>
           <p>
-            <a href="#buscar">Volver al buscador</a>
+            <a href="#buscar">{t('favoritos.volverBuscador')}</a>
           </p>
         </div>
       </section>
@@ -84,13 +90,12 @@ export default function Negocio({ usuario, perfil, onProponer }) {
     return (
       <section className="auth-pagina" aria-labelledby="negocio-ok">
         <div className="auth-tarjeta" role="status">
-          <h1 id="negocio-ok">Propuesta enviada</h1>
+          <h1 id="negocio-ok">{t('negocio.propuestaEnviada')}</h1>
           <p className="auth-sub">
-            Revisaremos <strong>{form.nombre}</strong> y la publicaremos si todo está
-            correcto. Te avisaremos a tu correo.
+            {t('negocio.revisaremos')} <strong>{form.nombre}</strong> {t('negocio.publicaremos')}
           </p>
           <p>
-            <a href="#buscar">Volver al buscador</a>
+            <a href="#buscar">{t('favoritos.volverBuscador')}</a>
           </p>
         </div>
       </section>
@@ -100,25 +105,25 @@ export default function Negocio({ usuario, perfil, onProponer }) {
   return (
     <section className="auth-pagina" aria-labelledby="negocio-titulo">
       <form className="auth-tarjeta tarjeta-ancha" onSubmit={manejarEnvio} noValidate>
-        <h1 id="negocio-titulo">Añade tu restaurante</h1>
-        <p className="auth-sub">Lo revisaremos antes de publicarlo en la guía.</p>
+        <h1 id="negocio-titulo">{t('negocio.titulo')}</h1>
+        <p className="auth-sub">{t('negocio.sub')}</p>
         {error && (
           <p className="auth-error" role="alert">
             {error}
           </p>
         )}
         <div className="campo">
-          <label htmlFor="ng-nombre">Nombre del local *</label>
+          <label htmlFor="ng-nombre">{t('negocio.nombreLocal')}</label>
           <input id="ng-nombre" type="text" value={form.nombre} onChange={(e) => set('nombre', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-ciudad">Ciudad *</label>
+          <label htmlFor="ng-ciudad">{t('negocio.ciudad')}</label>
           <input id="ng-ciudad" type="text" placeholder="Tarragona" value={form.ciudad} onChange={(e) => set('ciudad', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-zona">Zona *</label>
+          <label htmlFor="ng-zona">{t('negocio.zona')}</label>
           <select id="ng-zona" value={form.zona} onChange={(e) => set('zona', e.target.value)}>
-            <option value="">Elige zona</option>
+            <option value="">{t('negocio.eligeZona')}</option>
             {ZONAS_CATALUNA.map((z) => (
               <option key={z} value={z}>
                 {z.replace(', Spain', '')}
@@ -127,35 +132,35 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-dir">Dirección *</label>
+          <label htmlFor="ng-dir">{t('negocio.direccion')}</label>
           <input id="ng-dir" type="text" value={form.direccion} onChange={(e) => set('direccion', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-tel">Teléfono</label>
+          <label htmlFor="ng-tel">{t('negocio.telefono')}</label>
           <input id="ng-tel" type="tel" value={form.telefono} onChange={(e) => set('telefono', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-cat">Cocinas (separadas por comas, máx. 3) *</label>
+          <label htmlFor="ng-cat">{t('negocio.cocinas')}</label>
           <input id="ng-cat" type="text" placeholder="Mediterránea, Tapas" value={form.categorias} onChange={(e) => set('categorias', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-precio">Precio</label>
+          <label htmlFor="ng-precio">{t('negocio.precio')}</label>
           <select id="ng-precio" value={form.precio} onChange={(e) => set('precio', e.target.value)}>
-            <option value="€">€ · económico</option>
-            <option value="€€">€€ · medio</option>
-            <option value="€€€">€€€ · alto</option>
+            <option value="€">{t('negocio.economico')}</option>
+            <option value="€€">{t('negocio.medio')}</option>
+            <option value="€€€">{t('negocio.alto')}</option>
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-desc">Descripción</label>
+          <label htmlFor="ng-desc">{t('negocio.descripcion')}</label>
           <textarea id="ng-desc" rows="3" maxLength="500" value={form.descripcion} onChange={(e) => set('descripcion', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-foto">Foto (URL, opcional)</label>
+          <label htmlFor="ng-foto">{t('negocio.foto')}</label>
           <input id="ng-foto" type="url" placeholder="https://…" value={form.imagen_url} onChange={(e) => set('imagen_url', e.target.value)} />
         </div>
         <div className="campo">
-          <label htmlFor="ng-acceso">Acceso adaptado (silla de ruedas)</label>
+          <label htmlFor="ng-acceso">{t('negocio.accesoAdaptado')}</label>
           <select id="ng-acceso" value={form.acceso} onChange={(e) => set('acceso', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
@@ -165,7 +170,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-infantil">Menú infantil</label>
+          <label htmlFor="ng-infantil">{t('negocio.menuInfantil')}</label>
           <select id="ng-infantil" value={form.infantil} onChange={(e) => set('infantil', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
@@ -175,7 +180,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-entorno">Entorno tranquilo (apto TEA)</label>
+          <label htmlFor="ng-entorno">{t('negocio.entornoTranquilo')}</label>
           <select id="ng-entorno" value={form.entorno} onChange={(e) => set('entorno', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
@@ -185,7 +190,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-tronas">Tronas / sillas de bebé</label>
+          <label htmlFor="ng-tronas">{t('negocio.tronas')}</label>
           <select id="ng-tronas" value={form.tronas} onChange={(e) => set('tronas', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
@@ -195,7 +200,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-terraza">Terraza</label>
+          <label htmlFor="ng-terraza">{t('negocio.terraza')}</label>
           <select id="ng-terraza" value={form.terraza} onChange={(e) => set('terraza', e.target.value)}>
             {TRI.map((t) => (
               <option key={t.label} value={t.value}>
@@ -205,11 +210,11 @@ export default function Negocio({ usuario, perfil, onProponer }) {
           </select>
         </div>
         <div className="campo">
-          <label htmlFor="ng-alerg">Alérgenos (opcional)</label>
+          <label htmlFor="ng-alerg">{t('negocio.alergenos')}</label>
           <textarea id="ng-alerg" rows="2" maxLength="500" placeholder="Ej: disponemos de pan sin gluten; cocina con frutos secos…" value={form.alergenos} onChange={(e) => set('alergenos', e.target.value)} />
         </div>
         <button type="submit" className="btn-cta btn-grande auth-boton" disabled={enviando}>
-          {enviando ? 'Enviando…' : 'Proponer restaurante'}
+          {enviando ? t('negocio.enviando') : t('negocio.enviar')}
         </button>
       </form>
     </section>

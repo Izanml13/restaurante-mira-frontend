@@ -2,6 +2,10 @@
 import { useEffect, useState } from 'react';
 import { listarMisReservas, cancelarReserva } from '../services/reservaApi.js';
 import { diasMes, pronosticoDia, alertaTerraza } from '../services/meteoApi.js';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
 function hoyISO() {
   const h = new Date();
@@ -9,10 +13,12 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const TRADS = { es, ca, en };
 
 export default function Reservas({ usuario, esAdmin }) {
+  const t = useT(TRADS);
+  const MESES = t('modelos.meses');
+  const DIAS_SEMANA = t('modelos.diasSemana');
   const [lista, setLista] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -80,7 +86,7 @@ export default function Reservas({ usuario, esAdmin }) {
   if (!usuario) return null;
 
   async function handleCancelar(r) {
-    if (!window.confirm(`¿Cancelar la reserva del ${r.fecha} a las ${r.hora}?`)) return;
+    if (!window.confirm(t('reservas.cancelarReserva', { fecha: r.fecha, hora: r.hora }))) return;
     setError('');
     try {
       await cancelarReserva(r.id, { uid: usuario.uid, esAdmin });
@@ -125,8 +131,8 @@ export default function Reservas({ usuario, esAdmin }) {
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="reservas-titulo">
       <div className="auth-tarjeta tarjeta-ancha">
-        <h1 id="reservas-titulo">Mis reservas</h1>
-        {cargando && <p>Cargando…</p>}
+        <h1 id="reservas-titulo">{t('reservas.misReservas')}</h1>
+        {cargando && <p>{t('reservas.cargando')}</p>}
         {error && (
           <p className="auth-error" role="alert">
             {error}
@@ -135,20 +141,20 @@ export default function Reservas({ usuario, esAdmin }) {
         {!cargando && (
           <section aria-labelledby="cal-titulo">
             <h2 id="cal-titulo" className="cuenta-sub">
-              Calendario
+              {t('reservas.calendario')}
             </h2>
             <div className="cal-cab">
-              <button type="button" className="btn-secundario btn-peq" onClick={() => moverMes(-1)} aria-label="Mes anterior">
+              <button type="button" className="btn-secundario btn-peq" onClick={() => moverMes(-1)} aria-label={t('reservas.mesAnterior')}>
                 ←
               </button>
               <strong>
                 {MESES[mesVista.mes - 1]} {mesVista.anio}
               </strong>
-              <button type="button" className="btn-secundario btn-peq" onClick={() => moverMes(1)} aria-label="Mes siguiente">
+              <button type="button" className="btn-secundario btn-peq" onClick={() => moverMes(1)} aria-label={t('reservas.mesSiguiente')}>
                 →
               </button>
             </div>
-            <div className="cal-grid" role="grid" aria-label={`Reservas de ${MESES[mesVista.mes - 1]}`}>
+            <div className="cal-grid" role="grid" aria-label={`${t('reservas.misReservas')} ${MESES[mesVista.mes - 1]}`}>
               {DIAS_SEMANA.map((d) => (
                 <span key={d} className="cal-nombre-dia" role="columnheader">
                   {d}
@@ -187,9 +193,9 @@ export default function Reservas({ usuario, esAdmin }) {
               )}
             </div>
             <h3 className="cuenta-sub">
-              {new Date(`${diaSel}T12:00:00`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+              {new Date(`${diaSel}T12:00:00`).toLocaleDateString(t('modelos.locale'), { weekday: 'long', day: 'numeric', month: 'long' })}
             </h3>
-            {delDiaSel.length === 0 && <p className="vacio-texto">Nada este día. Toca otro con punto verde.</p>}
+            {delDiaSel.length === 0 && <p className="vacio-texto">{t('reservas.nadaEsteDia')}</p>}
             <ul className="lista-registros">
               {delDiaSel.map((r) => {
                 const aviso = alertaTerraza(r.terraza, meteo[r.fecha]);
@@ -199,7 +205,7 @@ export default function Reservas({ usuario, esAdmin }) {
                     <div>
                       <strong>{r.nombreRestaurante}</strong>
                       <div className="registro-detalle">
-                        {r.hora} · {r.comensales} {Number(r.comensales) === 1 ? 'persona' : 'personas'} ·{' '}
+                        {r.hora} · {r.comensales} {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} ·{' '}
                         <code>{r.codigo}</code>
                         {m && m.tempMax != null && (
                           <> · {Math.round(m.tempMax)}° {m.resumen}</>
@@ -219,11 +225,11 @@ export default function Reservas({ usuario, esAdmin }) {
         )}
         {!cargando && (
           <>
-            <div className="tabs" role="tablist" aria-label="Filtrar reservas">
+            <div className="tabs" role="tablist" aria-label={t('reservas.misReservas')}>
               {[
-                ['proximas', `Próximas (${proximas.length})`],
-                ['pasadas', `Pasadas (${pasadas.length})`],
-                ['canceladas', `Canceladas (${canceladas.length})`],
+                ['proximas', `${t('reservas.proximas')} (${proximas.length})`],
+                ['pasadas', `${t('reservas.pasadas')} (${pasadas.length})`],
+                ['canceladas', `${t('reservas.canceladas')} (${canceladas.length})`],
               ].map(([key, label]) => (
                 <button
                   key={key}
@@ -238,7 +244,7 @@ export default function Reservas({ usuario, esAdmin }) {
               ))}
             </div>
             {visibles.length === 0 && (
-              <p className="vacio-texto">Nada aquí. Reserva desde la ficha de un restaurante.</p>
+              <p className="vacio-texto">{t('reservas.nadaAqui')}</p>
             )}
             <ul className="lista-registros">
               {visibles.map((r) => (
@@ -247,14 +253,14 @@ export default function Reservas({ usuario, esAdmin }) {
                     <strong>{r.nombreRestaurante}</strong>
                     <div className="registro-detalle">
                       {r.fecha} a las {r.hora} · {r.comensales}{' '}
-                      {Number(r.comensales) === 1 ? 'persona' : 'personas'} · <code>{r.codigo}</code> ·{' '}
+                      {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} · <code>{r.codigo}</code> ·{' '}
                       {r.estado}
                     </div>
                     {r.comentarios && <div className="registro-detalle">“{r.comentarios}”</div>}
                   </div>
                   {r.estado === 'activa' && r.fecha >= hoy && (
                     <button type="button" className="btn-secundario btn-peq" onClick={() => handleCancelar(r)}>
-                      Cancelar
+                      {t('reservas.cancelar')}
                     </button>
                   )}
                 </li>

@@ -1,4 +1,4 @@
-/** Página "Mi cuenta": datos + preferencias + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
+/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas + puntos. */
 import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
@@ -6,6 +6,15 @@ import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
+import { useI18n } from '../i18n/index.jsx';
+import usePointsStore from '../stores/usePointsStore.js';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
+
+const TRADS = { es, ca, en };
+
+const LANG_FLAGS = { es: 'ES', ca: 'CA', en: 'EN' };
 
 function hoyISO() {
   const h = new Date();
@@ -13,7 +22,13 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+  const { lang, setLang, available } = useI18n();
+  const { saldoActual, rachaLogin, rachaReservas, fetchBalance } = usePointsStore();
+  function t(key) {
+    const dict = TRADS[lang] || TRADS.es;
+    return key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
+  }
   const [proximas, setProximas] = useState([]);
   const [incidencias, setIncidencias] = useState([]);
   const [misResenas, setMisResenas] = useState([]);
@@ -28,6 +43,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
       window.location.hash = '#/login';
       return;
     }
+    fetchBalance();
     let vivo = true;
     Promise.all([
       listarMisReservas(usuario.uid),
@@ -60,20 +76,19 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
 
   async function guardarPrefs(e) {
     e.preventDefault(); setGuardandoPrefs(true); setPrefsOk('');
-    try { await guardarDieta(borrador); setPrefsOk('Dieta guardada.'); }
-    catch { setPrefsOk('No se pudo guardar. Inténtalo de nuevo.'); }
+    try { await guardarDieta(borrador); setPrefsOk(t('cuenta.dietaGuardada')); }
+    catch { setPrefsOk(t('cuenta.dietaError')); }
     finally { setGuardandoPrefs(false); }
   }
 
   function toggleAcc(campo) { setBorradorAcc((prev) => ({ ...prev, [campo]: !prev[campo] })); setAccOk(''); }
   async function guardarAcc(e) {
     e.preventDefault(); setGuardandoAcc(true); setAccOk('');
-    try { await guardarAccesibilidad(borradorAcc); setAccOk('Accesibilidad guardada.'); }
-    catch { setAccOk('No se pudo guardar. Inténtalo de nuevo.'); }
+    try { await guardarAccesibilidad(borradorAcc); setAccOk(t('cuenta.accesibilidadGuardada')); }
+    catch { setAccOk(t('cuenta.accesibilidadError')); }
     finally { setGuardandoAcc(false); }
   }
 
-  // --- Verificación de email ---
   const [verificando, setVerificando] = useState(false);
   const [verOk, setVerOk] = useState('');
   const [verError, setVerError] = useState('');
@@ -82,9 +97,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
     setVerError(''); setVerOk(''); setVerificando(true);
     try {
       await onEnviarVerificacion();
-      setVerOk('Correo de verificación enviado. Revisa tu bandeja de entrada y haz clic en el enlace.');
+      setVerOk(t('cuenta.correoEnviado'));
     } catch (err) {
-      setVerError(err.message || 'No se pudo enviar el correo de verificación.');
+      setVerError(err.message || t('cuenta.correoError'));
     } finally {
       setVerificando(false);
     }
@@ -95,16 +110,15 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
     try {
       const verificado = await onRecargarEmailVerified();
       if (verificado) {
-        setVerOk('✓ Tu correo ha sido verificado correctamente.');
+        setVerOk(t('cuenta.correoVerificadoOk'));
       } else {
-        setVerError('Tu correo aún no está verificado. Haz clic en el enlace del email.');
+        setVerError(t('cuenta.correoNoCambiado'));
       }
     } catch {
-      setVerError('No se pudo comprobar el estado. Inténtalo de nuevo.');
+      setVerError(t('cuenta.comprobarError'));
     }
   }
 
-  // --- Cookies ---
   const [cookiesPrefs, setCookiesPrefs] = useState({ ...COOKIE_DEFAULT });
   const [cookiesOk, setCookiesOk] = useState('');
   useEffect(() => {
@@ -115,42 +129,84 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
   async function guardarCookiesCuenta() {
     setCookiesOk('');
     await guardarCookies(cookiesPrefs, usuario?.uid);
-    setCookiesOk('Preferencias de cookies guardadas.');
+    setCookiesOk(t('cuenta.cookiesGuardadas'));
   }
 
   if (!usuario) return null;
 
   const inicial = (usuario.nombre || usuario.email || '?').trim().charAt(0).toUpperCase();
   const miembroDesde = usuario.creado
-    ? new Date(usuario.creado).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(usuario.creado).toLocaleDateString(t('modelos.locale'), { day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
 
   return (
     <section className="auth-pagina" aria-labelledby="cuenta-titulo">
       <div className="auth-tarjeta">
         <p className="cuenta-avatar" aria-hidden="true">{inicial}</p>
-        <h1 id="cuenta-titulo">{usuario.nombre || 'Mi cuenta'}</h1>
+        <h1 id="cuenta-titulo">{usuario.nombre || t('cuenta.miCuenta')}</h1>
         <dl className="cuenta-datos">
-          <div><dt>Correo</dt><dd>{usuario.email}</dd></div>
-          <div><dt>Verificado</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? '✓ Sí' : 'No verificado'}</dd></div>
-          <div><dt>Miembro desde</dt><dd>{miembroDesde}</dd></div>
+          <div><dt>{t('cuenta.email')}</dt><dd>{usuario.email}</dd></div>
+          <div><dt>{t('cuenta.verificado')}</dt><dd style={{ color: usuario.emailVerified ? 'var(--verde)' : 'var(--naranja)' }}>{usuario.emailVerified ? `✓ ${t('cuenta.si')}` : t('cuenta.noVerificado')}</dd></div>
+          <div><dt>{t('cuenta.miembroDesde')}</dt><dd>{miembroDesde}</dd></div>
         </dl>
         <p className="cuenta-acciones">
-          <a href="#buscar" className="btn-cta">Buscar restaurantes</a>
-          <button type="button" className="btn-secundario" onClick={onSalir}>Cerrar sesión</button>
+          <a href="#buscar" className="btn-cta">{t('cuenta.buscarRestaurantes')}</a>
+          <button type="button" className="btn-secundario" onClick={onSalir}>{t('cuenta.cerrarSesion')}</button>
         </p>
 
+        {/* --- DASHBOARD PANEL --- */}
+        {(esAdmin || perfil?.tipo === 'empresa') && (
+          <div className="cuenta-dashboard-banner">
+            <h2 className="cuenta-sub">{esAdmin ? 'Panel de Administración' : 'Panel de Restaurante'}</h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.8rem' }}>
+              {esAdmin
+                ? 'Gestiona usuarios, restaurantes, reservas, comisiones y analytics de la plataforma.'
+                : 'Gestiona tu restaurante: información, reservas, facturación y tickets.'}
+            </p>
+            <a href={esAdmin ? '#/admin' : '#/dashboard'} className="btn-cta">
+              {esAdmin ? 'Abrir Panel Admin' : 'Abrir Mi Panel'}
+            </a>
+          </div>
+        )}
+
+        {/* --- MIRA POINTS --- */}
+        <h2 className="cuenta-sub">{t('points.title')}</h2>
+        <div className="cuenta-points">
+          <div className="cuenta-points__saldo">
+            <span className="cuenta-points__amount">{saldoActual}</span>
+            <span className="cuenta-points__label">{t('points.balance')}</span>
+          </div>
+          {rachaLogin?.dias > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--gris)', marginBottom: '0.5rem' }}>
+              🔥 {rachaLogin.dias} {t('points.days')} {t('points.streak')} — +{Math.min(5 + 3 * Math.max(0, rachaLogin.dias - 1), 15)} pts/día
+            </p>
+          )}
+          {rachaReservas?.semanasConsecutivas > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--dorado)', marginBottom: '0.5rem' }}>
+              ⭐ x{rachaReservas.multiplicador} multiplicador activo
+            </p>
+          )}
+          <div className="cuenta-points__actions">
+            <a href="#/puntos" className="btn-cta btn-peq">{t('points.history')}</a>
+            <a href="#/puntos/historial" className="btn-secundario btn-peq">{t('points.redeem')}</a>
+            <a href="#/invitar" className="btn-secundario btn-peq">{t('points.invite')}</a>
+          </div>
+          <div className="cuenta-redemption">
+            💰 100 pts = 1,00 € · Sin caducidad
+          </div>
+        </div>
+
         {/* --- DIETA --- */}
-        <h2 className="cuenta-sub">Mi dieta</h2>
+        <h2 className="cuenta-sub">{t('cuenta.miDieta')}</h2>
         <form onSubmit={guardarPrefs} className="prefs-form">
-          {[['vegano', 'Vegano'], ['vegetariano', 'Vegetariano']].map(([campo, etiqueta]) => (
+          {[['vegano', t('cuenta.vegano')], ['vegetariano', t('cuenta.vegetariano')]].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
               <input id={`pref-${campo}`} type="checkbox" checked={Boolean(borrador[campo])} onChange={() => toggleDieta(campo)} />
               {etiqueta}
             </label>
           ))}
           <fieldset className="prefs-alergias">
-            <legend>Mis alergias</legend>
+            <legend>{t('cuenta.misAlergias')}</legend>
             {ALERGENOS.map(({ key, label }) => (
               <label key={key} className="campo-check" htmlFor={`alerg-${key}`}>
                 <input id={`alerg-${key}`} type="checkbox" checked={borrador.alergias.includes(key)} onChange={() => toggleAlergia(key)} />
@@ -159,47 +215,64 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
             ))}
           </fieldset>
           <button type="submit" className="btn-secundario btn-peq" disabled={guardandoPrefs}>
-            {guardandoPrefs ? 'Guardando…' : 'Guardar dieta'}
+            {guardandoPrefs ? t('cuenta.guardando') : t('cuenta.guardarDieta')}
           </button>
           {prefsOk && <p className="vacio-texto" role="status">{prefsOk}</p>}
         </form>
 
         {/* --- ACCESIBILIDAD --- */}
-        <h2 className="cuenta-sub">Mi accesibilidad</h2>
+        <h2 className="cuenta-sub">{t('cuenta.miAccesibilidad')}</h2>
         <form onSubmit={guardarAcc} className="prefs-form">
-          <p className="vacio-texto">Solo verás locales con accesibilidad verificada.</p>
+          <p className="vacio-texto">{t('cuenta.soloAccesibilidad')}</p>
           <label className="campo-check" htmlFor="acc-silla">
             <input id="acc-silla" type="checkbox" checked={Boolean(borradorAcc.sillaRuedas)} onChange={() => toggleAcc('sillaRuedas')} />
-            Silla de ruedas (acceso sin escalones)
+            {t('cuenta.sillaRuedas')}
           </label>
           <label className="campo-check" htmlFor="acc-tea">
             <input id="acc-tea" type="checkbox" checked={Boolean(borradorAcc.tea)} onChange={() => toggleAcc('tea')} />
-            Espectro autista (entornos tranquilos)
+            {t('cuenta.espectroAutista')}
           </label>
           <button type="submit" className="btn-secundario btn-peq" disabled={guardandoAcc}>
-            {guardandoAcc ? 'Guardando…' : 'Guardar accesibilidad'}
+            {guardandoAcc ? t('cuenta.guardando') : t('cuenta.guardarAccesibilidad')}
           </button>
           {accOk && <p className="vacio-texto" role="status">{accOk}</p>}
         </form>
 
+        {/* --- IDIOMA --- */}
+        <h2 className="cuenta-sub">{t('cuenta.idioma')}</h2>
+        <div className="lang-selector">
+          {Object.entries(available).map(([code, label]) => (
+            <button
+              key={code}
+              type="button"
+              className={`lang-option${lang === code ? ' lang-activo' : ''}`}
+              onClick={() => setLang(code)}
+              aria-pressed={lang === code}
+              title={label}
+            >
+              {code.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
         {/* --- Verificación de email --- */}
-        <h2 className="cuenta-sub">Verificación de correo</h2>
+        <h2 className="cuenta-sub">{t('cuenta.verificacionCorreo')}</h2>
         <div className="prefs-form">
           {usuario.emailVerified ? (
             <div style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
-              <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ Tu correo está verificado.</p>
+              <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ {t('cuenta.correoVerificado')}</p>
             </div>
           ) : (
             <>
-              <p className="vacio-texto">Tu correo aún no está verificado. Verifícalo para que tu cuenta esté completamente activa.</p>
+              <p className="vacio-texto">{t('cuenta.correoNoVerificado')}</p>
               {verError && <p className="reserva-error" role="alert">{verError}</p>}
               {verOk && <p className="vacio-texto" role="status" style={{ color: 'var(--verde)' }}>{verOk}</p>}
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button type="button" className="btn-secundario btn-peq" onClick={enviarVerificacion} disabled={verificando}>
-                  {verificando ? 'Enviando…' : 'Enviar correo de verificación'}
+                  {verificando ? t('cuenta.enviando') : t('cuenta.enviarVerificacion')}
                 </button>
                 <button type="button" className="btn-texto" onClick={recargarVerificacion}>
-                  Ya verifiqué → comprobar
+                  {t('cuenta.yaVerifique')}
                 </button>
               </div>
             </>
@@ -207,9 +280,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </div>
 
         {/* --- COOKIES --- */}
-        <h2 className="cuenta-sub">Preferencias de cookies</h2>
+        <h2 className="cuenta-sub">{t('cuenta.preferenciasCookies')}</h2>
         <div className="prefs-form">
-          <p className="vacio-texto">Controla qué tipos de cookies aceptas. Se guardan en tu perfil y se aplican en todas tus sesiones.</p>
+          <p className="vacio-texto">{t('cuenta.cookiesDescripcion')}</p>
           {COOKIE_CATEGORIAS.filter((c) => !c.requerida).map((cat) => (
             <div key={cat.key} className="cookie-item">
               <label className="campo-check" htmlFor={`cookie-${cat.key}`}>
@@ -219,22 +292,27 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
                   checked={Boolean(cookiesPrefs[cat.key])}
                   onChange={() => setCookiesPrefs((p) => ({ ...p, [cat.key]: !p[cat.key] }))}
                 />
-                {cat.label}
+                {t(`cookie.${cat.key}`)}
               </label>
-              <span className="cookie-desc">{cat.desc}</span>
+              <span className="cookie-desc">{t(`cookie.${cat.key}Desc`)}</span>
             </div>
           ))}
           <button type="button" className="btn-secundario btn-peq" onClick={guardarCookiesCuenta}>
-            Guardar cookies
+            {t('cuenta.guardarCookies')}
           </button>
           {cookiesOk && <p className="vacio-texto" role="status">{cookiesOk}</p>}
         </div>
 
         {/* --- NEGOCIO --- */}
-        {perfil?.tipo === 'empresa' && (
+        {(perfil?.tipo === 'empresa' || esAdmin) && (
           <>
-            <h2 className="cuenta-sub">Mi negocio</h2>
-            <p><a href="#/negocio" className="btn-cta btn-peq">Añadir restaurante</a></p>
+            <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
+            {perfil?.tipo === 'empresa' && (
+              <p><a href="#/dashboard" className="btn-cta">{t('cuenta.anadirRestaurante')}</a></p>
+            )}
+            {esAdmin && (
+              <p><a href="#/admin" className="btn-cta">Panel de Administracion</a></p>
+            )}
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">
                 {misNegocios.map((n) => (
@@ -242,7 +320,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
                     <div>
                       <strong>{n.nombre}</strong>
                       <div className="registro-detalle">
-                        {n.ciudad} · {n.estado === 'aprobada' ? 'Publicado' : n.estado === 'rechazada' ? 'Rechazado' : 'En revisión'}
+                        {n.ciudad} · {n.estado === 'aprobada' ? t('cuenta.publicado') : n.estado === 'rechazada' ? t('cuenta.rechazado') : t('cuenta.enRevision')}
                       </div>
                     </div>
                   </li>
@@ -253,9 +331,9 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         )}
 
         {/* --- RESERVAS --- */}
-        <h2 className="cuenta-sub">Mis próximas reservas</h2>
-        {cargando && <p>Cargando…</p>}
-        {!cargando && proximas.length === 0 && <p className="vacio-texto">Sin próximas reservas.</p>}
+        <h2 className="cuenta-sub">{t('cuenta.proximasReservas')}</h2>
+        {cargando && <p>{t('otros.cargando')}</p>}
+        {!cargando && proximas.length === 0 && <p className="vacio-texto">{t('cuenta.sinReservas')}</p>}
         {!cargando && proximas.length > 0 && (
           <ul className="lista-registros">
             {proximas.map((r) => (
@@ -263,24 +341,24 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
                 <div>
                   <strong>{r.nombreRestaurante}</strong>
                   <div className="registro-detalle">
-                    {r.fecha} a las {r.hora} · {r.comensales} {Number(r.comensales) === 1 ? 'persona' : 'personas'} · <code>{r.codigo}</code>
+                    {r.fecha} · {r.hora} · {r.comensales} {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} · <code>{r.codigo}</code>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
         )}
-        <p><a href="#/reservas">Ver todas mis reservas</a></p>
+        <p><a href="#/reservas">{t('cuenta.verTodasReservas')}</a></p>
 
         {/* --- INCIDENCIAS --- */}
-        <h2 className="cuenta-sub">Mis incidencias</h2>
-        {!cargando && incidencias.length === 0 && <p className="vacio-texto">Sin incidencias.</p>}
+        <h2 className="cuenta-sub">{t('cuenta.misIncidencias')}</h2>
+        {!cargando && incidencias.length === 0 && <p className="vacio-texto">{t('cuenta.sinIncidencias')}</p>}
         {!cargando && incidencias.length > 0 && (
           <ul className="lista-registros">
             {incidencias.map((r) => (
               <li key={r.id} className="registro">
                 <div>
-                  <strong>{r.motivo}</strong> · {r.estado === 'resuelta' ? 'Resuelta' : 'Pendiente'}
+                  <strong>{r.motivo}</strong> · {r.estado === 'resuelta' ? t('cuenta.resuelta') : t('cuenta.pendiente')}
                   <div className="registro-detalle">{r.mensaje}</div>
                 </div>
               </li>
@@ -289,8 +367,8 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         )}
 
         {/* --- RESEÑAS --- */}
-        <h2 className="cuenta-sub">Mis reseñas</h2>
-        {!cargando && misResenas.length === 0 && <p className="vacio-texto">Aún no has publicado reseñas.</p>}
+        <h2 className="cuenta-sub">{t('cuenta.misResenas')}</h2>
+        {!cargando && misResenas.length === 0 && <p className="vacio-texto">{t('cuenta.sinResenas')}</p>}
         {!cargando && misResenas.length > 0 && (
           <ul className="lista-registros">
             {misResenas.map((r) => (

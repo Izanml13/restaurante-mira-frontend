@@ -1,6 +1,11 @@
 /** View pura: inicio de sesión + enlace a recuperación por email + Google Sign-In. */
 import { useState } from 'react';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
 
+const TRADS = { es, ca, en };
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function avisoResetDesdeHash() {
@@ -15,6 +20,7 @@ function avisoResetDesdeHash() {
 }
 
 export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
+  const t = useT(TRADS);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,8 +30,8 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
 
   async function manejarEnvio(e) {
     e.preventDefault();
-    if (!EMAIL_OK.test(email.trim())) return setError('Escribe un correo válido.');
-    if (password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
+    if (!EMAIL_OK.test(email.trim())) return setError(t('auth.correoInvalido'));
+    if (password.length < 6) return setError(t('auth.contrasenaCorta'));
     setError('');
     setEnviando(true);
     try {
@@ -59,16 +65,16 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
   return (
     <section className="auth-pagina" aria-labelledby="login-titulo">
       <form className="auth-tarjeta" onSubmit={manejarEnvio} noValidate>
-        <h1 id="login-titulo">Iniciar sesión</h1>
-        <p className="auth-sub">Entra para guardar tus sitios y opinar.</p>
+        <h1 id="login-titulo">{t('auth.iniciarSesion')}</h1>
+        <p className="auth-sub">{t('auth.entraParaGuardar')}</p>
         {avisoReset === 'ok' && (
           <p className="auth-sub" role="status" aria-live="polite" style={{ color: 'var(--verde)', fontWeight: 600 }}>
-            Contraseña cambiada. Inicia sesión con tu nueva clave.
+            {t('auth.contrasenaCambiada')}
           </p>
         )}
         {avisoReset === 'enviado' && (
           <p className="auth-sub" role="status" aria-live="polite" style={{ color: 'var(--verde)', fontWeight: 600 }}>
-            Si ese correo está registrado, recibirás un enlace. Revisa también spam.
+            {t('auth.revisaSpam')}
           </p>
         )}
         {error && (
@@ -77,7 +83,7 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
           </p>
         )}
         <div className="campo">
-          <label htmlFor="login-email">Correo</label>
+          <label htmlFor="login-email">{t('auth.correo')}</label>
           <input
             id="login-email"
             type="email"
@@ -87,7 +93,7 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
           />
         </div>
         <div className="campo">
-          <label htmlFor="login-pass">Contraseña</label>
+          <label htmlFor="login-pass">{t('auth.contrasena')}</label>
           <input
             id="login-pass"
             type="password"
@@ -97,7 +103,7 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
           />
         </div>
         <button type="submit" className="btn-cta btn-grande auth-boton" disabled={enviando}>
-          {enviando ? 'Entrando…' : 'Entrar'}
+          {enviando ? t('auth.entrando') : t('auth.entrar')}
         </button>
 
         <button
@@ -130,15 +136,15 @@ export default function Login({ onLogin, onLoginGoogle, yaTieneSesion }) {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
-          {cargandoGoogle ? 'Entrando con Google…' : 'Continuar con Google'}
+          {cargandoGoogle ? t('auth.googleEntrando') : t('auth.googleContinuar')}
         </button>
 
         <p className="auth-alt" style={{ margin: '0.6rem 0 0' }}>
-          <a href="#/recuperar">He olvidado mi contraseña</a>
+          <a href="#/recuperar">{t('auth.olvidasteContrasena')}</a>
         </p>
 
         <p className="auth-alt">
-          ¿No tienes cuenta? <a href="#/registro">Crea una gratis</a>
+          {t('auth.noTienesCuenta')} <a href="#/registro">{t('auth.creaUnaGratis')}</a>
         </p>
       </form>
     </section>

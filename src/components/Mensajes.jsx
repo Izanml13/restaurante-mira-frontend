@@ -1,8 +1,15 @@
 /** View pura: #/mensajes — buzón interno (avisos de reservas, etc.). */
 import { useEffect, useState } from 'react';
 import { listarMensajes, marcarLeido } from '../services/mensajesApi.js';
+import { useT } from '../i18n/index.jsx';
+import es from '../i18n/es.js';
+import ca from '../i18n/ca.js';
+import en from '../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 export default function Mensajes({ usuario, onLeidos }) {
+  const t = useT(TRADS);
   const [lista, setLista] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -44,16 +51,16 @@ export default function Mensajes({ usuario, onLeidos }) {
     <section className="auth-pagina pagina-ancha" aria-labelledby="mensajes-titulo">
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="mensajes-titulo">
-          Mensajes {noLeidos > 0 && <span className="badge-noleidos">{noLeidos} sin leer</span>}
+          {t('mensajes.titulo')} {noLeidos > 0 && <span className="badge-noleidos">{noLeidos} {t('mensajes.sinLeer')}</span>}
         </h1>
-        {cargando && <p>Cargando…</p>}
+        {cargando && <p>{t('mensajes.cargando')}</p>}
         {error && (
           <p className="auth-error" role="alert">
             {error}
           </p>
         )}
         {!cargando && !error && lista.length === 0 && (
-          <p className="vacio-texto">Sin mensajes. Cuando tengas una reserva próxima, TEAM MIRA te avisará aquí.</p>
+          <p className="vacio-texto">{t('mensajes.vacio')}</p>
         )}
         <ul className="lista-registros">
           {lista.map((m) => {
@@ -83,13 +90,13 @@ export default function Mensajes({ usuario, onLeidos }) {
                     <p className="mensaje-cuerpo" style={{ whiteSpace: 'pre-line' }}>{m.cuerpo}</p>
                     {(m.parkingLink || m.parkingNombre) && (
                       <p className="mensaje-parking" style={{ fontSize: '0.88rem' }}>
-                        🅿️ Parking: {m.parkingNombre || 'recomendado'}
+                        🅿️ {t('mensajes.parking')}: {m.parkingNombre || t('mensajes.recomendado')}
                         {m.parkingDistanciaM != null
-                          ? ` a ${m.parkingDistanciaM < 1000 ? `${m.parkingDistanciaM} m` : `${(m.parkingDistanciaM / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 })} km`}`
+                          ? ` a ${m.parkingDistanciaM < 1000 ? `${m.parkingDistanciaM} m` : `${(m.parkingDistanciaM / 1000).toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 })} km`}`
                           : ''}{' '}
                         {m.parkingLink && (
                           <a href={m.parkingLink} target="_blank" rel="noreferrer">
-                            Cómo llegar al parking
+                            {t('mensajes.comoLlegarParking')}
                           </a>
                         )}
                       </p>
