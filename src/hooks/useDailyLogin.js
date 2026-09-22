@@ -1,4 +1,3 @@
-import { create } from 'zustand';
 import { pointsApi } from '../services/api';
 
 const useDailyLogin = () => {
@@ -16,7 +15,18 @@ const useDailyLogin = () => {
       throw err;
     }
   };
-  return { claim };
+
+  const claimWheel = async () => {
+    try {
+      const result = await pointsApi.claimWheelReward();
+      return result;
+    } catch (err) {
+      console.error('Wheel claim failed:', err);
+      throw err;
+    }
+  };
+
+  return { claim, claimWheel };
 };
 
 export default useDailyLogin;

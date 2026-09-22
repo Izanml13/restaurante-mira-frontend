@@ -632,7 +632,8 @@ export default {
       "promo_click": "Clicked promoted restaurant",
       "invitacion": "Invitation accepted",
       "canje_descuento": "Points redeemed",
-      "ajuste_admin": "Admin adjustment"
+      "ajuste_admin": "Admin adjustment",
+      "ruleta_dia7": "Day 7 wheel"
     },
     "inviteEmailPlaceholder": "Friend's email",
     "inviteSending": "Sending...",
@@ -652,5 +653,30 @@ export default {
     "promoViews": "Promo views",
     "promoClicks": "Promo clicks",
     "redeems": "Redemptions"
+  },
+  "streak": {
+    "club": "MIRA Club",
+    "dailyReward": "Daily Reward",
+    "dayCompleted": "DAY {{n}} COMPLETED",
+    "streakTitle": "You're on a {{n}}-Day Streak!",
+    "streakSubtitle": "Log in daily to unlock more MIRA Points and get discounts on your next dinner.",
+    "foodiePath": "Foodie Path",
+    "week": "Week 1",
+    "wheelPrize": "Wheel: up to 100 MIRA pts!",
+    "yourBalance": "Your MIRA Points balance",
+    "accumulated": "accumulated",
+    "claim": "CLAIM +{{n}} MIRA!",
+    "spinWheel": "SPIN THE WHEEL!",
+    "rewardObtained": "REWARD OBTAINED!",
+    "streakProtector": "Streak protector active: if you forget to log in tomorrow, your streak won't be lost.",
+    "toastClaimed": "+{{n}} MIRA Points credited",
+    "toastNext": "Come back tomorrow to continue your streak!",
+    "wheelTitle": "You completed the 7-day streak!",
+    "wheelSubtitle": "Spin the wheel to win between 20 and 100 MIRA Points",
+    "wheelSpinning": "Spinning...",
+    "wheelSpinBtn": "🎡 SPIN THE WHEEL!",
+    "wheelCongrats": "Congratulations!",
+    "wheelAdded": "Added to your balance",
+    "milestone7": "x7 Chest"
   }
 }

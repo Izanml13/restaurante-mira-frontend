@@ -8,6 +8,7 @@ import { useRestaurantController } from './controllers/useRestaurantController.j
 import { useAuth } from './controllers/useAuth.js';
 import { useI18n, useT } from './i18n/index.jsx';
 import { PRECIOS, DISTANCIAS, ORDENES } from './models/restaurantModel.js';
+import usePointsStore from './stores/usePointsStore.js';
 import es from './i18n/es.js';
 import ca from './i18n/ca.js';
 import en from './i18n/en.js';
@@ -36,6 +37,8 @@ import CookieBanner from './components/CookieBanner.jsx';
 import Footer from './components/Footer.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import FloatingReservation from './components/FloatingReservation.jsx';
+import DailyStreakPopup from './components/DailyStreakPopup.jsx';
+import WheelModal from './components/WheelModal.jsx';
 import PuntosDashboard from './pages/PuntosDashboard.jsx';
 import HistorialPuntos from './pages/HistorialPuntos.jsx';
 import Invitar from './pages/Invitar.jsx';
@@ -43,6 +46,7 @@ import TicketPage from './pages/TicketPage.jsx';
 import Dashboard from './components/dashboard/Dashboard.jsx';
 import { enviarContacto } from './services/contactoApi.js';
 import { proponerNegocio } from './services/negocioApi.js';
+import useDailyLogin from './hooks/useDailyLogin.js';
 import './App.css';
 import { I18nProvider } from './i18n/index.jsx';
 
@@ -112,11 +116,21 @@ function AppContent({ auth, tema, setTema }) {
   const t = useT(TRADS);
   const { lang, setLang } = useI18n();
   const { usuario, crearCuenta, iniciarSesion, iniciarSesionGoogle, cerrarSesion, esAdmin, perfil, recargarPerfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, favoritos, toggleFavorito, noLeidos, recargarMensajes, enviarVerificacion, enviarVerificacionEmail, recargarEmailVerified, guardarLang } = auth;
+  const syncBalance = usePointsStore((s) => s.fetchBalance);
 
   const [puntosSaldo, setPuntosSaldo] = useState(0);
   const [inviteCodigo, setInviteCodigo] = useState(() => {
     try { return new URLSearchParams(window.location.hash.split('?')[1]).get('invite') || null; } catch { return null; }
   });
+
+  // ── Streak popup state ──
+  const [showStreakPopup, setShowStreakPopup] = useState(false);
+  const [streakData, setStreakData] = useState(null);
+  const [showWheel, setShowWheel] = useState(false);
+  const { claim: claimDaily, claimWheel } = useDailyLogin();
+  const claimedTodayKey = `dailyLogin_shown_${new Date().toISOString().split('T')[0]}`;
+  const newUserKey = `streak_newuser_shown_${usuario?.uid}`;
+
 
   useEffect(() => {
     if (perfil?.lang && perfil.lang !== lang) {
@@ -127,9 +141,93 @@ function AppContent({ auth, tema, setTema }) {
   useEffect(() => {
     if (!usuario) return;
     import('./services/api.js').then(({ pointsApi }) => {
-      pointsApi.getBalance().then((d) => setPuntosSaldo(d.saldoActual || 0)).catch(() => {});
+      Promise.all([
+        pointsApi.getBalance(),
+        pointsApi.isNewUser(),
+      ]).then(([d, isNew]) => {
+        setPuntosSaldo(d.saldoActual || 0);
+        if (isNew && !sessionStorage.getItem(newUserKey)) {
+          openStreakPopup({
+            racha: { dias: 0 },
+            puntos: 0,
+            yaReclamado: false,
+            nuevoSaldo: d.saldoActual,
+          });
+          sessionStorage.setItem(newUserKey, 'true');
+        }
+      }).catch(() => {});
     });
   }, [usuario]);
+
+  async function fetchStreakData() {
+    if (!usuario) return { racha: { dias: 0 }, puntos: 0, yaReclamado: true };
+    try {
+      const { pointsApi } = await import('./services/api.js');
+      const bal = await pointsApi.getBalance();
+      return {
+        racha: bal.rachaLogin || { dias: 0 },
+        puntos: 0,
+        yaReclamado: bal.rachaLogin?.yaReclamado ?? false,
+        nuevoSaldo: bal.saldoActual,
+      };
+    } catch {
+      return { racha: { dias: 0 }, puntos: 0, yaReclamado: true };
+    }
+  }
+
+  function openStreakPopup(data) {
+    setStreakData(data);
+    setShowStreakPopup(true);
+  }
+
+  async function handleClaimDaily() {
+    console.log('[App] handleClaimDaily called');
+    const result = await claimDaily();
+    console.log('[App] claimDaily result:', result);
+    if (result && result.nuevoSaldo) setPuntosSaldo(result.nuevoSaldo);
+    if (result && result.racha) {
+      setStreakData((prev) => ({
+        ...prev,
+        racha: result.racha,
+        yaReclamado: true,
+        puntos: result.puntos,
+      }));
+    }
+    syncBalance().catch(() => {});
+    return result;
+  }
+
+  function handleOpenWheel() {
+    setShowStreakPopup(false);
+    setShowWheel(true);
+  }
+
+  async function handleWheelSpin() {
+    const result = await claimWheel();
+    return result;
+  }
+
+  function handleCloseWheel(finalResult) {
+    setShowWheel(false);
+    sessionStorage.setItem(claimedTodayKey, 'true');
+    if (finalResult && finalResult.nuevoSaldo) {
+      setPuntosSaldo(finalResult.nuevoSaldo);
+    }
+    syncBalance().catch(() => {});
+    import('./services/api.js').then(({ pointsApi }) => {
+      pointsApi.getBalance().then((d) => setPuntosSaldo(d.saldoActual || 0)).catch(() => {});
+    });
+  }
+
+  function handleCloseStreakPopup() {
+    setShowStreakPopup(false);
+    sessionStorage.setItem(claimedTodayKey, 'true');
+    syncBalance().catch(() => {});
+    import('./services/api.js').then(({ pointsApi }) => {
+      pointsApi.getBalance().then((d) => setPuntosSaldo(d.saldoActual || 0)).catch(() => {});
+    });
+  }
+
 
   const {
     filtros,
@@ -223,7 +321,7 @@ function AppContent({ auth, tema, setTema }) {
       <a className="skip-link" href="#buscar">
         Saltar al buscador
       </a>
-      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} puntosSaldo={puntosSaldo} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} />
+      <Header usuario={usuario} esAdmin={esAdmin} perfil={perfil} numFavoritos={favoritos.length} noLeidos={noLeidos} puntosSaldo={puntosSaldo} tema={tema} onCambiarTema={() => setTema((t) => (t === 'oscuro' ? 'claro' : 'oscuro'))} onSalir={salir} onStreakClick={openStreakPopup} fetchStreakData={fetchStreakData} />
       <main>
         {usuario && !usuario.emailVerified && ruta !== 'login' && ruta !== 'registro' && ruta !== 'recuperar' && ruta !== 'restablecer' && (
           <div className="aviso-email" role="alert" style={{ background: 'var(--naranja)', color: '#fff', padding: '0.7rem 1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
@@ -256,7 +354,7 @@ function AppContent({ auth, tema, setTema }) {
         )}
         {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
         {ruta === 'privacidad' && <Privacidad />}
-        {ruta === 'puntos' && <PuntosDashboard />}
+        {ruta === 'puntos' && <PuntosDashboard fetchStreakData={fetchStreakData} onOpenStreak={openStreakPopup} usuario={usuario} />}
         {ruta === 'historialPuntos' && <HistorialPuntos />}
         {ruta === 'invitar' && <Invitar />}
         {ruta === 'ticket' && <TicketPage />}
@@ -335,7 +433,7 @@ function AppContent({ auth, tema, setTema }) {
       <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
-      <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} puntosSaldo={puntosSaldo} esAdmin={esAdmin} perfil={perfil} />
+      <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} puntosSaldo={puntosSaldo} esAdmin={esAdmin} perfil={perfil} usuario={usuario} onStreakClick={openStreakPopup} fetchStreakData={fetchStreakData} />
       <FloatingReservation
         visible={sheetVisible}
         restaurant={sheetRestaurante}
@@ -343,6 +441,22 @@ function AppContent({ auth, tema, setTema }) {
         onConfirm={handleFloatingConfirm}
         onClose={closeFloatingSheet}
       />
+      {showStreakPopup && streakData && (
+        <DailyStreakPopup
+          racha={streakData.racha}
+          saldo={puntosSaldo}
+          yaReclamado={streakData.yaReclamado}
+          onClaim={handleClaimDaily}
+          onWheel={handleOpenWheel}
+          onClose={handleCloseStreakPopup}
+        />
+      )}
+      {showWheel && (
+        <WheelModal
+          onSpin={handleWheelSpin}
+          onClose={handleCloseWheel}
+        />
+      )}
     </>
   );
 }

@@ -10,11 +10,12 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, puntosSaldo, tema, onCambiarTema, onSalir }) {
+export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, puntosSaldo, tema, onCambiarTema, onSalir, onStreakClick, fetchStreakData }) {
   const t = useT(TRADS);
   const { lang, cycleLang, available } = useI18n();
   const [abierto, setAbierto] = useState(false);
   const [oculto, setOculto] = useState(false);
+  const [loadingStreak, setLoadingStreak] = useState(false);
 
   useEffect(() => {
     if (!abierto) return undefined;
@@ -44,6 +45,19 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
 
   function cerrar() {
     setAbierto(false);
+  }
+
+  async function handleStreakTap() {
+    if (loadingStreak || !usuario) return;
+    setLoadingStreak(true);
+    try {
+      const data = await fetchStreakData?.();
+      onStreakClick?.(data || { racha: { dias: 0 }, puntos: 0, yaReclamado: true });
+    } catch {
+      onStreakClick?.({ racha: { dias: 0 }, puntos: 0, yaReclamado: true });
+    } finally {
+      setLoadingStreak(false);
+    }
   }
 
   function conmutarMensajes(e) {
@@ -101,11 +115,18 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
           {usuario ? (
             <>
               <a href="#/puntos" className="header-points-pill" title={t('points.title')}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" /><path d="M12 6v12M6 12h12" />
-                </svg>
+                <img src="/moneda-mira.png" alt="" className="header-points-pill-coin" />
                 {puntosSaldo || 0}
               </a>
+              <button
+                type="button"
+                className={`header-streak-btn${loadingStreak ? ' header-streak-btn--loading' : ''}`}
+                onClick={handleStreakTap}
+                aria-label="Abrir racha diaria"
+                title="Racha diaria"
+              >
+                <img src="/racha-fuego.png" alt="" className="header-streak-btn-img" />
+              </button>
               <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`${t('nav.favoritos')} (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>

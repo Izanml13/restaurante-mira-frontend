@@ -632,7 +632,8 @@ export default {
       "promo_click": "Click restaurant promocionat",
       "invitacion": "Invitació acceptada",
       "canje_descuento": "Bescanvi de punts",
-      "ajuste_admin": "Ajust admin"
+      "ajuste_admin": "Ajust admin",
+      "ruleta_dia7": "Ruleta dia 7"
     },
     "inviteEmailPlaceholder": "Email de l'amic",
     "inviteSending": "Enviant...",
@@ -652,5 +653,30 @@ export default {
     "promoViews": "Vistes promo",
     "promoClicks": "Clicks promo",
     "redeems": "Bescanvis"
+  },
+  "streak": {
+    "club": "MIRA Club",
+    "dailyReward": "Recompensa Diària",
+    "dayCompleted": "DIA {{n}} COMPLETAT",
+    "streakTitle": "Portes {{n}} Dies de Ratxa!",
+    "streakSubtitle": "Entra cada dia per desbloquejar més MIRA Points i aconseguir descomptes al teu proper sopar.",
+    "foodiePath": "Camí del Foodie",
+    "week": "Setmana 1",
+    "wheelPrize": "Ruleta: fins a 100 MIRA pts!",
+    "yourBalance": "El teu saldo de MIRA Points",
+    "accumulated": "acumulats",
+    "claim": "¡RECLAMAR +{{n}} MIRA!",
+    "spinWheel": "¡GIRAR RULETA!",
+    "rewardObtained": "¡RECOMPENSA OBTINGUDA!",
+    "streakProtector": "Protector de ratxa actiu: si oblides entrar demà, la teva ratxa no es perdrà.",
+    "toastClaimed": "+{{n}} MIRA Points acreditats",
+    "toastNext": "Torna demà per continuar la teva ratxa!",
+    "wheelTitle": "Has completat la ratxa de 7 dies!",
+    "wheelSubtitle": "Gira la ruleta per guanyar entre 20 i 100 MIRA Points",
+    "wheelSpinning": "Girant...",
+    "wheelSpinBtn": "🎡 ¡GIRAR RULETA!",
+    "wheelCongrats": "Enhorabona!",
+    "wheelAdded": "S'han afegit al teu saldo",
+    "milestone7": "x7 Cofre"
   }
 }

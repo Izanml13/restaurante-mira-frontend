@@ -25,13 +25,13 @@ const TIPO_COLORS = {
   ajuste_admin: '#616161',
 };
 
-export default function LedgerTable({ limit = 10, showFilters = false }) {
+export default function LedgerTable({ limit = 10, showFilters = false, usuario }) {
   const { ledger, fetchLedger, ledgerLoading } = usePointsStore();
   const [filtro, setFiltro] = useState('');
 
   useEffect(() => {
-    fetchLedger({ tipo: filtro || undefined, limit });
-  }, [filtro, limit]);
+    if (usuario === undefined || usuario) fetchLedger({ tipo: filtro || undefined, limit });
+  }, [usuario, filtro, limit]);
 
   if (ledgerLoading) {
     return <div className="ledger-loading">Cargando historial...</div>;

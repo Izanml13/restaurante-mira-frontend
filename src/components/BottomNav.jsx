@@ -1,6 +1,8 @@
 /**
  * Bottom navigation bar for mobile — glassmorphic dock style.
+ * Includes a small streak fire icon that opens the daily login popup.
  */
+import { useState } from 'react';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -8,8 +10,22 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function BottomNav({ ruta, numFavoritos, numReservas, puntosSaldo, esAdmin, perfil }) {
+export default function BottomNav({ ruta, numFavoritos, numReservas, puntosSaldo, esAdmin, perfil, usuario, onStreakClick, fetchStreakData }) {
   const t = useT(TRADS);
+  const [loadingStreak, setLoadingStreak] = useState(false);
+
+  async function handleStreakTap() {
+    if (loadingStreak || !usuario) return;
+    setLoadingStreak(true);
+    try {
+      const data = await fetchStreakData?.();
+      onStreakClick?.(data || { racha: { dias: 0 }, puntos: 0, yaReclamado: true });
+    } catch {
+      onStreakClick?.({ racha: { dias: 0 }, puntos: 0, yaReclamado: true });
+    } finally {
+      setLoadingStreak(false);
+    }
+  }
 
   const tabs = [
     { id: 'home', label: t('bottomNav.explorar'), href: '#/', icon: (
@@ -18,9 +34,7 @@ export default function BottomNav({ ruta, numFavoritos, numReservas, puntosSaldo
       </svg>
     )},
     { id: 'puntos', label: t('bottomNav.puntos') || 'Puntos', href: '#/puntos', badge: puntosSaldo > 0 ? puntosSaldo : null, icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" /><path d="M12 6v12M6 12h12" />
-      </svg>
+      <img src="/moneda-mira.png" alt="" className="bottom-nav-coin" />
     )},
     { id: 'reservas', label: t('bottomNav.reservas'), href: '#/reservas', badge: numReservas, icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -64,6 +78,16 @@ export default function BottomNav({ ruta, numFavoritos, numReservas, puntosSaldo
             {tab.badge > 0 && <span className="badge" aria-label={`${tab.badge}`}>{tab.badge}</span>}
           </a>
         ))}
+        {usuario && (
+          <button
+            className={`bottom-nav-streak${loadingStreak ? ' bottom-nav-streak--loading' : ''}`}
+            onClick={handleStreakTap}
+            aria-label="Abrir racha diaria"
+            type="button"
+          >
+            <img src="/racha-fuego.png" alt="" className="bottom-nav-streak-img" />
+          </button>
+        )}
       </div>
     </nav>
   );

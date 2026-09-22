@@ -632,7 +632,8 @@ export default {
       "promo_click": "Click restaurante promocionado",
       "invitacion": "Invitación aceptada",
       "canje_descuento": "Canje de puntos",
-      "ajuste_admin": "Ajuste admin"
+      "ajuste_admin": "Ajuste admin",
+      "ruleta_dia7": "Ruleta día 7"
     },
     "inviteEmailPlaceholder": "Email del amigo",
     "inviteSending": "Enviando...",
@@ -652,6 +653,31 @@ export default {
     "promoViews": "Vistas promo",
     "promoClicks": "Clicks promo",
     "redeems": "Canjes"
+  },
+  "streak": {
+    "club": "MIRA Club",
+    "dailyReward": "Recompensa Diaria",
+    "dayCompleted": "DÍA {{n}} COMPLETADO",
+    "streakTitle": "¡Llevas {{n}} Días de Racha!",
+    "streakSubtitle": "Entra a diario para desbloquear más MIRA Points y conseguir descuentos en tu próxima cena.",
+    "foodiePath": "Camino del Foodie",
+    "week": "Semana 1",
+    "wheelPrize": "Ruleta: ¡hasta 100 MIRA pts!",
+    "yourBalance": "Tu saldo de MIRA Points",
+    "accumulated": "acumulados",
+    "claim": "¡RECLAMAR +{{n}} MIRA!",
+    "spinWheel": "¡GIRAR RULETA!",
+    "rewardObtained": "¡RECOMPENSA OBTENIDA!",
+    "streakProtector": "Protector de racha activo: si olvidas entrar mañana, tu racha no se pierde.",
+    "toastClaimed": "+{{n}} MIRA Points acreditados",
+    "toastNext": "¡Vuelve mañana para continuar tu racha!",
+    "wheelTitle": "¡Completaste la racha de 7 días!",
+    "wheelSubtitle": "Gira la ruleta para ganar entre 20 y 100 MIRA Points",
+    "wheelSpinning": "Girando...",
+    "wheelSpinBtn": "🎡 ¡GIRAR RULETA!",
+    "wheelCongrats": "¡Felicidades!",
+    "wheelAdded": "Se han añadido a tu saldo",
+    "milestone7": "x7 Cofre"
   },
   "dashboard": {
     "panelAdmin": "Panel de Administración",

@@ -24,10 +24,10 @@ async function requireUser() {
 function calcRachaLogin(data) {
   const hoy = new Date().toISOString().split('T')[0];
   const ultimo = data.ultimoLoginDate || null;
-  if (ultimo === hoy) return { dias: data.rachaLoginDias || 0, ultimoLogin: ultimo, graceUsados: data.graceUsados || 0, yaReclamado: true };
+  if (ultimo === hoy) return { dias: Math.min(data.rachaLoginDias || 0, 7), ultimoLogin: ultimo, graceUsados: data.graceUsados || 0, yaReclamado: true };
   const anterior = new Date(ultimo || hoy);
   const diff = Math.floor((new Date(hoy) - anterior) / 86400000);
-  let dias = data.rachaLoginDias || 0;
+  let dias = Math.min(data.rachaLoginDias || 0, 7);
   let grace = data.graceUsados || 0;
   if (diff === 1) {
     dias += 1;
@@ -37,20 +37,48 @@ function calcRachaLogin(data) {
     dias = diff > 2 ? 1 : (dias || 0) + 1;
     if (diff > 2) grace = 0;
   }
-  const pts = Math.min(5 + 3 * Math.max(0, dias - 1), 15);
-  return { dias, ultimoLogin: hoy, graceUsados: grace, puntos: pts, yaReclamado: false };
+  dias = Math.min(dias, 7);
+  const dia7Disponible = dias >= 7;
+  const pts = dia7Disponible ? 0 : Math.min(5 + 3 * Math.max(0, dias - 1), 15);
+  return { dias, ultimoLogin: hoy, graceUsados: grace, puntos: pts, yaReclamado: false, dia7Disponible };
+}
+
+const WHEEL_PRIZES = [
+  { puntos: 20, label: '20 MIRA', peso: 475 },
+  { puntos: 25, label: '25 MIRA', peso: 200 },
+  { puntos: 30, label: '30 MIRA', peso: 150 },
+  { puntos: 50, label: '50 MIRA', peso: 120 },
+  { puntos: 100, label: '100 MIRA', peso: 5 },
+];
+
+function spinWheel() {
+  const totalPeso = WHEEL_PRIZES.reduce((s, p) => s + p.peso, 0);
+  let rand = Math.random() * totalPeso;
+  for (const prize of WHEEL_PRIZES) {
+    rand -= prize.peso;
+    if (rand <= 0) return prize;
+  }
+  return WHEEL_PRIZES[0];
 }
 
 export const pointsApi = {
+  isNewUser: async () => {
+    const u = await requireUser();
+    const snap = await getDoc(doc(db, 'usuarios', u.uid));
+    const d = snap.data() || {};
+    return !d.ultimoLoginDate && (d.rachaLoginDias || 0) === 0;
+  },
+
   getBalance: async () => {
     const u = await requireUser();
     const snap = await getDoc(doc(db, 'usuarios', u.uid));
     const d = snap.data() || {};
+    const racha = calcRachaLogin(d);
     return {
       saldoActual: d.saldoPuntos || 0,
       totalAcumulado: d.totalAcumulado || 0,
       totalCanjeado: d.totalCanjeado || 0,
-      rachaLogin: { dias: d.rachaLoginDias || 0, ultimoLogin: d.ultimoLoginDate || null, graceUsados: d.graceUsados || 0 },
+      rachaLogin: { dias: racha.dias, ultimoLogin: racha.ultimoLogin, graceUsados: racha.graceUsados, yaReclamado: racha.yaReclamado },
       rachaReservas: { semanasConsecutivas: d.rachaReservasSemanas || 0, multiplicador: d.rachaReservasMultiplicador || 1 },
     };
   },
@@ -71,6 +99,14 @@ export const pointsApi = {
     const d = snap.data() || {};
     const racha = calcRachaLogin(d);
     if (racha.yaReclamado) return { yaReclamado: true, puntos: 0, racha };
+    if (racha.dia7Disponible) {
+      await updateDoc(ref, {
+        rachaLoginDias: racha.dias,
+        ultimoLoginDate: racha.ultimoLogin,
+        graceUsados: racha.graceUsados,
+      });
+      return { yaReclamado: false, puntos: 0, racha, dia7Disponible: true, nuevoSaldo: d.saldoPuntos || 0 };
+    }
     await updateDoc(ref, {
       saldoPuntos: increment(racha.puntos),
       totalAcumulado: increment(racha.puntos),
@@ -85,6 +121,29 @@ export const pointsApi = {
     });
     return { yaReclamado: false, puntos: racha.puntos, racha, nuevoSaldo: (d.saldoPuntos || 0) + racha.puntos };
   },
+
+  claimWheelReward: async () => {
+    const u = await requireUser();
+    const ref = doc(db, 'usuarios', u.uid);
+    const snap = await getDoc(ref);
+    const d = snap.data() || {};
+    const prize = spinWheel();
+    await updateDoc(ref, {
+      saldoPuntos: increment(prize.puntos),
+      totalAcumulado: increment(prize.puntos),
+      rachaLoginDias: 0,
+      ultimoLoginDate: new Date().toISOString().split('T')[0],
+      graceUsados: 0,
+    });
+    await addDoc(collection(db, 'puntos_movimientos'), {
+      uid: u.uid, tipo: 'ruleta_dia7', puntos: prize.puntos,
+      descripcion: `Ruleta día 7: ${prize.label}`,
+      createdAt: Timestamp.now(),
+    });
+    return { puntos: prize.puntos, label: prize.label, nuevoSaldo: (d.saldoPuntos || 0) + prize.puntos };
+  },
+
+  getWheelPrizes: () => WHEEL_PRIZES.map(p => ({ puntos: p.puntos, label: p.label })),
 
   redeem: async (puntos) => {
     const u = await requireUser();

@@ -38,7 +38,7 @@ const usePointsStore = create((set, get) => ({
       const result = await pointsApi.dailyLogin();
       if (!result.yaReclamado) {
         set((state) => ({
-          saldoActual: result.nuevoSaldo || state.saldoActual + result.puntos,
+          saldoActual: result.nuevoSaldo || state.saldoActual + (result.puntos || 0),
           rachaLogin: result.racha || state.rachaLogin,
         }));
       }

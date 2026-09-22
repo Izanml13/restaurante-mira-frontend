@@ -11,13 +11,13 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function PuntosDashboard() {
+export default function PuntosDashboard({ fetchStreakData, onOpenStreak, usuario }) {
   const t = useT(TRADS);
   const { saldoActual, rachaLogin, rachaReservas, fetchBalance } = usePointsStore();
 
   useEffect(() => {
-    fetchBalance();
-  }, []);
+    if (usuario) fetchBalance();
+  }, [usuario]);
 
   return (
     <div className="puntos-page">
@@ -29,8 +29,13 @@ export default function PuntosDashboard() {
       <div className="puntos-page__grid">
         <div className="puntos-page__main">
           <BalanceCard />
-          <StreakBadge rachaLogin={rachaLogin} rachaReservas={rachaReservas} />
-          <LedgerTable limit={5} />
+          <StreakBadge
+            rachaLogin={rachaLogin}
+            rachaReservas={rachaReservas}
+            onOpenStreak={onOpenStreak}
+            fetchStreakData={fetchStreakData}
+          />
+          <LedgerTable limit={5} usuario={usuario} />
         </div>
         <div className="puntos-page__sidebar">
           <InvitePanel />

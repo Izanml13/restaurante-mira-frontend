@@ -23,7 +23,7 @@ export default function BalanceCard() {
     <div className="balance-card">
       <div className="balance-card__header">
         <h3>Mis Puntos MIRA</h3>
-        <span className="balance-card__badge">∞</span>
+        <img src="/moneda-mira.png" alt="MIRA Points" className="balance-card__coin" />
       </div>
       <div className="balance-card__saldo">
         <span className="balance-card__amount">{saldoActual}</span>
