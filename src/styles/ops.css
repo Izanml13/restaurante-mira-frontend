@@ -126,7 +126,7 @@
 .ops-nav-label { padding: 14px 28px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--ops-on-variant); }
 .ops-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
 .ops-nav-item {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center;
   padding: 9px 14px; border-radius: 8px; border: none; background: none; cursor: pointer;
   font-family: inherit; font-size: 14px; font-weight: 600; color: var(--ops-on-variant);
   transition: background 0.15s, color 0.15s; width: 100%; text-align: left;
@@ -134,6 +134,10 @@
 }
 .ops-nav-item:hover { background: var(--ops-surface-low); color: var(--ops-on-surface); }
 .ops-nav-item.active { background: var(--ops-primary-container); color: #fff; box-shadow: 0 1px 3px rgba(14,107,71,0.25); }
+.ops-sidebar:hover .ops-nav-item,
+.ops-sidebar:focus-within .ops-nav-item,
+.ops-sidebar.pinned .ops-nav-item,
+.ops-sidebar.open .ops-nav-item { justify-content: flex-start; gap: 12px; }
 .ops-nav-item-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .ops-nav-item .material-symbols-outlined { flex-shrink: 0; }
 .ops-badge {
