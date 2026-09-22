@@ -12,16 +12,18 @@ export default function ReservationActions({ reserva, onStatusChange, t }) {
     setLoading(true);
     setError("");
     try {
+      const yaTieneTicket = Boolean(reserva.ticketId);
       if (action === "confirmar") {
         const total = Number(precio);
-        if (total > 0) {
+        // 1 ticket por reserva: si ya tiene, solo confirmar asistencia sin crear otro ticket
+        if (total > 0 && !yaTieneTicket) {
           await dashboardApi.subirTicket(reserva.id, { totalPagado: total, asistio: true, fileName: "" });
         } else {
-          await dashboardApi.confirmAttendance(reserva.id, { precioBase: 0 });
+          await dashboardApi.confirmAttendance(reserva.id, { precioBase: yaTieneTicket ? 0 : 0 });
         }
       } else if (action === "no_show") {
         const total = Number(precio);
-        if (total > 0) {
+        if (total > 0 && !yaTieneTicket) {
           await dashboardApi.subirTicket(reserva.id, { totalPagado: total, asistio: false, fileName: "" });
         } else {
           await dashboardApi.markNoShow(reserva.id);
@@ -41,6 +43,7 @@ export default function ReservationActions({ reserva, onStatusChange, t }) {
 
   const estado = String(reserva.estado||'').toLowerCase();
   const activa = ['pendiente','confirmada','activa','en_mesa','en mesa'].includes(estado);
+  const yaTieneTicket = Boolean(reserva.ticketId);
   const totalNum = Number(precio)||0;
   const comisionPreview = totalNum>0 ? Math.round(totalNum*0.08*100)/100 : 0;
   const netoPreview = totalNum>0 ? Math.round((totalNum-comisionPreview)*100)/100 : 0;
@@ -48,7 +51,7 @@ export default function ReservationActions({ reserva, onStatusChange, t }) {
   return (
     <div className="dash-reservation-actions" style={{display:'flex', flexDirection:'column', gap:'0.4rem', minWidth:'180px'}}>
       {error && <span style={{color:'#b44d3e', fontSize:'0.78rem', background:'#ffdad6', padding:'0.3rem 0.5rem', borderRadius:'0.4rem'}}>{error}</span>}
-      {activa && (
+      {activa && !yaTieneTicket && (
         <div style={{display:'flex', flexDirection:'column', gap:'0.25rem', background:'var(--op-surface-low, #f0f3ff)', padding:'0.5rem', borderRadius:'0.5rem'}}>
           <label style={{fontSize:'0.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.04em', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
             <span>{tt("dashboard.precioBase","Importe ticket")}</span>
@@ -64,6 +67,11 @@ export default function ReservationActions({ reserva, onStatusChange, t }) {
             </>
           )}
           {!showPrice && <span style={{fontSize:'0.62rem', color:'var(--op-on-variant, #3f4942)'}}>Se confirmará sin ticket (0€). Activa "Con ticket" para registrar importe.</span>}
+        </div>
+      )}
+      {activa && yaTieneTicket && (
+        <div style={{fontSize:'0.62rem', color:'var(--op-on-variant, #3f4942)', background:'var(--op-surface-low, #f0f3ff)', padding:'0.4rem 0.5rem', borderRadius:'0.5rem'}}>
+          Ticket ya registrado para esta reserva (máx. 1 por reserva).
         </div>
       )}
       <div style={{display:'flex', gap:'0.35rem', flexWrap:'wrap'}}>

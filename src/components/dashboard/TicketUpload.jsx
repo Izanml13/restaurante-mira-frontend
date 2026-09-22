@@ -17,6 +17,11 @@ export default function TicketUpload({ reserva, onUploaded, t }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    // 1 ticket por reserva (no importa comensales)
+    if (reserva.ticketId) {
+      setError("Esta reserva ya tiene un ticket registrado (máx. 1 por reserva)");
+      return;
+    }
     if (!precio || Number(precio) <= 0) {
       setError(tt("dashboard.precioRequerido", "Introduce un importe válido (>0)"));
       return;
@@ -38,10 +43,10 @@ export default function TicketUpload({ reserva, onUploaded, t }) {
     }
   }
 
-  if (success) {
+  if (success || reserva.ticketId) {
     return (
       <div style={{background:'#d1fae5', color:'#065f46', padding:'0.7rem', borderRadius:'0.5rem', fontWeight:700, textAlign:'center', fontSize:'0.82rem'}}>
-        {tt("dashboard.ticketSubido","Ticket registrado")} · {euro(neto)} neto · {euro(comision)} comisión 8%
+        {success ? `${tt("dashboard.ticketSubido","Ticket registrado")} · ${euro(neto)} neto · ${euro(comision)} comisión 8%` : 'Ticket ya registrado (máx. 1 por reserva)'}
       </div>
     );
   }

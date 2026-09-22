@@ -530,12 +530,18 @@ export const dashboardApi = {
   },
 
   // Nuevo: subir ticket con precio + comisión 8% + confirmación asistencia en una transacción
+  // REGLA: UN solo ticket por reserva (independiente del nº de comensales)
   subirTicket: async (reservaId, { totalPagado, asistio = true, fileName = "", tipoDocumento = "Ticket TPV" } = {}) => {
     const u = await requireUser();
     const reservaRef = doc(db, 'reservas', reservaId);
     const snap = await getDoc(reservaRef);
     if (!snap.exists()) throw new Error('Reserva no encontrada');
     const r = snap.data();
+    // 1 ticket por reserva: si ya tiene ticketId, bloquear
+    if (r.ticketId) throw new Error('Esta reserva ya tiene un ticket registrado (máx. 1 por reserva)');
+    // Doble comprobación por si ticketId no se llegó a escribir
+    const yaExiste = await getDocs(query(collection(db, 'tickets'), where('reservaId', '==', reservaId), limit(1)));
+    if (!yaExiste.empty) throw new Error('Esta reserva ya tiene un ticket registrado (máx. 1 por reserva)');
     const rid = String(r.restaurantId || r.restauranteId || "");
     if (!rid) throw new Error('Reserva sin restaurante vinculado');
     const total = Number(totalPagado);
@@ -567,6 +573,7 @@ export const dashboardApi = {
     const nuevoEstado = asistio ? 'completada' : 'no_show';
     batch.update(reservaRef, { estado: nuevoEstado, totalPagado: total, importeComision: comision, netoRestaurante: neto, ticketId: ticketRef.id, updatedAt: Timestamp.now(), asistio: Boolean(asistio) });
     // Finanzas acumuladas (no toca restaurants): se guarda en colección dedicada
+    // totalTickets +1 SIEMPRE = 1 por reserva, no por comensal
     const finanzasRef = doc(db, 'finanzas_restaurante', rid);
     const comensales = Number(r.comensales) || 0;
     batch.set(finanzasRef, {
