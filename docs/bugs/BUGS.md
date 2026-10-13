@@ -13,6 +13,6 @@ Reparto por zonas para no tocar los mismos archivos:
 | [BUG-003](BUG-003.md) | Scroll de la carta/card se propaga a la landing | buscador | claude | pendiente | |
 | [BUG-004](BUG-004.md) | Preferencias/cookies con esquinas cuadradas | cuenta | codex | en revisión | fix/codex-bugs |
 | [BUG-005](BUG-005.md) | Filtro del mapa: solo las 4 comarcas | mapa | claude | pendiente | |
-| [BUG-006](BUG-006.md) | «Mis reservas» debe abrirse siempre arriba | reservas | codex | pendiente | |
+| [BUG-006](BUG-006.md) | «Mis reservas» debe abrirse siempre arriba | reservas | codex | en revisión | fix/codex-bugs |
 | [BUG-007](BUG-007.md) | Diseño tipo agenda en «Agenda del día» | reservas | codex | pendiente | |
 | [BUG-008](BUG-008.md) | Resolver incidencia con popup de confirmación | admin | codex | pendiente | |
