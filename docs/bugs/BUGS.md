@@ -8,7 +8,7 @@ Reparto por zonas para no tocar los mismos archivos:
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-001](BUG-001.md) | Abrir restaurante al clicar la card | buscador | claude | pendiente | |
+| [BUG-001](BUG-001.md) | Abrir restaurante al clicar la card | buscador | claude | en revisión | fix/BUG-001-card-clicable |
 | [BUG-002](BUG-002.md) | Tras reservar, cerrar desplegable e ir a «Mis reservas» | reservas | claude | pendiente | |
 | [BUG-003](BUG-003.md) | Scroll de la carta/card se propaga a la landing | buscador | claude | pendiente | |
 | [BUG-004](BUG-004.md) | Preferencias/cookies con esquinas cuadradas | cuenta | codex | pendiente | |

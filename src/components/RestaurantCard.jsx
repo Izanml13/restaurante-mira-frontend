@@ -42,8 +42,14 @@ export default function RestaurantCard({ restaurant, filtros, esFavorito, onTogg
   const destacado = valoracion >= 4.7;
   const disp = disponibilidadTexto(restaurant, filtros, t);
 
+  // Clic en cualquier zona de la card abre el restaurante, salvo en controles propios (favorito, carta…).
+  const abrirDesdeCard = (e) => {
+    if (e.target.closest('button, a, input, select, textarea, label')) return;
+    onSelect(restaurant);
+  };
+
   return (
-    <article className="card">
+    <article className="card card-clicable" onClick={abrirDesdeCard}>
       <div className="card-media">
         <img
           className="card-foto"
