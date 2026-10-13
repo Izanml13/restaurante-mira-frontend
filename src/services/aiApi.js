@@ -13,7 +13,7 @@
  * antes de la red si no había sesión, y el agente debe funcionar sin login.
  */
 import { api } from './httpClient.js';
-import { construirBody, nuevaIdempotencyKey, TIMEOUT_MS } from './aiPayload.js';
+import { construirBody, nuevaIdempotencyKey, TIMEOUT_MS, idiomaWeb } from './aiPayload.js';
 
 const RUTA = '/v1/ai/agent';
 
@@ -72,7 +72,7 @@ function conTimeout(signal, ms) {
  *                                            mock sin tocar variables de entorno
  */
 export async function enviarTurno({ message, history, confirmId, idempotencyKey, signal, forzarMock } = {}) {
-  const body = construirBody({ message, history, confirmId });
+  const body = construirBody({ message, history, confirmId, lang: idiomaWeb() });
   const key = idempotencyKey || nuevaIdempotencyKey();
 
   if (forzarMock ?? USA_MOCK) {

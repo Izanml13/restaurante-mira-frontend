@@ -33,7 +33,7 @@ Orden recomendado: los bugs transversales (018 tema, 019 idioma) se hacen **al f
 | [BUG-014](BUG-014.md) | Revisión de seguridad del backend | backend | codex | pendiente | |
 | [BUG-015](BUG-015.md) | «Invitar amigos» no funciona | puntos | codex | pendiente | |
 | [BUG-016](BUG-016.md) | Logo MIRA del header no vuelve a la landing | header | claude | en revisión | fix/claude-tanda2 |
-| [BUG-017](BUG-017.md) | Chatbot MIRASI: idioma, autoscroll y nº de recomendaciones | mira | claude | pendiente | |
+| [BUG-017](BUG-017.md) | Chatbot MIRASI: idioma, autoscroll y nº de recomendaciones | mira | claude | en revisión | fix/claude-tanda2 (front + back) |
 | [BUG-018](BUG-018.md) | Bugs visuales en modo oscuro y claro | tema | codex | pendiente | |
 | [BUG-019](BUG-019.md) | Toda la interfaz en un solo idioma | i18n | claude | pendiente | |
 | [BUG-020](BUG-020.md) | Header: mostrar solo el nombre del usuario | header | claude | en revisión | fix/claude-tanda2 |

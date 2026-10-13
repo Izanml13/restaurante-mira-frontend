@@ -675,6 +675,7 @@ export default {
   },
   "mira": {
     "titulo": "MIRA",
+    "saludo": "Hola, sóc MIRA. Digues-me què vols: buscar un lloc, mirar una fitxa, reservar taula o consultar els teus punts.",
     "errorTitulo": "MIRA no s'ha pogut mostrar.",
     "errorSub": "La resta de la web continua funcionant.",
     "escribiendo": "MIRA està escrivint",

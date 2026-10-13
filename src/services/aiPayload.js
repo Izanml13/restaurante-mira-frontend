@@ -56,8 +56,23 @@ export function buildHistory(mensajes) {
     .slice(-MAX_HISTORIAL);
 }
 
-export function construirBody({ message, history, confirmId }) {
+const IDIOMAS = ['es', 'ca', 'en'];
+
+/** Idioma activo de la web (misma regla que i18n/detectarIdioma), para que MIRA responda en él. */
+export function idiomaWeb() {
+  try {
+    const guardado = localStorage.getItem('mira_lang');
+    if (IDIOMAS.includes(guardado)) return guardado;
+  } catch { /* sin storage */ }
+  const nav = String(globalThis.navigator?.language || '').toLowerCase();
+  if (nav.startsWith('ca')) return 'ca';
+  if (nav.startsWith('en')) return 'en';
+  return 'es';
+}
+
+export function construirBody({ message, history, confirmId, lang }) {
   const body = { message: String(message ?? '').trim().slice(0, MAX_MENSAJE) };
+  if (IDIOMAS.includes(lang)) body.lang = lang;
   const h = buildHistory(history);
   if (h.length) body.history = h;
   if (esUuid(confirmId)) body.confirmId = confirmId;

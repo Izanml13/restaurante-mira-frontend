@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   buildHistory,
   construirBody,
+  idiomaWeb,
   nuevaIdempotencyKey,
   esUuid,
   camposVisibles,
@@ -242,4 +243,21 @@ test('filtra actions sin tool', () => {
   const r = normalizarRespuesta({ actions: [{ result: { ok: true } }, null, { tool: 'getBalance', result: { ok: true, data: { saldoActual: 40 } } }] });
   assert.equal(r.actions.length, 1);
   assert.equal(r.actions[0].data.saldoActual, 40);
+});
+test('construirBody: envía lang solo si es un idioma de la web', () => {
+  assert.equal(construirBody({ message: 'hola', lang: 'ca' }).lang, 'ca');
+  assert.equal(construirBody({ message: 'hola', lang: 'fr' }).lang, undefined);
+  assert.equal(construirBody({ message: 'hola' }).lang, undefined);
+});
+
+test('idiomaWeb: usa el idioma guardado y si no, el del navegador', () => {
+  const ls = globalThis.localStorage;
+  try {
+    globalThis.localStorage = { getItem: () => 'en' };
+    assert.equal(idiomaWeb(), 'en');
+    globalThis.localStorage = { getItem: () => null };
+    assert.ok(['es', 'ca', 'en'].includes(idiomaWeb()));
+  } finally {
+    globalThis.localStorage = ls;
+  }
 });
