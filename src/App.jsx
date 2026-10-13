@@ -369,6 +369,12 @@ function AppContent({ auth, tema, setTema }) {
     return () => window.removeEventListener('hashchange', abrirEnlaceReserva);
   }, [obtenerRestaurante, abrirDetalle]);
 
+  function irAMisReservas() {
+    cerrarDetalle();
+    window.location.hash = '#/reservas';
+    window.scrollTo(0, 0);
+  }
+
   async function salir() {
     await cerrarSesion();
     window.location.hash = '#/';
@@ -554,7 +560,7 @@ function AppContent({ auth, tema, setTema }) {
       </main>
       <Footer />
       <CookieBanner usuario={usuario} />
-      {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} />}
+      {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
       {ruta !== 'admin' && (
         <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} puntosSaldo={puntosSaldo} esAdmin={esAdmin} perfil={perfil} usuario={usuario} onStreakClick={openStreakPopup} fetchStreakData={fetchStreakData} onAbrirMira={AI_HABILITADO ? abrirMira : undefined} miraActiva={miraAbierta} />

@@ -109,7 +109,7 @@ function colorAvatar(nombre = '') {
   return `hsl(${h} 38% 42%)`;
 }
 
-export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta }) {
+export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta, onReservado }) {
   const t = useT(TRADS);
   const locale = t('modelos.locale');
   const { descuentoPendiente, fetchBalance } = usePointsStore();
@@ -267,6 +267,8 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     try {
       const r = await crearReserva({ restaurante: restaurant, usuario, fecha: reserva.fecha, hora: reserva.hora, comensales: reserva.comensales, comentarios: reserva.comentarios });
       setConfirmacion(r);
+      // Deja ver la confirmación un momento y lleva a «Mis reservas» cerrando la ficha.
+      if (onReservado) { setTimeout(onReservado, 1500); return; }
       const d = await getDisponibilidad(restaurant, reserva.fecha, reserva.hora);
       setDisponibilidad(d);
     } catch (err) { setErrorReserva(err.message); }
@@ -566,7 +568,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 <div>
                   <strong>{t('detail.reservaConfirmada')}</strong>
                   <p>{t('detail.codigo')}: <code>{confirmacion.codigo}</code> — {confirmacion.fecha} · {confirmacion.hora} · {confirmacion.comensales} {t('modelos.personas')}</p>
-                  <a href="#/reservas">{t('detail.verMisReservas')} →</a>
+                  <a href="#/reservas" onClick={onReservado ? (e) => { e.preventDefault(); onReservado(); } : undefined}>{t('detail.verMisReservas')} →</a>
                 </div>
               </div>
             )}
