@@ -148,11 +148,12 @@
   list-style: none; margin: 0; padding: 0.5rem 0;
   min-height: 12rem;
   background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), var(--borde) calc(2rem - 1px), var(--borde) 2rem);
+  background-position: 0 0.75rem;
   position: relative;
 }
 .rsv-agenda::before { content: ''; position: absolute; top: 0; bottom: 0; left: 4.8rem; border-left: 1px solid var(--rsv-oro); opacity: 0.6; }
 .rsv-agenda li { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1rem; align-items: start; padding: 0.5rem 0.3rem; min-height: 4rem; animation: rsv-entra 360ms var(--rsv-ease) both; }
-.rsv-agenda-hora { font: 800 0.95rem/2rem ui-monospace, Menlo, monospace; color: var(--primary-container, #0e6b47); }
+.rsv-agenda-hora { font: 800 0.95rem/2rem ui-monospace, Menlo, monospace; color: var(--verde); }
 .rsv-agenda li > div { font-family: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', cursive; line-height: 2rem; overflow-wrap: anywhere; }
 .rsv-agenda strong { display: block; color: var(--rsv-tinta); font-size: 1.1rem; }
 .rsv-agenda span:not(.rsv-agenda-hora) { display: block; font-size: 0.9rem; color: var(--texto-sec); }
