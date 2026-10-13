@@ -168,13 +168,9 @@ function AppContent({ auth, tema, setTema }) {
     import('./services/api.js').then(({ pointsApi }) => {
       pointsApi.isNewUser().then((isNew) => {
         if (isNew && !sessionStorage.getItem(newUserKey)) {
-          openStreakPopup({
-            racha: { dias: 0 },
-            puntos: 0,
-            yaReclamado: false,
-            nuevoSaldo: usePointsStore.getState().saldoActual,
-          });
           sessionStorage.setItem(newUserKey, 'true');
+          // Estado real de la racha (antes se pintaba siempre «día 0 sin reclamar», aunque ya hubiera reclamado hoy).
+          fetchStreakData().then(openStreakPopup);
         }
       }).catch(() => {});
     });

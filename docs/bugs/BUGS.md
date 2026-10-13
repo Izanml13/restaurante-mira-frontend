@@ -29,7 +29,7 @@ Orden recomendado: los bugs transversales (018 tema, 019 idioma) se hacen **al f
 | [BUG-010](BUG-010.md) | Multiplicador: «x» minúscula y número centrado | cuenta | claude | en revisión | fix/claude-tanda2 |
 | [BUG-011](BUG-011.md) | Botón «Marcar todo como leído» en mensajería | mensajes | codex | pendiente | |
 | [BUG-012](BUG-012.md) | Botón de MIRA JAM más destacado | reservas | codex | pendiente | |
-| [BUG-013](BUG-013.md) | Bugs de la racha diaria | puntos | claude | pendiente | |
+| [BUG-013](BUG-013.md) | Bugs de la racha diaria | puntos | claude | en revisión | fix/claude-tanda2 (front + back) |
 | [BUG-014](BUG-014.md) | Revisión de seguridad del backend | backend | codex | pendiente | |
 | [BUG-015](BUG-015.md) | «Invitar amigos» no funciona | puntos | codex | pendiente | |
 | [BUG-016](BUG-016.md) | Logo MIRA del header no vuelve a la landing | header | claude | en revisión | fix/claude-tanda2 |
