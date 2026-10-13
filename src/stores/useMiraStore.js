@@ -31,6 +31,8 @@ const SALUDO = {
 };
 
 let contador = 0;
+/** Sube con cada «Nuevo chat»: un turno de una conversación anterior no escribe en la nueva. */
+let conversacion = 0;
 const nuevoId = () => `m-${Date.now().toString(36)}-${(contador += 1)}`;
 
 const esUsuario = (m) => m && m.role === 'user';
@@ -51,8 +53,11 @@ export const useMiraStore = create((set, get) => ({
   alternar: () => set((s) => ({ abierto: !s.abierto })),
 
   /** Nueva conversación: fuera error, confirmación pendiente y reintento. */
-  limpiar: () =>
-    set({ mensajes: [SALUDO], error: null, confirmPendiente: null, ultimoFallido: null, enviando: false }),
+  limpiar: () => {
+    conversacion += 1;
+    get().abortController?.abort();
+    set({ mensajes: [SALUDO], error: null, confirmPendiente: null, ultimoFallido: null, enviando: false, abortController: null });
+  },
 
   /** Botón "Parar": aborta la petición en vuelo sin pintar error. */
   parar: () => {
@@ -62,6 +67,7 @@ export const useMiraStore = create((set, get) => ({
 
   _turno: async (mio, texto, confirmId) => {
     const ctl = new AbortController();
+    const miConversacion = conversacion;
     set({ enviando: true, error: null, abortController: ctl });
 
     try {
@@ -73,6 +79,7 @@ export const useMiraStore = create((set, get) => ({
         signal: ctl.signal,
       });
       const r = normalizarRespuesta(crudo);
+      if (miConversacion !== conversacion) return null;
       set((s) => ({
         mensajes: [...s.mensajes, { id: nuevoId(), role: 'model', content: r.reply, acciones: r.actions }],
         confirmPendiente: r.needsConfirm,
@@ -87,6 +94,7 @@ export const useMiraStore = create((set, get) => ({
       return r;
     } catch (err) {
       const info = desdeError(err);
+      if (miConversacion !== conversacion) return null;
       if (!info.abortado) {
         // El backend incluye requestId en los 500 para poder correlacionar con
         // sus logs. Sin esto no hay forma de encontrarlo.
