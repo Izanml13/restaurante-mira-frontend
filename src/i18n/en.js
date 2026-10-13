@@ -587,6 +587,11 @@ export default {
     "iniciarSesion": "Sign in"
   },
   "admin": {
+    "propuestaResolucion": "Resolution proposal",
+    "solucion": "Solution",
+    "encargado": "Person in charge",
+    "cancelarResolucion": "Cancel",
+    "confirmarResolucion": "Confirm resolution",
     "titulo": "Administration",
     "incidenciasPendientes": "Pending issues",
     "sinAcceso": "No access: this area is for administrators only.",

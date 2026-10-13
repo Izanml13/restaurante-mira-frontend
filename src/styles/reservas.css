@@ -143,11 +143,20 @@
 
 .rsv-agenda-fecha { margin: 0.2rem 0 1rem; color: var(--texto-sec); text-transform: capitalize; }
 .rsv-agenda-vacia { margin: 0; padding: 1.2rem; border-radius: 14px; background: var(--fondo-suave); color: var(--texto-sec); text-align: center; }
-.rsv-agenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-.rsv-agenda li { display: grid; grid-template-columns: 64px 1fr; gap: 0.8rem; align-items: start; padding: 0.75rem 0.85rem; border-radius: 14px; background: var(--fondo-suave); animation: rsv-entra 360ms var(--rsv-ease) both; }
-.rsv-agenda-hora { font: 800 1.05rem ui-monospace, Menlo, monospace; color: var(--primary-container, #0e6b47); }
-.rsv-agenda strong { display: block; color: var(--rsv-tinta); }
-.rsv-agenda span:not(.rsv-agenda-hora) { display: block; font-size: 0.82rem; color: var(--texto-sec); }
+/* Hoja pautada: margen horario y apuntes sobre líneas, con colores del tema. */
+.rsv-agenda {
+  list-style: none; margin: 0; padding: 0.5rem 0;
+  min-height: 12rem;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), var(--borde) calc(2rem - 1px), var(--borde) 2rem);
+  background-position: 0 0.75rem;
+  position: relative;
+}
+.rsv-agenda::before { content: ''; position: absolute; top: 0; bottom: 0; left: 4.8rem; border-left: 1px solid var(--rsv-oro); opacity: 0.6; }
+.rsv-agenda li { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1rem; align-items: start; padding: 0.5rem 0.3rem; min-height: 4rem; animation: rsv-entra 360ms var(--rsv-ease) both; }
+.rsv-agenda-hora { font: 800 0.95rem/2rem ui-monospace, Menlo, monospace; color: var(--verde); }
+.rsv-agenda li > div { font-family: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', cursive; line-height: 2rem; overflow-wrap: anywhere; }
+.rsv-agenda strong { display: block; color: var(--rsv-tinta); font-size: 1.1rem; }
+.rsv-agenda span:not(.rsv-agenda-hora) { display: block; font-size: 0.9rem; color: var(--texto-sec); }
 
 /* ── Pestañas ── */
 .rsv-tabs { display: inline-flex; gap: 0.25rem; padding: 0.3rem; border-radius: 999px; background: var(--fondo-suave); margin-bottom: 1rem; max-width: 100%; overflow-x: auto; scrollbar-width: none; }

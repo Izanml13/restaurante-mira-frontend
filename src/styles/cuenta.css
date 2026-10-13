@@ -75,7 +75,7 @@
   align-items: center;
   background: var(--verde-suave);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radio);
+  border-radius: var(--radio-xl);
   padding: 1rem 1.1rem;
 }
 

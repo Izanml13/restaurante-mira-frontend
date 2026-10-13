@@ -5,7 +5,7 @@
  * - Calendario del mes con meteo + agenda del día seleccionado.
  * - Tickets por pestañas (próximas / pasadas / canceladas) con sello de estado.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { listarMisReservas, cancelarReserva } from '../services/reservaApi.js';
 import { fetchRestaurantePorId } from '../services/restaurantApi.js';
 import { esperaApi } from '../services/mejorasApi.js';
@@ -175,6 +175,11 @@ export default function Reservas({ usuario, esAdmin }) {
   const [diaSel, setDiaSel] = useState(hoyISO());
   const [meteo, setMeteo] = useState({}); // fechaISO -> pronóstico | null
   const [enEspera, setEnEspera] = useState([]);
+
+  // Reinicia tras montar la vista, cuando React ya ha actualizado el documento.
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
     if (!usuario?.uid) {
