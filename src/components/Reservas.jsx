@@ -266,6 +266,17 @@ export default function Reservas({ usuario, esAdmin }) {
     }
   }
 
+  // Solo se quita de la lista si el servidor lo confirma (antes se ocultaba aunque fallara).
+  async function handleSalirEspera(e) {
+    setError('');
+    try {
+      await esperaApi.salir(e.id);
+      setEnEspera((l) => l.filter((x) => x.id !== e.id));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   const hoy = hoyISO();
   const orden = (a, b) => `${a.fecha}${a.hora}`.localeCompare(`${b.fecha}${b.hora}`);
   const noCancelada = (r) => estadoDe(r) !== 'cancelada';
@@ -349,7 +360,7 @@ export default function Reservas({ usuario, esAdmin }) {
                     ) : (
                       <span className="rsv-espera-estado">Esperando</span>
                     )}
-                    <button type="button" className="tk-cancelar" onClick={async () => { await esperaApi.salir(e.id).catch(() => {}); setEnEspera((l) => l.filter((x) => x.id !== e.id)); }}>Quitar</button>
+                    <button type="button" className="tk-cancelar" onClick={() => handleSalirEspera(e)}>Quitar</button>
                   </li>
                 ))}
               </ul>
