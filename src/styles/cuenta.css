@@ -248,12 +248,27 @@
   right: 0.35rem;
   top: 50%;
   transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
+  color: var(--gris);
   cursor: pointer;
-  font-size: 1.05rem;
-  padding: 0.3rem 0.45rem;
+  line-height: 0;
+  padding: 0.4rem;
   border-radius: var(--radio-peq);
+}
+
+.campo-pass-toggle:hover,
+.campo-pass-toggle[aria-pressed='true'] {
+  color: var(--primary-container);
+}
+
+/* Edge añade su propio ojo y quedaban dos. */
+.campo-pass input::-ms-reveal,
+.campo-pass input::-ms-clear {
+  display: none;
 }
 
 .campo-pass-toggle:focus-visible {

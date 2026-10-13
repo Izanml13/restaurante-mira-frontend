@@ -12,6 +12,17 @@ const TRADS = { es, ca, en };
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** 0-3: longitud + variedad de caracteres. Solo orientativo para el usuario. */
+/** Ojo de mostrar/ocultar contraseña: SVG con el color del tema (los emojis cambiaban según el sistema). */
+function IconoOjo({ tachado }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+      {tachado && <path d="M3 3l18 18" />}
+    </svg>
+  );
+}
+
 function fuerzaPassword(p) {
   if (!p) return 0;
   if (p.length < 8) return 1;
@@ -167,11 +178,12 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
                 <button
                   type="button"
                   className="campo-pass-toggle"
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setVerPass((v) => !v)}
                   aria-label={verPass ? t('registro.ocultar') : t('registro.mostrar')}
                   aria-pressed={verPass}
                 >
-                  {verPass ? '🙈' : '👁️'}
+                  <IconoOjo tachado={verPass} />
                 </button>
               </div>
               {password && (
