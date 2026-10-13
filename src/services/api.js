@@ -127,19 +127,23 @@ export const ticketsApi = {
 
 /* ────────────── INVITATIONS ────────────── */
 
+function normalizarInvitacion(inv) {
+  return {
+    ...inv,
+    emailInvitado: inv.emailInvitado || inv.invitadoEmail || inv.email || '',
+    link: inv.link || (inv.codigo ? `${window.location.origin}/#/registro?invite=${encodeURIComponent(inv.codigo)}` : null),
+  };
+}
+
 export const invitationsApi = {
   // El email del invitado no se audita (PII): solo que hubo invitación.
-  create: async (email) => conAuditoria('invitación_enviada', { pagina: 'invitar' }, api.post('/v1/invite', { email })),
+  create: async (email) => normalizarInvitacion(await conAuditoria('invitación_enviada', { pagina: 'invitar' }, api.post('/v1/invite', { email }))),
 
   accept: async (codigo) => conAuditoria('invitación_aceptada', { pagina: 'invitar' }, api.post('/v1/invite/accept', { codigo })),
 
   getMy: async () => {
     const d = await api.get('/v1/invite/my');
-    const enviadas = (d.enviadas || d.invitaciones || []).map((inv) => ({
-      ...inv,
-      emailInvitado: inv.emailInvitado || inv.invitadoEmail || '',
-      link: inv.link || null,
-    }));
+    const enviadas = (d.enviadas || d.invitaciones || []).map(normalizarInvitacion);
     const aceptadas = d.aceptadas ?? 0;
     return {
       enviadas,
