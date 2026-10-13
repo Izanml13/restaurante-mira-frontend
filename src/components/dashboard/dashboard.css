@@ -50,6 +50,8 @@
 
 /* Fallback dentro de auth-pagina: quitar padding externo y heredar ancho */
 .op-hub-wrap {
+  min-width: 0;
+  width: 100%;
   background: var(--op-canvas);
   margin: -1rem;
   padding: 1.25rem;
@@ -219,7 +221,7 @@
 .op-legend-dot{ width:0.5rem; height:0.5rem; border-radius:50%; display:inline-block; }
 
 /* Table */
-.op-table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.op-table-wrap{ min-width:0; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .op-table{ width:100%; border-collapse:collapse; font-size:0.78rem; }
 .op-table th{ text-align:left; padding:0.6rem 0.5rem; font-size:0.62rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color: var(--op-on-variant); background: rgba(240,243,255,0.6); white-space:nowrap; }
 .op-table th:first-child{ border-radius:0.4rem 0 0 0.4rem; }
@@ -481,3 +483,9 @@
 /* Botones sobre el verde de acción: contraste estable también al hover. */
 [data-theme='dark'] .op-btn-primary { background: var(--op-primary-container); color: #fff; }
 [data-theme='dark'] .op-date-chip-btn.active { color: #fff; }
+
+/* Las tablas desplazan dentro de su contenedor, sin ensanchar la página. */
+.op-hub, .op-dual > *, .op-reco-grid > *, .op-bottom > *, .op-directory { min-width: 0; }
+
+.op-date-chips { min-width: 0; max-width: 100%; }
+.op-hub .dash-chart { min-width: 0; max-width: 100%; }
