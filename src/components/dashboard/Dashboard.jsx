@@ -13,7 +13,7 @@ import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
-import { unirReservas } from "./dashboardDatos.js";
+import { unirReservas, filtrarTicketsPeriodo } from "./dashboardDatos.js";
 
 const TRADS = { es, ca, en };
 
@@ -86,16 +86,7 @@ const restDropdownRef = useRef(null);
 
   /** Tickets del periodo seleccionado en la cabecera (para la factura real). */
   function ticketsDelPeriodo(lista) {
-    if (selectedMonth === '90d') {
-      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
-      return lista.filter(t => { const f = fechaDeTicket(t); return !f || new Date(f) >= cutoff; });
-    }
-    if (selectedMonth === 'anio') {
-      const y = new Date().getFullYear();
-      return lista.filter(t => { const f = fechaDeTicket(t); return !f || Number(f.slice(0, 4)) === y; });
-    }
-    const m = new Date().toISOString().slice(0, 7);
-    return lista.filter(t => { const f = fechaDeTicket(t); return !f || f.startsWith(m); });
+    return filtrarTicketsPeriodo(lista, selectedMonth);
   }
 
   /** Abre la factura / el reporte fiscal: simulado (demo) o con datos reales del panel. */
@@ -233,22 +224,8 @@ const restDropdownRef = useRef(null);
   }
   function handleExportLiquidacion(){
     if(!data) return;
-    let list = data.ticketsRecientes||[];
-    // filtro por periodo seleccionado
-    if(selectedMonth==='90d'){
-      const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-90);
-      list = list.filter(t=> { const d=t.createdAt?.toDate? t.createdAt.toDate(): new Date(t.fecha||Date.now()); return d>=cutoff; });
-    } else if(selectedMonth==='anio'){
-      const y=new Date().getFullYear();
-      list = list.filter(t=> { const d=t.createdAt?.toDate? t.createdAt.toDate(): new Date(t.fecha||Date.now()); return d.getFullYear()===y; });
-    } else {
-      // este-mes
-      const m=new Date().toISOString().slice(0,7);
-      list = list.filter(t=> { const f=t.fecha || (t.createdAt?.toDate? t.createdAt.toDate().toISOString().split('T')[0] : ''); return f.startsWith(m) || true; }); // keep all if no fecha
-      // si no hay filtro, deja todos; si quieres estricto, descomenta siguiente linea
-      // if(list.length===0) list=data.ticketsRecientes||[];
-    }
-    const rows = list.map(t=> ({ fecha: t.fecha || (t.createdAt?.toDate? t.createdAt.toDate().toISOString().split('T')[0] : ''), codigo: t.codigoReserva || t.id.slice(0,6), total: t.totalPagado||0, comision: t.importeComision!=null ? t.importeComision : Math.round((t.totalPagado||0)*(comisionPct/100)*100)/100, neto: t.netoRestaurante!=null ? t.netoRestaurante : Math.round(((t.totalPagado||0) - (t.importeComision!=null ? t.importeComision : (t.totalPagado||0)*(comisionPct/100)))*100)/100, cliente: t.clienteNombre||t.restauranteNombre||'' }));
+    const list = ticketsDelPeriodo(data.ticketsRecientes || []);
+    const rows = list.map(t=> ({ fecha: fechaDeTicket(t), codigo: t.codigoReserva || t.id.slice(0,6), total: t.totalPagado||0, comision: t.importeComision!=null ? t.importeComision : Math.round((t.totalPagado||0)*(comisionPct/100)*100)/100, neto: t.netoRestaurante!=null ? t.netoRestaurante : Math.round(((t.totalPagado||0) - (t.importeComision!=null ? t.importeComision : (t.totalPagado||0)*(comisionPct/100)))*100)/100, cliente: t.clienteNombre||t.restauranteNombre||'' }));
     const header = ['Fecha','Codigo','Cliente','Total',`Comision ${comisionPct}%`,'Neto','Asistio'];
     const csv = [header.join(';'), ...rows.map(r=> [r.fecha,r.codigo,`"${r.cliente}"`,r.total.toFixed(2),r.comision.toFixed(2),r.neto.toFixed(2), 'si'].join(';'))].join('\n');
     const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});

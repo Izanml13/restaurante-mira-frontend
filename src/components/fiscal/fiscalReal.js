@@ -15,8 +15,15 @@ const r2 = (n) => Math.round(Number(n || 0) * 100) / 100;
 
 export function fechaDeTicket(t) {
   if (t?.fecha) return String(t.fecha).slice(0, 10);
-  if (t?.createdAt?.toDate) return t.createdAt.toDate().toISOString().slice(0, 10);
-  return '';
+  const valor = t?.createdAt;
+  let fecha;
+  if (valor?.toDate) fecha = valor.toDate();
+  else if (valor?.seconds != null || valor?._seconds != null) fecha = new Date((valor.seconds ?? valor._seconds) * 1000);
+  else if (valor != null) fecha = new Date(valor);
+  if (!fecha || Number.isNaN(fecha.getTime())) return '';
+  const partes = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(fecha);
+  const valorParte = (tipo) => partes.find((p) => p.type === tipo).value;
+  return `${valorParte('year')}-${valorParte('month')}-${valorParte('day')}`;
 }
 
 /** Factura de comisiones con los tickets reales subidos por el restaurante. */
