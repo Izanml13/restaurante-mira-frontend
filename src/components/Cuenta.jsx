@@ -239,8 +239,8 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
             </p>
           )}
           <div className="cuenta-points__actions">
-            <a href="#/puntos" className="btn-cta btn-peq">{t('points.history')}</a>
-            <a href="#/puntos/historial" className="btn-secundario btn-peq">{t('points.redeem')}</a>
+            <a href="#/puntos" className="btn-cta btn-peq">{t('points.redeem')}</a>
+            <a href="#/puntos/historial" className="btn-secundario btn-peq">{t('points.history')}</a>
             <a href="#/invitar" className="btn-secundario btn-peq">{t('points.invite')}</a>
           </div>
           <div className="cuenta-redemption">
