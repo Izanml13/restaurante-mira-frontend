@@ -1,5 +1,5 @@
 /** OpsReservas — reservas globales: buscar, filtrar y cambiar estado. */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getReservasGlobales, nombreRestauranteDe, descargarCSV, csvReservas, mensajeErrorFirestore, updateReservationStatus } from './opsData.js';
 import { useT } from '../../i18n/index.jsx';
 import es from '../../i18n/es.js';
@@ -16,7 +16,7 @@ const CLAVE_ESTADO = {
   no_show: 'ops.estadoNoShow',
 };
 
-export default function OpsReservas({ busquedaInicial = '' }) {
+export default function OpsReservas({ busquedaInicial = '', revisionBusqueda = 0 }) {
   const t = useT(TRADS);
   const [q, setQ] = useState(busquedaInicial);
   const [estado, setEstado] = useState('');
@@ -24,21 +24,27 @@ export default function OpsReservas({ busquedaInicial = '' }) {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [actuando, setActuando] = useState('');
+  const solicitud = useRef(0);
 
-  async function cargar() {
+  async function cargar(busqueda = q) {
+    const id = ++solicitud.current;
     setCargando(true);
     setError('');
     try {
-      setLista(await getReservasGlobales({ q, estado }));
+      const lista = await getReservasGlobales({ q: busqueda, estado });
+      if (id === solicitud.current) setLista(lista);
     } catch (e) {
-      setError(mensajeErrorFirestore(e, 'reservas'));
+      if (id === solicitud.current) setError(mensajeErrorFirestore(e, 'reservas'));
     } finally {
-      setCargando(false);
+      if (id === solicitud.current) setCargando(false);
     }
   }
 
-  useEffect(() => { cargar(); /* solo al montar */ }, []);
-  useEffect(() => { setQ(busquedaInicial); }, [busquedaInicial]);
+  useEffect(() => {
+    setQ(busquedaInicial);
+    cargar(busquedaInicial);
+    return () => { solicitud.current++; };
+  }, [busquedaInicial, revisionBusqueda]);
 
   async function cambiar(id, nuevo) {
     setError('');
@@ -72,7 +78,7 @@ export default function OpsReservas({ busquedaInicial = '' }) {
           <option value="">{t('ops.todosEstados')}</option>
           {ESTADOS.slice(1).map((e) => <option key={e} value={e}>{t(CLAVE_ESTADO[e])}</option>)}
         </select>
-        <button type="button" className="ops-btn primary sm" onClick={cargar}>{t('ops.buscar')}</button>
+        <button type="button" className="ops-btn primary sm" onClick={() => cargar()}>{t('ops.buscar')}</button>
       </div>
       {error && <p className="ops-error" role="alert">{error}</p>}
       {cargando && <p className="ops-empty" role="status">{t('ops.cargandoReservas')}</p>}

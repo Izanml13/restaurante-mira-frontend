@@ -901,6 +901,7 @@ export default {
     "puntosCanjeados": "Punts bescanviats"
   },
   "dashboard": {
+    "ticketsIncompletos": "No s’han rebut tots els tiquets. Actualitza el panell o comprova que l’API estigui actualitzada.",
     "sinAcceso": "No tens accés a aquest restaurant.",
     "panelAdmin": "Panell d'Administració",
     "errorSinRestaurante": "Assegura't de tenir un restaurant creat. Si ets empresa, ves a \"El meu compte\" → \"Afegeix restaurant\" per crear-ne un primer.",

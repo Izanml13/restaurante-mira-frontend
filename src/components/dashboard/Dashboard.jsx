@@ -13,6 +13,8 @@ import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
+import { unirReservas, filtrarTicketsPeriodo, csvLiquidacion, ticketsCompletos } from "./dashboardDatos.js";
+
 const TRADS = { es, ca, en };
 
 const CLAVE_DATOS_SIM = 'mira:rest-datos-simulados';
@@ -84,27 +86,29 @@ const restDropdownRef = useRef(null);
 
   /** Tickets del periodo seleccionado en la cabecera (para la factura real). */
   function ticketsDelPeriodo(lista) {
-    if (selectedMonth === '90d') {
-      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
-      return lista.filter(t => { const f = fechaDeTicket(t); return !f || new Date(f) >= cutoff; });
+    return filtrarTicketsPeriodo(lista, selectedMonth);
+  }
+
+  function ticketsParaDocumentos() {
+    try {
+      return ticketsDelPeriodo(ticketsCompletos(data));
+    } catch {
+      setError(t('dashboard.ticketsIncompletos'));
+      return null;
     }
-    if (selectedMonth === 'anio') {
-      const y = new Date().getFullYear();
-      return lista.filter(t => { const f = fechaDeTicket(t); return !f || Number(f.slice(0, 4)) === y; });
-    }
-    const m = new Date().toISOString().slice(0, 7);
-    return lista.filter(t => { const f = fechaDeTicket(t); return !f || f.startsWith(m); });
   }
 
   /** Abre la factura / el reporte fiscal: simulado (demo) o con datos reales del panel. */
   function abrirDocumento(tipo) {
     setDocReal(null);
     if (datosSimulados) { setDocumento(tipo); return; }
+    const tickets = tipo === 'factura' ? ticketsParaDocumentos() : [];
+    if (tickets === null) return;
     const rest = data?.restaurante || {};
     const pct = Number(rest.comisionPct) || 8;
     setDocReal(
       tipo === 'factura'
-        ? facturaReal({ restaurante: rest, comisionPct: pct, tickets: ticketsDelPeriodo(data?.ticketsRecientes || []) })
+        ? facturaReal({ restaurante: rest, comisionPct: pct, tickets })
         : reporteFiscalReal({ restaurante: rest, comisionPct: pct, ingresosPorMes: data?.ingresosPorMes || {} }),
     );
     setDocumento(tipo);
@@ -231,24 +235,9 @@ const restDropdownRef = useRef(null);
   }
   function handleExportLiquidacion(){
     if(!data) return;
-    let list = data.ticketsRecientes||[];
-    // filtro por periodo seleccionado
-    if(selectedMonth==='90d'){
-      const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-90);
-      list = list.filter(t=> { const d=t.createdAt?.toDate? t.createdAt.toDate(): new Date(t.fecha||Date.now()); return d>=cutoff; });
-    } else if(selectedMonth==='anio'){
-      const y=new Date().getFullYear();
-      list = list.filter(t=> { const d=t.createdAt?.toDate? t.createdAt.toDate(): new Date(t.fecha||Date.now()); return d.getFullYear()===y; });
-    } else {
-      // este-mes
-      const m=new Date().toISOString().slice(0,7);
-      list = list.filter(t=> { const f=t.fecha || (t.createdAt?.toDate? t.createdAt.toDate().toISOString().split('T')[0] : ''); return f.startsWith(m) || true; }); // keep all if no fecha
-      // si no hay filtro, deja todos; si quieres estricto, descomenta siguiente linea
-      // if(list.length===0) list=data.ticketsRecientes||[];
-    }
-    const rows = list.map(t=> ({ fecha: t.fecha || (t.createdAt?.toDate? t.createdAt.toDate().toISOString().split('T')[0] : ''), codigo: t.codigoReserva || t.id.slice(0,6), total: t.totalPagado||0, comision: t.importeComision!=null ? t.importeComision : Math.round((t.totalPagado||0)*(comisionPct/100)*100)/100, neto: t.netoRestaurante!=null ? t.netoRestaurante : Math.round(((t.totalPagado||0) - (t.importeComision!=null ? t.importeComision : (t.totalPagado||0)*(comisionPct/100)))*100)/100, cliente: t.clienteNombre||t.restauranteNombre||'' }));
-    const header = ['Fecha','Codigo','Cliente','Total',`Comision ${comisionPct}%`,'Neto','Asistio'];
-    const csv = [header.join(';'), ...rows.map(r=> [r.fecha,r.codigo,`"${r.cliente}"`,r.total.toFixed(2),r.comision.toFixed(2),r.neto.toFixed(2), 'si'].join(';'))].join('\n');
+    const list = ticketsParaDocumentos();
+    if (list === null) return;
+    const csv = csvLiquidacion(list, comisionPct);
     const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download=`liquidacion-${(data.restaurante.nombre||'restaurante').replace(/\s+/g,'_')}-${selectedMonth}-${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);
@@ -379,6 +368,7 @@ const restDropdownRef = useRef(null);
   if (!data) return null;
 
   const { restaurante, stats, proximasReservas, reservasHoy: reservasHoyList = [], ingresosPorMes, ticketsRecientes, finanzas, reservasParaTicket = [] } = data;
+  const reservasUnicas = unirReservas(proximasReservas || [], reservasHoyList);
   const hoyISO = new Date().toISOString().split('T')[0];
   const hoyLabel = new Date().toLocaleDateString(t('modelos.locale'), { day:'2-digit', month:'short'});
   // Finanzas persistidas (no texto plano) tiene prioridad sobre cálculo efímero
@@ -439,7 +429,7 @@ const restDropdownRef = useRef(null);
   const restId = restaurante.id ? `#RES-${String(restaurante.id).slice(-4).toUpperCase()}` : '#RES-????';
 
   return (
-    <section className="auth-pagina pagina-ancha" style={{background:'#F8FAFC', margin:'0 -1.5rem', padding:'1rem 1.5rem 2rem'}}>
+    <section className="auth-pagina pagina-ancha" style={{background:'#F8FAFC', margin:0, padding:'1rem 1.5rem 2rem'}}>
       <div style={{maxWidth:1280, margin:'0 auto', width:'100%'}} className="op-hub-wrap">
         <div className="op-hub">
           {/* Top Operational Control Bar */}
@@ -677,7 +667,7 @@ const restDropdownRef = useRef(null);
                   <p style={{fontSize:'0.68rem', color:'var(--op-on-variant)'}}>{filtroTodas ? t("dashboard.todasReservasFuturas") : t("dashboard.filtraPorFecha")}</p>
                 </div>
                 <div style={{background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0.5rem', fontSize:'0.68rem', fontWeight:700, color:'var(--op-primary)', display:'flex', alignItems:'center', gap:'0.25rem'}}>
-                  <span className="material-symbols-outlined" style={{fontSize:14}}>cloud_download</span> {t("dashboard.paxHoy", { n: hoyComensales })} · {(() => { const f=(data?.proximasReservas||[]).concat(data?.reservasHoy||[]).filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).reduce((s,r)=> s+(Number(r.comensales)||0),0); return f; })()} {fechaFiltro===hoyISO ? t("dashboard.hoy") : t("dashboard.enFecha", { fecha: fechaFiltro.slice(5) })}
+                  <span className="material-symbols-outlined" style={{fontSize:14}}>cloud_download</span> {t("dashboard.paxHoy", { n: hoyComensales })} · {(() => { const f=reservasUnicas.filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).reduce((s,r)=> s+(Number(r.comensales)||0),0); return f; })()} {fechaFiltro===hoyISO ? t("dashboard.hoy") : t("dashboard.enFecha", { fecha: fechaFiltro.slice(5) })}
                 </div>
               </div>
               <div className="op-occupancy">
@@ -693,7 +683,7 @@ const restDropdownRef = useRef(null);
                 <button className={`op-date-chip-btn ${fechaFiltro===hoyISO && !filtroTodas ? 'active':''}`} onClick={()=>{ setFechaFiltro(hoyISO); setFiltroTodas(false); setSelectedForecast(null); }}>{t("dashboard.hoyTitulo")}</button>
                 <button className={`op-date-chip-btn ${filtroTodas?'active':''}`} onClick={()=> setFiltroTodas(v=>!v)}>{filtroTodas? t("dashboard.filtrarPorFecha") : t("dashboard.verTodasFuturas")}</button>
                 <div className="op-date-chips" style={{marginLeft:'auto'}}>
-                  {Array.from({length:7}, (_,i)=>{ const d=new Date(); d.setDate(d.getDate()+i); const iso=d.toISOString().split('T')[0]; const count=(data?.proximasReservas||[]).concat(data?.reservasHoy||[]).filter(r=> r.fecha===iso && String(r.estado).toLowerCase()!=='cancelada').length; const label=d.toLocaleDateString(t('modelos.locale'),{day:'2-digit', month:'short'}); return (
+                  {Array.from({length:7}, (_,i)=>{ const d=new Date(); d.setDate(d.getDate()+i); const iso=d.toISOString().split('T')[0]; const count=reservasUnicas.filter(r=> r.fecha===iso && String(r.estado).toLowerCase()!=='cancelada').length; const label=d.toLocaleDateString(t('modelos.locale'),{day:'2-digit', month:'short'}); return (
                     <button key={iso} onClick={()=>{ setFechaFiltro(iso); setFiltroTodas(false); setSelectedForecast(null); }} className={`op-date-chip-btn ${fechaFiltro===iso && !filtroTodas ? 'active':''}`} title={t("dashboard.reservasTituloN", { n: count })}>{label} {count? `·${count}`:''}</button>
                   );})}
                 </div>
@@ -719,7 +709,7 @@ const restDropdownRef = useRef(null);
                       }
                       // Si no hay nada para la fecha exacta, también buscar en todas las reservas del restaurante (por si proximasReservas está limitada a 20)
                       if (base.length===0 && !filtroTodas) {
-                        const allRaw = (data?.proximasReservas||[]).concat(data?.reservasHoy||[]);
+                        const allRaw = reservasUnicas;
                         // ya está cubierto, pero intentamos fallback a reservas directas (ya tenemos)
                       }
                       if (base.length===0) {

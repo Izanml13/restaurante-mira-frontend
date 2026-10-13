@@ -49,12 +49,12 @@ Reproducciones de la auditoría de Codex. Se corrigen en la **tanda 3**.
 | [BUG-102](BUG-102.md) | Nuevo chat recibe la respuesta pendiente de la conversación anterior | mira | claude | en revisión | fix/claude-tanda3 |
 | [BUG-103](BUG-103.md) | Quitar de la lista de espera oculta la reserva aunque falle el servidor | reservas | claude | en revisión | fix/claude-tanda3 |
 | [BUG-104](BUG-104.md) | Los accesos de canje e historial de puntos de Mi cuenta están cruzados | cuenta/puntos | claude | en revisión | fix/claude-tanda3 |
-| [BUG-105](BUG-105.md) | Exportar liquidación de Este mes incluye tickets de otros meses | dashboard/fiscal | codex | pendiente | |
-| [BUG-106](BUG-106.md) | La exportación de liquidación pierde tickets cuando hay más de 20 | dashboard/fiscal | codex | pendiente | |
-| [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | codex | pendiente | |
-| [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | codex | pendiente | |
-| [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | codex | pendiente | |
-| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | codex | pendiente | |
+| [BUG-105](BUG-105.md) | Exportar liquidación de Este mes incluye tickets de otros meses | dashboard/fiscal | codex | en revisión | fix/claude-tanda3 |
+| [BUG-106](BUG-106.md) | La exportación de liquidación pierde tickets cuando hay más de 20 | dashboard/fiscal | codex | en revisión | fix/claude-tanda3 |
+| [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | codex | en revisión | fix/claude-tanda3 |
+| [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | codex | en revisión | fix/claude-tanda3 |
+| [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | codex | en revisión | fix/claude-tanda3 |
+| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | codex | en revisión | fix/claude-tanda3 |
 
 ## Tanda 3
 
@@ -68,5 +68,5 @@ Reparto por archivos: Codex se queda con el dashboard de restaurante, la exporta
 | BUG-105 a BUG-110 | (ver tabla de hallazgos) | dashboard/ops | codex | pendiente | |
 | [BUG-111](BUG-111.md) | POST /points/review da puntos sin una reseña real | puntos | claude | en revisión | fix/claude-tanda3 (front + back) |
 | [BUG-112](BUG-112.md) | Resto de textos fijos sin traducir (continuación de BUG-019) | i18n | claude | pendiente | |
-| [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | pendiente | |
+| [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | en revisión | fix/claude-tanda3 |
 
