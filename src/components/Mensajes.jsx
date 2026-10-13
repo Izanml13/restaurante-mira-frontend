@@ -1,6 +1,6 @@
 /** View pura: #/mensajes — buzón interno (avisos de reservas, etc.). */
 import { useEffect, useState } from 'react';
-import { listarMensajes, marcarLeido } from '../services/mensajesApi.js';
+import { listarMensajes, marcarLeido, marcarTodosLeidos } from '../services/mensajesApi.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -14,6 +14,7 @@ export default function Mensajes({ usuario, onLeidos }) {
   const [lista, setLista] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [marcando, setMarcando] = useState(false);
   const [abierto, setAbierto] = useState(null); // id expandido
 
   useEffect(() => {
@@ -46,6 +47,20 @@ export default function Mensajes({ usuario, onLeidos }) {
     }
   }
 
+  async function leerTodos() {
+    setMarcando(true);
+    setError('');
+    try {
+      await marcarTodosLeidos();
+      setLista((prev) => prev.map((m) => ({ ...m, leido: true })));
+      await onLeidos?.();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setMarcando(false);
+    }
+  }
+
   const noLeidos = lista.filter((m) => m.leido !== true).length;
 
   return (
@@ -54,6 +69,11 @@ export default function Mensajes({ usuario, onLeidos }) {
         <h1 id="mensajes-titulo">
           {t('mensajes.titulo')} {noLeidos > 0 && <span className="badge-noleidos">{noLeidos} {t('mensajes.sinLeer')}</span>}
         </h1>
+        {!cargando && noLeidos > 0 && (
+          <button type="button" className="btn-secundario btn-peq" disabled={marcando} onClick={leerTodos}>
+            {t('mensajes.marcarTodosLeidos')}
+          </button>
+        )}
         {cargando && <p>{t('mensajes.cargando')}</p>}
         {error && (
           <p className="auth-error" role="alert">

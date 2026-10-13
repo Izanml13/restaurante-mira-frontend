@@ -20,3 +20,7 @@ export async function contarNoLeidos() {
 export async function marcarLeido(id) {
   await api.put(`/v1/mensajes/${encodeURIComponent(id)}/read`);
 }
+
+export async function marcarTodosLeidos() {
+  return api.put('/v1/mensajes/read-all');
+}
