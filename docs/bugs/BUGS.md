@@ -65,8 +65,8 @@ Reparto por archivos: Codex se queda con el dashboard de restaurante, la exporta
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
 | BUG-101 a BUG-104 | (ver tabla de hallazgos) | usuario | claude | pendiente | |
-| BUG-105 a BUG-110 | (ver tabla de hallazgos) | dashboard/ops | codex | pendiente | |
+| BUG-105 a BUG-110 | (ver tabla de hallazgos) | dashboard/ops | codex | en revisión | fix/codex-tanda3 |
 | [BUG-111](BUG-111.md) | POST /points/review da puntos sin una reseña real | puntos | claude | pendiente | |
 | [BUG-112](BUG-112.md) | Resto de textos fijos sin traducir (continuación de BUG-019) | i18n | claude | pendiente | |
-| [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | pendiente | |
+| [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | en revisión | fix/codex-tanda3 |
 
