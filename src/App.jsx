@@ -323,6 +323,15 @@ function AppContent({ auth, tema, setTema }) {
   // Si hay un overlay por encima de z-180 el launcher se oculta solo.
   const hayOverlayEncima = Boolean(seleccionado || libro || sheetVisible || showStreakPopup || showWheel);
 
+  // Con la ficha o la carta abiertas, bloquea el scroll de la landing para que no se desplace por detrás.
+  useEffect(() => {
+    if (!seleccionado && !libro) return;
+    const html = document.documentElement;
+    const previo = html.style.overflow;
+    html.style.overflow = 'hidden';
+    return () => { html.style.overflow = previo; };
+  }, [seleccionado, libro]);
+
   // Abre la ficha completa (con carta) desde una tarjeta del chat de MIRA.
   // obtenerRestaurante busca por id en el catálogo ya cargado y, si no está,
   // lo pide a la API: por eso es async y no bloquea el chat.

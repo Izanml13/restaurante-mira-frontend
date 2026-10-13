@@ -740,6 +740,7 @@
   align-items: flex-start;
   padding: 4vh 1rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 200;
 }
 

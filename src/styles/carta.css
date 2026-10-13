@@ -4,6 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 300;
+  overscroll-behavior: contain;
   display: grid;
   place-items: center;
   padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem max(0.75rem, env(safe-area-inset-bottom));

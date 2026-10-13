@@ -10,7 +10,7 @@ Reparto por zonas para no tocar los mismos archivos:
 |----|--------|------|----------|--------|------|
 | [BUG-001](BUG-001.md) | Abrir restaurante al clicar la card | buscador | claude | pendiente | |
 | [BUG-002](BUG-002.md) | Tras reservar, cerrar desplegable e ir a «Mis reservas» | reservas | claude | en revisión | fix/BUG-002-reserva-a-mis-reservas |
-| [BUG-003](BUG-003.md) | Scroll de la carta/card se propaga a la landing | buscador | claude | pendiente | |
+| [BUG-003](BUG-003.md) | Scroll de la carta/card se propaga a la landing | buscador | claude | en revisión | fix/BUG-002-reserva-a-mis-reservas |
 | [BUG-004](BUG-004.md) | Preferencias/cookies con esquinas cuadradas | cuenta | codex | pendiente | |
 | [BUG-005](BUG-005.md) | Filtro del mapa: solo las 4 comarcas | mapa | claude | pendiente | |
 | [BUG-006](BUG-006.md) | «Mis reservas» debe abrirse siempre arriba | reservas | codex | pendiente | |
