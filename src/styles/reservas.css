@@ -89,12 +89,15 @@
 /* ── Reserva en grupo y lista de espera ── */
 .rsv-extras { display: grid; gap: 1rem; }
 .rsv-jam {
-  display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.2rem; border-radius: 18px; text-decoration: none;
-  background: radial-gradient(400px 200px at 0% 0%, rgba(30, 215, 96, 0.25), transparent 70%), #0d1512; color: #f3f7f4;
-  transition: transform 180ms var(--rsv-ease);
+  display: flex; align-items: center; gap: 1rem; padding: 1.4rem; min-height: 112px;
+  border: 2px solid var(--dorado); border-radius: var(--radio-xl); text-decoration: none;
+  background: var(--verde-suave); color: var(--tinta); box-shadow: var(--sombra-card);
+  transition: transform 180ms var(--rsv-ease), box-shadow 180ms var(--rsv-ease);
 }
-.rsv-jam > span:first-child { font-size: 1.6rem; }
-.rsv-jam strong { display: block; color: #1ed760; font-size: 1.02rem; }
+.rsv-jam > span:first-child { font-size: 2.5rem; flex-shrink: 0; }
+.rsv-jam strong { display: block; color: var(--verde); font-size: 1.3rem; margin-bottom: 0.2rem; }
+.rsv-jam:hover { box-shadow: var(--sombra-card-hover); }
+.rsv-jam:focus-visible { outline: 3px solid var(--verde); outline-offset: 3px; }
 .rsv-jam:active { transform: scale(0.98); }
 .rsv-espera ul { list-style: none; margin: 0.7rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
 .rsv-espera li { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; padding: 0.75rem 0.9rem; border-radius: 14px; background: var(--rsv-papel); box-shadow: 0 0 0 1px var(--borde); }
