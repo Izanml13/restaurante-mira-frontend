@@ -587,6 +587,11 @@ export default {
     "iniciarSesion": "Iniciar sessió"
   },
   "admin": {
+    "propuestaResolucion": "Proposta de resolució",
+    "solucion": "Solució",
+    "encargado": "Responsable",
+    "cancelarResolucion": "Cancel·lar",
+    "confirmarResolucion": "Confirmar resolució",
     "titulo": "Administració",
     "incidenciasPendientes": "Incidències pendents",
     "sinAcceso": "Sense accés: aquesta zona és només per a administradors.",

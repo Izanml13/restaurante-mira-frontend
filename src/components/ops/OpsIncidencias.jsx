@@ -7,6 +7,8 @@ import es from '../../i18n/es.js';
 import ca from '../../i18n/ca.js';
 import en from '../../i18n/en.js';
 
+import ResolverIncidenciaModal from '../ResolverIncidenciaModal.jsx';
+
 const TRADS = { es, ca, en };
 
 export default function OpsIncidencias() {
@@ -16,6 +18,7 @@ export default function OpsIncidencias() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [actuando, setActuando] = useState('');
+  const [incidencia, setIncidencia] = useState(null);
 
   useEffect(() => {
     let vivo = true;
@@ -41,6 +44,12 @@ export default function OpsIncidencias() {
 
   return (
     <>
+      {incidencia && <ResolverIncidenciaModal
+        onConfirmar={async (datos) => {
+          await resolverIncidencia(incidencia.id, datos);
+          setContactos((p) => p.filter((x) => x.id !== incidencia.id));
+        }}
+        onCancelar={() => setIncidencia(null)} />}
       <div className="ops-card">
         <div className="ops-card-head">
           <div>
@@ -59,7 +68,7 @@ export default function OpsIncidencias() {
                 <div className="ops-muted">{(c.mensaje || '').slice(0, 220)}</div>
               </div>
               <button type="button" className="ops-btn primary sm" disabled={actuando === c.id}
-                onClick={() => accionar(resolverIncidencia, c.id, 'c')}>
+                onClick={() => setIncidencia(c)}>
                 {t('ops.resolver')}
               </button>
             </li>

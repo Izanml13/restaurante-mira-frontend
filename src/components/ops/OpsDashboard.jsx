@@ -12,6 +12,8 @@ import ca from '../../i18n/ca.js';
 import en from '../../i18n/en.js';
 import TestReservas from '../TestReservas.jsx';
 
+import ResolverIncidenciaModal from '../ResolverIncidenciaModal.jsx';
+
 const TRADS = { es, ca, en };
 
 function euros(n, locale) {
@@ -38,6 +40,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
   const [resolviendo, setResolviendo] = useState('');
   const [documento, setDocumento] = useState(null);
   const [verTest, setVerTest] = useState(false);
+  const [incidencia, setIncidencia] = useState(null);
 
   useEffect(() => {
     if (demo) { setDatos(demo); setCargando(false); return undefined; }
@@ -48,7 +51,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
     return () => { vivo = false; };
   }, [demo]);
 
-  async function resolver(item) {
+  async function resolver(item, resolucion) {
     setError('');
     setResolviendo(item.id);
     try {
@@ -57,7 +60,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
       } else if (item.kind === 'negocio') {
         await aprobarNegocio(item.id);
       } else {
-        await resolverIncidencia(item.id);
+        await resolverIncidencia(item.id, resolucion);
       }
       setDatos((prev) => ({
         ...prev,
@@ -65,6 +68,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
         kpis: { ...prev.kpis, incidenciasPendientes: Math.max(0, prev.kpis.incidenciasPendientes - 1) },
       }));
     } catch (e) {
+      if (resolucion) throw e;
       setError(e.message);
     } finally {
       setResolviendo('');
@@ -124,6 +128,9 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
 
   return (
     <>
+      {incidencia && <ResolverIncidenciaModal
+        onConfirmar={(datos) => resolver(incidencia, datos)}
+        onCancelar={() => setIncidencia(null)} />}
       {error && <p className="ops-error" role="alert">{error}</p>}
       {documento && (
         <DocumentoFiscal tipo={documento} comisionPct={comisionPct}
@@ -323,7 +330,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
                   </div>
                 </div>
                 <div className="ops-inc-actions">
-                  <button type="button" className="ops-btn primary sm" disabled={resolviendo === it.id} onClick={() => resolver(it)}>
+                  <button type="button" className="ops-btn primary sm" disabled={resolviendo === it.id} onClick={() => it.kind === 'negocio' ? resolver(it) : setIncidencia(it)}>
                     {it.kind === 'negocio' ? t('ops.aprobar') : t('ops.resolver')}
                   </button>
                   {it.kind === 'negocio' && (

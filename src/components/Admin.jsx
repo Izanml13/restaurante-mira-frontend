@@ -7,6 +7,8 @@ import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
 
+import ResolverIncidenciaModal from './ResolverIncidenciaModal.jsx';
+
 const TRADS = { es, ca, en };
 
 export default function Admin({ usuario, esAdmin }) {
@@ -15,6 +17,7 @@ export default function Admin({ usuario, esAdmin }) {
   const [negocios, setNegocios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [incidencia, setIncidencia] = useState(null);
 
   useEffect(() => {
     if (!usuario?.uid) {
@@ -47,14 +50,10 @@ export default function Admin({ usuario, esAdmin }) {
 
   if (!usuario) return null;
 
-  async function handleResolver(id) {
+  async function handleResolver(id, datos) {
     setError('');
-    try {
-      await resolverIncidencia(id);
-      setLista((prev) => prev.filter((x) => x.id !== id));
-    } catch (e) {
-      setError(e.message);
-    }
+    await resolverIncidencia(id, datos);
+    setLista((prev) => prev.filter((x) => x.id !== id));
   }
 
   async function handleAprobar(id) {
@@ -79,6 +78,9 @@ export default function Admin({ usuario, esAdmin }) {
 
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="admin-titulo">
+      {incidencia && <ResolverIncidenciaModal
+        onConfirmar={(datos) => handleResolver(incidencia.id, datos)}
+        onCancelar={() => setIncidencia(null)} />}
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="admin-titulo">{t('admin.titulo')}</h1>
         {esAdmin && <h2 className="cuenta-sub">{t('admin.incidenciasPendientes')}</h2>}
@@ -104,7 +106,7 @@ export default function Admin({ usuario, esAdmin }) {
                   <strong>{r.motivo}</strong> · {r.nombre} ({r.email})
                   <div className="registro-detalle">{r.mensaje}</div>
                 </div>
-                <button type="button" className="btn-cta btn-peq" onClick={() => handleResolver(r.id)}>
+                <button type="button" className="btn-cta btn-peq" onClick={() => setIncidencia(r)}>
                   {t('admin.resolver')}
                 </button>
               </li>
