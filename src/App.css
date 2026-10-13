@@ -4179,7 +4179,7 @@ button.btn-texto {
 .streak-overlay--visible { opacity: 1; }
 
 .streak-modal {
-  background: #FCFBF8;
+  background: var(--papel);
   border-radius: 32px;
   max-width: 720px;
   width: 100%;
@@ -4226,7 +4226,7 @@ button.btn-texto {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--primary-container);
+  color: var(--verde);
 }
 .streak-modal__brand-sub {
   display: block;
@@ -4317,7 +4317,7 @@ button.btn-texto {
   position: absolute;
   top: -8px;
   right: -40px;
-  background: #fff;
+  background: var(--papel);
   border: 2px solid #F59E0B;
   border-radius: 16px;
   padding: 6px 14px;
@@ -4337,7 +4337,7 @@ button.btn-texto {
   left: 20px;
   width: 12px;
   height: 12px;
-  background: #fff;
+  background: var(--papel);
   border-right: 2px solid #F59E0B;
   border-bottom: 2px solid #F59E0B;
   transform: rotate(45deg);
@@ -4384,8 +4384,8 @@ button.btn-texto {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #FEF3C7;
-  color: #92400E;
+  background: var(--recompensa-fondo);
+  color: var(--recompensa-tinta);
   border: 1px solid rgba(245, 158, 11, 0.4);
   padding: 4px 14px;
   border-radius: 999px;
@@ -4435,7 +4435,7 @@ button.btn-texto {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--primary-container);
+  color: var(--verde);
 }
 .streak-modal__calendar-week {
   font-size: 0.7rem;
@@ -4446,8 +4446,8 @@ button.btn-texto {
 .streak-modal__calendar-prize {
   font-size: 0.68rem;
   font-weight: 800;
-  color: #D97706;
-  background: #FFFBEB;
+  color: var(--recompensa-tinta);
+  background: var(--recompensa-fondo);
   border: 1px solid #FDE68A;
   padding: 3px 10px;
   border-radius: 8px;
@@ -4461,8 +4461,8 @@ button.btn-texto {
 
 /* Día card */
 .streak-day {
-  background: rgba(0,0,0,0.03);
-  border: 2px solid rgba(0,0,0,0.06);
+  background: var(--fondo-suave);
+  border: 2px solid var(--borde);
   border-radius: 16px;
   padding: 8px 2px;
   display: flex;
@@ -4519,10 +4519,10 @@ button.btn-texto {
 .streak-day__points {
   font-size: 0.65rem;
   font-weight: 900;
-  color: var(--primary-container);
+  color: var(--verde);
 }
 .streak-day__points--wheel {
-  color: #D97706;
+  color: var(--recompensa-tinta);
   font-size: 0.55rem;
 }
 .streak-day__unit {
@@ -4536,28 +4536,28 @@ button.btn-texto {
 /* Día completado */
 .streak-day--done {
   background: rgba(0, 106, 85, 0.08);
-  border-color: var(--primary-container);
+  border-color: var(--verde);
 }
 
 /* Día de hoy (normal) */
 .streak-day--today {
-  background: linear-gradient(180deg, #FFFBEB, #FEF3C7);
+  background: var(--recompensa-fondo);
   border-color: #F59E0B;
   transform: scale(1.06);
   z-index: 2;
   box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
 }
-.streak-day--today .streak-day__name { color: #92400E; }
+.streak-day--today .streak-day__name { color: var(--recompensa-tinta); }
 
 /* Día de hoy ruleta (día 7) */
 .streak-day--wheel {
-  background: linear-gradient(180deg, #FEF3C7, #FDE68A);
+  background: var(--recompensa-fondo);
   border-color: #F59E0B;
   transform: scale(1.08);
   z-index: 2;
   box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
 }
-.streak-day--wheel .streak-day__name { color: #92400E; }
+.streak-day--wheel .streak-day__name { color: var(--recompensa-tinta); }
 .streak-day__tag {
   position: absolute;
   top: -8px;
@@ -4635,7 +4635,7 @@ button.btn-texto {
 .streak-modal__balance-text {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary-container);
+  color: var(--verde);
 }
 .streak-modal__balance-bar-wrap {
   margin-left: auto;
@@ -4792,7 +4792,7 @@ button.btn-texto {
 .wheel-overlay--visible { opacity: 1; }
 
 .wheel-modal {
-  background: #FCFBF8;
+  background: var(--papel);
   border-radius: 32px;
   max-width: 520px;
   width: 100%;
@@ -4837,7 +4837,7 @@ button.btn-texto {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--primary-container);
+  color: var(--verde);
 }
 .wheel-modal__brand-sub {
   display: block;
@@ -4985,7 +4985,7 @@ button.btn-texto {
   gap: 8px;
   font-size: 1.4rem;
   font-weight: 900;
-  color: #D97706;
+  color: var(--recompensa-tinta);
   margin-bottom: 4px;
 }
 .wheel-result__coin {

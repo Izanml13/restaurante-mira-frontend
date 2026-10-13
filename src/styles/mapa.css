@@ -31,7 +31,7 @@
   transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 160ms var(--mapa-ease);
 }
 .mapa-zona span { font-size: 0.74rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 999px; background: var(--fondo-suave); color: var(--texto-sec); font-variant-numeric: tabular-nums; }
-.mapa-zona.is-activa { background: var(--verde-oscuro, #0e3b2c); border-color: var(--verde-oscuro, #0e3b2c); color: #fff; }
+.mapa-zona.is-activa { background: var(--primary-container); border-color: var(--primary-container); color: #fff; }
 .mapa-zona.is-activa span { background: rgba(255, 255, 255, 0.18); color: #fff; }
 .mapa-zona:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) { .mapa-zona:not(.is-activa):hover { border-color: var(--primary-container, #0e6b47); } }

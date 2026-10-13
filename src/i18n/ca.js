@@ -639,6 +639,7 @@ export default {
     "errorRellena": "Omple els camps obligatoris."
   },
   "mensajes": {
+    "marcarTodosLeidos": "Marcar-ho tot com a llegit",
     "titulo": "Missatges",
     "sinLeer": "sense llegir",
     "vacio": "Sense missatges. Quan tinguis una reserva pròxima, TEAM MIRA t'avisarà aquí.",

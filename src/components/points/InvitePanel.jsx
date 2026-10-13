@@ -30,10 +30,15 @@ export default function InvitePanel() {
     }
   }
 
-  function copyLink(link) {
-    navigator.clipboard.writeText(link);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  async function copyLink(link) {
+    setError('');
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      setError(err.message || t('points.inviteError'));
+    }
   }
 
   return (

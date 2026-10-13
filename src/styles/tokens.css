@@ -37,6 +37,12 @@
   --radio: 12px;
   --radio-peq: 8px;
   --radio-xl: 24px;
+  --radio-med: var(--radio);
+  --radio-grande: var(--radio-xl);
+  --text-primary: var(--tinta);
+  --text-secondary: var(--texto-sec);
+  --recompensa-fondo: #fff4d6;
+  --recompensa-tinta: #7a4b00;
 
   /* Elevation — warm-tinted shadows (not black) */
   --sombra-card: 0 2px 8px rgba(22, 56, 44, 0.06);
@@ -77,6 +83,8 @@
   --tertiary: #ffb3c1;
   --tertiary-container: #8f1d14;
 
+  --recompensa-fondo: #332a1a;
+  --recompensa-tinta: #fed65b;
   --fondo: #111411;
   --fondo-suave: #1c201c;
   --tinta: #e2e8e4;

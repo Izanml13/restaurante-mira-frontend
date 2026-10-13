@@ -639,6 +639,7 @@ export default {
     "errorRellena": "Please fill in the required fields."
   },
   "mensajes": {
+    "marcarTodosLeidos": "Mark all as read",
     "titulo": "Messages",
     "sinLeer": "unread",
     "vacio": "No messages. When you have an upcoming reservation, TEAM MIRA will notify you here.",

@@ -84,7 +84,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
     try {
       const preferencias = { vegano, vegetariano, sinGluten, alergias };
       const accesibilidad = { sillaRuedas, tea };
-      await onRegistro({
+      if (!yaTieneSesion) await onRegistro({
         nombre,
         email,
         password,
@@ -94,9 +94,9 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
         lang,
       });
       if (inviteCodigo) {
-        import('../services/api.js').then(({ invitationsApi }) => {
-          invitationsApi.accept(inviteCodigo).catch(() => {});
-        });
+        const { invitationsApi } = await import('../services/api.js');
+        await invitationsApi.accept(inviteCodigo);
+        setInviteCodigo(null);
       }
       window.location.hash = '#/';
     } catch (err) {
@@ -106,7 +106,7 @@ export default function Registro({ onRegistro, yaTieneSesion }) {
     }
   }
 
-  if (yaTieneSesion) {
+  if (yaTieneSesion && !enviando && !inviteCodigo) {
     window.location.hash = '#/';
     return null;
   }

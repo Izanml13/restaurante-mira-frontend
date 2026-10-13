@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const root=path.resolve(process.argv[2] || process.cwd());
+const back=path.resolve(process.argv[3] || path.join(root,'../codex-tanda2-backend'));
+const front=fs.readFileSync(path.join(root,'src/components/dashboard/Dashboard.jsx'),'utf8');
+const backend=fs.readFileSync(path.join(back,'mira-api/src/modules/dashboard/service.js'),'utf8');
+const pure=backend.slice(backend.indexOf('const ESTADOS_PENDIENTES'),backend.indexOf('async function fetchReservasForRestaurant'))+backend.slice(backend.indexOf('function buildRestaurantAggregates'),backend.indexOf('async function listMyRestaurants'));
+const aggregate=new Function(pure+';return buildRestaurantAggregates;')();
+const code=front.slice(front.indexOf('  function handleExportLiquidacion(){'),front.indexOf('  async function handleSaveAforo'));
+async function exportar(data){let blob;new Function('data','selectedMonth','comisionPct','document','URL','Blob',code+';handleExportLiquidacion();')(data,'este-mes',8,{createElement:()=>({click(){}})},{createObjectURL:b=>{blob=b;return'temp'},revokeObjectURL(){}},Blob);return await blob.text();}
+const csv=await exportar({restaurante:{nombre:'Test'},ticketsRecientes:[{id:'actual',fecha:new Date().toISOString().slice(0,10),totalPagado:40},{id:'anterior',fecha:'2025-01-13',totalPagado:40,asistio:false}]});
+assert(csv.includes('2025-01-13'));assert(csv.split('\n').at(-1).endsWith(';si'));console.log('Fallo confirmado: Este mes incluye ticket antiguo y no-show se exporta como asistencia sí.');
+const tickets=Array.from({length:25},(_,i)=>({id:'t'+i,fecha:new Date().toISOString().slice(0,10),createdAt:new Date().toISOString(),totalPagado:100,importeComision:8}));
+const data={restaurante:{nombre:'Test'},...aggregate([],tickets,null)};
+const csv25=await exportar(data);assert.equal(data.stats.totalFacturacion,2500);assert.equal(csv25.split('\n').length-1,20);console.log('Fallo confirmado: 25 tickets/2500€ reales, CSV solo 20 tickets/2000€.');
+const reserva={id:'r1',fecha:new Date().toISOString().slice(0,10),estado:'confirmada',comensales:4};
+const snapshot=aggregate([reserva],[],null);
+const concatenadas=snapshot.proximasReservas.concat(snapshot.reservasHoy).filter(r=>r.fecha===reserva.fecha&&r.estado!=='cancelada');
+assert.equal(snapshot.stats.totalReservas,1);assert.equal(concatenadas.length,2);assert.equal(concatenadas.reduce((s,r)=>s+r.comensales,0),8);console.log('Fallo confirmado: backend con 1 reserva/4 pax; contadores frontend concatenados muestran 2/8.');

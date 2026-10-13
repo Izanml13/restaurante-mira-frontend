@@ -41,6 +41,12 @@
 }
 
 [data-theme='dark'] .ops-shell {
+  --ops-primary: #a8d5ba;
+  --ops-secondary: #a8d5ba;
+  --ops-tertiary: #8ab4ff;
+  --ops-error: #ffb3c1;
+  --ops-secondary-container: #2a3d2e;
+  --ops-on-secondary-container: #c5e8d4;
   --ops-surface: #0f1310;
   --ops-surface-lowest: #171b17;
   --ops-surface-low: #1d221d;
