@@ -41,17 +41,32 @@ Orden recomendado: los bugs transversales (018 tema, 019 idioma) se hacen **al f
 
 ## Hallazgos de BUG-021
 
-Reproducciones de la auditoría de Codex. Pendientes, sin asignar; no corregidos en esta tanda.
+Reproducciones de la auditoría de Codex. Se corrigen en la **tanda 3**.
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-101](BUG-101.md) | La ficha inventa plazas libres cuando falla la consulta de disponibilidad | reservas | | pendiente | |
-| [BUG-102](BUG-102.md) | Nuevo chat recibe la respuesta pendiente de la conversación anterior | mira | | pendiente | |
-| [BUG-103](BUG-103.md) | Quitar de la lista de espera oculta la reserva aunque falle el servidor | reservas | | pendiente | |
-| [BUG-104](BUG-104.md) | Los accesos de canje e historial de puntos de Mi cuenta están cruzados | cuenta/puntos | | pendiente | |
-| [BUG-105](BUG-105.md) | Exportar liquidación de Este mes incluye tickets de otros meses | dashboard/fiscal | | pendiente | |
-| [BUG-106](BUG-106.md) | La exportación de liquidación pierde tickets cuando hay más de 20 | dashboard/fiscal | | pendiente | |
-| [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | | pendiente | |
-| [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | | pendiente | |
-| [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | | pendiente | |
-| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | | pendiente | |
+| [BUG-101](BUG-101.md) | La ficha inventa plazas libres cuando falla la consulta de disponibilidad | reservas | claude | pendiente | |
+| [BUG-102](BUG-102.md) | Nuevo chat recibe la respuesta pendiente de la conversación anterior | mira | claude | pendiente | |
+| [BUG-103](BUG-103.md) | Quitar de la lista de espera oculta la reserva aunque falle el servidor | reservas | claude | pendiente | |
+| [BUG-104](BUG-104.md) | Los accesos de canje e historial de puntos de Mi cuenta están cruzados | cuenta/puntos | claude | pendiente | |
+| [BUG-105](BUG-105.md) | Exportar liquidación de Este mes incluye tickets de otros meses | dashboard/fiscal | codex | pendiente | |
+| [BUG-106](BUG-106.md) | La exportación de liquidación pierde tickets cuando hay más de 20 | dashboard/fiscal | codex | pendiente | |
+| [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | codex | pendiente | |
+| [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | codex | pendiente | |
+| [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | codex | pendiente | |
+| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | codex | pendiente | |
+
+## Tanda 3
+
+Base: rama `fix/claude-tanda2` (la tanda 2 aún no está en `main`). Ramas: **Claude** → `fix/claude-tanda3` · **Codex** → `fix/codex-tanda3` (worktrees `../codex-tanda3` y `../codex-tanda3-backend`).
+
+Reparto por archivos: Codex se queda con el dashboard de restaurante, la exportación fiscal y el panel Ops (todos los de `Dashboard.jsx` van juntos) y la seguridad P2. Claude, con la ficha, las reservas, MIRASI, «Mi cuenta» y los puntos. **BUG-112 (idioma) va el último**, después de unir la rama de Codex, porque toca `Dashboard.jsx` y los paneles Ops.
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| BUG-101 a BUG-104 | (ver tabla de hallazgos) | usuario | claude | pendiente | |
+| BUG-105 a BUG-110 | (ver tabla de hallazgos) | dashboard/ops | codex | pendiente | |
+| [BUG-111](BUG-111.md) | POST /points/review da puntos sin una reseña real | puntos | claude | pendiente | |
+| [BUG-112](BUG-112.md) | Resto de textos fijos sin traducir (continuación de BUG-019) | i18n | claude | pendiente | |
+| [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | pendiente | |
+
