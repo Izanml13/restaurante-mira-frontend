@@ -77,7 +77,8 @@ export const pointsApi = {
 
   claimDiscount: async (euros) => conAuditoria('puntos_canjeados', { accion: 'descuento', meta: { valor: euros } }, reclamarDescuento(euros)),
 
-  review: async () => api.post('/v1/points/review', {}),
+  // Reintento de los puntos de una reseña propia; crear la reseña ya los da.
+  review: async (reviewId) => api.post('/v1/points/review', { reviewId }),
 };
 
 /* ────────────── RESERVATIONS (legacy api.js) ────────────── */
