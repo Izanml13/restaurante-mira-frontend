@@ -308,7 +308,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   const fechaLegible = reserva.fecha
     ? parseFechaLocal(reserva.fecha).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })
     : '';
-  const sinPlazas = disponibilidad && disponibilidad.libres <= 0;
+  const sinPlazas = Boolean(disponibilidad && !disponibilidad.desconocida && disponibilidad.libres <= 0);
 
   return (
     <div className="modal-fondo" onClick={cerrarDesdeFondo}>
@@ -517,8 +517,10 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               )}
 
               {reserva.fecha && reserva.hora && disponibilidad && (
-                <p className={`det-disponible${sinPlazas ? ' completo' : ''}`} role="status">
-                  {sinPlazas ? t('detail.completo') : t('detail.plazasLibres', { libres: disponibilidad.libres, limite: disponibilidad.limite })}
+                <p className={`det-disponible${sinPlazas ? ' completo' : ''}${disponibilidad.desconocida ? ' desconocida' : ''}`} role="status">
+                  {disponibilidad.desconocida
+                    ? t('detail.disponibilidadDesconocida')
+                    : sinPlazas ? t('detail.completo') : t('detail.plazasLibres', { libres: disponibilidad.libres, limite: disponibilidad.limite })}
                 </p>
               )}
               {avisoTerraza && (

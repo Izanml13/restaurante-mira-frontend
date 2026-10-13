@@ -425,6 +425,7 @@ export default {
     "eligeHora": "Select time",
     "comensales": "Guests",
     "comentarios": "Comments (optional, max 500)",
+    "disponibilidadDesconocida": "We couldn't check availability. You can still try to book: we'll confirm if there's room.",
     "plazasLibres": "{{libres}} of {{limite}} spots available",
     "completo": "Fully booked at that time. Try another slot.",
     "reservando": "Booking…",

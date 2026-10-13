@@ -423,6 +423,7 @@ export default {
     "eligeHora": "Tria hora",
     "comensales": "Comensals",
     "comentarios": "Comentaris (opcional, màx. 500)",
+    "disponibilidadDesconocida": "No hem pogut comprovar les places lliures. Pots intentar reservar igualment: et confirmarem si hi ha lloc.",
     "plazasLibres": "{{libres}} de {{limite}} places lliures",
     "completo": "Complet a aquesta hora. Prova un altre torn.",
     "reservando": "Reservant…",

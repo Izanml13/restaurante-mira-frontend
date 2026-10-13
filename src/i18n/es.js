@@ -425,6 +425,7 @@ export default {
     "eligeHora": "Elige hora",
     "comensales": "Comensales",
     "comentarios": "Comentarios (opcional, máx. 500)",
+    "disponibilidadDesconocida": "No hemos podido comprobar las plazas libres. Puedes intentar reservar igualmente: te confirmaremos si hay sitio.",
     "plazasLibres": "{{libres}} de {{limite}} plazas libres",
     "completo": "Completo a esa hora. Prueba otra franja.",
     "reservando": "Reservando…",

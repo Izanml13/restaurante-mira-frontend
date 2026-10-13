@@ -57,7 +57,8 @@ export async function getDisponibilidad(restaurante, fecha, hora) {
     const d = await api.get(`/v1/reservations/availability?${q}`, { auth: "opcional" });
     return d;
   } catch {
-    return { limite, ocupadas: 0, libres: limite };
+    // Sin respuesta no sabemos cuántas plazas quedan: antes se devolvía el aforo entero como libre.
+    return { limite, ocupadas: null, libres: null, desconocida: true };
   }
 }
 
