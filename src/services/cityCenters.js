@@ -28,3 +28,23 @@ export function centroDeZona(zona) {
   }
   return CENTRO_CATALUNA;
 }
+
+/**
+ * Asigna un local a una de las 4 zonas del mapa (Barcelona, Tarragona, Girona, Lleida).
+ * Si su zona no es una de ellas (p. ej. "Salou, Spain", "Gerona, Spain"), usa el centro más cercano.
+ * Devuelve '' si no hay forma de ubicarlo.
+ * @param {{ zona?: string, coords?: { lat: number|string, lng: number|string } }} r
+ */
+export function zonaPrincipal(r) {
+  if (r?.zona && CENTROS_CIUDAD[r.zona]) return r.zona;
+  const lat = Number(r?.coords?.lat);
+  const lng = Number(r?.coords?.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
+  let mejor = '';
+  let menor = Infinity;
+  for (const [zona, c] of Object.entries(CENTROS_CIUDAD)) {
+    const d = (c.lat - lat) ** 2 + (c.lng - lng) ** 2;
+    if (d < menor) { menor = d; mejor = zona; }
+  }
+  return mejor;
+}
