@@ -2,8 +2,15 @@ import { useEffect, useState } from 'react';
 import { promotionsApi } from '../../services/api.js';
 import PromoBadge from './PromoBadge';
 import { track } from '../../services/auditoria.js';
+import { useT } from '../../i18n/index.jsx';
+import es from '../../i18n/es.js';
+import ca from '../../i18n/ca.js';
+import en from '../../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 export default function PromotedCarousel() {
+  const t = useT(TRADS);
   const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +29,7 @@ export default function PromotedCarousel() {
 
   return (
     <div className="promoted-carousel">
-      <h3 className="promoted-carousel__title">Restaurantes destacados</h3>
+      <h3 className="promoted-carousel__title">{t('ui.destacados')}</h3>
       <div className="promoted-carousel__track">
         {promos.slice(0, 5).map((promo) => (
           <div key={promo.id} className="promoted-carousel__card"

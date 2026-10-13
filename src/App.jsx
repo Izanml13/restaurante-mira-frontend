@@ -415,7 +415,7 @@ function AppContent({ auth, tema, setTema }) {
   return (
     <>
       <a className="skip-link" href="#buscar">
-        Saltar al buscador
+        {t('ui.saltarBuscador')}
       </a>
       {/* En '#/admin' el shell de ops ocupa toda la pantalla: su cabecera (con el
           buscador de restaurantes) es la que debe verse arriba del todo y fija al

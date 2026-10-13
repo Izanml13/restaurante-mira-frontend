@@ -235,7 +235,7 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           )}
           {rachaReservas?.semanasConsecutivas > 0 && (
             <p style={{ fontSize: '0.9rem', color: 'var(--dorado)', marginBottom: '0.5rem' }}>
-              ⭐ x{rachaReservas.multiplicador} multiplicador activo
+              {t('ui.multiplicadorActivo', { n: rachaReservas.multiplicador })}
             </p>
           )}
           <div className="cuenta-points__actions">
@@ -244,7 +244,7 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
             <a href="#/invitar" className="btn-secundario btn-peq">{t('points.invite')}</a>
           </div>
           <div className="cuenta-redemption">
-            💰 100 pts = 1,00 € · Sin caducidad
+            {t('ui.equivalenciaSinCaducidad')}
           </div>
         </div>
 
@@ -367,7 +367,7 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
               >{t('cuenta.anadirRestaurante')}</a></p>
             )}
             {esAdmin && (
-              <p><a href="#/admin" className="btn-cta">Panel de Administracion</a></p>
+              <p><a href="#/admin" className="btn-cta">{t('ui.panelAdminTitulo')}</a></p>
             )}
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">

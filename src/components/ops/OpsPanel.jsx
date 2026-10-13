@@ -130,7 +130,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
                 <img src="/logo.png" alt="" onError={(e) => { e.currentTarget.src = '/logotipo.png'; }} />
                 <span>
                   <span className="ops-brand-name">MIRA</span>
-                  <span className="ops-brand-sub">Operator Hub</span>
+                  <span className="ops-brand-sub">{t('ui.opsHub')}</span>
                 </span>
               </a>
             </div>
@@ -158,7 +158,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
           <div className="ops-side-foot">
             <div className="ops-sys">
               <span>API mira-api</span>
-              <span className="ops-sys-live">Live</span>
+              <span className="ops-sys-live">{t('ui.opsEnDirecto')}</span>
             </div>
             <div className="ops-theme-row">
               <span>{t('ops.modoVisual')}</span>

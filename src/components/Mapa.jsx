@@ -284,7 +284,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     <section className="mapa-pagina" aria-labelledby="mapa-titulo">
       <header className="mapa-cabecera">
         <div>
-          <p className="mapa-eyebrow">MIRA · Cataluña</p>
+          <p className="mapa-eyebrow">{t('ui.mapaEyebrow')}</p>
           <h1 id="mapa-titulo">{t('otros.mapaPorZonas')}</h1>
           <p className="mapa-sub" aria-live="polite">
             {cargando
@@ -292,7 +292,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
               : t('otros.localesEnMapa', { count: visibles.length }) + (zona ? ` · ${nombreZona(zona, t)}` : '')}
           </p>
         </div>
-        <ul className="mapa-leyenda" aria-label="Leyenda de notas">
+        <ul className="mapa-leyenda" aria-label={t('ui.leyendaNotas')}>
           <li><i className="mapa-pin-mini mapa-pin--top" />4,6+</li>
           <li><i className="mapa-pin-mini mapa-pin--alta" />4,0+</li>
           <li><i className="mapa-pin-mini mapa-pin--media" />&lt; 4</li>
@@ -323,7 +323,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
         {/* El mapa SIEMPRE en el DOM: si no, Leaflet no inicializa (altura 0) */}
         <div ref={refCont} className="mapa-lienzo" role="application" aria-label={t('otros.mapaPorZonas')} />
         {cargando && fuente.length === 0 && <div className="mapa-cargando" role="status"><span />{t('otros.cargandoMapa')}</div>}
-        {!seleccionado && !cargando && visibles.length > 0 && <p className="mapa-pista">Toca un pin para ver el restaurante</p>}
+        {!seleccionado && !cargando && visibles.length > 0 && <p className="mapa-pista">{t('ui.tocaPin')}</p>}
         {seleccionado && <PreviewCard r={seleccionado} t={t} onCerrar={cerrar} onVerFicha={verFicha} />}
       </div>
     </section>

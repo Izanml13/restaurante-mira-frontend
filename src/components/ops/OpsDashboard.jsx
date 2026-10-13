@@ -146,7 +146,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
       {/* Hero */}
       <div className="ops-hero">
         <div>
-          <span className="ops-live-chip"><i />MIRA Enterprise HQ</span>{' '}
+          <span className="ops-live-chip"><i />{t('ui.opsChip')}</span>{' '}
           <span className="ops-sync">{t('ops.syncVivo')}</span>
           <h1>{t('ops.panelTitulo')}</h1>
           <p>{t('ops.panelSub')}</p>

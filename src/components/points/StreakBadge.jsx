@@ -1,8 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useT } from '../../i18n/index.jsx';
+import es from '../../i18n/es.js';
+import ca from '../../i18n/ca.js';
+import en from '../../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 const TOTAL_DAYS = 7;
 
 export default function StreakBadge({ rachaLogin, rachaReservas, onOpenStreak, fetchStreakData }) {
+  const t = useT(TRADS);
   const [loading, setLoading] = useState(false);
   const [localRacha, setLocalRacha] = useState(rachaLogin);
 
@@ -73,7 +80,7 @@ export default function StreakBadge({ rachaLogin, rachaReservas, onOpenStreak, f
 
       <div className="streak-badge__progress-section">
         <div className="streak-badge__progress-header">
-          <span className="streak-badge__progress-label">Progreso de racha</span>
+          <span className="streak-badge__progress-label">{t('ui.progresoRacha')}</span>
           <span className="streak-badge__progress-count">{dias}/7 días</span>
         </div>
         <div className="streak-badge__progress-bar">

@@ -189,7 +189,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
                 className={`header-streak-btn${loadingStreak ? ' header-streak-btn--loading' : ''}`}
                 onClick={handleStreakTap}
                 aria-label={t('nav.abrirRacha')}
-                title="Racha diaria"
+                title={t('ui.rachaDiaria')}
               >
                 <img src="/racha-fuego.png" alt="" className="header-streak-btn-img" />
               </button>
@@ -200,19 +200,19 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
                 ✉{noLeidos > 0 ? ` ${noLeidos}` : ''}
               </a>
               {esAdmin && (
-                <a href="#/admin" className="header-dashboard-link header-dashboard-admin" title="Panel de Administracion">
+                <a href="#/admin" className="header-dashboard-link header-dashboard-admin" title={t('ui.panelAdminTitulo')}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                   </svg>
-                  <span>Panel Admin</span>
+                  <span>{t('ui.panelAdmin')}</span>
                 </a>
               )}
               {perfil?.tipo === 'empresa' && (
-                <a href="#/dashboard" className="header-dashboard-link header-dashboard-restaurante" title="Mi Panel de Restaurante">
+                <a href="#/dashboard" className="header-dashboard-link header-dashboard-restaurante" title={t('ui.miPanelTitulo')}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                   </svg>
-                  <span>Mi Panel</span>
+                  <span>{t('ui.miPanel')}</span>
                 </a>
               )}
               <a href="#/cuenta" className="header-cuenta-link" title={usuario.email} aria-label={`${t('nav.miCuenta')}: ${usuario.nombre || usuario.email}`}>

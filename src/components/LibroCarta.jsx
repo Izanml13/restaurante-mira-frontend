@@ -108,11 +108,12 @@ function PaginaLeyenda({ pagina, leyenda, t }) {
 }
 
 function PaginaFin({ restaurant }) {
+  const t = useT(TRADS);
   return (
     <div className="carta-fin" aria-hidden="true">
       <span className="carta-fin-marca">✦</span>
       <p>{restaurant.nombre}</p>
-      <span className="carta-fin-sub">Buen provecho</span>
+      <span className="carta-fin-sub">{t('ui.buenProvecho')}</span>
     </div>
   );
 }

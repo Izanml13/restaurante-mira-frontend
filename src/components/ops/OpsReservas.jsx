@@ -100,7 +100,7 @@ export default function OpsReservas({ busquedaInicial = '' }) {
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                       <button type="button" className="ops-btn soft sm" disabled={actuando === r.id} onClick={() => cambiar(r.id, 'confirmada')}>{t('ops.confirmar')}</button>
                       <button type="button" className="ops-btn soft sm" disabled={actuando === r.id} onClick={() => cambiar(r.id, 'completada')}>{t('ops.completar')}</button>
-                      <button type="button" className="ops-btn soft sm" disabled={actuando === r.id} onClick={() => cambiar(r.id, 'no_show')}>No-show</button>
+                      <button type="button" className="ops-btn soft sm" disabled={actuando === r.id} onClick={() => cambiar(r.id, 'no_show')}>{t('ui.noPresentado')}</button>
                       <button type="button" className="ops-btn soft sm" disabled={actuando === r.id} onClick={() => cambiar(r.id, 'cancelada')}>{t('ops.cancelar')}</button>
                     </div>
                   </td>
