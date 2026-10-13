@@ -1345,8 +1345,8 @@ code {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--gris);
-  font-weight: 500;
+  color: inherit;
+  font-weight: 600;
   font-size: 0.85rem;
 }
 

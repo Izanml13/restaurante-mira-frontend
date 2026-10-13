@@ -90,6 +90,19 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
     }
   }
 
+  // El enlace ya apunta a #/: si estás en la landing no hay cambio de ruta y no pasaba nada.
+  function irALanding(e) {
+    e.preventDefault();
+    cerrar();
+    if (window.location.hash === '#/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    window.location.hash = '#/';
+    // Tras pintar la landing, arriba del todo (sin animación, que el cambio de vista la cortaría).
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
+
   function conmutarMensajes(e) {
     if (window.location.hash === '#/mensajes') {
       e.preventDefault();
@@ -104,7 +117,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         href="#/"
         className={`logo logo-imagen logo-mira${compacto ? ' compacto' : ''}`}
         aria-label={t('nav.inicio')}
-        onClick={cerrar}
+        onClick={irALanding}
       >
         {/* Letras reales para poder plegarlas al hacer scroll (como el logo de Anthropic). */}
         <span className="lm-letra lm-m" aria-hidden="true">M</span>
@@ -202,12 +215,11 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
                   <span>Mi Panel</span>
                 </a>
               )}
-              <a href="#/cuenta" className="header-cuenta-link" title={usuario.email}>
+              <a href="#/cuenta" className="header-cuenta-link" title={usuario.email} aria-label={`${t('nav.miCuenta')}: ${usuario.nombre || usuario.email}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                <span>{t('nav.miCuenta')}</span>
                 <span className="header-cuenta-nombre">{usuario.nombre || usuario.email}</span>
               </a>
               <button type="button" className="btn-texto header-logout" onClick={onSalir} aria-label={t('nav.cerrarSesion')}>
