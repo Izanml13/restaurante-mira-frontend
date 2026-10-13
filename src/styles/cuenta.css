@@ -9,7 +9,8 @@
 
 .chip-check,
 .prefs-card > .campo-check,
-.prefs-card .chip-grid > .campo-check {
+.prefs-card .chip-grid > .campo-check,
+.prefs-card .cookie-item > .campo-check {
   display: inline-flex !important;
   align-items: center;
   gap: 0.45rem;
@@ -85,6 +86,10 @@
 .prefs-card > div,
 .prefs-card > .cookie-item {
   flex-basis: 100%;
+}
+
+.prefs-card .cookie-item > .campo-check {
+  align-self: flex-start;
 }
 
 .prefs-card > button {
