@@ -13,6 +13,8 @@ import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
+import { unirReservas } from "./dashboardDatos.js";
+
 const TRADS = { es, ca, en };
 
 const CLAVE_DATOS_SIM = 'mira:rest-datos-simulados';
@@ -379,6 +381,7 @@ const restDropdownRef = useRef(null);
   if (!data) return null;
 
   const { restaurante, stats, proximasReservas, reservasHoy: reservasHoyList = [], ingresosPorMes, ticketsRecientes, finanzas, reservasParaTicket = [] } = data;
+  const reservasUnicas = unirReservas(proximasReservas || [], reservasHoyList);
   const hoyISO = new Date().toISOString().split('T')[0];
   const hoyLabel = new Date().toLocaleDateString(t('modelos.locale'), { day:'2-digit', month:'short'});
   // Finanzas persistidas (no texto plano) tiene prioridad sobre cálculo efímero
@@ -677,7 +680,7 @@ const restDropdownRef = useRef(null);
                   <p style={{fontSize:'0.68rem', color:'var(--op-on-variant)'}}>{filtroTodas ? t("dashboard.todasReservasFuturas") : t("dashboard.filtraPorFecha")}</p>
                 </div>
                 <div style={{background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0.5rem', fontSize:'0.68rem', fontWeight:700, color:'var(--op-primary)', display:'flex', alignItems:'center', gap:'0.25rem'}}>
-                  <span className="material-symbols-outlined" style={{fontSize:14}}>cloud_download</span> {t("dashboard.paxHoy", { n: hoyComensales })} · {(() => { const f=(data?.proximasReservas||[]).concat(data?.reservasHoy||[]).filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).reduce((s,r)=> s+(Number(r.comensales)||0),0); return f; })()} {fechaFiltro===hoyISO ? t("dashboard.hoy") : t("dashboard.enFecha", { fecha: fechaFiltro.slice(5) })}
+                  <span className="material-symbols-outlined" style={{fontSize:14}}>cloud_download</span> {t("dashboard.paxHoy", { n: hoyComensales })} · {(() => { const f=reservasUnicas.filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).reduce((s,r)=> s+(Number(r.comensales)||0),0); return f; })()} {fechaFiltro===hoyISO ? t("dashboard.hoy") : t("dashboard.enFecha", { fecha: fechaFiltro.slice(5) })}
                 </div>
               </div>
               <div className="op-occupancy">
@@ -693,7 +696,7 @@ const restDropdownRef = useRef(null);
                 <button className={`op-date-chip-btn ${fechaFiltro===hoyISO && !filtroTodas ? 'active':''}`} onClick={()=>{ setFechaFiltro(hoyISO); setFiltroTodas(false); setSelectedForecast(null); }}>{t("dashboard.hoyTitulo")}</button>
                 <button className={`op-date-chip-btn ${filtroTodas?'active':''}`} onClick={()=> setFiltroTodas(v=>!v)}>{filtroTodas? t("dashboard.filtrarPorFecha") : t("dashboard.verTodasFuturas")}</button>
                 <div className="op-date-chips" style={{marginLeft:'auto'}}>
-                  {Array.from({length:7}, (_,i)=>{ const d=new Date(); d.setDate(d.getDate()+i); const iso=d.toISOString().split('T')[0]; const count=(data?.proximasReservas||[]).concat(data?.reservasHoy||[]).filter(r=> r.fecha===iso && String(r.estado).toLowerCase()!=='cancelada').length; const label=d.toLocaleDateString(t('modelos.locale'),{day:'2-digit', month:'short'}); return (
+                  {Array.from({length:7}, (_,i)=>{ const d=new Date(); d.setDate(d.getDate()+i); const iso=d.toISOString().split('T')[0]; const count=reservasUnicas.filter(r=> r.fecha===iso && String(r.estado).toLowerCase()!=='cancelada').length; const label=d.toLocaleDateString(t('modelos.locale'),{day:'2-digit', month:'short'}); return (
                     <button key={iso} onClick={()=>{ setFechaFiltro(iso); setFiltroTodas(false); setSelectedForecast(null); }} className={`op-date-chip-btn ${fechaFiltro===iso && !filtroTodas ? 'active':''}`} title={t("dashboard.reservasTituloN", { n: count })}>{label} {count? `·${count}`:''}</button>
                   );})}
                 </div>
@@ -719,7 +722,7 @@ const restDropdownRef = useRef(null);
                       }
                       // Si no hay nada para la fecha exacta, también buscar en todas las reservas del restaurante (por si proximasReservas está limitada a 20)
                       if (base.length===0 && !filtroTodas) {
-                        const allRaw = (data?.proximasReservas||[]).concat(data?.reservasHoy||[]);
+                        const allRaw = reservasUnicas;
                         // ya está cubierto, pero intentamos fallback a reservas directas (ya tenemos)
                       }
                       if (base.length===0) {
