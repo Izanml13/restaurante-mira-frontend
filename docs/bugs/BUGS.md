@@ -37,4 +37,21 @@ Orden recomendado: los bugs transversales (018 tema, 019 idioma) se hacen **al f
 | [BUG-018](BUG-018.md) | Bugs visuales en modo oscuro y claro | tema | codex | en revisión | fix/codex-tanda2 |
 | [BUG-019](BUG-019.md) | Toda la interfaz en un solo idioma | i18n | claude | pendiente | |
 | [BUG-020](BUG-020.md) | Header: mostrar solo el nombre del usuario | header | claude | pendiente | |
-| [BUG-021](BUG-021.md) | Auditoría general de bugs de la web | general | codex | pendiente | |
+| [BUG-021](BUG-021.md) | Auditoría general de bugs de la web | general | codex | en revisión | fix/codex-tanda2 |
+
+## Hallazgos de BUG-021
+
+Reproducciones de la auditoría de Codex. Pendientes, sin asignar; no corregidos en esta tanda.
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-101](BUG-101.md) | La ficha inventa plazas libres cuando falla la consulta de disponibilidad | reservas | | pendiente | |
+| [BUG-102](BUG-102.md) | Nuevo chat recibe la respuesta pendiente de la conversación anterior | mira | | pendiente | |
+| [BUG-103](BUG-103.md) | Quitar de la lista de espera oculta la reserva aunque falle el servidor | reservas | | pendiente | |
+| [BUG-104](BUG-104.md) | Los accesos de canje e historial de puntos de Mi cuenta están cruzados | cuenta/puntos | | pendiente | |
+| [BUG-105](BUG-105.md) | Exportar liquidación de Este mes incluye tickets de otros meses | dashboard/fiscal | | pendiente | |
+| [BUG-106](BUG-106.md) | La exportación de liquidación pierde tickets cuando hay más de 20 | dashboard/fiscal | | pendiente | |
+| [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | | pendiente | |
+| [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | | pendiente | |
+| [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | | pendiente | |
+| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | | pendiente | |
