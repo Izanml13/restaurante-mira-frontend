@@ -533,6 +533,10 @@
   transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
 }
 
+.card-clicable {
+  cursor: pointer;
+}
+
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--sombra-card-hover);
