@@ -54,7 +54,7 @@ Reproducciones de la auditoría de Codex. Se corrigen en la **tanda 3**.
 | [BUG-107](BUG-107.md) | Liquidación CSV marca los tickets de no-show como asistencia sí | dashboard/fiscal | codex | en revisión | fix/codex-tanda3 |
 | [BUG-108](BUG-108.md) | Dashboard duplica las reservas y comensales de hoy en sus contadores | dashboard | codex | en revisión | fix/codex-tanda3 |
 | [BUG-109](BUG-109.md) | Dashboard de restaurante desborda el ancho móvil de 390 px | dashboard/móvil | codex | en revisión | fix/codex-tanda3 |
-| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | codex | pendiente | |
+| [BUG-110](BUG-110.md) | La búsqueda de cabecera Ops no actualiza Reservas Globales al pulsar Enter | admin/ops | codex | en revisión | fix/codex-tanda3 |
 
 ## Tanda 3
 

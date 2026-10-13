@@ -50,6 +50,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   });
   const [menuMovil, setMenuMovil] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+  const [consultaCabecera, setConsultaCabecera] = useState({ q: '', revision: 0 });
   const [criticas, setCriticas] = useState(0);
   const [sidebarFija, setSidebarFija] = useState(false);
   const [simulado, setSimulado] = useState(leerSimulado);
@@ -192,7 +193,8 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && busqueda.trim()) {
+                  if (e.key === 'Enter') {
+                    setConsultaCabecera((prev) => ({ q: busqueda.trim(), revision: prev.revision + 1 }));
                     setSeccion('reservas');
                   }
                 }}
@@ -236,7 +238,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
           <main className="ops-content">
             {seccion === 'dashboard' && <OpsDashboard key={simulado ? 'sim' : 'real'} usuario={usuario} esAdmin={esAdmin} todos={todos} demo={simulado ? demo : null} />}
             {seccion === 'restaurantes' && <OpsRestaurantes />}
-            {seccion === 'reservas' && <OpsReservas busquedaInicial={busqueda} />}
+            {seccion === 'reservas' && <OpsReservas busquedaInicial={consultaCabecera.q} revisionBusqueda={consultaCabecera.revision} />}
             {seccion === 'finanzas' && <OpsFinanzas key={simulado ? 'sim' : 'real'} demo={simulado ? demo : null} />}
             {seccion === 'incidencias' && <OpsIncidencias />}
             {seccion === 'usuarios' && <OpsUsuarios />}
