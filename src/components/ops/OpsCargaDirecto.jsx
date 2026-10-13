@@ -8,6 +8,12 @@ import { useEffect, useRef, useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { metricasApi } from '../../services/mejorasApi.js';
 import { GlassTooltip } from './OpsCharts.jsx';
+import { useT } from '../../i18n/index.jsx';
+import es from '../../i18n/es.js';
+import ca from '../../i18n/ca.js';
+import en from '../../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 const INTERVALO_MS = 2000;
 const VERDE = '#0e6b47';
@@ -41,6 +47,7 @@ function Medidor({ etiqueta, valor, max, unidad, umbral }) {
 }
 
 export default function OpsCargaDirecto() {
+  const t = useT(TRADS);
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState('');
   const [pausado, setPausado] = useState(false);
@@ -70,7 +77,7 @@ export default function OpsCargaDirecto() {
   if (!datos) {
     return (
       <div className="ops-card" role={error ? 'alert' : 'status'}>
-        <h2>Carga en directo</h2>
+        <h2>{t('tx.cargaTitulo')}</h2>
         <p className={error ? 'ops-error' : 'ops-card-sub'}>{error || 'Conectando con la API…'}</p>
       </div>
     );
@@ -87,12 +94,12 @@ export default function OpsCargaDirecto() {
         <div className="ops-card-head">
           <div>
             <h2>
-              Carga en directo {!pausado && <span className="ops-live-chip"><i />en vivo</span>}
+              {t('tx.cargaTitulo')} {!pausado && <span className="ops-live-chip"><i />{t('tx.cargaEnVivo')}</span>}
             </h2>
-            <p className="ops-card-sub">Tráfico real de la API (Render) · se actualiza cada 2 s · no consulta la base de datos</p>
+            <p className="ops-card-sub">{t('tx.cargaSub')}</p>
           </div>
           <div className="carga-controles">
-            <div className="ops-seg" role="tablist" aria-label="Ventana">
+            <div className="ops-seg" role="tablist" aria-label={t('tx.cargaVentana')}>
               {VENTANAS.map(([v, n]) => (
                 <button key={v} type="button" role="tab" aria-selected={ventana === v} className={ventana === v ? 'active' : ''} onClick={() => setVentana(v)}>{n}</button>
               ))}
@@ -104,18 +111,18 @@ export default function OpsCargaDirecto() {
         </div>
         {error && <p className="ops-error" role="alert">Sin conexión con la API: {error}. Se muestra el último dato.</p>}
         <div className="ops-kpis carga-kpis">
-          <Indicador etiqueta="Peticiones/s" valor={fmt(r.rpsActual)} sub="media últimos 10 s" />
-          <Indicador etiqueta="Latencia p95" valor={fmt(r.p95, ' ms')} sub={`p50 ${fmt(r.p50, ' ms')} · p99 ${fmt(r.p99, ' ms')}`} tono={r.p95 > 1000 ? 'is-alerta' : ''} />
-          <Indicador etiqueta="% errores" valor={r.pctErrores == null ? '—' : `${String(r.pctErrores).replace('.', ',')} %`} sub={`${fmt(r.errores4xx)} 4xx · ${fmt(r.errores5xx)} 5xx`} tono={r.errores5xx > 0 ? 'is-alerta' : ''} />
-          <Indicador etiqueta="En curso" valor={fmt(r.enCurso)} sub="peticiones ahora mismo" />
-          <Indicador etiqueta="Clientes activos" valor={fmt(r.clientesActivos)} sub="último minuto" />
-          <Indicador etiqueta="Peticiones" valor={fmt(r.peticiones)} sub={`en la ventana · ${fmt(r.totalDesdeArranque)} desde el arranque`} />
+          <Indicador etiqueta={t('tx.cargaPeticionesS')} valor={fmt(r.rpsActual)} sub={t('tx.cargaMedia10')} />
+          <Indicador etiqueta={t('tx.cargaLatencia')} valor={fmt(r.p95, ' ms')} sub={`p50 ${fmt(r.p50, ' ms')} · p99 ${fmt(r.p99, ' ms')}`} tono={r.p95 > 1000 ? 'is-alerta' : ''} />
+          <Indicador etiqueta={t('tx.cargaPctErrores')} valor={r.pctErrores == null ? '—' : `${String(r.pctErrores).replace('.', ',')} %`} sub={`${fmt(r.errores4xx)} 4xx · ${fmt(r.errores5xx)} 5xx`} tono={r.errores5xx > 0 ? 'is-alerta' : ''} />
+          <Indicador etiqueta={t('tx.cargaEnCurso')} valor={fmt(r.enCurso)} sub={t('tx.cargaAhora')} />
+          <Indicador etiqueta={t('tx.cargaClientes')} valor={fmt(r.clientesActivos)} sub={t('tx.cargaUltimoMin')} />
+          <Indicador etiqueta={t('tx.cargaPeticiones')} valor={fmt(r.peticiones)} sub={t('tx.cargaVentanaTotal', { n: fmt(r.totalDesdeArranque) })} />
         </div>
       </div>
 
       <div className="ops-grid-2">
         <div className="ops-card">
-          <h3 className="carga-h3">Peticiones por segundo</h3>
+          <h3 className="carga-h3">{t('tx.cargaPeticionesSeg')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={serie} margin={{ top: 8, right: 6, left: -22, bottom: 0 }}>
               <defs><linearGradient id="cargaRps" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={VERDE} stopOpacity={0.4} /><stop offset="100%" stopColor={VERDE} stopOpacity={0} /></linearGradient></defs>
@@ -144,7 +151,7 @@ export default function OpsCargaDirecto() {
 
       <div className="ops-grid-2">
         <div className="ops-card">
-          <h3 className="carga-h3">Errores por segundo</h3>
+          <h3 className="carga-h3">{t('tx.cargaErroresSeg')}</h3>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={serie} margin={{ top: 8, right: 6, left: -22, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="var(--chart-grid, #e3e9f5)" strokeDasharray="4 4" />
@@ -157,21 +164,21 @@ export default function OpsCargaDirecto() {
           </ResponsiveContainer>
         </div>
         <div className="ops-card">
-          <h3 className="carga-h3">Salud del servidor <small>Node {s.node} · {s.nucleos} núcleos · arrancado hace {uptime}</small></h3>
-          <Medidor etiqueta="CPU del proceso" valor={s.cpuPct} max={100} unidad="%" umbral={80} />
-          <Medidor etiqueta="Memoria (RSS)" valor={s.memoriaMB} max={512} unidad="MB" umbral={450} />
-          <Medidor etiqueta="Heap en uso" valor={s.heapMB} max={s.heapTotalMB || 1} unidad={`/ ${s.heapTotalMB} MB`} />
-          <Medidor etiqueta="Retardo del event loop" valor={s.lagMs} max={200} unidad={`ms (p99 ${s.lagP99Ms})`} umbral={100} />
+          <h3 className="carga-h3">{t('tx.cargaSalud')} <small>Node {s.node} · {s.nucleos} núcleos · arrancado hace {uptime}</small></h3>
+          <Medidor etiqueta={t('tx.cargaCpu')} valor={s.cpuPct} max={100} unidad="%" umbral={80} />
+          <Medidor etiqueta={t('tx.cargaMemoria')} valor={s.memoriaMB} max={512} unidad="MB" umbral={450} />
+          <Medidor etiqueta={t('tx.cargaHeap')} valor={s.heapMB} max={s.heapTotalMB || 1} unidad={`/ ${s.heapTotalMB} MB`} />
+          <Medidor etiqueta={t('tx.cargaLag')} valor={s.lagMs} max={200} unidad={`ms (p99 ${s.lagP99Ms})`} umbral={100} />
         </div>
       </div>
 
       <div className="ops-card">
-        <h3 className="carga-h3">Rutas más pedidas <small>desde el arranque</small></h3>
+        <h3 className="carga-h3">{t('tx.cargaRutas')} <small>{t('tx.cargaDesdeArranque')}</small></h3>
         <div className="ops-table-wrap">
           <table className="ops-table">
-            <thead><tr><th>Ruta</th><th className="num">Peticiones</th><th className="num">Errores</th><th className="num">p95</th></tr></thead>
+            <thead><tr><th>{t('tx.cargaRuta')}</th><th className="num">{t('tx.cargaPeticiones')}</th><th className="num">{t('tx.cargaErrores')}</th><th className="num">p95</th></tr></thead>
             <tbody>
-              {datos.rutas.length === 0 && <tr><td colSpan="4" className="ops-empty">Sin tráfico todavía.</td></tr>}
+              {datos.rutas.length === 0 && <tr><td colSpan="4" className="ops-empty">{t('tx.cargaSinTrafico')}</td></tr>}
               {datos.rutas.map((x) => (
                 <tr key={x.ruta}>
                   <td><code className="ops-code">{x.ruta}</code></td>
@@ -183,7 +190,7 @@ export default function OpsCargaDirecto() {
             </tbody>
           </table>
         </div>
-        <p className="ops-muted carga-nota">Las métricas viven en la memoria de la API y se reinician al desplegar o cuando Render la duerme. El histórico de uso está en Auditoría.</p>
+        <p className="ops-muted carga-nota">{t('tx.cargaNota')}</p>
       </div>
     </div>
   );

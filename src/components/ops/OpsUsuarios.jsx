@@ -195,14 +195,14 @@ export default function OpsUsuarios() {
         <input className="ops-input" type="search" placeholder={t('ops.phNombreEmail')} value={q}
           onChange={(e) => setQ(e.target.value)} style={{ flex: 1, minWidth: 220 }} />
         {conSimulados && (
-          <select className="ops-input" value={origen} onChange={(e) => setOrigen(e.target.value)} aria-label="Origen">
-            <option value="">Reales y simulados</option>
-            <option value="real">Solo reales</option>
-            <option value="simulado">Solo simulados</option>
+          <select className="ops-input" value={origen} onChange={(e) => setOrigen(e.target.value)} aria-label={t('tx.opsOrigen')}>
+            <option value="">{t('tx.opsRealesSim')}</option>
+            <option value="real">{t('tx.opsSoloReales')}</option>
+            <option value="simulado">{t('tx.opsSoloSim')}</option>
           </select>
         )}
         <label className="ops-muted" style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-          <input type="checkbox" checked={conSimulados} onChange={cambiarSimulados} /> Incluir usuarios simulados
+          <input type="checkbox" checked={conSimulados} onChange={cambiarSimulados} /> {t('tx.opsIncluirSim')}
         </label>
       </div>
       {cargando && <p className="ops-empty" role="status">{t('ops.cargandoUsuarios')}</p>}
@@ -230,7 +230,7 @@ export default function OpsUsuarios() {
           <div className="ops-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="ops-user-t">
             <h3 id="ops-user-t">{modal.nombre || modal.email}</h3>
             {modal.simulado && (
-              <p className="ops-pill warn" style={{ marginBottom: 8 }}>Usuario simulado · los cambios solo se ven aquí, no se guardan en la base de datos</p>
+              <p className="ops-pill warn" style={{ marginBottom: 8 }}>{t('tx.opsUsuarioSim')}</p>
             )}
             <p className="ops-muted" style={{ marginTop: -4, marginBottom: 12 }}>
               {modal.email} · {modal.saldoPuntos || 0} pts · {t('ops.rachaDe', { n: modal.rachaLoginDias || 0 })}

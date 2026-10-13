@@ -330,7 +330,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               el.src = imagenParaRestaurante(restaurant.cocina, restaurant.id);
             }}
           />
-          {restaurant.imagenFuente === 'ia' && <span className="foto-etiqueta foto-etiqueta--det">Imagen ilustrativa · IA</span>}
+          {restaurant.imagenFuente === 'ia' && <span className="foto-etiqueta foto-etiqueta--det">{t('tx.detImagenIA')}</span>}
           {restaurant.imagenCredito && (
             <span className="foto-credito foto-credito--det">
               Foto:{' '}
@@ -459,7 +459,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
             <div className="det-reserva-cab">
               <h3 id="reserva-titulo" className="det-sub">{t('detail.reservarMesa')}</h3>
               <span className="det-puntos-badge">
-                <img src="/moneda-mira.png" alt="" /> +100 pts · x1.2 con racha
+                <img src="/moneda-mira.png" alt="" /> {t('tx.detPuntosReserva')}
               </span>
             </div>
             {descuentoPendiente?.euros > 0 && (
@@ -540,7 +540,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                     <p>✓ {espera.mensaje}</p>
                   ) : (
                     <>
-                      <p>Esta franja está completa. ¿Quieres que te avisemos si alguien cancela?</p>
+                      <p>{t('tx.detFranjaCompleta')}</p>
                       <button type="button" className="btn-secundario btn-peq" onClick={apuntarseEspera} disabled={espera.estado === 'enviando'}>
                         {espera.estado === 'enviando' ? 'Apuntando…' : 'Avisarme si se libera una mesa'}
                       </button>
@@ -561,7 +561,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               </div>
               {!usuario && <p className="det-nota-login">{t('otros.debes')} <a href="#/login">{t('otros.iniciarSesion')}</a> {t('detail.reservar')}.</p>}
               <a className="det-grupo" href={`#/jam/nueva?r=${encodeURIComponent(restaurant.id)}`}>
-                <span aria-hidden="true">👥</span> ¿Vais en grupo? <strong>Votadlo en una MIRA JAM</strong> y reservamos la opción ganadora
+                <span aria-hidden="true">👥</span> {t('tx.detVaisGrupo')} <strong>{t('tx.detVotadJam')}</strong> {t('tx.detReservamosGanadora')}
               </a>
             </form>
             {confirmacion && (

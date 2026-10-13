@@ -10,10 +10,17 @@ import { obtenerTrazaReal, suscribirTrazaReal, limpiarTrazaReal } from '../../se
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { generarLogsSimulados, agruparEnBloques, filtrarLogs, resumenLogs } from './informeUsuarios.js';
 import { descargarCSV } from './opsData.js';
+import { useT } from '../../i18n/index.jsx';
+import es from '../../i18n/es.js';
+import ca from '../../i18n/ca.js';
+import en from '../../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 const POR_DOC = 200;
 
 export default function OpsTrazabilidadSimulada({ usuarios }) {
+  const t = useT(TRADS);
   const [uid, setUid] = useState('');
   const [modulo, setModulo] = useState('');
   const [soloErrores, setSoloErrores] = useState(false);
@@ -44,53 +51,53 @@ export default function OpsTrazabilidadSimulada({ usuarios }) {
   }
 
   return (
-    <section className="informe-seccion" aria-label="Trazabilidad simulada">
+    <section className="informe-seccion" aria-label={t('tx.trzSimulada')}>
       <div className="ops-card-head">
         <div>
-          <h2>Trazabilidad</h2>
+          <h2>{t('tx.trzTitulo')}</h2>
           <p className="ops-card-sub">
-            <strong>{reales.length}</strong> peticiones reales de esta sesión + <strong>{simulados.length}</strong> simuladas
+            <strong>{reales.length}</strong> {t('tx.trzRealesSesion')} <strong>{simulados.length}</strong> simuladas
             → {bloques.length} documentos en formato <code>logs</code> (bloques de {POR_DOC}). Sin consultas a la BD.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" className="ops-btn soft sm" onClick={limpiarTrazaReal} disabled={!reales.length}>Vaciar reales</button>
+          <button type="button" className="ops-btn soft sm" onClick={limpiarTrazaReal} disabled={!reales.length}>{t('tx.trzVaciar')}</button>
           <button type="button" className="ops-btn soft sm" onClick={exportarCSV} disabled={!filtrados.length}>CSV</button>
         </div>
       </div>
 
       <div className="informe-kpis">
         <div><strong>{res.total}</strong><span>peticiones</span></div>
-        <div><strong>{res.usuarios}</strong><span>usuarios con sesión</span></div>
-        <div><strong>{res.anonimas}</strong><span>anónimas</span></div>
+        <div><strong>{res.usuarios}</strong><span>{t('tx.trzConSesion')}</span></div>
+        <div><strong>{res.anonimas}</strong><span>{t('tx.trzAnonimas')}</span></div>
         <div><strong>{res.errores}</strong><span>errores (4xx/5xx)</span></div>
       </div>
 
       <div className="ops-toolbar informe-filtros" role="search">
-        <input className="ops-input" type="search" placeholder="uid (p. ej. sim-007) o «anónimo»" value={uid}
+        <input className="ops-input" type="search" placeholder={t('tx.trzPhUid')} value={uid}
           onChange={(e) => setUid(e.target.value)} style={{ flex: 1, minWidth: 180 }} />
-        <select className="ops-input" value={origen} onChange={(e) => setOrigen(e.target.value)} aria-label="Origen">
-          <option value="">Real + simulado</option>
-          <option value="real">Solo real</option>
-          <option value="simulado">Solo simulado</option>
+        <select className="ops-input" value={origen} onChange={(e) => setOrigen(e.target.value)} aria-label={t('tx.opsOrigen')}>
+          <option value="">{t('tx.trzRealSim')}</option>
+          <option value="real">{t('tx.trzSoloReal')}</option>
+          <option value="simulado">{t('tx.trzSoloSim')}</option>
         </select>
-        <select className="ops-input" value={modulo} onChange={(e) => setModulo(e.target.value)} aria-label="Módulo">
-          <option value="">Todos los módulos</option>
+        <select className="ops-input" value={modulo} onChange={(e) => setModulo(e.target.value)} aria-label={t('tx.trzModulo')}>
+          <option value="">{t('tx.trzTodosModulos')}</option>
           {modulos.map((m) => <option key={m} value={m}>{m}</option>)}
         </select>
-        <label><input type="checkbox" checked={soloErrores} onChange={(e) => setSoloErrores(e.target.checked)} /> Solo errores</label>
+        <label><input type="checkbox" checked={soloErrores} onChange={(e) => setSoloErrores(e.target.checked)} /> {t('tx.trzSoloErrores')}</label>
       </div>
 
       <div className="informe-graficos">
         <figure>
-          <figcaption>Peticiones por módulo</figcaption>
+          <figcaption>{t('tx.trzPorModulo')}</figcaption>
           <BarChart width={340} height={220} data={res.porModulo}>
             <XAxis dataKey="nombre" tick={{ fontSize: 11 }} /><YAxis allowDecimals={false} /><Tooltip />
             <Bar dataKey="valor" name="Peticiones" fill="#004393" isAnimationActive={false} />
           </BarChart>
         </figure>
         <figure>
-          <figcaption>Documentos en <code>logs</code></figcaption>
+          <figcaption>{t('tx.trzDocumentosEn')} <code>logs</code></figcaption>
           <ul className="informe-bloques">
             {bloques.map((b, i) => (
               <li key={b.desde}>
@@ -107,7 +114,7 @@ export default function OpsTrazabilidadSimulada({ usuarios }) {
       <div className="informe-tabla-wrap">
         <table className="informe-tabla">
           <thead>
-            <tr><th>Fecha</th><th>Origen</th><th>Método</th><th>Ruta</th><th>Estado</th><th>ms</th><th>Usuario</th></tr>
+            <tr><th>{t('tx.trzFecha')}</th><th>{t('tx.trzOrigen')}</th><th>{t('tx.trzMetodo')}</th><th>{t('tx.cargaRuta')}</th><th>{t('tx.trzEstado')}</th><th>ms</th><th>{t('tx.trzUsuario')}</th></tr>
           </thead>
           <tbody>
             {filtrados.slice(-200).reverse().map((x) => (
@@ -131,7 +138,7 @@ export default function OpsTrazabilidadSimulada({ usuarios }) {
           <div className="ops-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="bloque-t">
             <h3 id="bloque-t">logs / documento {bloqueVisto + 1}</h3>
             <pre className="informe-json">{JSON.stringify({ ...bloques[bloqueVisto], registros: [...bloques[bloqueVisto].registros.slice(0, 3), `… ${Math.max(0, bloques[bloqueVisto].n - 3)} más`] }, null, 2)}</pre>
-            <div className="ops-modal-actions"><button type="button" className="ops-btn soft sm" onClick={() => setBloqueVisto(null)}>Cerrar</button></div>
+            <div className="ops-modal-actions"><button type="button" className="ops-btn soft sm" onClick={() => setBloqueVisto(null)}>{t('tx.infCerrar')}</button></div>
           </div>
         </div>
       )}

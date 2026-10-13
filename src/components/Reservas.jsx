@@ -343,11 +343,11 @@ export default function Reservas({ usuario, esAdmin }) {
         <div className="rsv-extras">
           <a className="rsv-jam" href="#/jam">
             <span aria-hidden="true">👥</span>
-            <span><strong>Reserva en grupo</strong> Votad dónde y cuándo; MIRA reserva la opción ganadora.</span>
+            <span><strong>{t('tx.jamReservaGrupo')}</strong> {t('tx.rsvJamIntro')}</span>
           </a>
           {enEspera.length > 0 && (
             <section className="rsv-espera" aria-labelledby="espera-titulo">
-              <h2 id="espera-titulo" className="rsv-h2">En lista de espera</h2>
+              <h2 id="espera-titulo" className="rsv-h2">{t('tx.rsvEnEspera')}</h2>
               <ul>
                 {enEspera.map((e) => (
                   <li key={e.id}>
@@ -356,11 +356,11 @@ export default function Reservas({ usuario, esAdmin }) {
                       <span>{new Date(`${e.fecha}T12:00:00`).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })} · {e.hora} · {t('reservas.mesa', { n: e.comensales })}</span>
                     </div>
                     {e.estado === 'avisado' ? (
-                      <a className="btn-cta btn-peq" href={`#/r/${encodeURIComponent(e.restauranteId)}?fecha=${e.fecha}&hora=${encodeURIComponent(e.hora)}&comensales=${e.comensales}`}>¡Mesa libre! Reservar</a>
+                      <a className="btn-cta btn-peq" href={`#/r/${encodeURIComponent(e.restauranteId)}?fecha=${e.fecha}&hora=${encodeURIComponent(e.hora)}&comensales=${e.comensales}`}>{t('tx.rsvMesaLibre')}</a>
                     ) : (
-                      <span className="rsv-espera-estado">Esperando</span>
+                      <span className="rsv-espera-estado">{t('tx.rsvEsperando')}</span>
                     )}
-                    <button type="button" className="tk-cancelar" onClick={() => handleSalirEspera(e)}>Quitar</button>
+                    <button type="button" className="tk-cancelar" onClick={() => handleSalirEspera(e)}>{t('tx.rsvQuitar')}</button>
                   </li>
                 ))}
               </ul>

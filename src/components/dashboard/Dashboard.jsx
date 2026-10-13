@@ -436,7 +436,7 @@ const restDropdownRef = useRef(null);
           <div className="op-topbar">
             <div className="op-topbar-left">
               <div style={{display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap'}}>
-                <span className="op-live-badge"><span className="op-live-dot"></span> Operator Hub Live</span>
+                <span className="op-live-badge"><span className="op-live-dot"></span> {t('tx.dashHubEnDirecto')}</span>
                 <span style={{fontSize:'0.68rem', color:'var(--op-outline)'}}>/</span>
                 <span style={{fontSize:'0.68rem', fontWeight:600, color:'var(--op-on-variant)'}}>{t("dashboard.gestionRendimiento")}</span>
               </div>

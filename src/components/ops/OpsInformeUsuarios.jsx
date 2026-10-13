@@ -14,6 +14,12 @@ import {
 } from './informeUsuarios.js';
 import { descargarCSV } from './opsData.js';
 import OpsTrazabilidadSimulada from './OpsTrazabilidadSimulada.jsx';
+import { useT } from '../../i18n/index.jsx';
+import es from '../../i18n/es.js';
+import ca from '../../i18n/ca.js';
+import en from '../../i18n/en.js';
+
+const TRADS = { es, ca, en };
 
 const COLORES = ['#0e6b47', '#004393', '#6bfe9c', '#005ac0', '#ba1a1a', '#6f7a72'];
 
@@ -27,10 +33,11 @@ function resumenFiltros(f) {
 }
 
 function Graficos({ ag, ancho = 340 }) {
+  const t = useT(TRADS);
   return (
     <div className="informe-graficos">
       <figure>
-        <figcaption>Usuarios por plataforma</figcaption>
+        <figcaption>{t('tx.infPorPlataforma')}</figcaption>
         <PieChart width={ancho} height={220}>
           <Pie data={ag.porPlataforma} dataKey="valor" nameKey="nombre" outerRadius={80} innerRadius={45}
             label={({ nombre, valor }) => `${nombre} (${valor})`} isAnimationActive={false}>
@@ -40,14 +47,14 @@ function Graficos({ ag, ancho = 340 }) {
         </PieChart>
       </figure>
       <figure>
-        <figcaption>Usuarios por tipo</figcaption>
+        <figcaption>{t('tx.infPorTipo')}</figcaption>
         <BarChart width={ancho} height={220} data={ag.porTipo}>
           <XAxis dataKey="nombre" /><YAxis allowDecimals={false} /><Tooltip />
           <Bar dataKey="valor" name="Usuarios" fill="#004393" isAnimationActive={false} />
         </BarChart>
       </figure>
       <figure>
-        <figcaption>Altas por semana</figcaption>
+        <figcaption>{t('tx.infAltasSemana')}</figcaption>
         <LineChart width={ancho} height={220} data={ag.altasSemana} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="nombre" padding={{ left: 8, right: 8 }} tick={{ fontSize: 11 }} /><YAxis allowDecimals={false} /><Tooltip />
           <Line type="monotone" dataKey="valor" name="Altas" stroke="#0e6b47" strokeWidth={2} isAnimationActive={false} />
@@ -69,6 +76,7 @@ function Graficos({ ag, ancho = 340 }) {
 
 /** `soloSimulado`: para la demo sin cuenta admin (siempre datos simulados). */
 export default function OpsInformeUsuarios({ lista = [], soloSimulado = false }) {
+  const t = useT(TRADS);
   const st = useInformeUsuariosStore();
   const { filtros, columnas, orden, enmascarar } = st;
   const simulado = soloSimulado || st.simulado;
@@ -108,7 +116,7 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
       <div className="ops-card-head">
         <div>
           <h2>Informe de clientes ({datos.length}{simulado ? ' · simulados' : ''})</h2>
-          <p className="ops-card-sub">Filtra, revisa los gráficos y exporta. Sin consultas extra a la base de datos.</p>
+          <p className="ops-card-sub">{t('tx.infSub')}</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button type="button" className="ops-btn soft sm" onClick={() => exportar('csv')} disabled={!datos.length}>CSV</button>
@@ -117,17 +125,17 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
       </div>
 
           <div className="ops-toolbar informe-filtros" role="search">
-            <input className="ops-input" type="search" placeholder="Nombre, email, preferencia…" value={filtros.q}
+            <input className="ops-input" type="search" placeholder={t('tx.infPhBuscar')} value={filtros.q}
               onChange={(e) => st.setFiltro('q', e.target.value)} style={{ flex: 1, minWidth: 180 }} />
-            <select className="ops-input" value={filtros.tipo} onChange={(e) => st.setFiltro('tipo', e.target.value)} aria-label="Tipo">
-              <option value="">Todos los tipos</option>
+            <select className="ops-input" value={filtros.tipo} onChange={(e) => st.setFiltro('tipo', e.target.value)} aria-label={t('tx.infTipo')}>
+              <option value="">{t('tx.infTodosTipos')}</option>
               {TIPOS.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
-            <select className="ops-input" value={filtros.plataforma} onChange={(e) => st.setFiltro('plataforma', e.target.value)} aria-label="Plataforma">
-              <option value="">Todas las plataformas</option>
+            <select className="ops-input" value={filtros.plataforma} onChange={(e) => st.setFiltro('plataforma', e.target.value)} aria-label={t('tx.infPlataforma')}>
+              <option value="">{t('tx.infTodasPlataformas')}</option>
               {PLATAFORMAS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <label className="ops-muted">Login desde <input className="ops-input" type="date" value={filtros.desde} onChange={(e) => st.setFiltro('desde', e.target.value)} /></label>
+            <label className="ops-muted">{t('tx.infLoginDesde')} <input className="ops-input" type="date" value={filtros.desde} onChange={(e) => st.setFiltro('desde', e.target.value)} /></label>
             <label className="ops-muted">hasta <input className="ops-input" type="date" value={filtros.hasta} onChange={(e) => st.setFiltro('hasta', e.target.value)} /></label>
           </div>
           <div className="ops-toolbar informe-opciones">
@@ -135,10 +143,10 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
               <label><input type="checkbox" checked={simulado} onChange={(e) => st.setPref('simulado', e.target.checked)} /> Datos simulados (100 usuarios)</label>
             )}
             {simulado && (
-              <button type="button" className="ops-btn soft sm" onClick={() => setSemilla((s) => s + 1)}>Regenerar simulación</button>
+              <button type="button" className="ops-btn soft sm" onClick={() => setSemilla((s) => s + 1)}>{t('tx.infRegenerar')}</button>
             )}
             <label><input type="checkbox" checked={enmascarar} onChange={(e) => st.setPref('enmascarar', e.target.checked)} /> Enmascarar emails al exportar (RGPD)</label>
-            <button type="button" className="ops-btn soft sm" onClick={st.restablecer}>Restablecer preferencias</button>
+            <button type="button" className="ops-btn soft sm" onClick={st.restablecer}>{t('tx.infRestablecer')}</button>
           </div>
           <details className="informe-columnas">
             <summary>Columnas ({cols.length})</summary>
@@ -159,14 +167,14 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
                       {c.nombre}{orden.campo === c.id ? (orden.asc ? ' ▲' : ' ▼') : ''}
                     </th>
                   ))}
-                  {simulado && <th>Traza</th>}
+                  {simulado && <th>{t('tx.infTraza')}</th>}
                 </tr>
               </thead>
               <tbody>
                 {datos.slice(0, 200).map((u) => (
                   <tr key={u.uid}>
                     {cols.map((c) => <td key={c.id}>{String(valorCelda(u, c.id)) || '—'}</td>)}
-                    {simulado && <td><button type="button" className="ops-btn soft sm" onClick={() => setTraza(u)}>Ver</button></td>}
+                    {simulado && <td><button type="button" className="ops-btn soft sm" onClick={() => setTraza(u)}>{t('tx.infVer')}</button></td>}
                   </tr>
                 ))}
               </tbody>
@@ -186,7 +194,7 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
                 return <li key={p.id} className={ev ? 'hecho' : ''}>{p.nombre}: {ev ? new Date(ev.fecha).toLocaleString('es-ES') : 'no alcanzado'}</li>;
               })}
             </ol>
-            <div className="ops-modal-actions"><button type="button" className="ops-btn soft sm" onClick={() => setTraza(null)}>Cerrar</button></div>
+            <div className="ops-modal-actions"><button type="button" className="ops-btn soft sm" onClick={() => setTraza(null)}>{t('tx.infCerrar')}</button></div>
           </div>
         </div>
       )}
@@ -194,7 +202,7 @@ export default function OpsInformeUsuarios({ lista = [], soloSimulado = false })
       {imprimir && (
         <div className="informe-imprimible">
           <header>
-            <h1>Informe de clientes — MIRA</h1>
+            <h1>{t('tx.infTitulo')}</h1>
             <p>
               Generado el {new Date(imprimir.fecha).toLocaleString('es-ES')}
               <br />Filtros: {imprimir.filtros} · {imprimir.filas} usuarios · origen {imprimir.origen}
