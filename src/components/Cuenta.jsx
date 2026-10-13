@@ -192,7 +192,9 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           <p className="emblema-progreso-racha" title={t('emblemas.multiplicador', { multi: multiTexto })}>
             <span className="emblema-progreso-racha-icono" aria-hidden="true">🔥</span>
             <span className="emblema-progreso-racha-nombre">{t('emblemas.multiplicador')}</span>
-            <strong className="emblema-progreso-racha-valor">{multiTexto}</strong>
+            <strong className="emblema-progreso-racha-valor">
+              <span className="emblema-progreso-racha-x" aria-hidden="true">x</span>{String(multiTexto).replace(/^x/i, '')}
+            </strong>
           </p>
         </div>
         <h1 id="cuenta-titulo">{usuario.nombre || t('cuenta.miCuenta')}</h1>

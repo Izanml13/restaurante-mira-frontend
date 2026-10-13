@@ -26,7 +26,7 @@ Orden recomendado: los bugs transversales (018 tema, 019 idioma) se hacen **al f
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
 | [BUG-009](BUG-009.md) | Icono del ojo de la contraseña roto en el registro | registro | claude | en revisión | fix/claude-tanda2 |
-| [BUG-010](BUG-010.md) | Multiplicador: «x» minúscula y número centrado | cuenta | claude | pendiente | |
+| [BUG-010](BUG-010.md) | Multiplicador: «x» minúscula y número centrado | cuenta | claude | en revisión | fix/claude-tanda2 |
 | [BUG-011](BUG-011.md) | Botón «Marcar todo como leído» en mensajería | mensajes | codex | pendiente | |
 | [BUG-012](BUG-012.md) | Botón de MIRA JAM más destacado | reservas | codex | pendiente | |
 | [BUG-013](BUG-013.md) | Bugs de la racha diaria | puntos | claude | pendiente | |

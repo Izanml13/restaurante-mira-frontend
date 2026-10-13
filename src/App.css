@@ -1630,12 +1630,22 @@ button.btn-texto {
 }
 
 .emblema-progreso-racha-valor {
-  font-family: var(--fuente-display);
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--dorado);
   letter-spacing: 0.02em;
   line-height: 1;
+  /* Cifras alineadas a la línea base: las de Playfair descendían y no quedaban centradas. */
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.emblema-progreso-racha-x {
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: none;
 }
 
 [data-theme='dark'] .emblema-progreso-racha {
