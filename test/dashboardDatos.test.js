@@ -57,3 +57,22 @@ test('CSV refleja asistencia real sin cambiar importes ni columnas', () => {
   assert.deepEqual(csv.slice(1).map(r => r.split(';').at(-1)), ['si', 'no', 'si']);
   assert.deepEqual(csv[2].split(';').slice(3, 6), ['100.00', '8.00', '92.00']);
 });
+
+import { ticketsCompletos } from '../src/components/dashboard/dashboardDatos.js';
+import { facturaReal } from '../src/components/fiscal/fiscalReal.js';
+
+test('CSV y factura incluyen 525 tickets completos aunque el preview solo tenga 20', () => {
+  const tickets = Array.from({ length: 525 }, (_, i) => ({ id: `t${i}`, fecha: '2026-10-13', totalPagado: 100, asistio: true }));
+  const lista = filtrarTicketsPeriodo(ticketsCompletos({ tickets, ticketsRecientes: tickets.slice(0, 20) }), 'este-mes', ahora);
+  const csv = csvLiquidacion(lista, 8).split('\n').slice(1);
+  assert.equal(csv.length, 525);
+  assert.equal(csv.reduce((n, r) => n + Number(r.split(';')[3]), 0), 52500);
+  const factura = facturaReal({ tickets: lista, comisionPct: 8 });
+  assert.equal(factura.lineas.length, 525);
+  assert.equal(factura.resumen.totalTickets, 52500);
+});
+
+test('una respuesta antigua no se usa como dataset completo de documentos', () => {
+  assert.throws(() => ticketsCompletos({ ticketsRecientes: [{ id: 'preview' }] }), /TICKETS_INCOMPLETOS/);
+  assert.deepEqual(ticketsCompletos({ tickets: [] }), []);
+});

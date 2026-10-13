@@ -29,3 +29,9 @@ export function csvLiquidacion(lista, comisionPct) {
   const header = ['Fecha','Codigo','Cliente','Total',`Comision ${comisionPct}%`,'Neto','Asistio'];
   return [header.join(';'), ...rows.map(r=> [r.fecha,r.codigo,`"${r.cliente}"`,r.total.toFixed(2),r.comision.toFixed(2),r.neto.toFixed(2), r.asistio ? 'si' : 'no'].join(';'))].join('\n');
 }
+
+/** No generar un documento con una vista previa de tickets truncada. */
+export function ticketsCompletos(datos) {
+  if (!Array.isArray(datos?.tickets)) throw new Error('TICKETS_INCOMPLETOS');
+  return datos.tickets;
+}

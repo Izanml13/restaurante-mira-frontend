@@ -13,7 +13,7 @@ import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
-import { unirReservas, filtrarTicketsPeriodo, csvLiquidacion } from "./dashboardDatos.js";
+import { unirReservas, filtrarTicketsPeriodo, csvLiquidacion, ticketsCompletos } from "./dashboardDatos.js";
 
 const TRADS = { es, ca, en };
 
@@ -89,15 +89,26 @@ const restDropdownRef = useRef(null);
     return filtrarTicketsPeriodo(lista, selectedMonth);
   }
 
+  function ticketsParaDocumentos() {
+    try {
+      return ticketsDelPeriodo(ticketsCompletos(data));
+    } catch {
+      setError(t('dashboard.ticketsIncompletos'));
+      return null;
+    }
+  }
+
   /** Abre la factura / el reporte fiscal: simulado (demo) o con datos reales del panel. */
   function abrirDocumento(tipo) {
     setDocReal(null);
     if (datosSimulados) { setDocumento(tipo); return; }
+    const tickets = tipo === 'factura' ? ticketsParaDocumentos() : [];
+    if (tickets === null) return;
     const rest = data?.restaurante || {};
     const pct = Number(rest.comisionPct) || 8;
     setDocReal(
       tipo === 'factura'
-        ? facturaReal({ restaurante: rest, comisionPct: pct, tickets: ticketsDelPeriodo(data?.ticketsRecientes || []) })
+        ? facturaReal({ restaurante: rest, comisionPct: pct, tickets })
         : reporteFiscalReal({ restaurante: rest, comisionPct: pct, ingresosPorMes: data?.ingresosPorMes || {} }),
     );
     setDocumento(tipo);
@@ -224,7 +235,8 @@ const restDropdownRef = useRef(null);
   }
   function handleExportLiquidacion(){
     if(!data) return;
-    const list = ticketsDelPeriodo(data.ticketsRecientes || []);
+    const list = ticketsParaDocumentos();
+    if (list === null) return;
     const csv = csvLiquidacion(list, comisionPct);
     const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);

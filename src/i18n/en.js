@@ -900,6 +900,7 @@ export default {
     "puntosCanjeados": "Points redeemed"
   },
   "dashboard": {
+    "ticketsIncompletos": "The complete ticket list was not received. Refresh the panel or check that the API is up to date.",
     "sinAcceso": "You don't have access to this restaurant.",
     "panelAdmin": "Admin Panel",
     "errorSinRestaurante": "Make sure you have a restaurant created. If you're a company, go to \"My account\" → \"Add restaurant\" to create one first.",

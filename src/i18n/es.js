@@ -900,6 +900,7 @@ export default {
     "puntosCanjeados": "Puntos canjeados"
   },
   "dashboard": {
+    "ticketsIncompletos": "No se han recibido todos los tickets. Actualiza el panel o comprueba que la API esté actualizada.",
     "sinAcceso": "No tienes acceso a este restaurante.",
     "panelAdmin": "Panel de Administración",
     "errorSinRestaurante": "Asegúrate de tener un restaurante creado. Si eres empresa, ve a \"Mi cuenta\" → \"Añadir restaurante\" para crear uno primero.",
