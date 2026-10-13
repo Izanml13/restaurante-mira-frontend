@@ -13,7 +13,7 @@ import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
-import { unirReservas, filtrarTicketsPeriodo } from "./dashboardDatos.js";
+import { unirReservas, filtrarTicketsPeriodo, csvLiquidacion } from "./dashboardDatos.js";
 
 const TRADS = { es, ca, en };
 
@@ -225,9 +225,7 @@ const restDropdownRef = useRef(null);
   function handleExportLiquidacion(){
     if(!data) return;
     const list = ticketsDelPeriodo(data.ticketsRecientes || []);
-    const rows = list.map(t=> ({ fecha: fechaDeTicket(t), codigo: t.codigoReserva || t.id.slice(0,6), total: t.totalPagado||0, comision: t.importeComision!=null ? t.importeComision : Math.round((t.totalPagado||0)*(comisionPct/100)*100)/100, neto: t.netoRestaurante!=null ? t.netoRestaurante : Math.round(((t.totalPagado||0) - (t.importeComision!=null ? t.importeComision : (t.totalPagado||0)*(comisionPct/100)))*100)/100, cliente: t.clienteNombre||t.restauranteNombre||'' }));
-    const header = ['Fecha','Codigo','Cliente','Total',`Comision ${comisionPct}%`,'Neto','Asistio'];
-    const csv = [header.join(';'), ...rows.map(r=> [r.fecha,r.codigo,`"${r.cliente}"`,r.total.toFixed(2),r.comision.toFixed(2),r.neto.toFixed(2), 'si'].join(';'))].join('\n');
+    const csv = csvLiquidacion(list, comisionPct);
     const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download=`liquidacion-${(data.restaurante.nombre||'restaurante').replace(/\s+/g,'_')}-${selectedMonth}-${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);

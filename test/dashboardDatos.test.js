@@ -44,3 +44,16 @@ test('el cambio de mes de un timestamp se interpreta en Europe/Madrid', () => {
   assert.deepEqual(filtrarTicketsPeriodo([ticket], 'este-mes', ahora), [ticket]);
   assert.deepEqual(filtrarTicketsPeriodo([ticket], 'este-mes', new Date('2026-09-30T22:30:00Z')), [ticket]);
 });
+
+import { csvLiquidacion } from '../src/components/dashboard/dashboardDatos.js';
+
+test('CSV refleja asistencia real sin cambiar importes ni columnas', () => {
+  const csv = csvLiquidacion([
+    { id: 'asiste', fecha: '2026-10-13', totalPagado: 100, asistio: true },
+    { id: 'no-show', fecha: '2026-10-13', totalPagado: 100, asistio: false },
+    { id: 'legacy', fecha: '2026-10-13', totalPagado: 100 },
+  ], 8).split('\n');
+  assert.equal(csv[0].split(';').length, 7);
+  assert.deepEqual(csv.slice(1).map(r => r.split(';').at(-1)), ['si', 'no', 'si']);
+  assert.deepEqual(csv[2].split(';').slice(3, 6), ['100.00', '8.00', '92.00']);
+});
