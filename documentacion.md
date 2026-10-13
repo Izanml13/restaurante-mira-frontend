@@ -657,8 +657,22 @@ enviarContacto({ nombre, email, motivo, mensaje })
 crearIncidencia({ uid, email, motivo, mensaje })
 listarMisIncidencias({ uid, email })
 listarIncidenciasPendientes()        // Admin
-resolverIncidencia(id)               // Admin
+resolverIncidencia(id, { propuestaResolucion, solucion, encargado })  // Admin
 ```
+
+**Resolución de incidencias (admin).** Resolver ya no es un solo clic: el botón «Resolver» abre `ResolverIncidenciaModal.jsx`, que pide tres campos obligatorios:
+
+| Campo | Límite | Qué es |
+|---|---|---|
+| Propuesta de resolución | 4000 | Qué se propone hacer |
+| Solución | 4000 | Qué se ha hecho finalmente |
+| Encargado | 200 | Persona responsable |
+
+- Se usa en los tres sitios donde se resuelven incidencias: `Admin.jsx`, `ops/OpsDashboard.jsx` y `ops/OpsIncidencias.jsx`.
+- `services/incidenciaResolucion.js` (`validarResolucion`) recorta y valida los campos antes de llamar a la API; con datos incompletos no se hace la petición.
+- «Cancelar» cierra sin cambiar nada; si la API falla, el popup sigue abierto con el error.
+- El backend (`PUT /v1/contactos/:id/resolve`) vuelve a validar y guarda los tres campos junto a `estado: "resuelta"`. Ver `docs/api.md` §16.4 del backend.
+- **Despliegue:** frontend antes que backend (o a la vez); un frontend antiguo recibiría 400.
 
 ### Negocio (`negocioApi.js`)
 
