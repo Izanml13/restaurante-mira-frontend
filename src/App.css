@@ -293,6 +293,10 @@
   transform: translateY(-1px);
 }
 
+[data-theme='dark'] .btn-cta:hover {
+  background: color-mix(in srgb, var(--primary-container) 78%, #000);
+}
+
 .btn-peq {
   padding: 0.5rem 1.1rem;
   font-size: 0.88rem;

@@ -76,13 +76,13 @@ Hallazgos del usuario tras la tanda 3 (modo oscuro, admin y modales). Rama: `fix
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-114](BUG-114.md) | Botón en modo oscuro no se oscurece al pasar el cursor | tema | claude | pendiente | |
+| [BUG-114](BUG-114.md) | Botón en modo oscuro no se oscurece al pasar el cursor | tema | claude | en revisión | fix/claude-tanda4 |
 | [BUG-115](BUG-115.md) | La mascota de MiraClub se ve transparente en modo oscuro | tema/miraclub | claude | pendiente | |
 | [BUG-116](BUG-116.md) | Texto de «reclamar MiraClub» ilegible en modo oscuro | tema/miraclub | claude | pendiente | |
-| [BUG-117](BUG-117.md) | Avatar de MiraAI: cuadrado blanco en el círculo en modo oscuro | mira/tema | claude | pendiente | |
+| [BUG-117](BUG-117.md) | Avatar de MiraAI: cuadrado blanco en el círculo en modo oscuro | mira/tema | claude | en revisión | fix/claude-tanda4 |
 | [BUG-118](BUG-118.md) | Desaparece la opción de ver cómo piensa MiraAI | mira | claude | pendiente | |
 | [BUG-119](BUG-119.md) | Los iconos de admin tardan en cargar | admin | claude | pendiente | |
-| [BUG-120](BUG-120.md) | Botones rojos de eliminar demasiado claros en modo oscuro | tema | claude | pendiente | |
+| [BUG-120](BUG-120.md) | Botones rojos de eliminar demasiado claros en modo oscuro | tema | claude | en revisión | fix/claude-tanda4 |
 | [BUG-121](BUG-121.md) | Los modales se centran en la página y no en la pantalla | ui-global | claude | pendiente | |
 | [BUG-122](BUG-122.md) | Ayuda visual de primera vez en Admin para el menú lateral | admin/ux | claude | pendiente | |
 | [BUG-123](BUG-123.md) | El menú desplegable izquierdo de Admin baja de más | admin | claude | pendiente | |
