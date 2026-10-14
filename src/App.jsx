@@ -63,6 +63,7 @@ import './styles/paneles.css';
 import './styles/cuenta.css';
 import { I18nProvider } from './i18n/index.jsx';
 import { instalarAuditoria } from './services/auditoria.js';
+import { abrirRachaSiPendiente } from './services/rachaEntrada.js';
 
 function baseHash() {
   const h = window.location.hash || '';
@@ -160,16 +161,22 @@ function AppContent({ auth, tema, setTema }) {
   }, [perfil?.lang]);
 
   useEffect(() => {
-    if (!usuario) return;
+    if (!usuario) {
+      // Sin sesión no queda ninguna racha abierta (ni la de la cuenta anterior).
+      setShowStreakPopup(false);
+      setStreakData(null);
+      return;
+    }
     // Un solo destino: la store (el header la lee). El resto de pantallas
     // que ya llamaban a fetchBalance() actualizan ahora el mismo estado.
     syncBalance();
     // Al entrar, la racha se abre siempre que la de hoy siga sin reclamar
-    // (no solo a usuarios nuevos). Si la API falla no se abre sola.
-    fetchStreakData().then((data) => {
-      if (!data.error && !data.yaReclamado) openStreakPopup(data);
-    });
-  }, [usuario]);
+    // (no solo a usuarios nuevos). Si la API falla, o la sesión cambia antes
+    // de que llegue la respuesta, no se abre sola.
+    let vigente = true;
+    abrirRachaSiPendiente(fetchStreakData, openStreakPopup, () => vigente);
+    return () => { vigente = false; };
+  }, [usuario?.uid]);
 
   async function fetchStreakData() {
     if (!usuario) return { racha: { dias: 0 }, puntos: 0, yaReclamado: false };
@@ -572,7 +579,7 @@ function AppContent({ auth, tema, setTema }) {
         onConfirm={handleFloatingConfirm}
         onClose={closeFloatingSheet}
       />
-      {showStreakPopup && streakData && (
+      {usuario && showStreakPopup && streakData && (
         <DailyStreakPopup
           racha={streakData.racha}
           saldo={puntosSaldo}
