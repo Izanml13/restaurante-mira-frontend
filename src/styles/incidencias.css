@@ -1,0 +1,10 @@
+.incidencias-vistas, .incidencias-filtros { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 1rem 0; }
+.incidencias-filtros label { display: grid; gap: 0.3rem; min-width: 0; }
+.incidencias-filtros input { max-width: 100%; padding: 0.5rem; color: var(--tinta); background: var(--fondo); border: 1px solid var(--borde); }
+.incidencias-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem; }
+.incidencias-graficos figure { min-width: 0; margin: 0; }
+.incidencias-graficos figcaption { margin-bottom: 0.7rem; font-weight: 600; }
+.incidencias-resueltas .registro { overflow-wrap: anywhere; }
+
+.ops-card .incidencias-filtros input { color: var(--ops-on-surface); background: var(--ops-surface); border-color: var(--ops-outline-variant); }
+.incidencias-vistas button[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 2px; }
