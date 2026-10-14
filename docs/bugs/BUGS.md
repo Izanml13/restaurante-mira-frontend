@@ -85,5 +85,5 @@ Reparto por archivos: Claude se queda con todo lo de `App.jsx` (card, JAM, filtr
 | [BUG-117](BUG-117.md) | Filtro de zona: solo las 4 provincias de Cataluña | buscador | claude | en curso (claude) | fix/claude-tanda4 |
 | [BUG-118](BUG-118.md) | Racha: modo oscuro, popup al entrar y scroll del fondo | racha | claude | en curso (claude) | fix/claude-tanda4 |
 | [BUG-119](BUG-119.md) | Al volver a Mapa no empieza arriba | mapa | claude | en curso (claude) | fix/claude-tanda4 |
-| [BUG-120](BUG-120.md) | Invitaciones: mensaje, lista tras F5 y envío real del correo | invitaciones | codex | en revisión | fix/codex-tanda4 |
-| [BUG-121](BUG-121.md) | Incidencias del admin: resolución y gráficos | admin/incidencias | codex | en revisión | fix/codex-tanda4 |
+| [BUG-120](BUG-120.md) | Invitaciones: mensaje, lista tras F5 y envío real del correo | invitaciones | codex | hecho | fix/codex-tanda4 |
+| [BUG-121](BUG-121.md) | Incidencias del admin: resolución y gráficos | admin/incidencias | codex | hecho | fix/codex-tanda4 |
