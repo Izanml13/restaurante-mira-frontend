@@ -1,7 +1,8 @@
 /**
  * Model — reglas de filtrado y ordenación (funciones puras, sin side-effects).
  */
-import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APTOS, aptoAccesibilidad, accesibilidadActiva } from '../models/restaurantModel.js';
+import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APTOS, aptoAccesibilidad, accesibilidadActiva, familiaCocina } from '../models/restaurantModel.js';
+import { zonaPrincipal } from './cityCenters.js';
 
 /**
  * Filtra la lista en cliente. Todos los filtros son opcionales.
@@ -22,11 +23,11 @@ export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona
     // Servicios (menú infantil, tronas, terraza, tranquilo): valen datos reales y estimados.
     if (servicios.length && !servicios.every((campo) => r[campo] === true)) return false;
     if (cocina) {
-      const nCocina = normalizeText(cocina);
-      const candidatas = [r.cocina, ...(r.categorias || [])].map(normalizeText);
-      if (!candidatas.includes(nCocina)) return false;
+      const familia = familiaCocina(cocina);
+      const candidatas = [r.cocina, ...(r.categorias || [])].filter(Boolean).map(familiaCocina);
+      if (!candidatas.includes(familia)) return false;
     }
-    if (zona && (r.zona ?? '') !== zona) return false;
+    if (zona && zonaPrincipal(r) !== zona) return false;
     if (maxKm != null && (r.distanciaKm == null || !(r.distanciaKm <= maxKm))) return false;
     if (query) {
       const haystack = normalizeText(`${r.nombre} ${r.cocina} ${r.descripcion} ${r.ciudad ?? ''} ${r.zona ?? ''}`);
