@@ -11,6 +11,7 @@ import { jamsApi } from '../services/mejorasApi.js';
 import { fetchRestaurants } from '../services/restaurantApi.js';
 import { SLOTS } from '../services/reservaApi.js';
 import { imagenParaRestaurante } from '../models/restaurantModel.js';
+import { comprimirImagen } from '../services/comprimirImagen.js';
 import '../styles/jam.css';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
@@ -18,6 +19,13 @@ import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
+
+// Portada por defecto (grupo de amigos en una mesa) y tamaños de las fotos subidas.
+const PORTADA_JAM = 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1400&q=60&auto=format&fit=crop';
+const FOTO = {
+  portada: { ancho: 1000, alto: 400, maxChars: 88000 },
+  perfil: { ancho: 256, alto: 256, maxChars: 29000 },
+};
 
 const DURACIONES = [
   [30, '30 minutos'], [120, '2 horas'], [24 * 60, '1 día'], [3 * 24 * 60, '3 días'],
@@ -193,6 +201,7 @@ function Sala({ codigo, usuario, perfil }) {
   const [enDirecto, setEnDirecto] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  const [subiendo, setSubiendo] = useState('');
   const yo = useRef({ miId: null, soyAnfitrion: false });
 
   // Lo que solo sabe la petición con sesión (quién soy) se conserva al llegar actualizaciones en directo.
@@ -237,6 +246,19 @@ function Sala({ codigo, usuario, perfil }) {
     accion(() => jamsApi.votar(sala.codigo, voto));
   }
 
+  async function subirFoto(tipo, file) {
+    if (!file) return;
+    setSubiendo(tipo);
+    try {
+      const dataUrl = await comprimirImagen(file, FOTO[tipo]);
+      aplicar(await jamsApi.ponerFoto(sala.codigo, tipo, dataUrl));
+    } catch (e) {
+      window.alert(e.message);
+    } finally {
+      setSubiendo('');
+    }
+  }
+
   async function compartir() {
     const datos = { title: `MIRA JAM · ${sala.titulo}`, text: t('tx.jamCompartirTexto', { codigo: sala.codigo }), url: enlace };
     try {
@@ -247,26 +269,63 @@ function Sala({ codigo, usuario, perfil }) {
 
   return (
     <section className={`jam-sala jam-sala--${sala.estado}`} aria-labelledby="jam-titulo">
-      <header className="jam-cabecera">
-        <div>
-          <span className="jam-marca">MIRA <b>JAM</b> {enDirecto && abierta && <i className="jam-vivo" title={t('tx.jamEnDirecto')} />}</span>
-          <h1 id="jam-titulo">{sala.titulo}</h1>
-          <p>Organiza {sala.anfitrion} · {sala.recuento.participantes} en la sala · {sala.recuento.hanVotado} han votado</p>
-        </div>
-        <div className="jam-codigo-caja">
-          <span>{t('tx.jamCodigo')}</span>
-          <strong>{sala.codigo}</strong>
-          <button type="button" className="jam-compartir" onClick={compartir}>{copiado ? t('tx.jamEnlaceCopiado') : t('tx.jamInvitarGrupo')}</button>
-        </div>
-      </header>
+      <div className="jam-hero" style={{ '--jam-portada': `url("${sala.portada || PORTADA_JAM}")` }}>
+        {sala.soyAnfitrion && (
+          <div className="jam-hero-acciones">
+            <label className="jam-foto-btn">
+              {subiendo === 'portada' ? t('tx.jamSubiendoFoto') : t('tx.jamCambiarPortada')}
+              <input type="file" accept="image/*" hidden disabled={Boolean(subiendo)} onChange={(e) => { subirFoto('portada', e.target.files[0]); e.target.value = ''; }} />
+            </label>
+            {sala.portada && <button type="button" className="jam-foto-btn" disabled={Boolean(subiendo)} onClick={() => accion(() => jamsApi.ponerFoto(sala.codigo, 'portada', null))}>{t('tx.jamQuitarPortada')}</button>}
+          </div>
+        )}
+        <header className="jam-cabecera">
+          <div className="jam-identidad">
+            <div className="jam-perfil">
+              {sala.foto ? <img src={sala.foto} alt="" /> : <span>{iniciales(sala.titulo)}</span>}
+              {sala.soyAnfitrion && (
+                <label className="jam-perfil-editar" title={t('tx.jamCambiarFoto')}>
+                  <span aria-hidden="true">{subiendo === 'perfil' ? '…' : '📷'}</span>
+                  <span className="sr-only">{t('tx.jamCambiarFoto')}</span>
+                  <input type="file" accept="image/*" hidden disabled={Boolean(subiendo)} onChange={(e) => { subirFoto('perfil', e.target.files[0]); e.target.value = ''; }} />
+                </label>
+              )}
+            </div>
+            <div>
+              <span className="jam-marca">MIRA <b>JAM</b> {enDirecto && abierta && <i className="jam-vivo" title={t('tx.jamEnDirecto')} />}</span>
+              <h1 id="jam-titulo">{sala.titulo}</h1>
+              <p>Organiza {sala.anfitrion} · {sala.recuento.participantes} en la sala · {sala.recuento.hanVotado} han votado</p>
+            </div>
+          </div>
+          <div className="jam-codigo-caja">
+            <span>{t('tx.jamCodigo')}</span>
+            <strong>{sala.codigo}</strong>
+            <button type="button" className="jam-compartir" onClick={compartir}>{copiado ? t('tx.jamEnlaceCopiado') : t('tx.jamInvitarGrupo')}</button>
+          </div>
+        </header>
+      </div>
 
-      <ul className="jam-avatares" aria-label={t('tx.jamParticipantes')}>
-        {sala.participantes.map((p) => (
-          <li key={p.id} className={`${p.id === sala.miId ? 'is-yo' : ''}${p.restaurantes.length || p.franjas.length ? ' ha-votado' : ''}`} title={`${p.nombre}${p.esAnfitrion ? ' (anfitrión)' : ''}`}>
-            <span>{iniciales(p.nombre)}</span>
-            {p.esAnfitrion && <i aria-hidden="true">★</i>}
-          </li>
-        ))}
+      <h2 className="jam-h2">{t('tx.jamParticipantes')} <small>{sala.recuento.hanVotado}/{sala.recuento.participantes}</small></h2>
+      <ul className="jam-miembros" aria-label={t('tx.jamParticipantes')}>
+        {sala.participantes.map((p) => {
+          const haVotado = Boolean(p.restaurantes.length || p.franjas.length);
+          const esYo = p.id === sala.miId;
+          return (
+            <li key={p.id} className={`jam-miembro${esYo ? ' is-yo' : ''}${haVotado ? ' ha-votado' : ''}`}>
+              <span className="jam-miembro-avatar" aria-hidden="true">{iniciales(p.nombre)}</span>
+              <span className="jam-miembro-info">
+                <strong>{p.nombre}</strong>
+                <span className="jam-miembro-etqs">
+                  {p.esAnfitrion && <em className="jam-etq jam-etq--oro">★ {t('tx.jamAnfitrionEtq')}</em>}
+                  {esYo && <em className="jam-etq">{t('tx.jamTuEtq')}</em>}
+                </span>
+                <span className="jam-miembro-estado">
+                  {haVotado ? `✓ ${t('tx.jamHaVotado')} · ${t('tx.jamVotosResumen', { r: p.restaurantes.length, f: p.franjas.length })}` : t('tx.jamPendienteVoto')}
+                </span>
+              </span>
+            </li>
+          );
+        })}
       </ul>
 
       {sala.estado === 'reservada' && (
@@ -395,6 +454,7 @@ function MisJams({ usuario }) {
           {lista.map((j) => (
             <li key={j.codigo}>
               <a href={`#/jam/${j.codigo}`}>
+                <span className="jam-lista-foto" aria-hidden="true" style={{ backgroundImage: `url("${j.foto || j.portada || PORTADA_JAM}")` }} />
                 <strong>{j.titulo}</strong>
                 <span>{j.restaurantes.map((r) => r.nombre).join(' · ')}</span>
                 <span className={`jam-estado jam-estado--${j.estado}`}>{estados[j.estado] || j.estado}</span>
