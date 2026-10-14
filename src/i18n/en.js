@@ -778,6 +778,8 @@ export default {
     "leyendaSellos": "Badge legend"
   },
   "points": {
+    "inviteSuccess": "Invitation sent!",
+    "inviteInvalidEmail": "Invalid email address, check it before sending again",
     "inviteError": "Error sending invitation",
     "saldoCon": "Balance: {{n}} pts",
     "redeemAmount": "Redeem {{n}} pts",

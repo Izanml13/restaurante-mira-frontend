@@ -778,6 +778,8 @@ export default {
     "leyendaSellos": "Llegenda de segells"
   },
   "points": {
+    "inviteSuccess": "Invitació enviada!",
+    "inviteInvalidEmail": "L’adreça no és vàlida, comprova-la abans de tornar a enviar",
     "inviteError": "Error en enviar la invitació",
     "saldoCon": "Saldo: {{n}} punts",
     "redeemAmount": "Bescanvia {{n}} punts",

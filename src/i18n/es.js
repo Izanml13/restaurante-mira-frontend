@@ -778,6 +778,8 @@ export default {
     "leyendaSellos": "Leyenda de sellos"
   },
   "points": {
+    "inviteSuccess": "¡Invitación enviada!",
+    "inviteInvalidEmail": "No existe la dirección, compruebe antes de volver a enviar",
     "inviteError": "Error al enviar invitación",
     "saldoCon": "Saldo: {{n}} pts",
     "redeemAmount": "Canjear {{n}} pts",

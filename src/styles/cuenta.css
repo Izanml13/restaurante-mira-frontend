@@ -355,3 +355,7 @@
   border-radius: var(--radio-peq);
   user-select: all;
 }
+
+.invite-form { flex-wrap: wrap; }
+.invite-feedback { flex-basis: 100%; }
+.invite-feedback p { margin: 0.4rem 0; }
