@@ -16,3 +16,11 @@ test('sin zona válida ni coordenadas devuelve vacío', () => {
   assert.equal(zonaPrincipal({ zona: 'Salou, Spain' }), '');
   assert.equal(zonaPrincipal(null), '');
 });
+
+test('el código postal manda sobre la zona de búsqueda y la distancia', () => {
+  // Cervera y Solsona están más cerca de Tarragona/Barcelona, pero son de Lleida (CP 25).
+  assert.equal(zonaPrincipal({ zona: 'Cervera, Spain', codigoPostal: '25200', coords: { lat: 41.670, lng: 1.272 } }), 'Lleida, Spain');
+  assert.equal(zonaPrincipal({ zona: 'Solsona, Spain', direccion: 'Carrer Major 1, 25280 Solsona, Spain', coords: { lat: 41.994, lng: 1.518 } }), 'Lleida, Spain');
+  assert.equal(zonaPrincipal({ zona: 'Barcelona, Spain', codigoPostal: '43840' }), 'Tarragona, Spain');
+  assert.equal(zonaPrincipal({ zona: 'Girona, Spain', codigoPostal: '28001' }), 'Girona, Spain');
+});

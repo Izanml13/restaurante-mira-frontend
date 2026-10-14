@@ -66,6 +66,7 @@ function mapearDocBase(id, d) {
       [categorias.join(' · '), d.direccion_completa || d.ciudad].filter(Boolean).join(' — ') ||
       'Restaurante recomendado por la guía MIRA.',
     direccion: d.direccion_completa || d.direccion || '',
+    codigoPostal: d.codigo_postal ? String(d.codigo_postal) : '',
     ciudad: d.ciudad || '',
     zona: d.zona_busqueda || '',
     telefono: d.telefono || '',
