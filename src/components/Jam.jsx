@@ -12,6 +12,7 @@ import { fetchRestaurants } from '../services/restaurantApi.js';
 import { SLOTS } from '../services/reservaApi.js';
 import { imagenParaRestaurante } from '../models/restaurantModel.js';
 import { comprimirImagen } from '../services/comprimirImagen.js';
+import { crearSincronizadorFotos } from '../services/jamFotos.js';
 import '../styles/jam.css';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
@@ -205,15 +206,13 @@ function Sala({ codigo, usuario, perfil }) {
   const yo = useRef({ miId: null, soyAnfitrion: false });
 
   // Lo que solo sabe la petición con sesión (quién soy) se conserva al llegar actualizaciones en directo.
-  // El directo no trae las fotos (pesan): se conservan las últimas y, si su
-  // versión (fotosV) cambia, se pide la sala completa una vez.
-  const fotos = useRef({ portada: null, foto: null, v: null });
+  // El directo no trae las fotos (pesan): ver services/jamFotos.js.
+  const fotos = useRef(null);
+  if (!fotos.current) fotos.current = crearSincronizadorFotos(jamsApi.obtener);
   const aplicar = useCallback(function aplicarSala(nueva) {
     if (nueva.miId) yo.current = { miId: nueva.miId, soyAnfitrion: nueva.soyAnfitrion };
-    if ('portada' in nueva) fotos.current = { portada: nueva.portada, foto: nueva.foto, v: nueva.fotosV || 0 };
-    else if (fotos.current.v !== null && (nueva.fotosV || 0) !== fotos.current.v) jamsApi.obtener(nueva.codigo).then(aplicarSala).catch(() => {});
-    const { portada, foto } = fotos.current;
-    setSala({ ...nueva, portada, foto, ...yo.current, estoyDentro: nueva.participantes.some((p) => p.id === yo.current.miId) });
+    const conFotos = fotos.current.aplicar(nueva, aplicarSala);
+    setSala({ ...conFotos, ...yo.current, estoyDentro: nueva.participantes.some((p) => p.id === yo.current.miId) });
   }, []);
 
   useEffect(() => {
@@ -484,7 +483,7 @@ export default function Jam({ usuario, perfil }) {
     <div className="jam">
       {ruta.camino === '' && <MisJams usuario={usuario} />}
       {ruta.camino === 'nueva' && <CrearJam usuario={usuario} perfil={perfil} preseleccion={ruta.params.get('r')} />}
-      {ruta.camino && ruta.camino !== 'nueva' && <Sala codigo={ruta.camino.toUpperCase()} usuario={usuario} perfil={perfil} />}
+      {ruta.camino && ruta.camino !== 'nueva' && <Sala key={ruta.camino.toUpperCase()} codigo={ruta.camino.toUpperCase()} usuario={usuario} perfil={perfil} />}
     </div>
   );
 }
