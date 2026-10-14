@@ -70,3 +70,20 @@ Reparto por archivos: Codex se queda con el dashboard de restaurante, la exporta
 | [BUG-112](BUG-112.md) | Resto de textos fijos sin traducir (continuación de BUG-019) | i18n | claude | en revisión | fix/claude-tanda3 |
 | [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | en revisión | fix/claude-tanda3 |
 
+
+## Tanda 4
+
+Base: `main`. Ramas: **Claude** → `fix/claude-tanda4` · **Codex** → `fix/codex-tanda4` (worktree `../codex-tanda4`; backend en `../restaurante-mira-backend`).
+
+Reparto por archivos: Claude se queda con todo lo de `App.jsx` (card, JAM, filtros, racha, mapa). Codex, con invitaciones (Mi cuenta + backend) y con incidencias del admin (`Admin.jsx` + backend). Codex no toca `App.jsx`; si lo necesita, lo avisa.
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-114](BUG-114.md) | La card del restaurante no se cierra al crear una JAM | card/jam | claude | en revisión | fix/claude-tanda4 |
+| [BUG-115](BUG-115.md) | Rediseño visual de la JAM (card, mini cards y fotos) | jam/ui | claude | en revisión | fix/claude-tanda4 |
+| [BUG-116](BUG-116.md) | Tipos de cocina repetidos en el filtro | buscador | claude | en revisión | fix/claude-tanda4 |
+| [BUG-117](BUG-117.md) | Filtro de zona: solo las 4 provincias de Cataluña | buscador | claude | en revisión | fix/claude-tanda4 |
+| [BUG-118](BUG-118.md) | Racha: modo oscuro, popup al entrar y scroll del fondo | racha | claude | en revisión | fix/claude-tanda4 |
+| [BUG-119](BUG-119.md) | Al volver a Mapa no empieza arriba | mapa | claude | en revisión | fix/claude-tanda4 |
+| [BUG-120](BUG-120.md) | Invitaciones: mensaje, lista tras F5 y envío real del correo | invitaciones | codex | en revisión | fix/codex-tanda4 |
+| [BUG-121](BUG-121.md) | Incidencias del admin: resolución y gráficos | admin/incidencias | codex | en revisión | fix/codex-tanda4 |
