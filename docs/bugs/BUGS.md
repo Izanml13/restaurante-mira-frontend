@@ -87,3 +87,10 @@ Reparto por archivos: Claude se queda con todo lo de `App.jsx` (card, JAM, filtr
 | [BUG-119](BUG-119.md) | Al volver a Mapa no empieza arriba | mapa | claude | hecho | fix/claude-tanda4 |
 | [BUG-120](BUG-120.md) | Invitaciones: mensaje, lista tras F5 y envío real del correo | invitaciones | codex | hecho | fix/codex-tanda4 |
 | [BUG-121](BUG-121.md) | Incidencias del admin: resolución y gráficos | admin/incidencias | codex | hecho | fix/codex-tanda4 |
+
+
+## Seguimiento de la prueba real de invitaciones
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-122](BUG-122.md) | Brevo acepta el envío pero el error posterior no cambia el estado | invitaciones/backend | codex | en revisión | fix/BUG-122-brevo-error |
