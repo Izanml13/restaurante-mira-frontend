@@ -151,7 +151,6 @@ function AppContent({ auth, tema, setTema }) {
   const [showWheel, setShowWheel] = useState(false);
   const { claim: claimDaily, claimWheel } = useDailyLogin();
   const claimedTodayKey = `dailyLogin_shown_${new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date())}`;
-  const newUserKey = `streak_newuser_shown_${usuario?.uid}`;
 
 
   useEffect(() => {
@@ -165,14 +164,10 @@ function AppContent({ auth, tema, setTema }) {
     // Un solo destino: la store (el header la lee). El resto de pantallas
     // que ya llamaban a fetchBalance() actualizan ahora el mismo estado.
     syncBalance();
-    import('./services/api.js').then(({ pointsApi }) => {
-      pointsApi.isNewUser().then((isNew) => {
-        if (isNew && !sessionStorage.getItem(newUserKey)) {
-          sessionStorage.setItem(newUserKey, 'true');
-          // Estado real de la racha (antes se pintaba siempre «día 0 sin reclamar», aunque ya hubiera reclamado hoy).
-          fetchStreakData().then(openStreakPopup);
-        }
-      }).catch(() => {});
+    // Al entrar, la racha se abre siempre que la de hoy siga sin reclamar
+    // (no solo a usuarios nuevos). Si la API falla no se abre sola.
+    fetchStreakData().then((data) => {
+      if (!data.error && !data.yaReclamado) openStreakPopup(data);
     });
   }, [usuario]);
 
@@ -195,7 +190,7 @@ function AppContent({ auth, tema, setTema }) {
       };
     } catch {
       // Error de red ≠ ya reclamado: dejar que el usuario reintente el claim manual.
-      return { racha: { dias: 0 }, puntos: 0, yaReclamado: false };
+      return { racha: { dias: 0 }, puntos: 0, yaReclamado: false, error: true };
     }
   }
 
@@ -319,14 +314,14 @@ function AppContent({ auth, tema, setTema }) {
   // Si hay un overlay por encima de z-180 el launcher se oculta solo.
   const hayOverlayEncima = Boolean(seleccionado || libro || sheetVisible || showStreakPopup || showWheel);
 
-  // Con la ficha o la carta abiertas, bloquea el scroll de la landing para que no se desplace por detrás.
+  // Con la ficha, la carta o la racha abiertas, bloquea el scroll de la landing para que no se desplace por detrás.
   useEffect(() => {
-    if (!seleccionado && !libro) return;
+    if (!seleccionado && !libro && !showStreakPopup && !showWheel) return;
     const html = document.documentElement;
     const previo = html.style.overflow;
     html.style.overflow = 'hidden';
     return () => { html.style.overflow = previo; };
-  }, [seleccionado, libro]);
+  }, [seleccionado, libro, showStreakPopup, showWheel]);
 
   // Abre la ficha completa (con carta) desde una tarjeta del chat de MIRA.
   // obtenerRestaurante busca por id en el catálogo ya cargado y, si no está,
