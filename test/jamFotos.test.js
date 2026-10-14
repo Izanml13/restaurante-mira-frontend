@@ -36,3 +36,38 @@ test('no pide nada antes de la primera carga completa', () => {
   sync.aplicar(sala({ fotosV: 4 }), () => {});
   assert.equal(peticiones.length, 0);
 });
+
+test('una versión recibida durante la petición se recupera aunque la respuesta traiga una anterior', async () => {
+  const { sync, peticiones } = preparar();
+  let mostrada = null;
+  const alRefrescar = (s) => { mostrada = sync.aplicar(s, alRefrescar); };
+  sync.aplicar(sala({ portada: 'p1', foto: 'f1', fotosV: 1 }), alRefrescar);
+  sync.aplicar(sala({ fotosV: 2 }), alRefrescar);
+  sync.aplicar(sala({ fotosV: 3 }), alRefrescar);
+  assert.equal(peticiones.length, 1);
+  peticiones[0].ok(sala({ portada: 'p2', foto: 'f2', fotosV: 2 }));
+  await new Promise((r) => setTimeout(r));
+  assert.equal(mostrada.portada, 'p2');
+  assert.equal(peticiones.length, 2, 'falta v3: se pide otra vez');
+  peticiones[1].ok(sala({ portada: 'p3', foto: 'f3', fotosV: 3 }));
+  await new Promise((r) => setTimeout(r));
+  assert.equal(mostrada.portada, 'p3');
+  assert.equal(peticiones.length, 2, 'al día: no se pide más');
+});
+
+test('una versión del directo anterior a la carga inicial se pide al terminar esa carga', () => {
+  const { sync, peticiones } = preparar();
+  sync.aplicar(sala({ fotosV: 2 }), () => {});
+  assert.equal(peticiones.length, 0);
+  sync.aplicar(sala({ portada: 'p1', foto: 'f1', fotosV: 1 }), () => {});
+  assert.equal(peticiones.length, 1);
+});
+
+test('un error no reintenta en bucle', async () => {
+  const peticiones = [];
+  const sync = crearSincronizadorFotos(() => { peticiones.push(1); return Promise.reject(new Error('red')); });
+  sync.aplicar(sala({ portada: 'p1', foto: 'f1', fotosV: 1 }), () => {});
+  sync.aplicar(sala({ fotosV: 2 }), () => {});
+  await new Promise((r) => setTimeout(r));
+  assert.equal(peticiones.length, 1);
+});
