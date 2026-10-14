@@ -21,3 +21,11 @@ Frontend `d1aba21`, backend `54e21db`, revisados el 14 de octubre de 2026. Front
 - BUG-115: foto local y reducción de SSE aprobadas; sigue en revisión por GET de refresco duplicados mientras hay una petición pendiente y respuestas de la sala anterior que se aplican a la actual. Reproducciones y propuesta de corrección en la ficha. No hay bucle recursivo infinito en el flujo normal, pero no se cumple una petición por cambio de versión.
 - No se han modificado implementaciones. Las verificaciones adicionales usaron el callback real de Jam.jsx con promesas controladas y la muestra pública guardada en la primera revisión. No se probó una sesión/entrega real.
 - BUG-120/Brevo y el aislamiento de cargas de BUG-121 ya están terminados en `fix/codex-tanda4`: frontend `f84aa48` y `9e03032`, backend `3f47cae`; 178 tests frontend, 280 backend y build frontend correcto, según la validación de esa rama. El backend no define build; sintaxis verificada. Fichas y pasos Render/Brevo están en `../codex-tanda4/docs/bugs/BUG-120.md` y BUG-121.md. No forman parte de la rama de Claude hasta que se incorporen.
+
+## Tercera revisión: sincronizador de fotos JAM
+
+Frontend `aed788e` (`5b95475` de implementación), 180/180 tests y build correcto. Backend `54e21db` sin cambios, aprobado previamente. Rama local de revisión `review/codex-claude-tanda4-fotos`.
+
+La deduplicación por petición en curso y el montaje nuevo por código corrigen los dos casos anteriores. Queda una carrera de versiones: SSE v3 recibido durante el GET de refresco se descarta; si este devuelve v2, no se programa la recuperación de v3. BUG-115 conserva en revisión y la reproducción/propuesta están al final de su ficha.
+
+BUG-120 y BUG-121: el usuario comunicó la aprobación de Claude (178/178 tests frontend y build, 280/280 backend). Se anotó la aprobación, los tres comentarios no bloqueantes solicitados y el estado hecho en sus fichas y BUGS.md de `fix/codex-tanda4`, commit `469819c`. Se solicitó publicar `fix/codex-tanda4` en origin en ambos repositorios para la unión.
