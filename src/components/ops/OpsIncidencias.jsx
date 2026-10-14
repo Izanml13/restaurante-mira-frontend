@@ -25,7 +25,7 @@ export default function OpsIncidencias() {
 
   useEffect(() => {
     let vivo = true;
-    Promise.all([listarPendientes(), listarNegociosPendientes(), listarResueltas()])
+    Promise.all([listarPendientes().catch(() => []), listarNegociosPendientes().catch(() => []), listarResueltas().catch(() => [])])
       .then(([c, n, r]) => { if (vivo) { setResueltas(r); setContactos(c); setNegocios(n); setCargando(false); } })
       .catch((e) => { if (vivo) { setError(e.message); setCargando(false); } });
     return () => { vivo = false; };

@@ -32,7 +32,7 @@ export default function Admin({ usuario, esAdmin }) {
       return;
     }
     let vivo = true;
-    Promise.all([listarPendientes(), listarNegociosPendientes(), listarResueltas()])
+    Promise.all([listarPendientes().catch(() => []), listarNegociosPendientes().catch(() => []), listarResueltas().catch(() => [])])
       .then(([l, n, r]) => {
         if (vivo) {
           setLista(l);
