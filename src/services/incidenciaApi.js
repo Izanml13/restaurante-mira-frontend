@@ -24,8 +24,13 @@ export async function listarPendientes() {
   return Array.isArray(d) ? d : d.data || [];
 }
 
+export async function listarResueltas() {
+  const d = await api.get('/v1/contactos/resolved');
+  return Array.isArray(d) ? d : d.data || [];
+}
+
 export async function resolverIncidencia(id, datos) {
   const resolucion = validarResolucion(datos);
-  await conAuditoria('incidencia_resuelta', { entidadTipo: 'incidencia', entidadId: String(id), cambios: [{ campo: 'estado', antes: 'pendiente', despues: 'resuelta' }] },
+  return await conAuditoria('incidencia_resuelta', { entidadTipo: 'incidencia', entidadId: String(id), cambios: [{ campo: 'estado', antes: 'pendiente', despues: 'resuelta' }] },
     api.put(`/v1/contactos/${encodeURIComponent(id)}/resolve`, resolucion), { panel: true });
 }

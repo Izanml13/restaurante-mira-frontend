@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
 import InvitePanel from '../components/points/InvitePanel';
-import useInviteStore from '../stores/useInviteStore';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -10,12 +8,6 @@ const TRADS = { es, ca, en };
 
 export default function Invitar() {
   const t = useT(TRADS);
-  const { fetchMyInvites } = useInviteStore();
-
-  useEffect(() => {
-    fetchMyInvites();
-  }, []);
-
   return (
     <div className="puntos-page">
       <div className="puntos-page__header">

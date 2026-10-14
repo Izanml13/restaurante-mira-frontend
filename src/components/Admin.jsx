@@ -1,12 +1,13 @@
 /** View pura: panel admin — incidencias + locales propuestos. */
 import { useEffect, useState } from 'react';
-import { listarPendientes, resolverIncidencia } from '../services/incidenciaApi.js';
+import { listarPendientes, listarResueltas, resolverIncidencia } from '../services/incidenciaApi.js';
 import { listarNegociosPendientes, aprobarNegocio, rechazarNegocio } from '../services/negocioApi.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
 
+import IncidenciasResueltas from './IncidenciasResueltas.jsx';
 import ResolverIncidenciaModal from './ResolverIncidenciaModal.jsx';
 
 const TRADS = { es, ca, en };
@@ -14,6 +15,8 @@ const TRADS = { es, ca, en };
 export default function Admin({ usuario, esAdmin }) {
   const t = useT(TRADS);
   const [lista, setLista] = useState([]);
+  const [resueltas, setResueltas] = useState([]);
+  const [vista, setVista] = useState('pendientes');
   const [negocios, setNegocios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -29,10 +32,11 @@ export default function Admin({ usuario, esAdmin }) {
       return;
     }
     let vivo = true;
-    Promise.all([listarPendientes(), listarNegociosPendientes()])
-      .then(([l, n]) => {
+    Promise.all([listarPendientes().catch(() => []), listarNegociosPendientes().catch(() => []), listarResueltas().catch(() => [])])
+      .then(([l, n, r]) => {
         if (vivo) {
           setLista(l);
+          setResueltas(r);
           setNegocios(n);
           setCargando(false);
         }
@@ -52,7 +56,8 @@ export default function Admin({ usuario, esAdmin }) {
 
   async function handleResolver(id, datos) {
     setError('');
-    await resolverIncidencia(id, datos);
+    const resuelta = await resolverIncidencia(id, datos);
+    setResueltas((prev) => [resuelta, ...prev.filter((x) => x.id !== id)]);
     setLista((prev) => prev.filter((x) => x.id !== id));
   }
 
@@ -83,7 +88,14 @@ export default function Admin({ usuario, esAdmin }) {
         onCancelar={() => setIncidencia(null)} />}
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="admin-titulo">{t('admin.titulo')}</h1>
-        {esAdmin && <h2 className="cuenta-sub">{t('admin.incidenciasPendientes')}</h2>}
+        {esAdmin && <>
+          <h2 className="cuenta-sub">{t('admin.incidenciasTitulo')}</h2>
+          <div className="incidencias-vistas">
+            <button type="button" className="btn-secundario" aria-pressed={vista === 'pendientes'} onClick={() => setVista('pendientes')}>{t('admin.incidenciasPendientes')} ({lista.length})</button>
+            <button type="button" className="btn-secundario" aria-pressed={vista === 'resueltas'} onClick={() => setVista('resueltas')}>{t('admin.incidenciasResueltas')} ({resueltas.length})</button>
+          </div>
+          {!cargando && vista === 'resueltas' && <IncidenciasResueltas lista={resueltas} />}
+        </>}
         {cargando && <p>{t('otros.cargando')}</p>}
         {!cargando && !esAdmin && (
           <p className="auth-error" role="alert">
@@ -95,10 +107,10 @@ export default function Admin({ usuario, esAdmin }) {
             {error}
           </p>
         )}
-        {!cargando && esAdmin && lista.length === 0 && !error && (
+        {!cargando && esAdmin && vista === 'pendientes' && lista.length === 0 && !error && (
           <p className="vacio-texto">{t('admin.noIncidencias')}</p>
         )}
-        {!cargando && esAdmin && lista.length > 0 && (
+        {!cargando && esAdmin && vista === 'pendientes' && lista.length > 0 && (
           <ul className="lista-registros">
             {lista.map((r) => (
               <li key={r.id} className="registro">
