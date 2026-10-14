@@ -324,6 +324,11 @@
   color: var(--primary-container);
 }
 
+[data-theme='dark'] .btn-secundario:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 .btn-secundario:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -344,6 +349,10 @@
 .btn-reservar:hover {
   background: var(--primary);
   transform: translateY(-1px);
+}
+
+[data-theme='dark'] .btn-reservar:hover {
+  background: color-mix(in srgb, var(--primary-container) 78%, #000);
 }
 
 /* ---------- Hero ---------- */
