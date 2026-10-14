@@ -93,4 +93,4 @@ Reparto por archivos: Claude se queda con todo lo de `App.jsx` (card, JAM, filtr
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-122](BUG-122.md) | Brevo acepta el envío pero el error posterior no cambia el estado | invitaciones/backend | codex | en revisión | fix/BUG-122-brevo-error |
+| [BUG-122](BUG-122.md) | Brevo acepta el envío pero el error posterior no cambia el estado | invitaciones/backend | codex | hecho | fix/BUG-122-brevo-error |
