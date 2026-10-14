@@ -1716,5 +1716,26 @@ export default {
     "trzSimulada": "Trazabilidad simulada",
     "trzPhUid": "uid (p. ej. sim-007) o «anónimo»",
     "trzModulo": "Módulo"
+  },
+  "cocinaFamilia": {
+    "japonesa": "Japonesa",
+    "española": "Española",
+    "italiana": "Italiana",
+    "mexicana": "Mexicana",
+    "china": "China",
+    "tailandesa": "Tailandesa",
+    "india": "India",
+    "americana": "Americana",
+    "marisco": "Marisco",
+    "brasa": "Brasa",
+    "francesa": "Francesa",
+    "griega": "Griega",
+    "turca": "Turca",
+    "dulce": "Dulces y postres",
+    "desayuno": "Desayunos y cafés",
+    "vinos": "Vinos",
+    "vegana": "Vegana",
+    "copas": "Copas",
+    "fusión": "Fusión"
   }
 }

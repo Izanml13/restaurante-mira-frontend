@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { opcionesCocina, COCINAS } from '../src/models/restaurantModel.js';
+import { opcionesCocina, COCINAS, familiaCocina, recomendarPara } from '../src/models/restaurantModel.js';
 import { filterRestaurants } from '../src/services/filterService.js';
 
 test('opcionesCocina no repite tipos entre español, Yelp y mayúsculas', () => {
@@ -26,4 +26,13 @@ test('filtrar por zona agrupa cada local en su provincia', () => {
     { id: 3, zona: 'Barcelona, Spain' },
   ];
   assert.deepEqual(filterRestaurants(lista, { zona: 'Tarragona, Spain' }).map((r) => r.id), [1, 2]);
+});
+
+test('«Barbacoa» cuenta como brasa en opciones, filtro y recomendaciones', () => {
+  assert.equal(familiaCocina('Barbacoa'), 'brasa');
+  assert.deepEqual(opcionesCocina(['Asador', 'Brasa', 'Barbacoa', 'Barbeque']), ['Brasa']);
+  const lista = [{ id: 1, cocina: 'Barbacoa', categorias: ['Barbacoa'] }, { id: 2, cocina: 'Italian', categorias: ['Italian'] }];
+  assert.deepEqual(filterRestaurants(lista, { cocina: 'Brasa' }).map((r) => r.id), [1]);
+  const recs = recomendarPara([{ id: 9, cocina: 'Asador' }], lista);
+  assert.deepEqual(recs.map((r) => r.restaurante.id), [1]);
 });

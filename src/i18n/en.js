@@ -1716,5 +1716,26 @@ export default {
     "trzSimulada": "Simulated traceability",
     "trzPhUid": "uid (e.g. sim-007) or “anonymous”",
     "trzModulo": "Module"
+  },
+  "cocinaFamilia": {
+    "japonesa": "Japanese",
+    "española": "Spanish",
+    "italiana": "Italian",
+    "mexicana": "Mexican",
+    "china": "Chinese",
+    "tailandesa": "Thai",
+    "india": "Indian",
+    "americana": "American",
+    "marisco": "Seafood",
+    "brasa": "Grill",
+    "francesa": "French",
+    "griega": "Greek",
+    "turca": "Turkish",
+    "dulce": "Desserts",
+    "desayuno": "Breakfast & coffee",
+    "vinos": "Wine",
+    "vegana": "Vegan",
+    "copas": "Drinks",
+    "fusión": "Fusion"
   }
 }

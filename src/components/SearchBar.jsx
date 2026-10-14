@@ -2,7 +2,7 @@
  * View pura: barra de búsqueda con filtros tipo pills + búsqueda por texto.
  */
 import { useEffect, useState } from 'react';
-import { DIAS, FRANJAS } from '../models/restaurantModel.js';
+import { DIAS, FRANJAS, familiaCocina } from '../models/restaurantModel.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -82,9 +82,14 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChan
           <label htmlFor="f-cocina">{t('busqueda.cocina')}</label>
           <select id="f-cocina" name="cocina" value={filtros.cocina} onChange={(e) => onChange('cocina', e.target.value)}>
             <option value="">{t('busqueda.todas')}</option>
-            {opciones.cocinas.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+            {opciones.cocinas
+              .map((c) => {
+                const clave = `cocinaFamilia.${familiaCocina(c)}`;
+                const etiqueta = t(clave);
+                return { c, etiqueta: etiqueta === clave ? c : etiqueta };
+              })
+              .sort((a, b) => a.etiqueta.localeCompare(b.etiqueta))
+              .map(({ c, etiqueta }) => <option key={c} value={c}>{etiqueta}</option>)}
           </select>
         </div>
 

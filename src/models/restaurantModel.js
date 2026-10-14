@@ -486,7 +486,7 @@ const FAMILIAS_COCINA = [
   ['india', ['indian', 'india', 'curry']],
   ['americana', ['burger', 'hamburg', 'mcdonald', 'american', 'diner', 'sandwich', 'bocatta']],
   ['marisco', ['seafood', 'marisc', 'pescad', 'marisqueria']],
-  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco', 'barbe', 'bbq']],
+  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco', 'barbe', 'bbq', 'barbacoa']],
   ['francesa', ['french', 'franc']],
   ['griega', ['greek', 'grieg']],
   ['turca', ['kebab', 'turk', 'leban', 'arab']],
