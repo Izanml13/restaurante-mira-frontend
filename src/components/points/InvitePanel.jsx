@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import InvitacionEmailEstado from './InvitacionEmailEstado.js';
 import useInviteStore from '../../stores/useInviteStore.js';
 import { useT } from '../../i18n/index.jsx';
 import es from '../../i18n/es.js';
@@ -37,8 +38,10 @@ export default function InvitePanel() {
     setLoading(true);
     setError('');
     try {
-      await createInvite(email.trim());
-      setSuccess(true);
+      const invitacion = await createInvite(email.trim());
+      if (invitacion.emailEstado === 'no_enviado') setError(t('points.inviteNotSent'));
+      else if (invitacion.emailEstado === 'inexistente') setError(t('points.inviteInvalidEmail'));
+      else setSuccess(true);
       setEmail('');
     } catch (err) {
       setError(err.message || t('points.inviteError'));
@@ -113,6 +116,7 @@ export default function InvitePanel() {
                     ? '⏳'
                     : '❌'}
               </span>
+              <InvitacionEmailEstado emailEstado={inv.emailEstado} t={t} />
               {inv.link && (
                 <button className="btn-texto" onClick={() => copyLink(inv.link)}>
                   {copied ? t('points.inviteCopied') : t('points.inviteCopyLink')}

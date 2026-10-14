@@ -792,6 +792,7 @@ export default {
     "leyendaSellos": "Llegenda de segells"
   },
   "points": {
+    "inviteNotSent": "No s’ha pogut enviar el correu. La invitació continua creada.",
     "inviteSuccess": "Invitació enviada!",
     "inviteInvalidEmail": "L’adreça no és vàlida, comprova-la abans de tornar a enviar",
     "inviteError": "Error en enviar la invitació",

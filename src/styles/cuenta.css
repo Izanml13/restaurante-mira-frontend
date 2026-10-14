@@ -359,3 +359,6 @@
 .invite-form { flex-wrap: wrap; }
 .invite-feedback { flex-basis: 100%; }
 .invite-feedback p { margin: 0.4rem 0; }
+
+.invite-item { flex-wrap: wrap; }
+.invite-item__email-error { flex-basis: 100%; margin: 0.3rem 0; color: var(--rojo); font-size: 0.85rem; }

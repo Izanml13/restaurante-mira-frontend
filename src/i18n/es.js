@@ -792,6 +792,7 @@ export default {
     "leyendaSellos": "Leyenda de sellos"
   },
   "points": {
+    "inviteNotSent": "El correo no se pudo enviar. La invitación sigue creada.",
     "inviteSuccess": "¡Invitación enviada!",
     "inviteInvalidEmail": "No existe la dirección, compruebe antes de volver a enviar",
     "inviteError": "Error al enviar invitación",

@@ -792,6 +792,7 @@ export default {
     "leyendaSellos": "Badge legend"
   },
   "points": {
+    "inviteNotSent": "The email could not be sent. The invitation is still saved.",
     "inviteSuccess": "Invitation sent!",
     "inviteInvalidEmail": "Invalid email address, check it before sending again",
     "inviteError": "Error sending invitation",
