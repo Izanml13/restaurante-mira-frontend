@@ -20,8 +20,8 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-// Portada por defecto (grupo de amigos en una mesa) y tamaños de las fotos subidas.
-const PORTADA_JAM = 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1400&q=60&auto=format&fit=crop';
+// Portada por defecto (grupo de amigos en una mesa; Unsplash, guardada en public/) y tamaños de las fotos subidas.
+const PORTADA_JAM = '/jam-grupo.jpg';
 const FOTO = {
   portada: { ancho: 1000, alto: 400, maxChars: 88000 },
   perfil: { ancho: 256, alto: 256, maxChars: 29000 },
@@ -205,9 +205,15 @@ function Sala({ codigo, usuario, perfil }) {
   const yo = useRef({ miId: null, soyAnfitrion: false });
 
   // Lo que solo sabe la petición con sesión (quién soy) se conserva al llegar actualizaciones en directo.
-  const aplicar = useCallback((nueva) => {
+  // El directo no trae las fotos (pesan): se conservan las últimas y, si su
+  // versión (fotosV) cambia, se pide la sala completa una vez.
+  const fotos = useRef({ portada: null, foto: null, v: null });
+  const aplicar = useCallback(function aplicarSala(nueva) {
     if (nueva.miId) yo.current = { miId: nueva.miId, soyAnfitrion: nueva.soyAnfitrion };
-    setSala({ ...nueva, ...yo.current, estoyDentro: nueva.participantes.some((p) => p.id === yo.current.miId) });
+    if ('portada' in nueva) fotos.current = { portada: nueva.portada, foto: nueva.foto, v: nueva.fotosV || 0 };
+    else if (fotos.current.v !== null && (nueva.fotosV || 0) !== fotos.current.v) jamsApi.obtener(nueva.codigo).then(aplicarSala).catch(() => {});
+    const { portada, foto } = fotos.current;
+    setSala({ ...nueva, portada, foto, ...yo.current, estoyDentro: nueva.participantes.some((p) => p.id === yo.current.miId) });
   }, []);
 
   useEffect(() => {

@@ -689,7 +689,7 @@
   border: 1.5px solid var(--neon); border-radius: var(--radio-xl); color: #f3f7f4; text-decoration: none;
   background:
     linear-gradient(180deg, rgba(8, 14, 12, 0.35) 0%, rgba(8, 14, 12, 0.88) 70%),
-    url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900&q=60&auto=format&fit=crop') center / cover,
+    url('/jam-grupo.jpg') center / cover, /* foto de Unsplash (licencia Unsplash, uso libre), guardada en public/ */
     #0d1512;
   box-shadow: 0 0 0 1px rgba(30, 215, 96, 0.25), 0 0 22px -4px rgba(30, 215, 96, 0.55);
   transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms ease;
