@@ -1,6 +1,6 @@
 /**
  * View: descarga de la app (#/app).
- * - Android: APK de EAS (VITE_APK_URL). Sin URL, el botón sale desactivado.
+ * - Android: APK de la última Release de GitHub (o VITE_APK_URL si se define).
  * - iPhone: instrucciones para añadir la PWA a la pantalla de inicio (iOS 16.4+).
  * Detecta el dispositivo para poner primero su tarjeta y avisa si ya se está
  * usando la app instalada. Textos en el bloque `app` de i18n.
@@ -12,7 +12,10 @@ import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
 import '../styles/descargar.css';
 
-const APK_URL = import.meta.env.VITE_APK_URL || '';
+// Última versión publicada como Release de GitHub (se puede sobrescribir con VITE_APK_URL).
+const APK_URL =
+  import.meta.env.VITE_APK_URL ||
+  'https://github.com/ruben-munoz-bl/restaurante-mira-frontend/releases/latest/download/mira.apk';
 
 const TRADS = { es, ca, en };
 
