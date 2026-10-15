@@ -95,6 +95,24 @@ function erroresOferta(d, conRestaurante) {
   return Object.keys(e).length ? e : null;
 }
 
+function distanciaM(a, b) {
+  const rad = (g) => (g * Math.PI) / 180;
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lng - a.lng) / 2) ** 2;
+  return 2 * 6371000 * Math.asin(Math.sqrt(h));
+}
+
+/** Contrato fase 2 (G05): ofertas vigentes a <= 1 km con el nivel alcanzado. */
+function ofertasCerca(pos) {
+  return ofertas.filter(vigente).map((o) => {
+    const r = docs.find((d) => d.id === o.restauranteId);
+    if (!r?.coordenadas) return null;
+    const coordenadas = { lat: r.coordenadas.latitud, lng: r.coordenadas.longitud };
+    const d = Math.round(distanciaM(pos, coordenadas));
+    const nivel = [...o.niveles].sort((x, y) => x.distancia - y.distancia).find((n) => d <= n.distancia);
+    return nivel ? { restaurante: { id: r.id, nombre: r.nombre, coordenadas }, oferta: o, distanciaM: d, nivel } : null;
+  }).filter(Boolean).sort((a, b) => a.distanciaM - b.distanciaM);
+}
+
 function otraActiva(restauranteId, id) { return ofertas.some((o) => o.restauranteId === restauranteId && o.activa && o.id !== id); }
 
 function enviar(res, status, body) {
@@ -137,6 +155,14 @@ http
       return enviar(res, 200, { data: { id: 'res1', codigo: 'MIRA-' + Math.random().toString(36).slice(2, 7).toUpperCase(), ...datos } });
     }
     if (p.startsWith('/v1/promotions')) return enviar(res, 200, { data: [] });
+    if (p === '/v1/ofertas/cerca' && req.method === 'GET') {
+      const lat = Number(url.searchParams.get('lat'));
+      const lng = Number(url.searchParams.get('lng'));
+      if (!url.searchParams.get('lat') || !url.searchParams.get('lng') || !(Math.abs(lat) <= 90) || !(Math.abs(lng) <= 180)) {
+        return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { lat: ['Entre -90 y 90'], lng: ['Entre -180 y 180'] } });
+      }
+      return enviar(res, 200, { data: ofertasCerca({ lat, lng }) });
+    }
     if (p === '/v1/ofertas' || p === '/v1/ofertas/mias') {
       const rid = url.searchParams.get('restauranteId');
       if (req.method === 'GET') {
