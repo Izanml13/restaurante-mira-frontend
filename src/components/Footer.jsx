@@ -22,6 +22,7 @@ export default function Footer() {
             <li><a href="#buscar">{t('hero.buscar')}</a></li>
             <li><a href="#/mapa">{t('nav.mapa')}</a></li>
             <li><a href="#/reservas">{t('nav.reservas')}</a></li>
+            <li><a href="#/app">{t('footer.app')}</a></li>
           </ul>
         </nav>
         <nav className="footer-col" aria-label={t('nav.miCuenta')}>

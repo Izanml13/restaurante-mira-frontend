@@ -668,6 +668,7 @@ export default {
     "copyright": "© 2026 MIRA. All rights reserved.",
     "hecho": "Spain",
     "avisoPrivacidad": "Privacy policy",
+    "app": "Get the app",
     "avisoCookies": "Cookie policy",
     "direccion": "12 Market Street, Madrid",
     "contactoInfo": "hello@mira.example — 910 123 456"
@@ -1754,5 +1755,42 @@ export default {
     "vegana": "Vegan",
     "copas": "Drinks",
     "fusión": "Fusion"
+  },
+  "app": {
+    "ojo": "MIRA app",
+    "titulo": "Take MIRA with you",
+    "sub": "Install it on your phone and get instant alerts about your bookings, your messages and offers from nearby restaurants.",
+    "ventajas": [
+      "Booking alerts",
+      "Offers near you",
+      "One-tap access"
+    ],
+    "tuMovil": "Your phone",
+    "instalada": "You're already using MIRA as an app. All set!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Download the installer and install it on your phone.",
+      "boton": "Download APK",
+      "pronto": "Coming very soon",
+      "pasos": [
+        "Open the downloaded file (mira.apk).",
+        "If Android asks, allow \"Install unknown apps\" for your browser.",
+        "Open MIRA, sign in and allow notifications."
+      ],
+      "web": "Or install the web version"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Add it to your Home Screen from Safari. No App Store needed.",
+      "pasos": [
+        "Open this page in Safari.",
+        "Tap the Share button {{icono}} in the bottom bar.",
+        "Choose \"Add to Home Screen\" and confirm with \"Add\".",
+        "Open MIRA from the new icon and turn on alerts."
+      ],
+      "nota": "You need iOS 16.4 or later to receive notifications.",
+      "noSafari": "You're in another browser: copy the link and open it in Safari."
+    },
+    "escritorio": "Open this page on your phone:"
   }
 }
