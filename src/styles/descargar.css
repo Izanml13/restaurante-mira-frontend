@@ -220,3 +220,61 @@
   .app-boton, .app-tarjeta { transition: none; }
   .app-boton:hover:not(:disabled) { transform: none; }
 }
+
+/* Aviso "MIRA tiene app" en la portada: solo en móvil */
+.aviso-app {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .aviso-app {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem var(--gutter-movil) 0;
+    padding: 0.75rem 0.85rem;
+    background: var(--papel);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-card);
+  }
+}
+
+.aviso-app img { border-radius: 10px; flex-shrink: 0; }
+
+.aviso-app-texto {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.aviso-app-texto strong { color: var(--tinta); font-size: 0.95rem; }
+.aviso-app-texto span { color: var(--gris); font-size: 0.82rem; }
+
+.aviso-app-boton {
+  flex-shrink: 0;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+[data-theme='dark'] .aviso-app-boton { background: var(--primary); color: #0b1f17; }
+
+.aviso-app-cerrar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--texto-sec);
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.aviso-app-cerrar:focus-visible,
+.aviso-app-boton:focus-visible { outline: none; box-shadow: var(--sombra-card-focus); }

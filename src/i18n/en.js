@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filter by area",
     "mapa": "Map",
     "contacto": "Contact",
+    "app": "Get the app",
     "reservas": "My bookings",
     "favoritos": "Favourites",
     "admin": "Admin",
@@ -1757,6 +1758,10 @@ export default {
     "fusión": "Fusion"
   },
   "app": {
+    "avisoTitulo": "MIRA has an app",
+    "avisoTexto": "Booking alerts and offers near you.",
+    "avisoBoton": "Download",
+    "avisoCerrar": "Close notice",
     "ojo": "MIRA app",
     "titulo": "Take MIRA with you",
     "sub": "Install it on your phone and get instant alerts about your bookings, your messages and offers from nearby restaurants.",

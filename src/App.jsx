@@ -36,6 +36,7 @@ import Mapa from './components/Mapa.jsx';
 import Descubrir from './components/Descubrir.jsx';
 import Privacidad from './components/Privacidad.jsx';
 import DescargarApp from './components/DescargarApp.jsx';
+import AvisoApp from './components/AvisoApp.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
@@ -487,6 +488,7 @@ function AppContent({ auth, tema, setTema }) {
         {ruta === 'home' && (
           <>
             <Hero total={total} numZonas={zonasDisponibles.length} />
+            <AvisoApp />
             <section id="buscar" className="buscar" aria-labelledby="buscar-titulo">
                <h2 id="buscar-titulo" className="buscar-titulo">
                  {t('busqueda.titulo')}

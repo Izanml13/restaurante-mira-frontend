@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filtra per zona",
     "mapa": "Mapa",
     "contacto": "Contacte",
+    "app": "L'app",
     "reservas": "Les meves reserves",
     "favoritos": "Preferits",
     "admin": "Administració",
@@ -1757,6 +1758,10 @@ export default {
     "fusión": "Fusió"
   },
   "app": {
+    "avisoTitulo": "MIRA ja té app",
+    "avisoTexto": "Avisos de reserves i ofertes a prop teu.",
+    "avisoBoton": "Descarregar",
+    "avisoCerrar": "Tancar avís",
     "ojo": "App MIRA",
     "titulo": "Porta MIRA a la butxaca",
     "sub": "Instal·la-la al mòbil i t'avisem a l'instant de les teves reserves, els teus missatges i les ofertes dels restaurants propers.",

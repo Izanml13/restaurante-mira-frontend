@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filtrar por zona",
     "mapa": "Mapa",
     "contacto": "Contacto",
+    "app": "La app",
     "reservas": "Mis reservas",
     "favoritos": "Favoritos",
     "admin": "Administración",
@@ -1757,6 +1758,10 @@ export default {
     "fusión": "Fusión"
   },
   "app": {
+    "avisoTitulo": "MIRA ya tiene app",
+    "avisoTexto": "Avisos de reservas y ofertas cerca de ti.",
+    "avisoBoton": "Descargar",
+    "avisoCerrar": "Cerrar aviso",
     "ojo": "App MIRA",
     "titulo": "Lleva MIRA en el bolsillo",
     "sub": "Instálala en tu móvil y te avisamos al momento de tus reservas, tus mensajes y las ofertas de los restaurantes cercanos.",
