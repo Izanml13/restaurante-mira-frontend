@@ -10,6 +10,7 @@ import es from "../../i18n/es.js";
 import ca from "../../i18n/ca.js";
 import en from "../../i18n/en.js";
 import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
+import OfertasPanel from "./OfertasPanel.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
@@ -59,6 +60,7 @@ function DashboardRestaurante({ usuario, perfil, esAdmin }) {
   const [createSuccess, setCreateSuccess] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [showFicha, setShowFicha] = useState(false);
+  const [showOfertas, setShowOfertas] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [selectedForecast, setSelectedForecast] = useState(null);
   const [showAllReservas, setShowAllReservas] = useState(false);
@@ -505,6 +507,7 @@ const restDropdownRef = useRef(null);
               <button className="op-btn-ghost" onClick={()=> abrirDocumento('fiscal')} title={datosSimulados ? t("dashboard.datosSimulados") : t("dashboard.datosReales")}><span className="material-symbols-outlined" style={{fontSize:16}}>file_present</span> {t("dashboard.botonReporteFiscal")}</button>
               <button className="op-btn-ghost" onClick={handleExportLiquidacion}><span className="material-symbols-outlined" style={{fontSize:16}}>download</span> {t("dashboard.exportarLiquidacion")}</button>
               <button className="op-btn-ghost" onClick={()=> setShowFicha(v=>!v)}><span className="material-symbols-outlined" style={{fontSize:16}}>storefront</span> {t("dashboard.ficha")}</button>
+              <button className="op-btn-ghost" onClick={()=> setShowOfertas(v=>!v)} data-test="dashboard-ofertas-btn"><span className="material-symbols-outlined" style={{fontSize:16}}>local_offer</span> {t("ofertas.boton")}</button>
               <button type="button" role="switch" aria-checked={datosSimulados} className={`op-sim-switch ${datosSimulados ? 'on' : ''}`} onClick={toggleDatosSimulados} title={t("dashboard.datosSimuladosDesc")}>
                 <span className="op-sim-track"><i /></span>
                 <span>{t("dashboard.datosSimulados")}</span>
@@ -551,6 +554,11 @@ const restDropdownRef = useRef(null);
                 {editing ? <><button className="op-btn-primary" onClick={handleSave} disabled={saving}>{saving? t("otros.cargando"):t("dashboard.guardar")}</button><button className="op-btn-ghost" onClick={()=>{ setEditing(false); setFormData(restaurante);}}>{t("dashboard.cancelar")}</button></> : <button className="op-btn-ghost" onClick={()=> setEditing(true)}>{t("dashboard.editar")}</button>}
               </div>
             </div>
+          )}
+
+          {/* Ofertas por distancia (G04) */}
+          {showOfertas && restaurante.id && (
+            <OfertasPanel restauranteId={restaurante.id} />
           )}
 
           {/* Primary KPIs */}

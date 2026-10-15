@@ -489,3 +489,33 @@
 
 .op-date-chips { min-width: 0; max-width: 100%; }
 .op-hub .dash-chart { min-width: 0; max-width: 100%; }
+
+/* ── G04 · Ofertas por distancia ── */
+.ofertas-panel { gap: 0.75rem; }
+.ofertas-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; flex-wrap: wrap; }
+.ofertas-intro { font-size: 0.68rem; color: var(--op-on-variant); margin-top: 0.15rem; }
+.ofertas-ok { display: flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.7rem; border-radius: 0.5rem; background: var(--op-success-bg); color: var(--op-on-secondary-container); font-size: 0.72rem; font-weight: 700; }
+.ofertas-error { color: var(--op-error); font-size: 0.68rem; font-weight: 600; margin-top: 0.25rem; display: block; }
+.ofertas-vacio { font-size: 0.75rem; color: var(--op-on-variant); padding: 0.5rem 0; }
+.ofertas-lista { display: flex; flex-direction: column; gap: 0.6rem; }
+.ofertas-fila { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; padding: 0.7rem 0.8rem; border: 1px solid var(--op-border); border-radius: var(--op-radius-lg); background: var(--op-surface-lowest); }
+.ofertas-fila-info { flex: 1 1 240px; min-width: 0; }
+.ofertas-fila-titulo { font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.ofertas-fila-meta { font-size: 0.65rem; color: var(--op-outline); font-family: ui-monospace, monospace; }
+.ofertas-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+.ofertas-chip { font-family: ui-monospace, monospace; font-size: 0.6rem; font-weight: 700; padding: 0.12rem 0.4rem; border-radius: 0.3rem; background: var(--op-surface-container); color: var(--op-on-variant); }
+.ofertas-fila-acciones { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+.ofertas-borrar-confirm { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; color: var(--op-error); font-weight: 700; }
+.ofertas-form { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem; }
+.ofertas-form-fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; align-items: end; }
+.ofertas-niveles { display: flex; flex-direction: column; gap: 0.5rem; }
+.ofertas-nivel { display: grid; grid-template-columns: 6.5rem 1fr 5rem; gap: 0.5rem; align-items: center; }
+.ofertas-nivel-label { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--op-on-variant); }
+.ofertas-aviso-mejora { padding: 0.5rem 0.7rem; border-radius: 0.5rem; background: var(--op-warning-bg); color: #8a5300; font-size: 0.68rem; font-weight: 600; }
+.ofertas-acciones { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+[data-theme='dark'] .ofertas-aviso-mejora { color: #fed65b; }
+[data-theme='dark'] .ofertas-chip { background: #2c332c; color: var(--op-on-surface); }
+[data-theme='dark'] .ofertas-fila { background: #232824; }
+@media (max-width: 640px) {
+  .ofertas-nivel, .ofertas-form-fila { grid-template-columns: 1fr; gap: 0.3rem; }
+}
