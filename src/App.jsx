@@ -38,6 +38,7 @@ import Privacidad from './components/Privacidad.jsx';
 import DescargarApp from './components/DescargarApp.jsx';
 import AvisoApp from './components/AvisoApp.jsx';
 import AvisosOfertas from './components/AvisosOfertas.jsx';
+import Llegada from './components/Llegada.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
@@ -97,6 +98,7 @@ function rutaActual() {
   if (h === '#/puntos/historial') return 'historialPuntos';
   if (h === '#/invitar') return 'invitar';
   if (h.startsWith('#/ticket/')) return 'ticket';
+  if (h.startsWith('#/llegada/')) return 'llegada';
   if (h === '#/dashboard') return 'dashboard';
   if (h === '#/jam' || h.startsWith('#/jam/')) return 'jam';
   return 'home';
@@ -476,6 +478,13 @@ function AppContent({ auth, tema, setTema }) {
         {ruta === 'historialPuntos' && <HistorialPuntos usuario={usuario} />}
         {ruta === 'invitar' && <Invitar />}
         {ruta === 'ticket' && <TicketPage />}
+        {ruta === 'llegada' && (
+          <Llegada
+            key={window.location.hash}
+            restauranteId={decodeURIComponent(window.location.hash.slice('#/llegada/'.length).split('?')[0])}
+            obtenerRestaurante={obtenerRestaurante}
+          />
+        )}
         {ruta === 'descubrir' && (
           <Descubrir
             todos={todos}

@@ -29,8 +29,12 @@ function Aviso({ aviso, onCerrar, t }) {
         <span>{nivel.texto}</span>
         <small>{llegada ? t('ofertasCerca.llegada') : t('ofertasCerca.aDistancia', { m: distanciaM })}</small>
       </div>
-      <a className="aviso-oferta-ver" href={`#/r/${encodeURIComponent(restaurante.id)}`} onClick={onCerrar}>
-        {t('ofertasCerca.ver')}
+      <a
+        className="aviso-oferta-ver"
+        href={llegada ? `#/llegada/${encodeURIComponent(restaurante.id)}` : `#/r/${encodeURIComponent(restaurante.id)}`}
+        onClick={onCerrar}
+      >
+        {llegada ? t('ofertasCerca.verQR') : t('ofertasCerca.ver')}
       </a>
       <button type="button" className="aviso-oferta-cerrar" onClick={onCerrar} aria-label={t('ofertasCerca.cerrar')}>✕</button>
     </div>

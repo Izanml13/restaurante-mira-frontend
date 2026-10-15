@@ -1,0 +1,98 @@
+/* Pantalla de llegada con QR (G09). */
+.llegada-pagina {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 2.5rem var(--gutter) 4rem;
+  display: grid;
+  gap: 1.1rem;
+  text-align: center;
+}
+
+.llegada-ojo {
+  margin: 0;
+  color: var(--dorado);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.llegada-pagina h1 {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-size: clamp(1.9rem, 6vw, 2.4rem);
+  color: var(--tinta);
+}
+
+.llegada-oferta {
+  display: grid;
+  gap: 0.2rem;
+  padding: 1rem;
+  border-radius: var(--radio);
+  background: var(--verde-suave);
+}
+
+.llegada-oferta span { color: var(--gris); font-size: 0.85rem; }
+.llegada-oferta strong { color: var(--verde); font-size: 1.25rem; }
+
+.llegada-qr-caja {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: var(--radio-xl);
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--sombra-card);
+}
+
+.llegada-qr { width: min(260px, 70vw); height: auto; border-radius: 8px; }
+.llegada-qr-caja.caducado .llegada-qr { opacity: 0.2; filter: grayscale(1); }
+
+.llegada-estado { margin: 0; color: var(--gris); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+
+.llegada-aviso { display: grid; justify-items: center; gap: 0.75rem; }
+.llegada-aviso p { margin: 0; color: var(--tinta); line-height: 1.5; }
+
+.llegada-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary-container);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-theme='dark'] .llegada-boton { background: var(--primary); color: #0b1f17; }
+.llegada-boton:focus-visible { outline: none; box-shadow: var(--sombra-card-focus); }
+
+.llegada-ok {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 1.5rem;
+  border-radius: var(--radio-xl);
+  background: var(--confirm-tinte);
+  color: var(--confirm-tinta);
+}
+
+.llegada-ok span {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: #fff;
+  font-size: 1.8rem;
+}
+
+.llegada-ok strong { font-size: 1.3rem; }
+.llegada-ok p { margin: 0; }

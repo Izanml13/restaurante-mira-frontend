@@ -1847,6 +1847,7 @@ export default {
     "errorDesconocido": "Your position couldn't be obtained."
   },
   "ofertasCerca": {
+    "verQR": "My QR",
     "ver": "View",
     "cerrar": "Close alert",
     "aDistancia": "{{m}} m away",
@@ -1898,5 +1899,26 @@ export default {
     "errPermiso": "You do not have permission to manage this restaurant's offers.",
     "errNoEncontrada": "The offer no longer exists.",
     "errRed": "Could not reach the server. Please try again."
+  },
+  "llegada": {
+    "tituloLejos": "Almost there",
+    "titulo": "You're here!",
+    "tuOferta": "Your arrival offer",
+    "buscando": "Checking that you are at the restaurant…",
+    "ensenalo": "Show it to the staff",
+    "caducaEn": "expires in {{t}}",
+    "aplicada": "Offer applied",
+    "aplicadaTexto": "The restaurant has validated your visit. Enjoy!",
+    "caducado": "This QR has expired.",
+    "otroQR": "Get a new QR",
+    "reintentar": "Try again",
+    "lejos": "You're {{m}} m away. Get within 50 m of the restaurant.",
+    "lejosSinDato": "You're still too far. Get within 50 m of the restaurant.",
+    "activaUbicacion": "To create your QR we need to check you are at the restaurant. Turn on location in My account.",
+    "irACuenta": "Go to My account",
+    "sinSesion": "Sign in to get your arrival QR.",
+    "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
+    "error": "We couldn't create your QR."
   }
 }
