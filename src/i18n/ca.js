@@ -1792,5 +1792,27 @@ export default {
       "noSafari": "Estàs en un altre navegador: copia l'enllaç i obre'l a Safari."
     },
     "escritorio": "Obre aquesta pàgina al mòbil:"
+  },
+  "avisos": {
+    "titulo": "Notificacions",
+    "activar": "Activar avisos",
+    "activando": "Activant…",
+    "desactivar": "Desactivar en aquest dispositiu",
+    "comoInstalar": "Com instal·lar-la",
+    "queRecibir": "Què vols rebre",
+    "error": "No s'han pogut activar els avisos. Torna-ho a provar.",
+    "estado": {
+      "instalar-ios": "A l'iPhone, primer afegeix MIRA a la pantalla d'inici i obre-la des de la icona.",
+      "no-soportado": "Aquest navegador no admet notificacions.",
+      "sin-clave": "Les notificacions web encara no estan disponibles.",
+      "bloqueado": "Has bloquejat les notificacions. Activa-les a la configuració del navegador.",
+      "activo": "Rebràs avisos en aquest dispositiu.",
+      "inactivo": "T'avisem de les teves reserves, missatges i ofertes properes."
+    },
+    "categoria": {
+      "reservas": "Reserves",
+      "mensajes": "Missatges",
+      "promociones": "Ofertes i promocions"
+    }
   }
 }

@@ -26,9 +26,9 @@ self.addEventListener('push', (e) => {
 
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
-  // data.ruta llega como en la app móvil ("/reservas") → hash de la web (#/reservas).
-  const ruta = e.notification.data?.ruta;
-  const destino = typeof ruta === 'string' && ruta.startsWith('/') ? `/#${ruta}` : '/';
+  // data.ruta llega como "reservas" o "/reservas" → hash de la web (#/reservas).
+  const ruta = String(e.notification.data?.ruta || '').replace(/^\/+/, '');
+  const destino = /^[\w/-]+$/.test(ruta) ? `/#/${ruta}` : '/';
   e.waitUntil((async () => {
     const abiertas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const c of abiertas) {

@@ -79,8 +79,9 @@ export async function borrarPush() {
 /** Al tocar una notificación con data.ruta, navega a esa pantalla. */
 export function escucharToques(navegar) {
   const abrir = (resp) => {
-    const ruta = resp?.notification?.request?.content?.data?.ruta;
-    if (typeof ruta === 'string' && ruta.startsWith('/')) navegar(ruta);
+    // El backend manda "reservas" o "/reservas".
+    const ruta = String(resp?.notification?.request?.content?.data?.ruta || '').replace(/^\/+/, '');
+    if (/^[\w/-]+$/.test(ruta)) navegar(`/${ruta}`);
   };
   const ultima = Notifications.getLastNotificationResponse();
   if (ultima) abrir(ultima);

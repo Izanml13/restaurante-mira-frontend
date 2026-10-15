@@ -1792,5 +1792,27 @@ export default {
       "noSafari": "Estás en otro navegador: copia el enlace y ábrelo en Safari."
     },
     "escritorio": "Abre esta página en tu móvil:"
+  },
+  "avisos": {
+    "titulo": "Notificaciones",
+    "activar": "Activar avisos",
+    "activando": "Activando…",
+    "desactivar": "Desactivar en este dispositivo",
+    "comoInstalar": "Cómo instalarla",
+    "queRecibir": "Qué quieres recibir",
+    "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",
+    "estado": {
+      "instalar-ios": "En iPhone, primero añade MIRA a tu pantalla de inicio y ábrela desde el icono.",
+      "no-soportado": "Este navegador no admite notificaciones.",
+      "sin-clave": "Las notificaciones web aún no están disponibles.",
+      "bloqueado": "Has bloqueado las notificaciones. Actívalas en los ajustes del navegador.",
+      "activo": "Recibirás avisos en este dispositivo.",
+      "inactivo": "Te avisamos de tus reservas, mensajes y ofertas cercanas."
+    },
+    "categoria": {
+      "reservas": "Reservas",
+      "mensajes": "Mensajes",
+      "promociones": "Ofertas y promociones"
+    }
   }
 }

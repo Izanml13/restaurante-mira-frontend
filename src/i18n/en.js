@@ -1792,5 +1792,27 @@ export default {
       "noSafari": "You're in another browser: copy the link and open it in Safari."
     },
     "escritorio": "Open this page on your phone:"
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "activar": "Turn on alerts",
+    "activando": "Turning on…",
+    "desactivar": "Turn off on this device",
+    "comoInstalar": "How to install it",
+    "queRecibir": "What to receive",
+    "error": "Couldn't turn on alerts. Please try again.",
+    "estado": {
+      "instalar-ios": "On iPhone, first add MIRA to your Home Screen and open it from the icon.",
+      "no-soportado": "This browser doesn't support notifications.",
+      "sin-clave": "Web notifications aren't available yet.",
+      "bloqueado": "You've blocked notifications. Turn them on in your browser settings.",
+      "activo": "You'll get alerts on this device.",
+      "inactivo": "We let you know about your bookings, messages and nearby offers."
+    },
+    "categoria": {
+      "reservas": "Bookings",
+      "mensajes": "Messages",
+      "promociones": "Offers and promotions"
+    }
   }
 }
