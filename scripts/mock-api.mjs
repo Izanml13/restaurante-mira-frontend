@@ -58,6 +58,63 @@ const docs = restaurants.map((r, i) => {
 
 const resenasMira = {}; // creadas durante la sesión (en memoria)
 
+// Ofertas por geolocalización (contrato fase 1, bóveda: Proyecto/Contratos API.md).
+// En memoria: se pierden al reiniciar. El mock no comprueba dueños ni sesión.
+const DISTANCIAS = [1000, 500, 100, 20];
+const ofertas = [{
+  id: 'of1', restauranteId: '1', titulo: 'Menú de mediodía', activa: true, desde: null, hasta: null,
+  niveles: [
+    { distancia: 1000, texto: 'Café gratis con el menú', descuentoPct: 5 },
+    { distancia: 500, texto: '10 % en la cuenta', descuentoPct: 10 },
+    { distancia: 100, texto: '15 % en la cuenta', descuentoPct: 15 },
+    { distancia: 20, texto: '20 % + postre gratis', descuentoPct: 20 },
+  ],
+  creado: '2026-10-15T09:00:00.000Z', actualizado: '2026-10-15T09:00:00.000Z',
+}];
+
+function hoy() { return new Date().toISOString().slice(0, 10); }
+function vigente(o) { return o.activa && (!o.desde || o.desde <= hoy()) && (!o.hasta || o.hasta >= hoy()); }
+
+/** Mismas reglas que el contrato; devuelve { campo: [mensajes] } o null. */
+function erroresOferta(d, conRestaurante) {
+  const e = {};
+  const fecha = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
+  if (conRestaurante && !d.restauranteId) e.restauranteId = ['Obligatorio'];
+  if (typeof d.titulo !== 'string' || !d.titulo.trim() || d.titulo.length > 80) e.titulo = ['Entre 1 y 80 caracteres'];
+  if (typeof d.activa !== 'boolean') e.activa = ['Tiene que ser true o false'];
+  if (!fecha(d.desde) || !fecha(d.hasta)) e.desde = ['Formato AAAA-MM-DD'];
+  else if (d.desde && d.hasta && d.desde > d.hasta) e.hasta = ['No puede ser anterior a desde'];
+  const n = d.niveles;
+  if (!Array.isArray(n) || n.length !== 4 || n.some((x, i) => x?.distancia !== DISTANCIAS[i])) {
+    e.niveles = ['Tienen que ser 4 niveles: 1000, 500, 100 y 20 m, en ese orden'];
+  } else if (n.some((x) => typeof x.texto !== 'string' || !x.texto.trim() || x.texto.length > 140 || !Number.isInteger(x.descuentoPct) || x.descuentoPct < 0 || x.descuentoPct > 100)) {
+    e.niveles = ['Cada nivel: texto de 1 a 140 caracteres y descuentoPct entero de 0 a 100'];
+  } else if (n.some((x, i) => i > 0 && x.descuentoPct < n[i - 1].descuentoPct) || n[3].descuentoPct <= n[0].descuentoPct) {
+    e.niveles = ['Cada nivel tiene que ser igual o mejor que el anterior, y el de 20 m mejor que el de 1000 m'];
+  }
+  return Object.keys(e).length ? e : null;
+}
+
+function distanciaM(a, b) {
+  const rad = (g) => (g * Math.PI) / 180;
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lng - a.lng) / 2) ** 2;
+  return 2 * 6371000 * Math.asin(Math.sqrt(h));
+}
+
+/** Contrato fase 2 (G05): ofertas vigentes a <= 1 km con el nivel alcanzado. */
+function ofertasCerca(pos) {
+  return ofertas.filter(vigente).map((o) => {
+    const r = docs.find((d) => d.id === o.restauranteId);
+    if (!r?.coordenadas) return null;
+    const coordenadas = { lat: r.coordenadas.latitud, lng: r.coordenadas.longitud };
+    const d = Math.round(distanciaM(pos, coordenadas));
+    const nivel = [...o.niveles].sort((x, y) => x.distancia - y.distancia).find((n) => d <= n.distancia);
+    return nivel ? { restaurante: { id: r.id, nombre: r.nombre, coordenadas }, oferta: o, distanciaM: d, nivel } : null;
+  }).filter(Boolean).sort((a, b) => a.distanciaM - b.distanciaM);
+}
+
+function otraActiva(restauranteId, id) { return ofertas.some((o) => o.restauranteId === restauranteId && o.activa && o.id !== id); }
+
 function enviar(res, status, body) {
   res.writeHead(status, {
     'Content-Type': 'application/json',
@@ -98,6 +155,44 @@ http
       return enviar(res, 200, { data: { id: 'res1', codigo: 'MIRA-' + Math.random().toString(36).slice(2, 7).toUpperCase(), ...datos } });
     }
     if (p.startsWith('/v1/promotions')) return enviar(res, 200, { data: [] });
+    if (p === '/v1/ofertas/cerca' && req.method === 'GET') {
+      const lat = Number(url.searchParams.get('lat'));
+      const lng = Number(url.searchParams.get('lng'));
+      if (!url.searchParams.get('lat') || !url.searchParams.get('lng') || !(Math.abs(lat) <= 90) || !(Math.abs(lng) <= 180)) {
+        return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { lat: ['Entre -90 y 90'], lng: ['Entre -180 y 180'] } });
+      }
+      return enviar(res, 200, { data: ofertasCerca({ lat, lng }) });
+    }
+    if (p === '/v1/ofertas' || p === '/v1/ofertas/mias') {
+      const rid = url.searchParams.get('restauranteId');
+      if (req.method === 'GET') {
+        if (!rid) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { restauranteId: ['Obligatorio'] } });
+        const delRest = ofertas.filter((o) => o.restauranteId === rid);
+        return enviar(res, 200, { data: p === '/v1/ofertas' ? delRest.filter(vigente) : [...delRest].reverse() });
+      }
+      if (req.method === 'POST' && p === '/v1/ofertas') {
+        const errores = erroresOferta(datos, true);
+        if (errores) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: errores });
+        if (datos.activa && otraActiva(String(datos.restauranteId))) return enviar(res, 409, { error: 'CONFLICT', message: 'Ya hay otra oferta activa en este restaurante' });
+        const ahora = new Date().toISOString();
+        const nueva = { id: `of${Date.now()}`, restauranteId: String(datos.restauranteId), titulo: datos.titulo.trim(), activa: datos.activa, desde: datos.desde ?? null, hasta: datos.hasta ?? null, niveles: datos.niveles, creado: ahora, actualizado: ahora };
+        ofertas.push(nueva);
+        return enviar(res, 201, nueva);
+      }
+    }
+    const ofertaId = p.match(/^\/v1\/ofertas\/([^/]+)$/);
+    if (ofertaId && ofertaId[1] !== 'mias' && ofertaId[1] !== 'cerca') {
+      const i = ofertas.findIndex((o) => o.id === decodeURIComponent(ofertaId[1]));
+      if (i === -1) return enviar(res, 404, { error: 'NOT_FOUND' });
+      if (req.method === 'DELETE') { ofertas.splice(i, 1); res.writeHead(204, { 'Access-Control-Allow-Origin': '*' }); return res.end(); }
+      if (req.method === 'PUT') {
+        const errores = erroresOferta(datos, false);
+        if (errores) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: errores });
+        if (datos.activa && otraActiva(ofertas[i].restauranteId, ofertas[i].id)) return enviar(res, 409, { error: 'CONFLICT', message: 'Ya hay otra oferta activa en este restaurante' });
+        ofertas[i] = { ...ofertas[i], titulo: datos.titulo.trim(), activa: datos.activa, desde: datos.desde ?? null, hasta: datos.hasta ?? null, niveles: datos.niveles, actualizado: new Date().toISOString() };
+        return enviar(res, 200, ofertas[i]);
+      }
+    }
     if (p.startsWith('/v1/points/balance')) return enviar(res, 200, { saldoActual: 0, rachaLogin: { dias: 0, yaReclamado: true } });
     return enviar(res, 200, { data: [], items: [] });
   })
