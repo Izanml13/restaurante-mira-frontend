@@ -45,7 +45,10 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "MIRA usa tu ubicación, solo con la app abierta, para mostrarte ofertas de restaurantes cercanos. No guardamos tu recorrido."
+          "locationWhenInUsePermission": "MIRA usa tu ubicación, solo con la app abierta, para mostrarte ofertas de restaurantes cercanos. No guardamos tu recorrido.",
+          "locationAlwaysAndWhenInUsePermission": "Si activas «Avisar también con la app cerrada», MIRA usa tu ubicación en segundo plano solo para avisarte de ofertas de restaurantes cercanos. No guardamos tu recorrido y puedes desactivarlo en Mi cuenta.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
       ]
     ],

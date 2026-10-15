@@ -798,5 +798,13 @@ export default {
       "mensajes": "Messages",
       "promociones": "Offers and promotions"
     }
+  },
+  "fondo": {
+    "titulo": "Also alert me with the app closed",
+    "explicacion": "We use your location in the background only to alert you about nearby offers. You'll see an ongoing notification while it's on. We don't store your route.",
+    "denegado": "Android needs the \"Allow all the time\" permission for this. You can grant it in Settings → Apps → MIRA → Location.",
+    "error": "Couldn't turn it on. Please try again.",
+    "servicioTitulo": "MIRA is looking for offers near you",
+    "servicioTexto": "Turn it off any time in My account."
   }
 }

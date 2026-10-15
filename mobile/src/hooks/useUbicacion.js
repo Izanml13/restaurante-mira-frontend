@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import { leerConsentimiento, guardarConsentimiento, posicionVisible } from '../models/ubicacionModel.js';
 import { iniciarSeguimiento } from '../services/seguimientoUbicacion.js';
+import { desactivarFondo } from '../services/ubicacionFondo.js';
 
 // Todas las instancias del hook (Mi cuenta, avisos de G06…) comparten la decisión.
 const oyentes = new Set();
@@ -36,6 +37,7 @@ export default function useUbicacion() {
 
   const decidir = useCallback((estado) => {
     setConsentimiento(guardarConsentimiento(globalThis.localStorage, estado));
+    if (estado !== 'aceptado') desactivarFondo();
     for (const f of oyentes) f();
   }, []);
 

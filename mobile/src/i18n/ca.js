@@ -798,5 +798,13 @@ export default {
       "mensajes": "Missatges",
       "promociones": "Ofertes i promocions"
     }
+  },
+  "fondo": {
+    "titulo": "Avisar també amb l'app tancada",
+    "explicacion": "Fem servir la teva ubicació en segon pla només per avisar-te d'ofertes properes. Veuràs una notificació fixa mentre estigui activat. No guardem el teu recorregut.",
+    "denegado": "Per a això Android necessita el permís «Permetre sempre». Pots donar-lo a Configuració → Aplicacions → MIRA → Ubicació.",
+    "error": "No s'ha pogut activar. Torna-ho a provar.",
+    "servicioTitulo": "MIRA busca ofertes a prop teu",
+    "servicioTexto": "Desactiva-ho quan vulguis a El meu compte."
   }
 }

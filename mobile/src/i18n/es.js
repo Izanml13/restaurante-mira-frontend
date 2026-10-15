@@ -874,5 +874,13 @@ export default {
       "mensajes": "Mensajes",
       "promociones": "Ofertas y promociones"
     }
+  },
+  "fondo": {
+    "titulo": "Avisar también con la app cerrada",
+    "explicacion": "Usamos tu ubicación en segundo plano solo para avisarte de ofertas cercanas. Verás una notificación fija mientras esté activo. No guardamos tu recorrido.",
+    "denegado": "Para esto Android necesita el permiso «Permitir siempre». Puedes darlo en Ajustes → Apps → MIRA → Ubicación.",
+    "error": "No se ha podido activar. Inténtalo de nuevo.",
+    "servicioTitulo": "MIRA busca ofertas cerca de ti",
+    "servicioTexto": "Desactívalo cuando quieras en Mi cuenta."
   }
 }

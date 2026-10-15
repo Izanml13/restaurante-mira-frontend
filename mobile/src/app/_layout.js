@@ -28,6 +28,7 @@ import { AuthProvider, useAuthContext } from '../context/AuthContext';
 import { StreakProvider } from '../context/StreakContext';
 import PopupsRacha from '../components/PopupsRacha';
 import AvisosOfertas from '../components/AvisosOfertas';
+import '../services/ubicacionFondo';
 import { escucharToques } from '../services/notificaciones';
 
 function I18nConAuth({ children }) {
