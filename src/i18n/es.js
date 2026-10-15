@@ -1463,6 +1463,23 @@ export default {
     "eliminando": "Eliminando…",
     "siEliminar": "Sí, eliminar"
   },
+  "ofertasStats": {
+    "titulo": "Rendimiento de las ofertas",
+    "sinDatos": "Todavía no hay avisos de ofertas que mostrar.",
+    "errorCargar": "No se pudieron cargar las estadísticas.",
+    "reintentar": "Reintentar",
+    "totalAvisos": "Avisos mostrados",
+    "totalVisitas": "Visitas (QR)",
+    "totalConfirmadas": "Llegadas confirmadas",
+    "tasa": "Conversión a llegada",
+    "tasaValor": "{{pct}} %",
+    "porNivel": "Avisos por distancia",
+    "porFecha": "Evolución por día",
+    "avisos": "Avisos",
+    "visitas": "Visitas",
+    "confirmadas": "Confirmadas",
+    "notaPrivacidad": "Solo se guardan contadores agregados: nunca la ubicación de los clientes."
+  },
   "meteo": {
     "despejado": "Despejado",
     "nublado": "Nubes y claros",

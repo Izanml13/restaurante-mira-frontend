@@ -1463,6 +1463,23 @@ export default {
     "eliminando": "Deleting…",
     "siEliminar": "Yes, delete"
   },
+  "ofertasStats": {
+    "titulo": "Offer performance",
+    "sinDatos": "There are no offer impressions to show yet.",
+    "errorCargar": "Could not load the statistics.",
+    "reintentar": "Retry",
+    "totalAvisos": "Impressions shown",
+    "totalVisitas": "Visits (QR)",
+    "totalConfirmadas": "Confirmed arrivals",
+    "tasa": "Arrival conversion",
+    "tasaValor": "{{pct}} %",
+    "porNivel": "Impressions by distance",
+    "porFecha": "Daily trend",
+    "avisos": "Impressions",
+    "visitas": "Visits",
+    "confirmadas": "Confirmed",
+    "notaPrivacidad": "Only aggregated counters are stored: never customer locations."
+  },
   "meteo": {
     "despejado": "Clear sky",
     "nublado": "Partly cloudy",
