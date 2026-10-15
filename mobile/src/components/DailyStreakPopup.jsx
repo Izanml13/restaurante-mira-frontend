@@ -65,6 +65,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
         puntosNuevos > 0 || (result?.nuevoSaldo != null && result?.yaReclamado !== true);
       if (!exito) {
         setClaimed(true);
+        setTimeout(() => onClose?.(), 1200);
         return;
       }
       setClaimed(true);
@@ -74,11 +75,13 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
       else if (puntosNuevos > 0) setAnimSaldo((prev) => prev + puntosNuevos);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3500);
+      // Se cierra solo tras ver los puntos.
+      setTimeout(() => onClose?.(), 2200);
     } catch {
       setClaimed(false);
       setJustClaimed(false);
     }
-  }, [claimed, esDia7, onClaim, onWheel]);
+  }, [claimed, esDia7, onClaim, onWheel, onClose]);
 
   const habla = esDia7
     ? '¡Llegaste al día 7!'

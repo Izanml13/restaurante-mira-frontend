@@ -129,6 +129,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
       if (!exito) {
         // Ya estaba reclamado hoy (API o caché): solo cambia el botón, sin confeti.
         setClaimed(true);
+        setTimeout(() => onClose?.(), 1200);
         return;
       }
 
@@ -146,11 +147,13 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
       // Toast siempre en claim exitoso (aunque a veces los puntos sean 0 en día 7).
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3500);
+      // Se cierra solo tras ver los puntos.
+      setTimeout(() => onClose?.(), 2200);
     } catch {
       setClaimed(false);
       setJustClaimed(false);
     }
-  }, [claimed, esDia7, onClaim, onWheel]);
+  }, [claimed, esDia7, onClaim, onWheel, onClose]);
 
   const handleClose = () => {
     onClose?.();
