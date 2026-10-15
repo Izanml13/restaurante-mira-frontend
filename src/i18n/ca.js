@@ -1466,16 +1466,18 @@ export default {
   "ofertasStats": {
     "titulo": "Rendiment de les ofertes",
     "sinDatos": "Encara no hi ha avisos d'ofertes que mostrar.",
+    "errorCargar": "No s'han pogut carregar les estadístiques.",
+    "reintentar": "Tornar-ho a provar",
     "totalAvisos": "Avisos mostrats",
-    "totalLlegadas": "Arribades amb QR",
+    "totalVisitas": "Visites (QR)",
+    "totalConfirmadas": "Arribades confirmades",
     "tasa": "Conversió a arribada",
     "tasaValor": "{{pct}} %",
-    "mejorNivel": "Nivell més efectiu",
-    "nivelValor": "A {{n}} m",
-    "porNivel": "Avisos i arribades per distància",
+    "porNivel": "Avisos per distància",
     "porFecha": "Evolució per dia",
     "avisos": "Avisos",
-    "llegadas": "Arribades",
+    "visitas": "Visites",
+    "confirmadas": "Confirmades",
     "notaPrivacidad": "Només es desen comptadors agregats: mai la ubicació dels clients."
   },
   "meteo": {

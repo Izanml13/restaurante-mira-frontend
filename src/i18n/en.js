@@ -1466,16 +1466,18 @@ export default {
   "ofertasStats": {
     "titulo": "Offer performance",
     "sinDatos": "There are no offer impressions to show yet.",
+    "errorCargar": "Could not load the statistics.",
+    "reintentar": "Retry",
     "totalAvisos": "Impressions shown",
-    "totalLlegadas": "QR arrivals",
+    "totalVisitas": "Visits (QR)",
+    "totalConfirmadas": "Confirmed arrivals",
     "tasa": "Arrival conversion",
     "tasaValor": "{{pct}} %",
-    "mejorNivel": "Most effective level",
-    "nivelValor": "At {{n}} m",
-    "porNivel": "Impressions and arrivals by distance",
+    "porNivel": "Impressions by distance",
     "porFecha": "Daily trend",
     "avisos": "Impressions",
-    "llegadas": "Arrivals",
+    "visitas": "Visits",
+    "confirmadas": "Confirmed",
     "notaPrivacidad": "Only aggregated counters are stored: never customer locations."
   },
   "meteo": {

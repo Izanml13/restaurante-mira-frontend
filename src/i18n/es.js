@@ -1466,16 +1466,18 @@ export default {
   "ofertasStats": {
     "titulo": "Rendimiento de las ofertas",
     "sinDatos": "Todavía no hay avisos de ofertas que mostrar.",
+    "errorCargar": "No se pudieron cargar las estadísticas.",
+    "reintentar": "Reintentar",
     "totalAvisos": "Avisos mostrados",
-    "totalLlegadas": "Llegadas con QR",
+    "totalVisitas": "Visitas (QR)",
+    "totalConfirmadas": "Llegadas confirmadas",
     "tasa": "Conversión a llegada",
     "tasaValor": "{{pct}} %",
-    "mejorNivel": "Nivel más efectivo",
-    "nivelValor": "A {{n}} m",
-    "porNivel": "Avisos y llegadas por distancia",
+    "porNivel": "Avisos por distancia",
     "porFecha": "Evolución por día",
     "avisos": "Avisos",
-    "llegadas": "Llegadas",
+    "visitas": "Visitas",
+    "confirmadas": "Confirmadas",
     "notaPrivacidad": "Solo se guardan contadores agregados: nunca la ubicación de los clientes."
   },
   "meteo": {

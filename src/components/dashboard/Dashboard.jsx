@@ -11,6 +11,7 @@ import ca from "../../i18n/ca.js";
 import en from "../../i18n/en.js";
 import DocumentoFiscal from "../fiscal/DocumentoFiscal.jsx";
 import OfertasPanel from "./OfertasPanel.jsx";
+import OfertasStats from "./OfertasStats.jsx";
 import { facturaReal, reporteFiscalReal, fechaDeTicket } from "../fiscal/fiscalReal.js";
 import "./dashboard.css";
 
@@ -556,9 +557,12 @@ const restDropdownRef = useRef(null);
             </div>
           )}
 
-          {/* Ofertas por distancia (G04) */}
+          {/* Ofertas por distancia (G04) + estadísticas (G07) */}
           {showOfertas && restaurante.id && (
-            <OfertasPanel restauranteId={restaurante.id} />
+            <>
+              <OfertasPanel restauranteId={restaurante.id} />
+              <OfertasStats restauranteId={restaurante.id} />
+            </>
           )}
 
           {/* Primary KPIs */}
