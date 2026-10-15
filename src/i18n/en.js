@@ -6,7 +6,7 @@ export default {
     "filtrarZona": "Filter by area",
     "mapa": "Map",
     "contacto": "Contact",
-    "app": "Get the app",
+    "app": "MIRAPP",
     "reservas": "My bookings",
     "favoritos": "Favourites",
     "admin": "Admin",
@@ -669,7 +669,7 @@ export default {
     "copyright": "© 2026 MIRA. All rights reserved.",
     "hecho": "Spain",
     "avisoPrivacidad": "Privacy policy",
-    "app": "Get the app",
+    "app": "Get MIRAPP",
     "avisoCookies": "Cookie policy",
     "direccion": "12 Market Street, Madrid",
     "contactoInfo": "hello@mira.example — 910 123 456"
@@ -1800,11 +1800,11 @@ export default {
     "fusión": "Fusion"
   },
   "app": {
-    "avisoTitulo": "MIRA has an app",
+    "avisoTitulo": "Get MIRAPP",
     "avisoTexto": "Booking alerts and offers near you.",
     "avisoBoton": "Download",
     "avisoCerrar": "Close notice",
-    "ojo": "MIRA app",
+    "ojo": "MIRAPP",
     "titulo": "Take MIRA with you",
     "sub": "Install it on your phone and get instant alerts about your bookings, your messages and offers from nearby restaurants.",
     "ventajas": [

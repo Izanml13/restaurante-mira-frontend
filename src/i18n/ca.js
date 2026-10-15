@@ -6,7 +6,7 @@ export default {
     "filtrarZona": "Filtra per zona",
     "mapa": "Mapa",
     "contacto": "Contacte",
-    "app": "L'app",
+    "app": "MIRAPP",
     "reservas": "Les meves reserves",
     "favoritos": "Preferits",
     "admin": "Administració",
@@ -669,7 +669,7 @@ export default {
     "copyright": "© 2026 MIRA. Tots els drets reservats.",
     "hecho": "Espanya",
     "avisoPrivacidad": "Avís de privacitat",
-    "app": "Descarrega l'app",
+    "app": "Descarrega MIRAPP",
     "avisoCookies": "Política de cookies",
     "direccion": "Carrer del Mercat 12, Madrid",
     "contactoInfo": "hola@mira.exemple — 910 123 456"
@@ -1800,11 +1800,11 @@ export default {
     "fusión": "Fusió"
   },
   "app": {
-    "avisoTitulo": "MIRA ja té app",
+    "avisoTitulo": "Descarrega MIRAPP",
     "avisoTexto": "Avisos de reserves i ofertes a prop teu.",
     "avisoBoton": "Descarregar",
     "avisoCerrar": "Tancar avís",
-    "ojo": "App MIRA",
+    "ojo": "MIRAPP",
     "titulo": "Porta MIRA a la butxaca",
     "sub": "Instal·la-la al mòbil i t'avisem a l'instant de les teves reserves, els teus missatges i les ofertes dels restaurants propers.",
     "ventajas": [
