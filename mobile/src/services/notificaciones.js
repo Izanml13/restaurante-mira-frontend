@@ -83,7 +83,7 @@ export function escucharToques(navegar) {
     const data = resp?.notification?.request?.content?.data || {};
     // Avisos de ofertas (G06): abren la ficha del restaurante.
     const rid = String(data.restauranteId || '');
-    if (/^[\w-]+$/.test(rid)) { navegar(`/detalle?id=${encodeURIComponent(rid)}`); return; }
+    if (/^[\w-]+$/.test(rid)) { navegar(`/${data.llegada ? 'llegada' : 'detalle'}?id=${encodeURIComponent(rid)}`); return; }
     // El backend manda "reservas" o "/reservas".
     const ruta = String(data.ruta || '').replace(/^\/+/, '');
     if (/^[\w/-]+$/.test(ruta)) navegar(`/${ruta}`);

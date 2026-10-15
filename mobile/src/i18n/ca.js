@@ -761,9 +761,31 @@ export default {
     "errorPermisoApp": "No has donat permís d'ubicació. Activa'l a la configuració del mòbil per fer servir aquesta funció."
   },
   "ofertasCerca": {
+    "verQR": "El meu QR",
     "ver": "Veure",
     "cerrar": "Tancar avís",
     "aDistancia": "A {{m}} m de tu",
     "llegada": "Ja hi ets! Ensenya el teu QR en entrar"
+  },
+  "llegada": {
+    "tituloLejos": "Gairebé hi ets",
+    "titulo": "Ja hi ets!",
+    "tuOferta": "La teva oferta d'arribada",
+    "buscando": "Comprovant que ets al local…",
+    "ensenalo": "Ensenya'l al personal",
+    "caducaEn": "caduca en {{t}}",
+    "aplicada": "Oferta aplicada",
+    "aplicadaTexto": "El restaurant ha validat la teva visita. Bon profit!",
+    "caducado": "Aquest QR ha caducat.",
+    "otroQR": "Demanar un altre QR",
+    "reintentar": "Tornar-ho a provar",
+    "lejos": "Ets a {{m}} m. Acosta-t'hi a menys de 50 m del local.",
+    "lejosSinDato": "Encara ets lluny. Acosta-t'hi a menys de 50 m del local.",
+    "activaUbicacion": "Per generar el QR hem de comprovar que ets al local. Activa la ubicació a El meu compte.",
+    "irACuenta": "Anar a El meu compte",
+    "sinSesion": "Inicia sessió per generar el QR d'arribada.",
+    "sinOferta": "Aquest restaurant ara no té cap oferta activa.",
+    "noDisponible": "Els QR d'arribada encara no estan disponibles. Prova-ho d'aquí a una estona.",
+    "error": "No hem pogut generar el teu QR."
   }
 }

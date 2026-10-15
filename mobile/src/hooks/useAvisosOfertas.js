@@ -37,7 +37,7 @@ export default function useAvisosOfertas(t) {
           notificarLocal({
             titulo: `${llegada ? '📍' : '🎯'} ${n.restaurante.nombre}`,
             cuerpo: `${n.nivel.texto} · ${llegada ? tRef.current('ofertasCerca.llegada') : tRef.current('ofertasCerca.aDistancia', { m: n.distanciaM })}`,
-            data: { restauranteId: String(n.restaurante.id) },
+            data: { restauranteId: String(n.restaurante.id), llegada: llegada ? '1' : '' },
           });
         }
       })

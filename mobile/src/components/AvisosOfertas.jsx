@@ -45,11 +45,11 @@ function Aviso({ aviso, onCerrar, t }) {
         </Text>
       </View>
       <Pressable
-        onPress={() => { onCerrar(); router.push({ pathname: '/detalle', params: { id: String(restaurante.id) } }); }}
+        onPress={() => { onCerrar(); router.push({ pathname: llegada ? '/llegada' : '/detalle', params: { id: String(restaurante.id) } }); }}
         accessibilityRole="button"
         style={({ pressed }) => [styles.ver, { backgroundColor: colores.primaryContainer }, pressed && { opacity: 0.85 }]}
       >
-        <Text style={styles.verTxt}>{t('ofertasCerca.ver')}</Text>
+        <Text style={styles.verTxt}>{llegada ? t('ofertasCerca.verQR') : t('ofertasCerca.ver')}</Text>
       </Pressable>
       <Pressable onPress={onCerrar} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('ofertasCerca.cerrar')} style={styles.cerrar}>
         <Text style={{ color: colores.textoSec, fontSize: 16 }}>✕</Text>

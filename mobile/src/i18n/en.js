@@ -761,9 +761,31 @@ export default {
     "errorPermisoApp": "You haven't allowed location. Turn it on in your phone settings to use this feature."
   },
   "ofertasCerca": {
+    "verQR": "My QR",
     "ver": "View",
     "cerrar": "Close alert",
     "aDistancia": "{{m}} m away",
     "llegada": "You're here! Show your QR when you enter"
+  },
+  "llegada": {
+    "tituloLejos": "Almost there",
+    "titulo": "You're here!",
+    "tuOferta": "Your arrival offer",
+    "buscando": "Checking that you are at the restaurant…",
+    "ensenalo": "Show it to the staff",
+    "caducaEn": "expires in {{t}}",
+    "aplicada": "Offer applied",
+    "aplicadaTexto": "The restaurant has validated your visit. Enjoy!",
+    "caducado": "This QR has expired.",
+    "otroQR": "Get a new QR",
+    "reintentar": "Try again",
+    "lejos": "You're {{m}} m away. Get within 50 m of the restaurant.",
+    "lejosSinDato": "You're still too far. Get within 50 m of the restaurant.",
+    "activaUbicacion": "To create your QR we need to check you are at the restaurant. Turn on location in My account.",
+    "irACuenta": "Go to My account",
+    "sinSesion": "Sign in to get your arrival QR.",
+    "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
+    "error": "We couldn't create your QR."
   }
 }

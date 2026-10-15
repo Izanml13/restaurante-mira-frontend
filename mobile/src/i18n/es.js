@@ -837,9 +837,31 @@ export default {
     "errorPermisoApp": "No has dado permiso de ubicación. Actívalo en los ajustes del móvil para usar esta función."
   },
   "ofertasCerca": {
+    "verQR": "Mi QR",
     "ver": "Ver",
     "cerrar": "Cerrar aviso",
     "aDistancia": "A {{m}} m de ti",
     "llegada": "¡Has llegado! Enseña tu QR al entrar"
+  },
+  "llegada": {
+    "tituloLejos": "Casi has llegado",
+    "titulo": "¡Ya has llegado!",
+    "tuOferta": "Tu oferta de llegada",
+    "buscando": "Comprobando que estás en el local…",
+    "ensenalo": "Enséñaselo al personal",
+    "caducaEn": "caduca en {{t}}",
+    "aplicada": "Oferta aplicada",
+    "aplicadaTexto": "El restaurante ha validado tu visita. ¡Que aproveche!",
+    "caducado": "Este QR ha caducado.",
+    "otroQR": "Pedir otro QR",
+    "reintentar": "Reintentar",
+    "lejos": "Estás a {{m}} m. Acércate a menos de 50 m del local.",
+    "lejosSinDato": "Todavía estás lejos. Acércate a menos de 50 m del local.",
+    "activaUbicacion": "Para generar tu QR necesitamos comprobar que estás en el local. Activa la ubicación en Mi cuenta.",
+    "irACuenta": "Ir a Mi cuenta",
+    "sinSesion": "Inicia sesión para generar tu QR de llegada.",
+    "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
+    "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
+    "error": "No hemos podido generar tu QR."
   }
 }
