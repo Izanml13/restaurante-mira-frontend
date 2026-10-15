@@ -27,6 +27,7 @@ import {
 } from '../models/restaurantModel.js';
 import EmblemaAvatar from '../components/EmblemaAvatar.jsx';
 import UbicacionCuenta from '../components/UbicacionCuenta.jsx';
+import PreferenciasAvisos from '../components/PreferenciasAvisos.jsx';
 import CheckCasilla from '../components/ui/CheckCasilla';
 import Chip, { ChipGrid } from '../components/ui/Chip';
 import { AuthPagina, AuthTarjeta, AuthError } from '../components/ui/Auth';
@@ -574,6 +575,9 @@ export default function Cuenta() {
               </>
             )}
           </View>
+
+          {/* --- Notificaciones (T10) --- */}
+          <PreferenciasAvisos Sub={Sub} />
 
           {/* --- Ubicación (G03) --- */}
           <Sub>{t('ubicacion.titulo')}</Sub>

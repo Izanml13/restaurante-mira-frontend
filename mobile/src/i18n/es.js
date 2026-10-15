@@ -864,5 +864,15 @@ export default {
     "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
     "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
     "error": "No hemos podido generar tu QR."
+  },
+  "avisos": {
+    "titulo": "Notificaciones",
+    "queRecibir": "Qué quieres recibir",
+    "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",
+    "categoria": {
+      "reservas": "Reservas",
+      "mensajes": "Mensajes",
+      "promociones": "Ofertas y promociones"
+    }
   }
 }

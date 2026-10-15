@@ -788,5 +788,15 @@ export default {
     "sinOferta": "Aquest restaurant ara no té cap oferta activa.",
     "noDisponible": "Els QR d'arribada encara no estan disponibles. Prova-ho d'aquí a una estona.",
     "error": "No hem pogut generar el teu QR."
+  },
+  "avisos": {
+    "titulo": "Notificacions",
+    "queRecibir": "Què vols rebre",
+    "error": "No s'han pogut activar els avisos. Torna-ho a provar.",
+    "categoria": {
+      "reservas": "Reserves",
+      "mensajes": "Missatges",
+      "promociones": "Ofertes i promocions"
+    }
   }
 }

@@ -788,5 +788,15 @@ export default {
     "sinOferta": "This restaurant doesn't have an active offer right now.",
     "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
     "error": "We couldn't create your QR."
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "queRecibir": "What to receive",
+    "error": "Couldn't turn on alerts. Please try again.",
+    "categoria": {
+      "reservas": "Bookings",
+      "mensajes": "Messages",
+      "promociones": "Offers and promotions"
+    }
   }
 }
