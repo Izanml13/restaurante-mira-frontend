@@ -1463,6 +1463,21 @@ export default {
     "eliminando": "Eliminant…",
     "siEliminar": "Sí, eliminar"
   },
+  "ofertasStats": {
+    "titulo": "Rendiment de les ofertes",
+    "sinDatos": "Encara no hi ha avisos d'ofertes que mostrar.",
+    "totalAvisos": "Avisos mostrats",
+    "totalLlegadas": "Arribades amb QR",
+    "tasa": "Conversió a arribada",
+    "tasaValor": "{{pct}} %",
+    "mejorNivel": "Nivell més efectiu",
+    "nivelValor": "A {{n}} m",
+    "porNivel": "Avisos i arribades per distància",
+    "porFecha": "Evolució per dia",
+    "avisos": "Avisos",
+    "llegadas": "Arribades",
+    "notaPrivacidad": "Només es desen comptadors agregats: mai la ubicació dels clients."
+  },
   "meteo": {
     "despejado": "Cel ras",
     "nublado": "Núvols i clarianes",
