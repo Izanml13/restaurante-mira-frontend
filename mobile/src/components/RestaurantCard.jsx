@@ -3,7 +3,7 @@
  * estrellas, distancia, disponibilidad y acciones).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -42,6 +42,7 @@ export default function RestaurantCard({
 }) {
   const t = useT(TRADS);
   const { colores } = useTheme();
+  const esMovil = useWindowDimensions().width <= 767;
   const {
     nombre,
     cocina,
@@ -66,6 +67,75 @@ export default function RestaurantCard({
 
   const cerrado =
     disp === t('card.cerradoLunes') || disp === t('card.cerradoMartes');
+
+  const kmTxt =
+    distanciaKm == null
+      ? t('card.centroNoDisponible')
+      : t('card.kmCentro', { km: distanciaKm.toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 }) });
+
+  if (esMovil) {
+    return (
+      <Pressable
+        onPress={() => onSelect(restaurant)}
+        accessibilityRole={Platform.OS === 'web' ? undefined : 'button'}
+        accessibilityLabel={`${nombre}, ${cocina}, ${ciudad}`}
+        style={({ pressed }) => [
+          styles.card,
+          { backgroundColor: colores.papel, borderColor: colores.glassBorder },
+          sombraCard(colores),
+          pressed && { transform: [{ scale: 0.985 }] },
+        ]}
+      >
+        <View style={[styles.media, { height: Math.min(altoMedia, 190), backgroundColor: colores.fondoSuave }]}>
+          <Image source={{ uri }} style={styles.foto} resizeMode="cover" onError={() => uri !== fallback && setUri(fallback)} />
+          {destacado && (
+            <View style={[styles.top, { backgroundColor: colores.tertiaryContainer }]}>
+              <Text style={styles.topTxt}>{t('card.recomendado')}</Text>
+            </View>
+          )}
+          {promoActiva && <PromoBadge promoActiva={promoActiva} style={styles.promo} />}
+          {onToggleFavorito && (
+            <Pressable
+              onPress={() => onToggleFavorito(restaurant.id)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityState={{ selected: Boolean(esFavorito) }}
+              accessibilityLabel={esFavorito ? `${t('card.quitarFavoritos')} ${nombre}` : `${t('card.guardarFavoritos')} ${nombre}`}
+              style={({ pressed }) => [styles.favMovil, { backgroundColor: colores.favBg, transform: [{ scale: pressed ? 1.12 : 1 }] }]}
+            >
+              <Text style={{ fontSize: 18, lineHeight: 22, color: esFavorito ? colores.rojo : colores.gris }}>{esFavorito ? '♥' : '♡'}</Text>
+            </Pressable>
+          )}
+        </View>
+        <View style={styles.cuerpoMovil}>
+          <View style={styles.filaMovil}>
+            <Text numberOfLines={1} style={[styles.tituloMovil, { color: colores.tinta }]}>{nombre}</Text>
+            {valoracion > 0 && (
+              <View style={[styles.notaMovil, { backgroundColor: colores.verdeSuave }]}>
+                <Text style={[styles.notaMovilTxt, { color: colores.verde }]}>★ {valoracion.toLocaleString(t('modelos.locale'))}</Text>
+              </View>
+            )}
+          </View>
+          <Text numberOfLines={1} style={[styles.metaMovil, { color: colores.gris }]}>
+            {cocina} · {precio} · {ciudad}
+          </Text>
+          <View style={styles.filaMovil}>
+            <Text numberOfLines={1} style={[styles.metaMovil, { color: colores.textoSec, flex: 1 }]}>
+              {kmTxt}
+              {valoracion > 0 ? ` · ${(totalResenasYelp ?? 0).toLocaleString(t('modelos.locale'))} ${t('card.opiniones')}` : ` · ${t('card.nuevo')}`}
+            </Text>
+            {onVerCarta && (
+              <Pressable onPress={() => onVerCarta(restaurant)} hitSlop={10} accessibilityRole="button" accessibilityLabel={`${t('card.verCarta')} ${nombre}`}>
+                <Text style={[styles.cartaMovil, { color: colores.primaryContainer }]}>{t('movil.carta')} ›</Text>
+              </Pressable>
+            )}
+          </View>
+          {disp && <Text style={[styles.disp, { color: cerrado ? colores.rojo : colores.primaryContainer }]}>{disp}</Text>}
+          {children}
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <View style={[styles.card, { backgroundColor: colores.papel, borderColor: colores.glassBorder }, sombraCard(colores)]}>
@@ -187,6 +257,23 @@ export default function RestaurantCard({
 }
 
 const styles = StyleSheet.create({
+  favMovil: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cuerpoMovil: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, gap: 4 },
+  filaMovil: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  tituloMovil: { flex: 1, fontFamily: FUENTES.display, fontSize: 20 },
+  notaMovil: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  notaMovilTxt: { fontFamily: FUENTES.textoBold, fontSize: 13 },
+  metaMovil: { fontFamily: FUENTES.texto, fontSize: 14 },
+  cartaMovil: { fontFamily: FUENTES.textoBold, fontSize: 14 },
   card: {
     borderWidth: 1,
     borderRadius: RADIO.xl,

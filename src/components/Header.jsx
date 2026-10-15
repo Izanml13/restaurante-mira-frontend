@@ -164,6 +164,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
             <li><a href="#/mapa">{t('nav.mapa')}</a></li>
             <li><a href="#/reservas">{t('nav.reservas')}</a></li>
             <li><a href="#/contacto">{t('nav.contacto')}</a></li>
+            <li><a href="#/app">{t('nav.app')}</a></li>
           </ul>
         </nav>
         <div className="header-cuentas" onClick={cerrar}>

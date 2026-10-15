@@ -11,6 +11,7 @@ import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
 import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { contarNoLeidos } from '../services/mensajesApi.js';
+import { registrarPush, borrarPush } from '../services/notificaciones.js';
 
 const LS_DIETA = 'mira:dieta';
 const LS_FAVS = 'mira:favoritos';
@@ -83,6 +84,12 @@ export function useAuth() {
       setFusionadoUid(null);
     }
   }), []);
+
+  // Push: registra el dispositivo al entrar (una vez por usuario).
+  useEffect(() => {
+    if (!usuario?.uid) return;
+    registrarPush(localStorage.getItem('mira_lang') || 'es');
+  }, [usuario?.uid]);
 
   // Perfil remoto + fusión de favoritos locales al entrar.
   useEffect(() => {
@@ -237,7 +244,7 @@ export function useAuth() {
     crearCuenta,
     iniciarSesion,
     iniciarSesionGoogle: iniciarSesionGoogleFn,
-    cerrarSesion,
+    cerrarSesion: async () => { await borrarPush(); return cerrarSesion(); },
     enviarVerificacion,
     enviarVerificacionEmail,
     recargarEmailVerified,

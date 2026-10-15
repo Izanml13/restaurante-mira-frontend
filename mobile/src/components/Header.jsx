@@ -22,6 +22,7 @@ import { FUENTES, RADIO, sombraCard } from '../theme/tokens';
 import { IMG } from '../theme/imagenes';
 import { IconoRejilla, IconoPersona, IconoSalir } from './shell/Iconos';
 import { btnCta } from '../theme/ui';
+import BarraMovil from './shell/BarraMovil';
 
 const TRADS = { es, ca, en };
 
@@ -98,6 +99,9 @@ export default function Header({ oculto = false, onAltoChange }) {
   const { usuario, esAdmin, perfil, favoritos, noLeidos } = auth;
   const numFavoritos = favoritos?.length || 0;
   const puntosSaldo = streak.puntosSaldo;
+
+  // En móvil, barra nativa de una fila (ver shell/BarraMovil).
+  if (esMovil) return <BarraMovil oculto={oculto} onAltoChange={onAltoChange} />;
 
   const navLista = (
     <View style={styles.navList}>

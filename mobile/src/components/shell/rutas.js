@@ -25,6 +25,7 @@ export function rutaDesdePath(pathname) {
   if (p === '/dashboard') return 'dashboard';
   if (p === '/detalle') return 'detalle';
   if (p === '/carta') return 'carta';
+  if (p === '/llegada') return 'llegada';
   return 'home';
 }
 

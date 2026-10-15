@@ -17,6 +17,7 @@
     },
     "android": {
       "package": "app.mira.restaurante",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#002218",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -35,14 +36,31 @@
       "expo-sharing",
       "expo-localization",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#002218"
+        }
+      ],
+      [
         "expo-location",
         {
-          "locationWhenInUsePermission": "MIRA usa tu ubicación, solo con la app abierta, para mostrarte ofertas de restaurantes cercanos. No guardamos tu recorrido."
+          "locationWhenInUsePermission": "MIRA usa tu ubicación, solo con la app abierta, para mostrarte ofertas de restaurantes cercanos. No guardamos tu recorrido.",
+          "locationAlwaysAndWhenInUsePermission": "Si activas «Avisar también con la app cerrada», MIRA usa tu ubicación en segundo plano solo para avisarte de ofertas de restaurantes cercanos. No guardamos tu recorrido y puedes desactivarlo en Mi cuenta.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
       ]
     ],
     "experiments": {
       "typedRoutes": false
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c9039d16-d956-42d0-a68b-1cf22361dcc6"
+      }
+    },
+    "owner": "alos209"
   }
 }

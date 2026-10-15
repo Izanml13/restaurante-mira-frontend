@@ -3,7 +3,7 @@
  * info + acciones + carta + reserva + mapa/parkings + reseñas con likes.
  * En RN es una pantalla a pantalla completa (ruta /detalle, presentación modal).
  */
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -60,6 +60,30 @@ function googleLink(coords, direccion) {
   }
   if (direccion) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
   return null;
+}
+
+function proximosDias(n, locale) {
+  const out = [];
+  const hoy = new Date();
+  for (let i = 0; i < n; i += 1) {
+    const d = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + i);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    out.push({ iso, dia: d.toLocaleDateString(locale, { weekday: 'short' }).replace('.', ''), num: d.getDate() });
+  }
+  return out;
+}
+
+/** Botón redondo de acción rápida (llamar, cómo llegar, carta…). */
+function Accion({ icono, texto, onPress }) {
+  const { colores } = useTheme();
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={texto} style={({ pressed }) => [styles.accion, pressed && { opacity: 0.7 }]}>
+      <View style={[styles.accionIcono, { backgroundColor: colores.verdeSuave }]}>
+        <Text style={{ fontSize: 20 }}>{icono}</Text>
+      </View>
+      <Text numberOfLines={1} style={[styles.accionTxt, { color: colores.tinta }]}>{texto}</Text>
+    </Pressable>
+  );
 }
 
 function coordsValidas(coords) {
@@ -161,6 +185,8 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
 
   const apilado = width <= 560;
   const mapaEnFila = width >= 1024;
+  const scrollRef = useRef(null);
+  const [reservaY, setReservaY] = useState(0);
 
   const [verTodas, setVerTodas] = useState(false);
   const [verTodasYelp, setVerTodasYelp] = useState(false);
@@ -385,11 +411,18 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
   }
 
   const carta = cartaDelLocal(restaurant);
+  const servicios = [
+    ['accesoDiscapacidad', t('detail.accesoAdaptado')],
+    ['menuInfantil', t('detail.menuInfantil')],
+    ['tronas', t('detail.tronas')],
+    ['terraza', t('detail.terraza')],
+    ['entornoTranquilo', t('detail.entornoTranquilo')],
+  ].filter(([k]) => restaurant[k] === true);
 
   return (
     <View style={[styles.raiz, { backgroundColor: colores.papel }]}>
       <View style={[styles.barraDorada, { backgroundColor: colores.dorado }]} />
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView ref={scrollRef} contentContainerStyle={[styles.scroll, apilado && { paddingBottom: 120 }]}>
         <View style={styles.fotoWrap}>
           <Image
             source={{ uri }}
@@ -438,15 +471,49 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
             </View>
           )}
 
+          {apilado && (
+            <View style={styles.resumen}>
+              <View style={styles.resumenFila}>
+                {restaurant.valoracion > 0 && (
+                  <View style={[styles.notaPill, { backgroundColor: colores.verdeSuave }]}>
+                    <Text style={[styles.notaPillTxt, { color: colores.verde }]}>
+                      ★ {restaurant.valoracion.toLocaleString(t('modelos.locale'))}
+                    </Text>
+                  </View>
+                )}
+                <Text style={[styles.resumenTxt, { color: colores.gris }]}>
+                  {(restaurant.totalResenasYelp ?? 0).toLocaleString(t('modelos.locale'))} {t('card.opiniones')} · {restaurant.precio}
+                  {media != null ? ` · MIRA ★ ${media.toLocaleString(t('modelos.locale'))}` : ''}
+                </Text>
+              </View>
+              {restaurant.direccion ? (
+                <Text style={[styles.resumenTxt, { color: colores.gris }]}>📍 {restaurant.direccion}</Text>
+              ) : null}
+              {servicios.length > 0 && (
+                <View style={styles.chips}>
+                  {servicios.map(([k, txt]) => (
+                    <View key={k} style={[styles.chip, { backgroundColor: colores.verdeSuave }]}>
+                      <Text style={[styles.chipTxt, { color: colores.primaryContainer }]}>✓ {txt}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              {restaurant.alergenos ? (
+                <Text style={[styles.resumenTxt, { color: colores.gris }]}>{t('detail.alergenos')}: {restaurant.alergenos}</Text>
+              ) : null}
+            </View>
+          )}
+
+          {!apilado && (
           <View style={styles.datos}>
             <Dato etiqueta={t('detail.notaYelp')}>
               ★ {restaurant.valoracion.toLocaleString(t('modelos.locale'))} ({restaurant.totalResenasYelp ?? 0}{' '}
-              {t('card.resenas')})
+              {t('card.opiniones')})
             </Dato>
             {media != null && <Dato etiqueta={t('detail.notaMira')}>★ {media.toLocaleString(t('modelos.locale'))}</Dato>}
             <Dato etiqueta={t('detail.precio')} valor={restaurant.precio} />
-            {restaurant.direccion && <Dato etiqueta={t('detail.direccion')} valor={restaurant.direccion} />}
-            {restaurant.telefono && (
+            {Boolean(restaurant.direccion) && <Dato etiqueta={t('detail.direccion')} valor={restaurant.direccion} />}
+            {Boolean(restaurant.telefono) && (
               <Dato etiqueta={t('detail.telefono')}>
                 <Text
                   onPress={() => Linking.openURL(`tel:${restaurant.telefono.replace(/\s/g, '')}`)}
@@ -465,7 +532,20 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               {restaurant.alergenos || t('detail.sinInfoAlrgenos')}
             </Dato>
           </View>
+          )}
 
+          {apilado && (
+            <View style={styles.accionesMovil}>
+              {restaurant.telefono ? (
+                <Accion icono="📞" texto={t('movil.llamar')} onPress={() => Linking.openURL(`tel:${restaurant.telefono.replace(/\s/g, '')}`)} />
+              ) : null}
+              {externalMapUrl ? <Accion icono="📍" texto={t('movil.comoLlegar')} onPress={() => Linking.openURL(externalMapUrl)} /> : null}
+              {onVerCarta ? <Accion icono="📖" texto={t('movil.carta')} onPress={() => onVerCarta(restaurant)} /> : null}
+              {restaurant.yelpUrl ? <Accion icono="⭐" texto="Yelp" onPress={() => abrirUrlSegura(Linking, restaurant.yelpUrl)} /> : null}
+            </View>
+          )}
+
+          {!apilado && (
           <View style={styles.acciones}>
             {onVerCarta && (
               <Pressable
@@ -475,7 +555,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 <Text style={btnCta(colores, { peq: true })}>{t('detail.verCarta')}</Text>
               </Pressable>
             )}
-            {externalMapUrl && (
+            {Boolean(externalMapUrl) && (
               <Pressable
                 onPress={() => Linking.openURL(externalMapUrl)}
                 style={({ pressed }) => [{ opacity: pressed ? 0.75 : 1 }]}
@@ -483,7 +563,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 <Text style={[btnSecundario(colores), styles.btnSinMargen]}>📍 {t('detail.comoLlegar')}</Text>
               </Pressable>
             )}
-            {restaurant.yelpUrl && (
+            {Boolean(restaurant.yelpUrl) && (
               <Pressable
                 onPress={() => abrirUrlSegura(Linking, restaurant.yelpUrl)}
                 style={({ pressed }) => [{ opacity: pressed ? 0.75 : 1 }]}
@@ -492,6 +572,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               </Pressable>
             )}
           </View>
+          )}
 
           {/* La carta */}
           <Text style={[styles.sub, { color: colores.tinta }]}>{t('detail.laCarta')}</Text>
@@ -517,7 +598,10 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
           )}
 
           {/* Reserva */}
-          <View style={[styles.reservaBloque, { backgroundColor: colores.fondoSuave, borderColor: colores.glassBorder }]}>
+          <View
+            onLayout={(e) => setReservaY(e.nativeEvent.layout.y)}
+            style={[styles.reservaBloque, { backgroundColor: colores.fondoSuave, borderColor: colores.glassBorder }]}
+          >
             <View style={styles.subFila}>
               <Text style={[styles.sub, { color: colores.tinta, marginTop: 0, marginBottom: 0 }]}>
                 📅 {t('detail.reservarMesa')}
@@ -547,7 +631,32 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
             )}
 
             <View style={styles.reservaGrid}>
-              <View style={[styles.campo, apilado ? { width: '100%' } : { flex: 1, minWidth: 150 }]}>
+              {apilado ? (
+                <View style={[styles.campo, { width: '100%' }]}>
+                  <CampoEtiqueta>{t('detail.fecha')}</CampoEtiqueta>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dias}>
+                    {proximosDias(14, t('modelos.locale')).map((d) => {
+                      const activo = reserva.fecha === d.iso;
+                      return (
+                        <Pressable
+                          key={d.iso}
+                          onPress={() => setReserva((s) => ({ ...s, fecha: d.iso }))}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: activo }}
+                          style={[
+                            styles.dia,
+                            { borderColor: activo ? colores.primaryContainer : colores.borde, backgroundColor: activo ? colores.primaryContainer : colores.papel },
+                          ]}
+                        >
+                          <Text style={[styles.diaSem, { color: activo ? '#fff' : colores.gris }]}>{d.dia}</Text>
+                          <Text style={[styles.diaNum, { color: activo ? '#fff' : colores.tinta }]}>{d.num}</Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              ) : (
+              <View style={[styles.campo, { flex: 1, minWidth: 150 }]}>
                 <CampoEtiqueta>{t('detail.fecha')}</CampoEtiqueta>
                 <TextInput
                   value={reserva.fecha}
@@ -562,6 +671,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                   ]}
                 />
               </View>
+              )}
               <View style={[styles.campo, apilado ? { width: '100%' } : { flex: 1, minWidth: 150 }]}>
                 <SelectCampo
                   label={t('detail.hora')}
@@ -600,7 +710,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               />
             </View>
 
-            {reserva.fecha && reserva.hora && disponibilidad && (
+            {Boolean(reserva.fecha && reserva.hora && disponibilidad) && (
               <Text style={[styles.plazas, { color: colores.primaryContainer }]} accessibilityLiveRegion="polite">
                 {disponibilidad.libres > 0
                   ? t('detail.plazasLibres', { libres: disponibilidad.libres, limite: disponibilidad.limite })
@@ -608,7 +718,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
               </Text>
             )}
 
-            {avisoTerraza && (
+            {Boolean(avisoTerraza) && (
               <View style={styles.avisoMeteo} accessibilityLiveRegion="polite">
                 <Text style={styles.avisoMeteoTxt}>
                   {avisoTerraza}
@@ -808,11 +918,56 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
           )}
         </View>
       </ScrollView>
+      {apilado && !confirmacion && (
+        <View style={[styles.barraReserva, { backgroundColor: colores.papel, borderTopColor: colores.borde }]}>
+          <View style={{ flex: 1 }}>
+            <Text numberOfLines={1} style={[styles.barraNombre, { color: colores.tinta }]}>{restaurant.nombre}</Text>
+            <Text style={[styles.barraSub, { color: colores.gris }]}>+100 pts · {restaurant.precio}</Text>
+          </View>
+          <Pressable
+            onPress={() => scrollRef.current?.scrollTo({ y: Math.max(0, reservaY - 12), animated: true })}
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.barraBtn, { backgroundColor: colores.primaryContainer }, pressed && { opacity: 0.85 }]}
+          >
+            <Text style={styles.barraBtnTxt}>{t('movil.reservar')}</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  resumen: { gap: 8, marginTop: 4, marginBottom: 8 },
+  resumenFila: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  resumenTxt: { fontFamily: FUENTES.texto, fontSize: 14.5, lineHeight: 21 },
+  notaPill: { borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
+  notaPillTxt: { fontFamily: FUENTES.textoBold, fontSize: 14 },
+  accionesMovil: { flexDirection: 'row', justifyContent: 'space-around', marginVertical: 12, paddingVertical: 4 },
+  accion: { alignItems: 'center', gap: 6, minWidth: 64 },
+  accionIcono: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
+  accionTxt: { fontFamily: FUENTES.textoSemi, fontSize: 12.5 },
+  dias: { gap: 8, paddingVertical: 4 },
+  dia: { width: 56, height: 64, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  diaSem: { fontFamily: FUENTES.textoSemi, fontSize: 12, textTransform: 'capitalize' },
+  diaNum: { fontFamily: FUENTES.textoBold, fontSize: 18 },
+  barraReserva: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 24,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  barraNombre: { fontFamily: FUENTES.textoBold, fontSize: 15 },
+  barraSub: { fontFamily: FUENTES.texto, fontSize: 13 },
+  barraBtn: { height: 50, borderRadius: 25, paddingHorizontal: 24, alignItems: 'center', justifyContent: 'center' },
+  barraBtnTxt: { color: '#fff', fontFamily: FUENTES.textoBold, fontSize: 16 },
   raiz: {
     flex: 1,
   },

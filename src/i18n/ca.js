@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filtra per zona",
     "mapa": "Mapa",
     "contacto": "Contacte",
+    "app": "MIRAPP",
     "reservas": "Les meves reserves",
     "favoritos": "Preferits",
     "admin": "Administració",
@@ -668,6 +669,7 @@ export default {
     "copyright": "© 2026 MIRA. Tots els drets reservats.",
     "hecho": "Espanya",
     "avisoPrivacidad": "Avís de privacitat",
+    "app": "Descarrega MIRAPP",
     "avisoCookies": "Política de cookies",
     "direccion": "Carrer del Mercat 12, Madrid",
     "contactoInfo": "hola@mira.exemple — 910 123 456"
@@ -1797,6 +1799,69 @@ export default {
     "copas": "Copes",
     "fusión": "Fusió"
   },
+  "app": {
+    "avisoTitulo": "Descarrega MIRAPP",
+    "avisoTexto": "Avisos de reserves i ofertes a prop teu.",
+    "avisoBoton": "Descarregar",
+    "avisoCerrar": "Tancar avís",
+    "ojo": "MIRAPP",
+    "titulo": "Porta MIRA a la butxaca",
+    "sub": "Instal·la-la al mòbil i t'avisem a l'instant de les teves reserves, els teus missatges i les ofertes dels restaurants propers.",
+    "ventajas": [
+      "Avisos de reserves",
+      "Ofertes a prop teu",
+      "Accés amb un toc"
+    ],
+    "tuMovil": "El teu mòbil",
+    "instalada": "Ja estàs fent servir MIRA com a app. Tot a punt!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Descarrega l'instal·lador i instal·la'l al mòbil.",
+      "boton": "Descarregar l'APK",
+      "pronto": "Disponible molt aviat",
+      "pasos": [
+        "Obre l'arxiu descarregat (mira.apk).",
+        "Si Android ho demana, permet «Instal·lar aplicacions d'origen desconegut» per al navegador.",
+        "Obre MIRA, inicia sessió i accepta les notificacions."
+      ],
+      "web": "O instal·la la versió web"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Afegeix-la a la pantalla d'inici des de Safari. No cal l'App Store.",
+      "pasos": [
+        "Obre aquesta pàgina a Safari.",
+        "Toca el botó Compartir {{icono}} de la barra inferior.",
+        "Tria «Afegir a la pantalla d'inici» i confirma amb «Afegir».",
+        "Obre MIRA des de la icona nova i activa els avisos."
+      ],
+      "nota": "Necessites iOS 16.4 o posterior per rebre notificacions.",
+      "noSafari": "Estàs en un altre navegador: copia l'enllaç i obre'l a Safari."
+    },
+    "escritorio": "Obre aquesta pàgina al mòbil:"
+  },
+  "avisos": {
+    "titulo": "Notificacions",
+    "activar": "Activar avisos",
+    "activando": "Activant…",
+    "desactivar": "Desactivar en aquest dispositiu",
+    "comoInstalar": "Com instal·lar-la",
+    "queRecibir": "Què vols rebre",
+    "error": "No s'han pogut activar els avisos. Torna-ho a provar.",
+    "estado": {
+      "instalar-ios": "A l'iPhone, primer afegeix MIRA a la pantalla d'inici i obre-la des de la icona.",
+      "no-soportado": "Aquest navegador no admet notificacions.",
+      "sin-clave": "Les notificacions web encara no estan disponibles.",
+      "bloqueado": "Has bloquejat les notificacions. Activa-les a la configuració del navegador.",
+      "activo": "Rebràs avisos en aquest dispositiu.",
+      "inactivo": "T'avisem de les teves reserves, missatges i ofertes properes."
+    },
+    "categoria": {
+      "reservas": "Reserves",
+      "mensajes": "Missatges",
+      "promociones": "Ofertes i promocions"
+    }
+  },
   "ubicacion": {
     "titulo": "Ubicació per a ofertes properes",
     "descripcion": "Si l'actives, MIRA et pot avisar d'ofertes de restaurants quan hi siguis a prop.",
@@ -1822,6 +1887,13 @@ export default {
     "errorTiempo": "La teva posició triga massa. Ho tornem a provar.",
     "errorNoSoportado": "Aquest navegador no permet fer servir la ubicació.",
     "errorDesconocido": "No s'ha pogut obtenir la teva posició."
+  },
+  "ofertasCerca": {
+    "verQR": "El meu QR",
+    "ver": "Veure",
+    "cerrar": "Tancar avís",
+    "aDistancia": "A {{m}} m de tu",
+    "llegada": "Ja hi ets! Ensenya el teu QR en entrar"
   }
 ,
   "ofertas": {
@@ -1869,5 +1941,26 @@ export default {
     "errPermiso": "No tens permís per gestionar les ofertes d'aquest restaurant.",
     "errNoEncontrada": "L'oferta ja no existeix.",
     "errRed": "No s'ha pogut contactar amb el servidor. Intenta-ho de nou."
+  },
+  "llegada": {
+    "tituloLejos": "Gairebé hi ets",
+    "titulo": "Ja hi ets!",
+    "tuOferta": "La teva oferta d'arribada",
+    "buscando": "Comprovant que ets al local…",
+    "ensenalo": "Ensenya'l al personal",
+    "caducaEn": "caduca en {{t}}",
+    "aplicada": "Oferta aplicada",
+    "aplicadaTexto": "El restaurant ha validat la teva visita. Bon profit!",
+    "caducado": "Aquest QR ha caducat.",
+    "otroQR": "Demanar un altre QR",
+    "reintentar": "Tornar-ho a provar",
+    "lejos": "Ets a {{m}} m. Acosta-t'hi a menys de 50 m del local.",
+    "lejosSinDato": "Encara ets lluny. Acosta-t'hi a menys de 50 m del local.",
+    "activaUbicacion": "Per generar el QR hem de comprovar que ets al local. Activa la ubicació a El meu compte.",
+    "irACuenta": "Anar a El meu compte",
+    "sinSesion": "Inicia sessió per generar el QR d'arribada.",
+    "sinOferta": "Aquest restaurant ara no té cap oferta activa.",
+    "noDisponible": "Els QR d'arribada encara no estan disponibles. Prova-ho d'aquí a una estona.",
+    "error": "No hem pogut generar el teu QR."
   }
 }

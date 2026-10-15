@@ -35,6 +35,10 @@ import Mensajes from './components/Mensajes.jsx';
 import Mapa from './components/Mapa.jsx';
 import Descubrir from './components/Descubrir.jsx';
 import Privacidad from './components/Privacidad.jsx';
+import DescargarApp from './components/DescargarApp.jsx';
+import AvisoApp from './components/AvisoApp.jsx';
+import AvisosOfertas from './components/AvisosOfertas.jsx';
+import Llegada from './components/Llegada.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
@@ -89,10 +93,12 @@ function rutaActual() {
   if (h === '#/mapa') return 'mapa';
   if (h === '#/descubrir') return 'descubrir';
   if (h === '#/privacidad') return 'privacidad';
+  if (h === '#/app') return 'app';
   if (h === '#/puntos') return 'puntos';
   if (h === '#/puntos/historial') return 'historialPuntos';
   if (h === '#/invitar') return 'invitar';
   if (h.startsWith('#/ticket/')) return 'ticket';
+  if (h.startsWith('#/llegada/')) return 'llegada';
   if (h === '#/dashboard') return 'dashboard';
   if (h === '#/jam' || h.startsWith('#/jam/')) return 'jam';
   return 'home';
@@ -467,10 +473,18 @@ function AppContent({ auth, tema, setTema }) {
         )}
         {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
         {ruta === 'privacidad' && <Privacidad />}
+        {ruta === 'app' && <DescargarApp />}
         {ruta === 'puntos' && <PuntosDashboard fetchStreakData={fetchStreakData} onOpenStreak={openStreakPopup} usuario={usuario} />}
         {ruta === 'historialPuntos' && <HistorialPuntos usuario={usuario} />}
         {ruta === 'invitar' && <Invitar />}
         {ruta === 'ticket' && <TicketPage />}
+        {ruta === 'llegada' && (
+          <Llegada
+            key={window.location.hash}
+            restauranteId={decodeURIComponent(window.location.hash.slice('#/llegada/'.length).split('?')[0])}
+            obtenerRestaurante={obtenerRestaurante}
+          />
+        )}
         {ruta === 'descubrir' && (
           <Descubrir
             todos={todos}
@@ -484,6 +498,7 @@ function AppContent({ auth, tema, setTema }) {
         {ruta === 'home' && (
           <>
             <Hero total={total} numZonas={zonasDisponibles.length} />
+            <AvisoApp />
             <section id="buscar" className="buscar" aria-labelledby="buscar-titulo">
                <h2 id="buscar-titulo" className="buscar-titulo">
                  {t('busqueda.titulo')}
@@ -566,6 +581,7 @@ function AppContent({ auth, tema, setTema }) {
         )}
       </main>
       <Footer />
+      <AvisosOfertas />
       <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}

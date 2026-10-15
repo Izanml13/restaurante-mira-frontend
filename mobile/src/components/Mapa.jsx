@@ -1,11 +1,11 @@
 /**
  * #/mapa — locales con coordenadas filtrables por zona — espejo de Mapa.jsx web.
- * Leaflet → react-native-maps con tiles OpenStreetMap (gratis, sin claves).
+ * Leaflet + OpenStreetMap en un WebView (MapaLeaflet), sin claves de Google.
  * Círculos verdes, callout "Ver más información" → detalle.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
-import MapView, { UrlTile, Marker, Callout } from 'react-native-maps';
+import MapaLeaflet from './MapaLeaflet';
 import { fetchRestaurantesMapa } from '../services/restaurantApi.js';
 import { ZONAS_CATALUNA } from '../models/restaurantModel.js';
 import { centroDeZona, CENTRO_CATALUNA } from '../services/cityCenters.js';
@@ -23,10 +23,6 @@ function nombreZona(z, t) {
   return String(z || '').replace(', Spain', '') || (t ? t('otros.sinZona') : 'Sin zona');
 }
 
-function deltaDeZoom(zoom) {
-  return 360 / Math.pow(2, zoom || 13);
-}
-
 function coordsValidas(r) {
   return (
     r.coords &&
@@ -38,8 +34,8 @@ function coordsValidas(r) {
 export default function Mapa({ todos, total, onVerDetalle }) {
   const t = useT(TRADS);
   const { colores } = useTheme();
-  const { height } = useWindowDimensions();
-  const mapRef = useRef(null);
+  const { height, width } = useWindowDimensions();
+  const movil = width <= 767;
 
   const [fuente, setFuente] = useState(() => (Array.isArray(todos) && todos.length ? [...todos] : []));
   const [cargando, setCargando] = useState(() => !(Array.isArray(todos) && todos.length));
@@ -102,52 +98,28 @@ export default function Mapa({ todos, total, onVerDetalle }) {
     [porZona],
   );
 
-  // Repintar cámara al cambiar zona/datos (fitBounds padding 30 / maxZoom 13).
-  useEffect(() => {
-    const mapa = mapRef.current;
-    if (!mapa) return undefined;
-    const timer = setTimeout(() => {
-      try {
-        const pts = visibles.map((r) => ({
-          latitude: Number(r.coords.lat),
-          longitude: Number(r.coords.lng),
-        }));
-        if (pts.length > 1) {
-          mapa.fitToSuppliedCoordinates(pts, {
-            edgePadding: { top: 30, right: 30, bottom: 30, left: 30 },
-            animated: true,
-          });
-        } else if (pts.length === 1) {
-          mapa.animateToRegion({ ...pts[0], latitudeDelta: 0.03, longitudeDelta: 0.03 }, 400);
-        } else if (zona) {
-          const centro = centroDeZona(zona);
-          mapa.animateToRegion(
-            {
-              latitude: Number(centro.lat),
-              longitude: Number(centro.lng),
-              latitudeDelta: deltaDeZoom(centro.zoom),
-              longitudeDelta: deltaDeZoom(centro.zoom),
-            },
-            400,
-          );
-        } else if (fuente.length === 0) {
-          mapa.animateToRegion(regionInicial(), 400);
-        }
-      } catch {
-        /* contenedor aún no listo */
-      }
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [visibles, zona, fuente.length]);
+  // Encuadre: con puntos, Leaflet los encuadra todos; sin puntos, la zona o Cataluña.
+  const encuadre = useMemo(() => {
+    if (visibles.length) return null;
+    const c = zona ? centroDeZona(zona) : CENTRO_CATALUNA;
+    return { lat: Number(c.lat), lng: Number(c.lng), zoom: c.zoom || 8 };
+  }, [visibles.length, zona]);
+
+  const puntos = useMemo(
+    () => visibles.map((r) => ({
+      id: String(r.id),
+      lat: Number(r.coords.lat),
+      lng: Number(r.coords.lng),
+      color: '#16382C',
+      titulo: r.nombre,
+      texto: `★ ${r.valoracion ?? '—'} · ${r.precio} · ${nombreZona(r.zona, t)}`,
+      boton: t('card.verMas'),
+    })),
+    [visibles, t],
+  );
 
   const mapaVacio = !cargando && fuente.length === 0 && !error;
   const mapH = Math.max(380, Math.round(height * 0.65));
-
-  function regionInicial() {
-    const c = CENTRO_CATALUNA;
-    const d = deltaDeZoom(c.zoom);
-    return { latitude: Number(c.lat), longitude: Number(c.lng), latitudeDelta: d, longitudeDelta: d };
-  }
 
   function tabBtn(valor, etiqueta) {
     const activo = zona === valor;
@@ -173,11 +145,12 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   }
 
   return (
-    <View style={[styles.pagina, { paddingHorizontal: 24 }]}>
+    <View style={[styles.pagina, { paddingHorizontal: movil ? 16 : 24 }, movil && { paddingTop: 20 }]}>
       <View
         style={[
           styles.tarjeta,
           { backgroundColor: colores.papel, borderColor: colores.glassBorder },
+          movil && { borderWidth: 0, backgroundColor: 'transparent', padding: 0, borderRadius: 0 },
         ]}
       >
         <Text style={[TITULO_DISPLAY, styles.titulo, { color: colores.tinta }]}>
@@ -197,7 +170,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
               }.`}
         </Text>
 
-        {error && fuente.length === 0 && (
+        {Boolean(error) && fuente.length === 0 && (
           <View style={[styles.errorPanel, { backgroundColor: colores.fondoSuave, borderColor: colores.rojo }]}>
             <Text style={[styles.errorTitulo, { color: colores.tinta }]}>{t('otros.noMapa')}</Text>
             <Text style={[styles.errorTxt, { color: colores.gris }]}>{error}</Text>
@@ -216,54 +189,14 @@ export default function Mapa({ todos, total, onVerDetalle }) {
           ]}
           accessibilityLabel={t('otros.mapaPorZonas')}
         >
-          <MapView ref={mapRef} style={styles.mapa} initialRegion={regionInicial()}>
-            <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} />
-            {zona && (
-              <Marker
-                coordinate={{
-                  latitude: Number(centroDeZona(zona).lat),
-                  longitude: Number(centroDeZona(zona).lng),
-                }}
-                anchor={{ x: 0.5, y: 0.5 }}
-                tracksViewChanges={false}
-                zIndex={2}
-              >
-                <View style={styles.pinCentro}>
-                  <Text style={styles.pinCentroTxt}>★</Text>
-                </View>
-              </Marker>
-            )}
-            {visibles.map((r) => (
-              <Marker
-                key={r.id}
-                coordinate={{ latitude: Number(r.coords.lat), longitude: Number(r.coords.lng) }}
-                anchor={{ x: 0.5, y: 0.5 }}
-                tracksViewChanges={false}
-              >
-                <View style={styles.circulo} />
-                <Callout
-                  tooltip
-                  onPress={() => {
-                    const hallado = visibles.find((x) => String(x.id) === String(r.id));
-                    if (hallado) onVerDetalle?.(hallado);
-                  }}
-                >
-                  <View style={styles.callout}>
-                    <Text style={styles.calloutTitulo}>{r.nombre}</Text>
-                    <Text style={styles.calloutTexto}>
-                      ★ {r.valoracion ?? '—'} · {r.precio} · {nombreZona(r.zona, t)}
-                    </Text>
-                    <View style={styles.calloutBtn}>
-                      <Text style={styles.calloutBtnTxt}>{t('card.verMas')}</Text>
-                    </View>
-                  </View>
-                </Callout>
-              </Marker>
-            ))}
-          </MapView>
-          <Text style={styles.atribucion} pointerEvents="none">
-            © OpenStreetMap
-          </Text>
+          <MapaLeaflet
+            puntos={puntos}
+            encuadre={encuadre}
+            onPulsar={(id) => {
+              const hallado = visibles.find((x) => String(x.id) === id);
+              if (hallado) onVerDetalle?.(hallado);
+            }}
+          />
         </View>
 
         {cargando && fuente.length === 0 && (

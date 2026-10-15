@@ -472,6 +472,7 @@ export default {
     "km": "km"
   },
   "libro": {
+    "pasarPagina": "Tap the right side to go forward and the left side to go back",
     "cartaDe": "Menu of {{nombre}}",
     "cerrarCarta": "Close",
     "leyenda": "Legend",
@@ -718,6 +719,19 @@ export default {
     "multiplicador": "Multiplier",
     "multiplicadorValor": "{{multi}}"
   },
+  "movil": {
+    "saludo": "Where shall we eat today?",
+    "hola": "Hi, {{nombre}}",
+    "filtros": "Filters",
+    "verResultados": "Show {{n}} results",
+    "todas": "All",
+    "reservar": "Book a table",
+    "llamar": "Call",
+    "comoLlegar": "Directions",
+    "carta": "Menu",
+    "info": "Information",
+    "resenas": "reviews"
+  },
   "ubicacion": {
     "titulo": "Location for nearby offers",
     "descripcion": "If you turn it on, MIRA can let you know about restaurant offers when you're nearby.",
@@ -746,5 +760,51 @@ export default {
     "puntoAbiertaApp": "For now it's only used while the app is open.",
     "noSeEnviaApp": "Only this phone sees it; it isn't sent or stored.",
     "errorPermisoApp": "You haven't allowed location. Turn it on in your phone settings to use this feature."
+  },
+  "ofertasCerca": {
+    "verQR": "My QR",
+    "ver": "View",
+    "cerrar": "Close alert",
+    "aDistancia": "{{m}} m away",
+    "llegada": "You're here! Show your QR when you enter"
+  },
+  "llegada": {
+    "tituloLejos": "Almost there",
+    "titulo": "You're here!",
+    "tuOferta": "Your arrival offer",
+    "buscando": "Checking that you are at the restaurant…",
+    "ensenalo": "Show it to the staff",
+    "caducaEn": "expires in {{t}}",
+    "aplicada": "Offer applied",
+    "aplicadaTexto": "The restaurant has validated your visit. Enjoy!",
+    "caducado": "This QR has expired.",
+    "otroQR": "Get a new QR",
+    "reintentar": "Try again",
+    "lejos": "You're {{m}} m away. Get within 50 m of the restaurant.",
+    "lejosSinDato": "You're still too far. Get within 50 m of the restaurant.",
+    "activaUbicacion": "To create your QR we need to check you are at the restaurant. Turn on location in My account.",
+    "irACuenta": "Go to My account",
+    "sinSesion": "Sign in to get your arrival QR.",
+    "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
+    "error": "We couldn't create your QR."
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "queRecibir": "What to receive",
+    "error": "Couldn't turn on alerts. Please try again.",
+    "categoria": {
+      "reservas": "Bookings",
+      "mensajes": "Messages",
+      "promociones": "Offers and promotions"
+    }
+  },
+  "fondo": {
+    "titulo": "Also alert me with the app closed",
+    "explicacion": "We use your location in the background only to alert you about nearby offers. You'll see an ongoing notification while it's on. We don't store your route.",
+    "denegado": "Android needs the \"Allow all the time\" permission for this. You can grant it in Settings → Apps → MIRA → Location.",
+    "error": "Couldn't turn it on. Please try again.",
+    "servicioTitulo": "MIRA is looking for offers near you",
+    "servicioTexto": "Turn it off any time in My account."
   }
 }

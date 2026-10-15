@@ -15,6 +15,7 @@ import { FUENTES, RADIO, ANCHO_MAX, GUTTER, GUTTER_MOVIL, sombraFlotante } from 
 import { btnSecundario } from '../theme/ui';
 import { IconoBusqueda } from './shell/Iconos';
 import SelectCampo, { CampoEtiqueta } from './ui/SelectCampo';
+import BuscadorMovil from './BuscadorMovil';
 
 const TRADS = { es, ca, en };
 const GAP = 14.4; // 0.9rem
@@ -28,7 +29,7 @@ for (let h = 0; h < 24; h += 1) {
   }
 }
 
-export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChange, onClear }) {
+export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChange, onClear, total = 0 }) {
   const t = useT(TRADS);
   const { colores } = useTheme();
   const { width } = useWindowDimensions();
@@ -54,7 +55,8 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChan
   const innerW = seccionW - PAD * 2;
   const itemW = cols === 1 ? innerW : (innerW - GAP * (cols - 1)) / cols;
   const textoW = cols === 1 ? innerW : cols >= 4 ? itemW * 2 + GAP : innerW;
-  const anchoCampo = cols === 1 ? innerW : itemW;
+  // En móvil los filtros van en una hoja inferior a todo el ancho.
+  const anchoCampo = esMovil ? width - 40 : cols === 1 ? innerW : itemW;
 
   const filtrosVisibles = !esMovil || !plegado;
 
@@ -122,6 +124,25 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChan
         onChange={(v) => onChange('orden', v)}
         style={{ width: anchoCampo }}
       />
+    </>
+  );
+
+  if (esMovil) {
+    return (
+      <BuscadorMovil
+        filtros={filtros}
+        opciones={opciones}
+        hayFiltrosActivos={hayFiltrosActivos}
+        onChange={onChange}
+        onClear={onClear}
+        total={total}
+        selects={selects}
+      />
+    );
+  }
+
+  const limpiar = (
+    <>
       <View style={{ width: anchoCampo, justifyContent: 'flex-end' }}>
         <Pressable
           onPress={onClear}
@@ -176,7 +197,7 @@ export default function SearchBar({ filtros, opciones, hayFiltrosActivos, onChan
       )}
 
       {filtrosVisibles && (
-        <View style={cols === 1 ? styles.filtrosMovil : styles.filtrosEscritorio}>{selects}</View>
+        <View style={cols === 1 ? styles.filtrosMovil : styles.filtrosEscritorio}>{selects}{limpiar}</View>
       )}
     </View>
   );

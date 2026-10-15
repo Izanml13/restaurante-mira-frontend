@@ -6,6 +6,7 @@
  *   npm run dev:mock            # Vite apuntando a esta API
  */
 import http from 'node:http';
+import { createHash } from 'node:crypto';
 import { restaurants } from '../src/data/restaurants.js';
 
 const PORT = Number(process.env.MOCK_PORT || 3001);
@@ -57,6 +58,7 @@ const docs = restaurants.map((r, i) => {
 });
 
 const resenasMira = {}; // creadas durante la sesión (en memoria)
+const dispositivos = new Map(); // push (T04): id -> { token, tipo, plataforma, idioma }
 
 // Ofertas por geolocalización (contrato fase 1, bóveda: Proyecto/Contratos API.md).
 // En memoria: se pierden al reiniciar. El mock no comprueba dueños ni sesión.
@@ -116,6 +118,16 @@ function ofertasCerca(pos) {
 // Estadísticas (contrato fase 3, para G07): contadores por restaurante y día.
 // Se generan 14 días de ejemplo para el restaurante 1 y se suman los avisos reales.
 const stats = new Map();
+// Visitas con QR (contrato fase 3, para G09/G10). En memoria; el QR lleva una
+// firma falsa ("mock"): aquí no hay VISITAS_SECRET.
+const visitas = new Map();
+const QUINCE_MIN = 15 * 60 * 1000;
+function visitaPublica(v) {
+  const caducada = v.estado === 'pendiente' && Date.parse(v.caducaEn) <= Date.now();
+  return { ...v, estado: caducada ? 'caducada' : v.estado };
+}
+function qrDe(v) { return `v1.${v.id}.${Date.parse(v.caducaEn)}.mock`; }
+
 function filaStats(rid, fecha) {
   const k = `${rid}_${fecha}`;
   if (!stats.has(k)) stats.set(k, { fecha, avisos: { 1000: 0, 500: 0, 100: 0, 20: 0 }, visitas: 0, confirmadas: 0 });
@@ -168,6 +180,32 @@ http
     if (p === '/v1/reservations' && req.method === 'POST') {
       return enviar(res, 200, { data: { id: 'res1', codigo: 'MIRA-' + Math.random().toString(36).slice(2, 7).toUpperCase(), ...datos } });
     }
+    // Push (contrato T04): sin Bearer → 401; el id es SHA-256 de `tipo:token`.
+    if (p.startsWith('/v1/push/tokens')) {
+      if (!req.headers.authorization) return enviar(res, 401, { error: 'MISSING_TOKEN', message: 'Falta el Bearer' });
+      if (p === '/v1/push/tokens' && req.method === 'POST') {
+        const { token, tipo, plataforma, idioma } = datos;
+        const details = {};
+        if (typeof token !== 'string' || !token || /\s/.test(token) || token.length > 4096) details.token = ['Token no válido'];
+        else if (tipo === 'expo' && !/^Expo(nent)?PushToken\[.+\]$/.test(token)) details.token = ['Formato ExpoPushToken[...]'];
+        if (!['expo', 'web'].includes(tipo)) details.tipo = ['expo o web'];
+        if (!['android', 'ios', 'web'].includes(plataforma)) details.plataforma = ['android, ios o web'];
+        if (!['es', 'ca', 'en'].includes(idioma)) details.idioma = ['es, ca o en'];
+        if (Object.keys(datos).some((k) => !['token', 'tipo', 'plataforma', 'idioma'].includes(k))) details._ = ['Campos no admitidos'];
+        if (Object.keys(details).length) return enviar(res, 400, { error: 'VALIDATION_ERROR', details });
+        const id = createHash('sha256').update(`${tipo}:${token}`).digest('hex');
+        dispositivos.set(id, { token, tipo, plataforma, idioma });
+        console.log(`  push: ${dispositivos.size} dispositivo(s) registrados`);
+        return enviar(res, 200, { id, tipo, plataforma, idioma });
+      }
+      const borrar = p.match(/^\/v1\/push\/tokens\/([^/]+)$/);
+      if (borrar && req.method === 'DELETE') {
+        if (!/^[0-9a-f]{64}$/.test(borrar[1])) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { id: ['64 hex'] } });
+        dispositivos.delete(borrar[1]);
+        res.writeHead(204, { 'Access-Control-Allow-Origin': '*' });
+        return res.end();
+      }
+    }
     if (p.startsWith('/v1/promotions')) return enviar(res, 200, { data: [] });
     if (p === '/v1/ofertas/cerca' && req.method === 'GET') {
       const lat = Number(url.searchParams.get('lat'));
@@ -184,6 +222,51 @@ http
       }
       const data = [...stats.entries()].filter(([k, v]) => k.startsWith(`${rid}_`) && v.fecha >= desde && v.fecha <= hasta).map(([, v]) => v).sort((a, b) => a.fecha.localeCompare(b.fecha));
       return enviar(res, 200, { data });
+    }
+    if (p === '/v1/visitas' && req.method === 'POST') {
+      if (!req.headers.authorization) return enviar(res, 401, { error: 'MISSING_TOKEN', message: 'Falta el Bearer' });
+      const { restauranteId, lat, lng } = datos;
+      if (!restauranteId || !(Math.abs(lat) <= 90) || !(Math.abs(lng) <= 180)) {
+        return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { restauranteId: ['Obligatorio'], lat: ['-90 a 90'], lng: ['-180 a 180'] } });
+      }
+      const r = docs.find((d) => d.id === String(restauranteId));
+      const o = ofertas.find((x) => x.restauranteId === String(restauranteId) && vigente(x));
+      if (!r?.coordenadas || !o) return enviar(res, 404, { error: 'NOT_FOUND' });
+      const d = Math.round(distanciaM({ lat, lng }, { lat: r.coordenadas.latitud, lng: r.coordenadas.longitud }));
+      if (d > 50) return enviar(res, 422, { error: 'LEJOS', distanciaM: d });
+      // Una pendiente por cliente y restaurante: se reemite sin renovar los 15 min.
+      const previa = [...visitas.values()].find((v) => v.restauranteId === r.id && visitaPublica(v).estado === 'pendiente');
+      const v = previa || {
+        id: `vis${Date.now()}`, restauranteId: r.id, ofertaId: o.id,
+        nivel: [...o.niveles].sort((a, b) => a.distancia - b.distancia)[0],
+        estado: 'pendiente', creada: new Date().toISOString(),
+        caducaEn: new Date(Date.now() + QUINCE_MIN).toISOString(), confirmadaEn: null, comisionPct: null,
+      };
+      if (!previa) { visitas.set(v.id, v); filaStats(r.id, hoy()).visitas += 1; }
+      return enviar(res, 201, { visita: visitaPublica(v), qr: qrDe(v) });
+    }
+    if (p === '/v1/visitas/validar' && req.method === 'POST') {
+      const m = /^v1\.([^.]+)\.(\d+)\.(.+)$/.exec(String(datos.qr || ''));
+      if (!m) return enviar(res, 400, { error: 'QR_INVALIDO' });
+      const v = visitas.get(m[1]);
+      if (Number(m[2]) <= Date.now()) return enviar(res, 410, { error: 'QR_CADUCADO' });
+      if (!v) return enviar(res, 404, { error: 'NOT_FOUND' });
+      if (v.estado !== 'pendiente') return enviar(res, 409, { error: 'QR_USADO' });
+      Object.assign(v, { estado: 'confirmada', confirmadaEn: new Date().toISOString(), comisionPct: 8 });
+      filaStats(v.restauranteId, hoy()).confirmadas += 1;
+      return enviar(res, 200, { visita: visitaPublica(v), aplicar: { texto: v.nivel.texto, descuentoPct: v.nivel.descuentoPct }, cliente: { nombre: 'Cliente de prueba' } });
+    }
+    if (p === '/v1/visitas/restaurante' && req.method === 'GET') {
+      const rid = url.searchParams.get('restauranteId');
+      if (!rid) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { restauranteId: ['Obligatorio'] } });
+      const lista = [...visitas.values()].filter((v) => v.restauranteId === rid).reverse();
+      return enviar(res, 200, { data: lista.map((v) => ({ ...visitaPublica(v), cliente: { nombre: 'Cliente de prueba' } })) });
+    }
+    const unaVisita = p.match(/^\/v1\/visitas\/([^/]+)$/);
+    if (unaVisita && req.method === 'GET') {
+      if (!req.headers.authorization) return enviar(res, 401, { error: 'MISSING_TOKEN', message: 'Falta el Bearer' });
+      const v = visitas.get(decodeURIComponent(unaVisita[1]));
+      return v ? enviar(res, 200, visitaPublica(v)) : enviar(res, 404, { error: 'NOT_FOUND' });
     }
     const aviso = p.match(/^\/v1\/ofertas\/([^/]+)\/avisos$/);
     if (aviso && req.method === 'POST') {

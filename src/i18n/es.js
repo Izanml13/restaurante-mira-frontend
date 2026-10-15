@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filtrar por zona",
     "mapa": "Mapa",
     "contacto": "Contacto",
+    "app": "MIRAPP",
     "reservas": "Mis reservas",
     "favoritos": "Favoritos",
     "admin": "Administración",
@@ -668,6 +669,7 @@ export default {
     "copyright": "© 2026 MIRA. Todos los derechos reservados.",
     "hecho": "España",
     "avisoPrivacidad": "Aviso de privacidad",
+    "app": "Descarga MIRAPP",
     "avisoCookies": "Política de cookies",
     "direccion": "Calle del Mercado 12, Madrid",
     "contactoInfo": "hola@mira.ejemplo — 910 123 456"
@@ -1797,6 +1799,69 @@ export default {
     "copas": "Copas",
     "fusión": "Fusión"
   },
+  "app": {
+    "avisoTitulo": "Descarga MIRAPP",
+    "avisoTexto": "Avisos de reservas y ofertas cerca de ti.",
+    "avisoBoton": "Descargar",
+    "avisoCerrar": "Cerrar aviso",
+    "ojo": "MIRAPP",
+    "titulo": "Lleva MIRA en el bolsillo",
+    "sub": "Instálala en tu móvil y te avisamos al momento de tus reservas, tus mensajes y las ofertas de los restaurantes cercanos.",
+    "ventajas": [
+      "Avisos de reservas",
+      "Ofertas cerca de ti",
+      "Acceso en un toque"
+    ],
+    "tuMovil": "Tu móvil",
+    "instalada": "Ya estás usando MIRA como app. ¡Todo listo!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Descarga el instalador e instálalo en tu móvil.",
+      "boton": "Descargar APK",
+      "pronto": "Disponible muy pronto",
+      "pasos": [
+        "Abre el archivo descargado (mira.apk).",
+        "Si Android lo pide, permite «Instalar apps de origen desconocido» para tu navegador.",
+        "Abre MIRA, inicia sesión y acepta las notificaciones."
+      ],
+      "web": "O instala la versión web"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Añádela a tu pantalla de inicio desde Safari. No necesitas App Store.",
+      "pasos": [
+        "Abre esta página en Safari.",
+        "Pulsa el botón Compartir {{icono}} de la barra inferior.",
+        "Elige «Añadir a pantalla de inicio» y confirma con «Añadir».",
+        "Abre MIRA desde el icono nuevo y activa los avisos."
+      ],
+      "nota": "Necesitas iOS 16.4 o posterior para recibir notificaciones.",
+      "noSafari": "Estás en otro navegador: copia el enlace y ábrelo en Safari."
+    },
+    "escritorio": "Abre esta página en tu móvil:"
+  },
+  "avisos": {
+    "titulo": "Notificaciones",
+    "activar": "Activar avisos",
+    "activando": "Activando…",
+    "desactivar": "Desactivar en este dispositivo",
+    "comoInstalar": "Cómo instalarla",
+    "queRecibir": "Qué quieres recibir",
+    "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",
+    "estado": {
+      "instalar-ios": "En iPhone, primero añade MIRA a tu pantalla de inicio y ábrela desde el icono.",
+      "no-soportado": "Este navegador no admite notificaciones.",
+      "sin-clave": "Las notificaciones web aún no están disponibles.",
+      "bloqueado": "Has bloqueado las notificaciones. Actívalas en los ajustes del navegador.",
+      "activo": "Recibirás avisos en este dispositivo.",
+      "inactivo": "Te avisamos de tus reservas, mensajes y ofertas cercanas."
+    },
+    "categoria": {
+      "reservas": "Reservas",
+      "mensajes": "Mensajes",
+      "promociones": "Ofertas y promociones"
+    }
+  },
   "ubicacion": {
     "titulo": "Ubicación para ofertas cercanas",
     "descripcion": "Si la activas, MIRA puede avisarte de ofertas de restaurantes cuando estás cerca.",
@@ -1822,6 +1887,13 @@ export default {
     "errorTiempo": "Tu posición está tardando demasiado. Lo volvemos a intentar.",
     "errorNoSoportado": "Este navegador no permite usar la ubicación.",
     "errorDesconocido": "No se ha podido obtener tu posición."
+  },
+  "ofertasCerca": {
+    "verQR": "Mi QR",
+    "ver": "Ver",
+    "cerrar": "Cerrar aviso",
+    "aDistancia": "A {{m}} m de ti",
+    "llegada": "¡Has llegado! Enseña tu QR al entrar"
   }
 ,
   "ofertas": {
@@ -1869,5 +1941,26 @@ export default {
     "errPermiso": "No tienes permiso para gestionar las ofertas de este restaurante.",
     "errNoEncontrada": "La oferta ya no existe.",
     "errRed": "No se ha podido contactar con el servidor. Inténtalo de nuevo."
+  },
+  "llegada": {
+    "tituloLejos": "Casi has llegado",
+    "titulo": "¡Ya has llegado!",
+    "tuOferta": "Tu oferta de llegada",
+    "buscando": "Comprobando que estás en el local…",
+    "ensenalo": "Enséñaselo al personal",
+    "caducaEn": "caduca en {{t}}",
+    "aplicada": "Oferta aplicada",
+    "aplicadaTexto": "El restaurante ha validado tu visita. ¡Que aproveche!",
+    "caducado": "Este QR ha caducado.",
+    "otroQR": "Pedir otro QR",
+    "reintentar": "Reintentar",
+    "lejos": "Estás a {{m}} m. Acércate a menos de 50 m del local.",
+    "lejosSinDato": "Todavía estás lejos. Acércate a menos de 50 m del local.",
+    "activaUbicacion": "Para generar tu QR necesitamos comprobar que estás en el local. Activa la ubicación en Mi cuenta.",
+    "irACuenta": "Ir a Mi cuenta",
+    "sinSesion": "Inicia sesión para generar tu QR de llegada.",
+    "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
+    "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
+    "error": "No hemos podido generar tu QR."
   }
 }

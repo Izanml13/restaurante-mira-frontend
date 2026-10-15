@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
 import { obtenerEmblemasUsuario } from '../services/emblemasApi.js';
 import EmblemaAvatar from './EmblemaAvatar.jsx';
+import AvisosPush from './AvisosPush.jsx';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
 import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
@@ -333,6 +334,9 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
             </>
           )}
         </div>
+
+        {/* --- NOTIFICACIONES (T07) --- */}
+        <AvisosPush t={t} lang={lang} />
 
         {/* --- UBICACIÓN (G03) --- */}
         <UbicacionCuenta />

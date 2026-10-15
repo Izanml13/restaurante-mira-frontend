@@ -1,0 +1,73 @@
+/* Avisos por distancia (G06): pila flotante abajo, sobre la barra inferior en móvil. */
+.avisos-ofertas {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 2rem));
+  display: grid;
+  gap: 0.6rem;
+  z-index: 900;
+}
+
+@media (max-width: 767px) {
+  .avisos-ofertas { bottom: calc(76px + env(safe-area-inset-bottom)); }
+}
+
+.aviso-oferta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--dorado-claro);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-flotante);
+  animation: aviso-entra 0.25s ease-out;
+}
+
+.aviso-oferta.es-llegada { border-left-color: var(--primary-container); }
+
+.aviso-oferta-icono { font-size: 1.5rem; flex-shrink: 0; }
+
+.aviso-oferta-texto { display: grid; flex: 1; min-width: 0; line-height: 1.3; }
+.aviso-oferta-texto strong { color: var(--tinta); font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aviso-oferta-texto span { color: var(--verde); font-weight: 700; font-size: 0.9rem; }
+.aviso-oferta-texto small { color: var(--texto-sec); font-size: 0.78rem; }
+
+.aviso-oferta-ver {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+[data-theme='dark'] .aviso-oferta-ver { background: var(--primary); color: #0b1f17; }
+
+.aviso-oferta-cerrar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-sec);
+  cursor: pointer;
+}
+
+.aviso-oferta-ver:focus-visible,
+.aviso-oferta-cerrar:focus-visible { outline: none; box-shadow: var(--sombra-card-focus); }
+
+@keyframes aviso-entra {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-oferta { animation: none; }
+}

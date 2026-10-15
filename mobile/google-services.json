@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "62450147191",
+    "project_id": "restaurante-mira-18e0c",
+    "storage_bucket": "restaurante-mira-18e0c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62450147191:android:c42e8a3b4952510909cb72",
+        "android_client_info": {
+          "package_name": "app.mira.restaurante"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "62450147191-9b5a01f8og0qgpn359e2ure3modsu0k6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOiJZa85Db989YAs0nFJ5doxrqIi9zedo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "62450147191-9b5a01f8og0qgpn359e2ure3modsu0k6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

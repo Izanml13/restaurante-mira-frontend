@@ -15,6 +15,7 @@ import {
   Animated,
   Easing as EasingRN,
   Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -228,6 +229,8 @@ function Cara({ lado, cuero, children, style }) {
 
 export default function LibroCarta({ restaurant, dieta, onClose }) {
   const t = useT(TRADS);
+  // En el móvil (estrecho) cabe una sola página: se pasa de una en una.
+  const unaPagina = useWindowDimensions().width < 700;
 
   const [spread, setSpread] = useState(0);
   const montado = useRef(true);
@@ -235,6 +238,7 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
   const [apertura] = useState(() => new Animated.Value(0));
   const [transicion] = useState(() => new Animated.Value(1));
   const libroRect = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const anchoPagina = useRef(0);
 
   const libro = useMemo(() => cartaLibro(restaurant), [restaurant]);
   const tema = useMemo(() => temaCarta(restaurant.cocina), [restaurant.cocina]);
@@ -248,15 +252,19 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
       ...libro.secciones.map((s, i) => ({ tipo: 'seccion', ...s, num: i + 1 })),
       { tipo: 'leyenda', num: libro.secciones.length + 1 },
     ];
+    const lista = [{ tipo: 'portada' }];
+    if (unaPagina) {
+      for (const pg of paginas) lista.push({ tipo: 'una', pg });
+      return lista;
+    }
     if (paginas.length % 2 === 1) {
       paginas.push({ tipo: 'vacia', num: paginas.length + 1 });
     }
-    const lista = [{ tipo: 'portada' }];
     for (let i = 0; i < paginas.length; i += 2) {
       lista.push({ tipo: 'spread', izq: paginas[i], der: paginas[i + 1] });
     }
     return lista;
-  }, [libro]);
+  }, [libro, unaPagina]);
 
   const maxSpread = spreads.length - 1;
 
@@ -342,6 +350,22 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
         </Pressable>
       </View>
     );
+  } else if (unaPagina) {
+    // Una página: tocar la mitad izquierda vuelve, la derecha avanza.
+    const { pg } = spreads[spread];
+    hojas = (
+      <View style={estilos.spread}>
+        <Pressable
+          style={estilos.pliego}
+          onPress={(e) => irA(e.nativeEvent.locationX < anchoPagina.current / 2 ? spread - 1 : spread + 1)}
+          onLayout={(e) => { anchoPagina.current = e.nativeEvent.layout.width; }}
+          accessibilityRole="button"
+          accessibilityHint={t('libro.pasarPagina')}
+        >
+          <Cara cuero={false} style={estilos.caraSola}>{pintarPagina(pg)}</Cara>
+        </Pressable>
+      </View>
+    );
   } else {
     const pg = spreads[spread];
     hojas = (
@@ -377,6 +401,11 @@ export default function LibroCarta({ restaurant, dieta, onClose }) {
         </Animated.View>
       </Animated.View>
       <View style={estilos.barraCierre}>
+        {unaPagina && spread > 0 && (
+          <Text style={estilos.contador} accessibilityLiveRegion="polite">
+            {spread} / {maxSpread}
+          </Text>
+        )}
         <Pressable
           onPress={onClose}
           style={({ pressed }) => [estilos.btnSalir, pressed && { opacity: 0.75 }]}
@@ -432,6 +461,18 @@ const estilos = StyleSheet.create({
     maxWidth: 1180,
     flex: 1,
     borderRadius: 14,
+  },
+  caraSola: {
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  contador: {
+    color: '#f0d78c',
+    fontSize: 13,
+    fontFamily: FUENTES.textoBold,
+    marginBottom: 8,
   },
   barraCierre: {
     flexShrink: 0,

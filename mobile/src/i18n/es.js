@@ -472,6 +472,7 @@ export default {
     "km": "km"
   },
   "libro": {
+    "pasarPagina": "Toca la derecha para avanzar y la izquierda para volver",
     "cartaDe": "Carta de {{nombre}}",
     "cerrarCarta": "Cerrar",
     "leyenda": "Leyenda",
@@ -794,6 +795,19 @@ export default {
     "multiplicador": "Multiplicador",
     "multiplicadorValor": "{{multi}}"
   },
+  "movil": {
+    "saludo": "¿Dónde comemos hoy?",
+    "hola": "Hola, {{nombre}}",
+    "filtros": "Filtros",
+    "verResultados": "Ver {{n}} resultados",
+    "todas": "Todas",
+    "reservar": "Reservar mesa",
+    "llamar": "Llamar",
+    "comoLlegar": "Cómo llegar",
+    "carta": "Carta",
+    "info": "Información",
+    "resenas": "opiniones"
+  },
   "ubicacion": {
     "titulo": "Ubicación para ofertas cercanas",
     "descripcion": "Si la activas, MIRA puede avisarte de ofertas de restaurantes cuando estás cerca.",
@@ -822,5 +836,51 @@ export default {
     "puntoAbiertaApp": "De momento solo se usa con la app abierta.",
     "noSeEnviaApp": "Solo la ve este móvil; no se envía ni se guarda.",
     "errorPermisoApp": "No has dado permiso de ubicación. Actívalo en los ajustes del móvil para usar esta función."
+  },
+  "ofertasCerca": {
+    "verQR": "Mi QR",
+    "ver": "Ver",
+    "cerrar": "Cerrar aviso",
+    "aDistancia": "A {{m}} m de ti",
+    "llegada": "¡Has llegado! Enseña tu QR al entrar"
+  },
+  "llegada": {
+    "tituloLejos": "Casi has llegado",
+    "titulo": "¡Ya has llegado!",
+    "tuOferta": "Tu oferta de llegada",
+    "buscando": "Comprobando que estás en el local…",
+    "ensenalo": "Enséñaselo al personal",
+    "caducaEn": "caduca en {{t}}",
+    "aplicada": "Oferta aplicada",
+    "aplicadaTexto": "El restaurante ha validado tu visita. ¡Que aproveche!",
+    "caducado": "Este QR ha caducado.",
+    "otroQR": "Pedir otro QR",
+    "reintentar": "Reintentar",
+    "lejos": "Estás a {{m}} m. Acércate a menos de 50 m del local.",
+    "lejosSinDato": "Todavía estás lejos. Acércate a menos de 50 m del local.",
+    "activaUbicacion": "Para generar tu QR necesitamos comprobar que estás en el local. Activa la ubicación en Mi cuenta.",
+    "irACuenta": "Ir a Mi cuenta",
+    "sinSesion": "Inicia sesión para generar tu QR de llegada.",
+    "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
+    "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
+    "error": "No hemos podido generar tu QR."
+  },
+  "avisos": {
+    "titulo": "Notificaciones",
+    "queRecibir": "Qué quieres recibir",
+    "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",
+    "categoria": {
+      "reservas": "Reservas",
+      "mensajes": "Mensajes",
+      "promociones": "Ofertas y promociones"
+    }
+  },
+  "fondo": {
+    "titulo": "Avisar también con la app cerrada",
+    "explicacion": "Usamos tu ubicación en segundo plano solo para avisarte de ofertas cercanas. Verás una notificación fija mientras esté activo. No guardamos tu recorrido.",
+    "denegado": "Para esto Android necesita el permiso «Permitir siempre». Puedes darlo en Ajustes → Apps → MIRA → Ubicación.",
+    "error": "No se ha podido activar. Inténtalo de nuevo.",
+    "servicioTitulo": "MIRA busca ofertas cerca de ti",
+    "servicioTexto": "Desactívalo cuando quieras en Mi cuenta."
   }
 }

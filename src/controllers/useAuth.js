@@ -6,6 +6,7 @@
  * Las Views reciben todo por props.
  */
 import { useEffect, useState } from 'react';
+import { desactivarPush } from '../services/pushWeb.js';
 import { suscribirSesion, crearCuenta, iniciarSesion, iniciarSesionGoogle as iniciarSesionGoogleFn, cerrarSesion, enviarVerificacionEmail, recargarEmailVerified } from '../services/authApi.js';
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
@@ -252,7 +253,7 @@ export function useAuth() {
     crearCuenta: crearCuentaConPerfil,
     iniciarSesion,
     iniciarSesionGoogle: iniciarSesionGoogleFn,
-    cerrarSesion,
+    cerrarSesion: async () => { await desactivarPush(); return cerrarSesion(); },
     enviarVerificacion,
     enviarVerificacionEmail,
     recargarEmailVerified,

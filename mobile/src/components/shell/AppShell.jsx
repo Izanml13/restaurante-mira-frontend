@@ -107,7 +107,7 @@ export function AppShell({
           >
             {aviso}
             {children}
-            {!ocultarFooter && <Footer />}
+            {!ocultarFooter && !esMovil && <Footer />}
             <View style={{ height: 24 }} />
           </ScrollView>
         ) : (

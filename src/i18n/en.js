@@ -6,6 +6,7 @@ export default {
     "filtrarZona": "Filter by area",
     "mapa": "Map",
     "contacto": "Contact",
+    "app": "MIRAPP",
     "reservas": "My bookings",
     "favoritos": "Favourites",
     "admin": "Admin",
@@ -668,6 +669,7 @@ export default {
     "copyright": "© 2026 MIRA. All rights reserved.",
     "hecho": "Spain",
     "avisoPrivacidad": "Privacy policy",
+    "app": "Get MIRAPP",
     "avisoCookies": "Cookie policy",
     "direccion": "12 Market Street, Madrid",
     "contactoInfo": "hello@mira.example — 910 123 456"
@@ -1797,6 +1799,69 @@ export default {
     "copas": "Drinks",
     "fusión": "Fusion"
   },
+  "app": {
+    "avisoTitulo": "Get MIRAPP",
+    "avisoTexto": "Booking alerts and offers near you.",
+    "avisoBoton": "Download",
+    "avisoCerrar": "Close notice",
+    "ojo": "MIRAPP",
+    "titulo": "Take MIRA with you",
+    "sub": "Install it on your phone and get instant alerts about your bookings, your messages and offers from nearby restaurants.",
+    "ventajas": [
+      "Booking alerts",
+      "Offers near you",
+      "One-tap access"
+    ],
+    "tuMovil": "Your phone",
+    "instalada": "You're already using MIRA as an app. All set!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Download the installer and install it on your phone.",
+      "boton": "Download APK",
+      "pronto": "Coming very soon",
+      "pasos": [
+        "Open the downloaded file (mira.apk).",
+        "If Android asks, allow \"Install unknown apps\" for your browser.",
+        "Open MIRA, sign in and allow notifications."
+      ],
+      "web": "Or install the web version"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Add it to your Home Screen from Safari. No App Store needed.",
+      "pasos": [
+        "Open this page in Safari.",
+        "Tap the Share button {{icono}} in the bottom bar.",
+        "Choose \"Add to Home Screen\" and confirm with \"Add\".",
+        "Open MIRA from the new icon and turn on alerts."
+      ],
+      "nota": "You need iOS 16.4 or later to receive notifications.",
+      "noSafari": "You're in another browser: copy the link and open it in Safari."
+    },
+    "escritorio": "Open this page on your phone:"
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "activar": "Turn on alerts",
+    "activando": "Turning on…",
+    "desactivar": "Turn off on this device",
+    "comoInstalar": "How to install it",
+    "queRecibir": "What to receive",
+    "error": "Couldn't turn on alerts. Please try again.",
+    "estado": {
+      "instalar-ios": "On iPhone, first add MIRA to your Home Screen and open it from the icon.",
+      "no-soportado": "This browser doesn't support notifications.",
+      "sin-clave": "Web notifications aren't available yet.",
+      "bloqueado": "You've blocked notifications. Turn them on in your browser settings.",
+      "activo": "You'll get alerts on this device.",
+      "inactivo": "We let you know about your bookings, messages and nearby offers."
+    },
+    "categoria": {
+      "reservas": "Bookings",
+      "mensajes": "Messages",
+      "promociones": "Offers and promotions"
+    }
+  },
   "ubicacion": {
     "titulo": "Location for nearby offers",
     "descripcion": "If you turn it on, MIRA can let you know about restaurant offers when you're nearby.",
@@ -1822,6 +1887,13 @@ export default {
     "errorTiempo": "Your position is taking too long. We'll try again.",
     "errorNoSoportado": "This browser doesn't support location.",
     "errorDesconocido": "Your position couldn't be obtained."
+  },
+  "ofertasCerca": {
+    "verQR": "My QR",
+    "ver": "View",
+    "cerrar": "Close alert",
+    "aDistancia": "{{m}} m away",
+    "llegada": "You're here! Show your QR when you enter"
   }
 ,
   "ofertas": {
@@ -1869,5 +1941,26 @@ export default {
     "errPermiso": "You do not have permission to manage this restaurant's offers.",
     "errNoEncontrada": "The offer no longer exists.",
     "errRed": "Could not reach the server. Please try again."
+  },
+  "llegada": {
+    "tituloLejos": "Almost there",
+    "titulo": "You're here!",
+    "tuOferta": "Your arrival offer",
+    "buscando": "Checking that you are at the restaurant…",
+    "ensenalo": "Show it to the staff",
+    "caducaEn": "expires in {{t}}",
+    "aplicada": "Offer applied",
+    "aplicadaTexto": "The restaurant has validated your visit. Enjoy!",
+    "caducado": "This QR has expired.",
+    "otroQR": "Get a new QR",
+    "reintentar": "Try again",
+    "lejos": "You're {{m}} m away. Get within 50 m of the restaurant.",
+    "lejosSinDato": "You're still too far. Get within 50 m of the restaurant.",
+    "activaUbicacion": "To create your QR we need to check you are at the restaurant. Turn on location in My account.",
+    "irACuenta": "Go to My account",
+    "sinSesion": "Sign in to get your arrival QR.",
+    "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
+    "error": "We couldn't create your QR."
   }
 }

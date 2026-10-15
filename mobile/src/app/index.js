@@ -86,6 +86,7 @@ export default function Index() {
     router.push({ pathname: '/carta', params: { id: String(r.id) } });
   }
 
+  const esMovil = width <= 767;
   const gutter = width <= 640 ? GUTTER_MOVIL : GUTTER;
   const cols = columnasDe(width);
 
@@ -93,14 +94,23 @@ export default function Index() {
 
   return (
     <AppShell onCercaFinal={cercaFinal}>
-      <Hero total={total} numZonas={zonasDisponibles.length} onBuscar={irAlBuscador} />
+      {esMovil ? (
+        <View style={[styles.intro, { paddingHorizontal: gutter }]}>
+          <Text style={[styles.introHola, { color: colores.dorado }]}>
+            {auth.usuario ? t('movil.hola', { nombre: (auth.perfil?.nombre || auth.usuario.nombre || '').split(' ')[0] || 'MIRA' }) : 'MIRA'}
+          </Text>
+          <Text style={[styles.introTitulo, { color: colores.tinta }]} accessibilityRole="header">{t('movil.saludo')}</Text>
+        </View>
+      ) : (
+        <Hero total={total} numZonas={zonasDisponibles.length} onBuscar={irAlBuscador} />
+      )}
 
       <View
         onLayout={(e) => setBuscadorY(e.nativeEvent.layout.y)}
         style={[styles.buscar, { paddingHorizontal: gutter, maxWidth: ANCHO_MAX }]}
         accessibilityLabel={t('busqueda.titulo')}
       >
-        <Text style={[styles.buscarTitulo, { color: colores.tinta }]}>{t('busqueda.titulo')}</Text>
+        {!esMovil && <Text style={[styles.buscarTitulo, { color: colores.tinta }]}>{t('busqueda.titulo')}</Text>}
 
         {estado === 'cargando' && (
           <View accessibilityLabel={t('otros.cargando')} accessibilityLiveRegion="polite">
@@ -126,6 +136,7 @@ export default function Index() {
               hayFiltrosActivos={hayFiltrosActivos}
               onChange={actualizarFiltro}
               onClear={limpiarFiltros}
+              total={filtrados.length}
             />
 
             <Text style={[styles.contador, { color: colores.tinta }]} accessibilityLiveRegion="polite">
@@ -176,6 +187,22 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  intro: {
+    paddingTop: 20,
+    paddingBottom: 16,
+    gap: 2,
+  },
+  introHola: {
+    fontFamily: FUENTES.textoBold,
+    fontSize: 13,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  introTitulo: {
+    fontFamily: FUENTES.display,
+    fontSize: 30,
+    lineHeight: 36,
+  },
   buscar: {
     width: '100%',
     alignSelf: 'center',
