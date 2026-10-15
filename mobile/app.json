@@ -17,6 +17,7 @@
     },
     "android": {
       "package": "app.mira.restaurante",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#002218",
         "foregroundImage": "./assets/android-icon-foreground.png",
