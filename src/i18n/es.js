@@ -668,6 +668,7 @@ export default {
     "copyright": "© 2026 MIRA. Todos los derechos reservados.",
     "hecho": "España",
     "avisoPrivacidad": "Aviso de privacidad",
+    "app": "Descarga la app",
     "avisoCookies": "Política de cookies",
     "direccion": "Calle del Mercado 12, Madrid",
     "contactoInfo": "hola@mira.ejemplo — 910 123 456"
@@ -1754,5 +1755,42 @@ export default {
     "vegana": "Vegana",
     "copas": "Copas",
     "fusión": "Fusión"
+  },
+  "app": {
+    "ojo": "App MIRA",
+    "titulo": "Lleva MIRA en el bolsillo",
+    "sub": "Instálala en tu móvil y te avisamos al momento de tus reservas, tus mensajes y las ofertas de los restaurantes cercanos.",
+    "ventajas": [
+      "Avisos de reservas",
+      "Ofertas cerca de ti",
+      "Acceso en un toque"
+    ],
+    "tuMovil": "Tu móvil",
+    "instalada": "Ya estás usando MIRA como app. ¡Todo listo!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Descarga el instalador e instálalo en tu móvil.",
+      "boton": "Descargar APK",
+      "pronto": "Disponible muy pronto",
+      "pasos": [
+        "Abre el archivo descargado (mira.apk).",
+        "Si Android lo pide, permite «Instalar apps de origen desconocido» para tu navegador.",
+        "Abre MIRA, inicia sesión y acepta las notificaciones."
+      ],
+      "web": "O instala la versión web"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Añádela a tu pantalla de inicio desde Safari. No necesitas App Store.",
+      "pasos": [
+        "Abre esta página en Safari.",
+        "Pulsa el botón Compartir {{icono}} de la barra inferior.",
+        "Elige «Añadir a pantalla de inicio» y confirma con «Añadir».",
+        "Abre MIRA desde el icono nuevo y activa los avisos."
+      ],
+      "nota": "Necesitas iOS 16.4 o posterior para recibir notificaciones.",
+      "noSafari": "Estás en otro navegador: copia el enlace y ábrelo en Safari."
+    },
+    "escritorio": "Abre esta página en tu móvil:"
   }
 }

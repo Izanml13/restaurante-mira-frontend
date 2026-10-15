@@ -668,6 +668,7 @@ export default {
     "copyright": "© 2026 MIRA. Tots els drets reservats.",
     "hecho": "Espanya",
     "avisoPrivacidad": "Avís de privacitat",
+    "app": "Descarrega l'app",
     "avisoCookies": "Política de cookies",
     "direccion": "Carrer del Mercat 12, Madrid",
     "contactoInfo": "hola@mira.exemple — 910 123 456"
@@ -1754,5 +1755,42 @@ export default {
     "vegana": "Vegana",
     "copas": "Copes",
     "fusión": "Fusió"
+  },
+  "app": {
+    "ojo": "App MIRA",
+    "titulo": "Porta MIRA a la butxaca",
+    "sub": "Instal·la-la al mòbil i t'avisem a l'instant de les teves reserves, els teus missatges i les ofertes dels restaurants propers.",
+    "ventajas": [
+      "Avisos de reserves",
+      "Ofertes a prop teu",
+      "Accés amb un toc"
+    ],
+    "tuMovil": "El teu mòbil",
+    "instalada": "Ja estàs fent servir MIRA com a app. Tot a punt!",
+    "android": {
+      "titulo": "Android",
+      "texto": "Descarrega l'instal·lador i instal·la'l al mòbil.",
+      "boton": "Descarregar l'APK",
+      "pronto": "Disponible molt aviat",
+      "pasos": [
+        "Obre l'arxiu descarregat (mira.apk).",
+        "Si Android ho demana, permet «Instal·lar aplicacions d'origen desconegut» per al navegador.",
+        "Obre MIRA, inicia sessió i accepta les notificacions."
+      ],
+      "web": "O instal·la la versió web"
+    },
+    "ios": {
+      "titulo": "iPhone",
+      "texto": "Afegeix-la a la pantalla d'inici des de Safari. No cal l'App Store.",
+      "pasos": [
+        "Obre aquesta pàgina a Safari.",
+        "Toca el botó Compartir {{icono}} de la barra inferior.",
+        "Tria «Afegir a la pantalla d'inici» i confirma amb «Afegir».",
+        "Obre MIRA des de la icona nova i activa els avisos."
+      ],
+      "nota": "Necessites iOS 16.4 o posterior per rebre notificacions.",
+      "noSafari": "Estàs en un altre navegador: copia l'enllaç i obre'l a Safari."
+    },
+    "escritorio": "Obre aquesta pàgina al mòbil:"
   }
 }

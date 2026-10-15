@@ -35,6 +35,7 @@ import Mensajes from './components/Mensajes.jsx';
 import Mapa from './components/Mapa.jsx';
 import Descubrir from './components/Descubrir.jsx';
 import Privacidad from './components/Privacidad.jsx';
+import DescargarApp from './components/DescargarApp.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
@@ -89,6 +90,7 @@ function rutaActual() {
   if (h === '#/mapa') return 'mapa';
   if (h === '#/descubrir') return 'descubrir';
   if (h === '#/privacidad') return 'privacidad';
+  if (h === '#/app') return 'app';
   if (h === '#/puntos') return 'puntos';
   if (h === '#/puntos/historial') return 'historialPuntos';
   if (h === '#/invitar') return 'invitar';
@@ -467,6 +469,7 @@ function AppContent({ auth, tema, setTema }) {
         )}
         {ruta === 'mensajes' && <Mensajes usuario={usuario} onLeidos={recargarMensajes} />}
         {ruta === 'privacidad' && <Privacidad />}
+        {ruta === 'app' && <DescargarApp />}
         {ruta === 'puntos' && <PuntosDashboard fetchStreakData={fetchStreakData} onOpenStreak={openStreakPopup} usuario={usuario} />}
         {ruta === 'historialPuntos' && <HistorialPuntos usuario={usuario} />}
         {ruta === 'invitar' && <Invitar />}

@@ -1,0 +1,222 @@
+/* Página #/app: descarga de la app (APK y PWA en iPhone). Solo tokens del tema. */
+.app-pagina {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 3rem var(--gutter) 4rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.app-hero {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.app-ojo {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dorado);
+}
+
+.app-hero h1 {
+  font-family: var(--fuente-display);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
+  margin: 0;
+  color: var(--tinta);
+}
+
+.app-sub {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--gris);
+  line-height: 1.55;
+}
+
+.app-ventajas {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.app-ventajas li {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--verde-suave);
+  color: var(--verde);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.app-instalada {
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radio);
+  background: var(--confirm-tinte);
+  color: var(--confirm-tinta);
+  text-align: center;
+  font-weight: 600;
+}
+
+.app-rejilla {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .app-rejilla { grid-template-columns: 1fr 1fr; }
+}
+
+.app-tarjeta {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  padding: 1.75rem;
+  background: var(--papel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radio-xl);
+  box-shadow: var(--sombra-card);
+  transition: box-shadow 0.2s;
+}
+
+.app-tarjeta:hover { box-shadow: var(--sombra-card-hover); }
+
+.app-tarjeta.es-tuya { border-color: var(--dorado-claro); }
+
+.app-tuya {
+  position: absolute;
+  top: -0.7rem;
+  right: 1.25rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: var(--secondary-container);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.app-tarjeta-cab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-tarjeta-cab h2 {
+  font-family: var(--fuente-display);
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--tinta);
+}
+
+.app-tarjeta-icono {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radio);
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.app-texto { margin: 0; color: var(--gris); line-height: 1.5; }
+
+.app-boton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary-container);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.app-boton:hover:not(:disabled) { background: var(--primary); transform: translateY(-1px); }
+.app-boton:focus-visible { outline: none; box-shadow: var(--sombra-card-focus); }
+.app-boton:disabled { opacity: 0.5; cursor: not-allowed; }
+
+[data-theme='dark'] .app-boton { background: var(--primary); color: #0b1f17; }
+[data-theme='dark'] .app-boton:hover:not(:disabled) { background: var(--verde-oscuro); }
+
+.app-boton-web { margin-top: 0; justify-self: start; }
+
+.app-pasos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.app-pasos li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  line-height: 1.5;
+  color: var(--tinta);
+}
+
+.app-paso-num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--verde-suave);
+  color: var(--verde);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.app-icono-compartir {
+  display: inline-block;
+  vertical-align: -3px;
+  margin: 0 0.2rem;
+  color: var(--azul);
+}
+
+.app-nota,
+.app-escritorio {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-sec);
+}
+
+.app-escritorio { text-align: center; overflow-wrap: anywhere; }
+
+.app-aviso {
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radio-peq);
+  background: var(--error-tinte);
+  color: var(--error-tinta);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .app-pagina { padding: 2rem var(--gutter-movil) 3rem; }
+  .app-tarjeta { padding: 1.35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-boton, .app-tarjeta { transition: none; }
+  .app-boton:hover:not(:disabled) { transform: none; }
+}
