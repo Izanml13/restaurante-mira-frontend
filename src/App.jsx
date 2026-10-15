@@ -37,6 +37,7 @@ import Descubrir from './components/Descubrir.jsx';
 import Privacidad from './components/Privacidad.jsx';
 import DescargarApp from './components/DescargarApp.jsx';
 import AvisoApp from './components/AvisoApp.jsx';
+import AvisosOfertas from './components/AvisosOfertas.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
@@ -571,6 +572,7 @@ function AppContent({ auth, tema, setTema }) {
         )}
       </main>
       <Footer />
+      <AvisosOfertas />
       <CookieBanner usuario={usuario} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}

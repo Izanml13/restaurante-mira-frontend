@@ -835,5 +835,11 @@ export default {
     "puntoAbiertaApp": "De momento solo se usa con la app abierta.",
     "noSeEnviaApp": "Solo la ve este móvil; no se envía ni se guarda.",
     "errorPermisoApp": "No has dado permiso de ubicación. Actívalo en los ajustes del móvil para usar esta función."
+  },
+  "ofertasCerca": {
+    "ver": "Ver",
+    "cerrar": "Cerrar aviso",
+    "aDistancia": "A {{m}} m de ti",
+    "llegada": "¡Has llegado! Enseña tu QR al entrar"
   }
 }

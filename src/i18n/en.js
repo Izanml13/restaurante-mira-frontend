@@ -1845,5 +1845,11 @@ export default {
     "errorTiempo": "Your position is taking too long. We'll try again.",
     "errorNoSoportado": "This browser doesn't support location.",
     "errorDesconocido": "Your position couldn't be obtained."
+  },
+  "ofertasCerca": {
+    "ver": "View",
+    "cerrar": "Close alert",
+    "aDistancia": "{{m}} m away",
+    "llegada": "You're here! Show your QR when you enter"
   }
 }

@@ -80,12 +80,28 @@ export async function borrarPush() {
 export function escucharToques(navegar) {
   if (Platform.OS === 'web') return () => {};
   const abrir = (resp) => {
+    const data = resp?.notification?.request?.content?.data || {};
+    // Avisos de ofertas (G06): abren la ficha del restaurante.
+    const rid = String(data.restauranteId || '');
+    if (/^[\w-]+$/.test(rid)) { navegar(`/detalle?id=${encodeURIComponent(rid)}`); return; }
     // El backend manda "reservas" o "/reservas".
-    const ruta = String(resp?.notification?.request?.content?.data?.ruta || '').replace(/^\/+/, '');
+    const ruta = String(data.ruta || '').replace(/^\/+/, '');
     if (/^[\w/-]+$/.test(ruta)) navegar(`/${ruta}`);
   };
   const ultima = Notifications.getLastNotificationResponse();
   if (ultima) abrir(ultima);
   const sub = Notifications.addNotificationResponseReceivedListener(abrir);
   return () => sub.remove();
+}
+
+/** Notificación local inmediata (G06: aviso de oferta cercana con la app abierta). */
+export async function notificarLocal({ titulo, cuerpo, data }) {
+  if (Platform.OS === 'web') return;
+  try {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') return;
+    await Notifications.scheduleNotificationAsync({ content: { title: titulo, body: cuerpo, data }, trigger: null });
+  } catch (e) {
+    console.warn('[MIRA push] Notificación local:', e?.message || e);
+  }
 }

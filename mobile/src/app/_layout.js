@@ -27,6 +27,7 @@ import { I18nProvider } from '../i18n/index.jsx';
 import { AuthProvider, useAuthContext } from '../context/AuthContext';
 import { StreakProvider } from '../context/StreakContext';
 import PopupsRacha from '../components/PopupsRacha';
+import AvisosOfertas from '../components/AvisosOfertas';
 import { escucharToques } from '../services/notificaciones';
 
 function I18nConAuth({ children }) {
@@ -124,6 +125,7 @@ export default function RootLayout() {
                 <View style={{ flex: 1 }}>
                   <RootStack />
                   <PopupsRacha />
+                  <AvisosOfertas />
                 </View>
               </I18nConAuth>
             </StreakConAuth>

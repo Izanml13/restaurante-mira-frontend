@@ -759,5 +759,11 @@ export default {
     "puntoAbiertaApp": "De moment només s'utilitza amb l'app oberta.",
     "noSeEnviaApp": "Només la veu aquest mòbil; no s'envia ni es desa.",
     "errorPermisoApp": "No has donat permís d'ubicació. Activa'l a la configuració del mòbil per fer servir aquesta funció."
+  },
+  "ofertasCerca": {
+    "ver": "Veure",
+    "cerrar": "Tancar avís",
+    "aDistancia": "A {{m}} m de tu",
+    "llegada": "Ja hi ets! Ensenya el teu QR en entrar"
   }
 }

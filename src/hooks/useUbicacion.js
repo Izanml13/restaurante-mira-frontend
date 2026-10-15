@@ -10,11 +10,21 @@ function almacenamiento() {
   try { return window.localStorage; } catch { return null; }
 }
 
+// Todas las instancias del hook (Mi cuenta, avisos de G06…) comparten la decisión.
+const EVENTO = 'mira:ubicacion';
+
 export default function useUbicacion() {
   const [consentimiento, setConsentimiento] = useState(() => leerConsentimiento(almacenamiento()));
   const [posicion, setPosicion] = useState(null);
   const [error, setError] = useState('');
   const activa = consentimiento.estado === 'aceptado';
+
+  useEffect(() => {
+    const releer = () => setConsentimiento(leerConsentimiento(almacenamiento()));
+    window.addEventListener(EVENTO, releer);
+    window.addEventListener('storage', releer);
+    return () => { window.removeEventListener(EVENTO, releer); window.removeEventListener('storage', releer); };
+  }, []);
 
   useEffect(() => {
     if (!activa) { setPosicion(null); setError(''); return undefined; }
@@ -27,7 +37,10 @@ export default function useUbicacion() {
     return () => navigator.geolocation.clearWatch(id);
   }, [activa]);
 
-  const decidir = useCallback((estado) => setConsentimiento(guardarConsentimiento(almacenamiento(), estado)), []);
+  const decidir = useCallback((estado) => {
+    setConsentimiento(guardarConsentimiento(almacenamiento(), estado));
+    window.dispatchEvent(new Event(EVENTO));
+  }, []);
 
   return {
     consentimiento,

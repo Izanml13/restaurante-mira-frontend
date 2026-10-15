@@ -1845,5 +1845,11 @@ export default {
     "errorTiempo": "La teva posició triga massa. Ho tornem a provar.",
     "errorNoSoportado": "Aquest navegador no permet fer servir la ubicació.",
     "errorDesconocido": "No s'ha pogut obtenir la teva posició."
+  },
+  "ofertasCerca": {
+    "ver": "Veure",
+    "cerrar": "Tancar avís",
+    "aDistancia": "A {{m}} m de tu",
+    "llegada": "Ja hi ets! Ensenya el teu QR en entrar"
   }
 }

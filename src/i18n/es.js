@@ -1845,5 +1845,11 @@ export default {
     "errorTiempo": "Tu posición está tardando demasiado. Lo volvemos a intentar.",
     "errorNoSoportado": "Este navegador no permite usar la ubicación.",
     "errorDesconocido": "No se ha podido obtener tu posición."
+  },
+  "ofertasCerca": {
+    "ver": "Ver",
+    "cerrar": "Cerrar aviso",
+    "aDistancia": "A {{m}} m de ti",
+    "llegada": "¡Has llegado! Enseña tu QR al entrar"
   }
 }

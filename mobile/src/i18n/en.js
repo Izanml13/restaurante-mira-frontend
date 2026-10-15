@@ -759,5 +759,11 @@ export default {
     "puntoAbiertaApp": "For now it's only used while the app is open.",
     "noSeEnviaApp": "Only this phone sees it; it isn't sent or stored.",
     "errorPermisoApp": "You haven't allowed location. Turn it on in your phone settings to use this feature."
+  },
+  "ofertasCerca": {
+    "ver": "View",
+    "cerrar": "Close alert",
+    "aDistancia": "{{m}} m away",
+    "llegada": "You're here! Show your QR when you enter"
   }
 }
