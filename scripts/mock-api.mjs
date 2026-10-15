@@ -6,6 +6,7 @@
  *   npm run dev:mock            # Vite apuntando a esta API
  */
 import http from 'node:http';
+import { createHash } from 'node:crypto';
 import { restaurants } from '../src/data/restaurants.js';
 
 const PORT = Number(process.env.MOCK_PORT || 3001);
@@ -57,6 +58,7 @@ const docs = restaurants.map((r, i) => {
 });
 
 const resenasMira = {}; // creadas durante la sesión (en memoria)
+const dispositivos = new Map(); // push (T04): id -> { token, tipo, plataforma, idioma }
 
 function enviar(res, status, body) {
   res.writeHead(status, {
@@ -96,6 +98,32 @@ http
     if (p === '/v1/reservations/availability') return enviar(res, 200, { limite: 20, ocupadas: 6, libres: 14 });
     if (p === '/v1/reservations' && req.method === 'POST') {
       return enviar(res, 200, { data: { id: 'res1', codigo: 'MIRA-' + Math.random().toString(36).slice(2, 7).toUpperCase(), ...datos } });
+    }
+    // Push (contrato T04): sin Bearer → 401; el id es SHA-256 de `tipo:token`.
+    if (p.startsWith('/v1/push/tokens')) {
+      if (!req.headers.authorization) return enviar(res, 401, { error: 'MISSING_TOKEN', message: 'Falta el Bearer' });
+      if (p === '/v1/push/tokens' && req.method === 'POST') {
+        const { token, tipo, plataforma, idioma } = datos;
+        const details = {};
+        if (typeof token !== 'string' || !token || /\s/.test(token) || token.length > 4096) details.token = ['Token no válido'];
+        else if (tipo === 'expo' && !/^Expo(nent)?PushToken\[.+\]$/.test(token)) details.token = ['Formato ExpoPushToken[...]'];
+        if (!['expo', 'web'].includes(tipo)) details.tipo = ['expo o web'];
+        if (!['android', 'ios', 'web'].includes(plataforma)) details.plataforma = ['android, ios o web'];
+        if (!['es', 'ca', 'en'].includes(idioma)) details.idioma = ['es, ca o en'];
+        if (Object.keys(datos).some((k) => !['token', 'tipo', 'plataforma', 'idioma'].includes(k))) details._ = ['Campos no admitidos'];
+        if (Object.keys(details).length) return enviar(res, 400, { error: 'VALIDATION_ERROR', details });
+        const id = createHash('sha256').update(`${tipo}:${token}`).digest('hex');
+        dispositivos.set(id, { token, tipo, plataforma, idioma });
+        console.log(`  push: ${dispositivos.size} dispositivo(s) registrados`);
+        return enviar(res, 200, { id, tipo, plataforma, idioma });
+      }
+      const borrar = p.match(/^\/v1\/push\/tokens\/([^/]+)$/);
+      if (borrar && req.method === 'DELETE') {
+        if (!/^[0-9a-f]{64}$/.test(borrar[1])) return enviar(res, 400, { error: 'VALIDATION_ERROR', details: { id: ['64 hex'] } });
+        dispositivos.delete(borrar[1]);
+        res.writeHead(204, { 'Access-Control-Allow-Origin': '*' });
+        return res.end();
+      }
     }
     if (p.startsWith('/v1/promotions')) return enviar(res, 200, { data: [] });
     if (p.startsWith('/v1/points/balance')) return enviar(res, 200, { saldoActual: 0, rachaLogin: { dias: 0, yaReclamado: true } });

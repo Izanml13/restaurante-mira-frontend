@@ -33,7 +33,14 @@
       "expo-font",
       "expo-image",
       "expo-sharing",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#002218"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

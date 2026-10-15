@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -27,6 +27,7 @@ import { I18nProvider } from '../i18n/index.jsx';
 import { AuthProvider, useAuthContext } from '../context/AuthContext';
 import { StreakProvider } from '../context/StreakContext';
 import PopupsRacha from '../components/PopupsRacha';
+import { escucharToques } from '../services/notificaciones';
 
 function I18nConAuth({ children }) {
   const auth = useAuthContext();
@@ -40,6 +41,7 @@ function StreakConAuth({ children }) {
 
 function RootStack() {
   const { tema, colores } = useTheme();
+  useEffect(() => escucharToques((ruta) => router.push(ruta)), []);
   return (
     <>
       <StatusBar style={tema === 'oscuro' ? 'light' : 'dark'} />
