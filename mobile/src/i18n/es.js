@@ -793,5 +793,18 @@ export default {
     "maximo": "Has alcanzado el emblema Michelin.",
     "multiplicador": "Multiplicador",
     "multiplicadorValor": "{{multi}}"
+  },
+  "movil": {
+    "saludo": "¿Dónde comemos hoy?",
+    "hola": "Hola, {{nombre}}",
+    "filtros": "Filtros",
+    "verResultados": "Ver {{n}} resultados",
+    "todas": "Todas",
+    "reservar": "Reservar mesa",
+    "llamar": "Llamar",
+    "comoLlegar": "Cómo llegar",
+    "carta": "Carta",
+    "info": "Información",
+    "resenas": "opiniones"
   }
 }

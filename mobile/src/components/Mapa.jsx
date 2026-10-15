@@ -38,7 +38,8 @@ function coordsValidas(r) {
 export default function Mapa({ todos, total, onVerDetalle }) {
   const t = useT(TRADS);
   const { colores } = useTheme();
-  const { height } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
+  const movil = width <= 767;
   const mapRef = useRef(null);
 
   const [fuente, setFuente] = useState(() => (Array.isArray(todos) && todos.length ? [...todos] : []));
@@ -173,11 +174,12 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   }
 
   return (
-    <View style={[styles.pagina, { paddingHorizontal: 24 }]}>
+    <View style={[styles.pagina, { paddingHorizontal: movil ? 16 : 24 }, movil && { paddingTop: 20 }]}>
       <View
         style={[
           styles.tarjeta,
           { backgroundColor: colores.papel, borderColor: colores.glassBorder },
+          movil && { borderWidth: 0, backgroundColor: 'transparent', padding: 0, borderRadius: 0 },
         ]}
       >
         <Text style={[TITULO_DISPLAY, styles.titulo, { color: colores.tinta }]}>
@@ -197,7 +199,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
               }.`}
         </Text>
 
-        {error && fuente.length === 0 && (
+        {Boolean(error) && fuente.length === 0 && (
           <View style={[styles.errorPanel, { backgroundColor: colores.fondoSuave, borderColor: colores.rojo }]}>
             <Text style={[styles.errorTitulo, { color: colores.tinta }]}>{t('otros.noMapa')}</Text>
             <Text style={[styles.errorTxt, { color: colores.gris }]}>{error}</Text>
@@ -218,7 +220,7 @@ export default function Mapa({ todos, total, onVerDetalle }) {
         >
           <MapView ref={mapRef} style={styles.mapa} initialRegion={regionInicial()}>
             <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} />
-            {zona && (
+            {Boolean(zona) && (
               <Marker
                 coordinate={{
                   latitude: Number(centroDeZona(zona).lat),

@@ -717,5 +717,18 @@ export default {
     "maximo": "Has aconseguit l'emblema Michelin.",
     "multiplicador": "Multiplicador",
     "multiplicadorValor": "{{multi}}"
+  },
+  "movil": {
+    "saludo": "On mengem avui?",
+    "hola": "Hola, {{nombre}}",
+    "filtros": "Filtres",
+    "verResultados": "Veure {{n}} resultats",
+    "todas": "Totes",
+    "reservar": "Reservar taula",
+    "llamar": "Trucar",
+    "comoLlegar": "Com arribar-hi",
+    "carta": "Carta",
+    "info": "Informació",
+    "resenas": "opinions"
   }
 }

@@ -2,29 +2,35 @@
  * Piezas compartidas de las páginas de autenticación web
  * (.auth-pagina, .auth-tarjeta, .auth-sub, .auth-error, .auth-boton, .auth-alt).
  */
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { FUENTES, RADIO, ANCHO_MAX, sombraFlotante } from '../../theme/tokens';
 import { btnCta, btnSecundario } from '../../theme/ui';
 
+// En móvil (≤767) las páginas van a todo el ancho y sin marco, como una app nativa.
+const esMovilW = (w) => w <= 767;
+
 export function AuthPagina({ children, style, ancho }) {
-  return <View style={[styles.pagina, ancho && styles.paginaAncha, style]}>{children}</View>;
+  const movil = esMovilW(useWindowDimensions().width);
+  return <View style={[styles.pagina, ancho && styles.paginaAncha, style, movil && styles.paginaMovil]}>{children}</View>;
 }
 
 export function AuthTarjeta({ titulo, children, style, ancho }) {
   const { colores } = useTheme();
+  const movil = esMovilW(useWindowDimensions().width);
   return (
     <View
       style={[
         styles.tarjeta,
         ancho && styles.tarjetaAncha,
         { backgroundColor: colores.papel, borderColor: colores.glassBorder },
-        sombraFlotante(colores),
+        !movil && sombraFlotante(colores),
         style,
+        movil && styles.tarjetaMovil,
       ]}
     >
       {titulo ? (
-        <Text style={[styles.titulo, { color: colores.tinta }]}>{titulo}</Text>
+        <Text style={[styles.titulo, { color: colores.tinta }, movil && styles.tituloMovil]} accessibilityRole="header">{titulo}</Text>
       ) : null}
       {children}
     </View>
@@ -96,6 +102,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 64,
     alignItems: 'center',
+  },
+  paginaMovil: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    alignItems: 'stretch',
+  },
+  tarjetaMovil: {
+    maxWidth: '100%',
+    borderWidth: 0,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    gap: 16,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  tituloMovil: {
+    fontSize: 30,
+    lineHeight: 36,
+    marginBottom: 2,
   },
   tarjeta: {
     width: '100%',

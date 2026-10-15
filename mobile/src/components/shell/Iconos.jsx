@@ -70,3 +70,65 @@ export function IconoSalir({ size = 16, color = 'currentColor', style }) {
     </Svg>
   );
 }
+
+export function IconoAtras({ size = 24, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Polyline points="15 18 9 12 15 6" />
+    </Svg>
+  );
+}
+
+export function IconoMenu({ size = 22, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Line x1="4" y1="7" x2="20" y2="7" />
+      <Line x1="4" y1="12" x2="20" y2="12" />
+      <Line x1="4" y1="17" x2="20" y2="17" />
+    </Svg>
+  );
+}
+
+export function IconoCerrar({ size = 22, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Line x1="6" y1="6" x2="18" y2="18" />
+      <Line x1="18" y1="6" x2="6" y2="18" />
+    </Svg>
+  );
+}
+
+export function IconoTema({ size = 20, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+    </Svg>
+  );
+}
+
+export function IconoMapa({ size = 22, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" />
+      <Line x1="9" y1="4" x2="9" y2="18" />
+      <Line x1="15" y1="6" x2="15" y2="20" />
+    </Svg>
+  );
+}
+
+export function IconoMensaje({ size = 20, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Rect x="3" y="5" width="18" height="14" rx="2" />
+      <Polyline points="3 7 12 13 21 7" />
+    </Svg>
+  );
+}
+
+export function IconoFlecha({ size = 18, color = 'currentColor', style }) {
+  return (
+    <Svg {...base(size)} stroke={color} style={style}>
+      <Polyline points="9 18 15 12 9 6" />
+    </Svg>
+  );
+}

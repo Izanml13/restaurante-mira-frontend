@@ -717,5 +717,18 @@ export default {
     "maximo": "You've reached the Michelin badge.",
     "multiplicador": "Multiplier",
     "multiplicadorValor": "{{multi}}"
+  },
+  "movil": {
+    "saludo": "Where shall we eat today?",
+    "hola": "Hi, {{nombre}}",
+    "filtros": "Filters",
+    "verResultados": "Show {{n}} results",
+    "todas": "All",
+    "reservar": "Book a table",
+    "llamar": "Call",
+    "comoLlegar": "Directions",
+    "carta": "Menu",
+    "info": "Information",
+    "resenas": "reviews"
   }
 }
