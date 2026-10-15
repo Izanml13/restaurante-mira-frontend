@@ -41,6 +41,12 @@
           "icon": "./assets/android-icon-monochrome.png",
           "color": "#002218"
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "MIRA usa tu ubicación, solo con la app abierta, para mostrarte ofertas de restaurantes cercanos. No guardamos tu recorrido."
+        }
       ]
     ],
     "experiments": {
