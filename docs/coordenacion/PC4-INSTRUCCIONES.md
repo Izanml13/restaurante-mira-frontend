@@ -63,18 +63,19 @@ Ya usáis git, así que la mensajería no requiere instalar nada:
 - Lógica pura en `src/models/` (o `services/` si es utilidad) con tests en `test/` con `node --test`.
 - i18n: claves nuevas en `es.js`, `ca.js` y `en.js` (faltan las 3 o no se usan).
 - Estilos con las clases `op-*` y tokens de `dashboard.css` (claro/oscuro automáticos).
-- `mobile/` no se toca en este proyecto.
+- `mobile/` no lo toca PC 4 (es del reparto de PC 3, con rama de base `feat/mira-app`); en web, no toques las tareas de PC 3 (G03/G06/G09 si alguna cae en web).
 - Orden de despliegue: backend (Render) primero, frontend (Vercel) después.
 
 ## 7. Archivos por tarea (no solaparse)
 
 | Tarea | Crea / cambia |
 |---|---|
-| G04 (PC 3) | `src/models/ofertasModel.js`, `src/services/ofertasApi.js`, `src/components/dashboard/OfertasPanel.jsx`, sección en `Dashboard.jsx`, claves `ofertas.*` en i18n, `test/ofertasModel.test.js` |
+| G04 (PC 3, **hecha**; revisa/mergea PC 4) | `src/models/ofertasModel.js`, `src/services/ofertasApi.js`, `src/components/dashboard/OfertasPanel.jsx`, sección en `Dashboard.jsx`, claves `ofertas.*` en i18n, `test/ofertasModel.test.js` |
 | G07 (PC 4) | `src/models/ofertasStatsModel.js`, `src/components/dashboard/OfertasStats.jsx`, claves `ofertasStats.*`, tests |
 | G10 (PC 4) | `src/components/dashboard/OfertasEscanner.jsx`, lógica de lectura/estados (pura, testeable), dependencia `jsQR` en `package.json`, claves `escaner.*`, tests |
+| G03/G06/G09 móvil (PC 3, base `feat/mira-app`) | en `mobile/`: permisos y consentimiento de ubicación (`expo-location`), avisos por distancia, pantalla de llegada con QR; `mobile/src/app/`, `mobile/src/pages/`, `mobile/src/services/`, `mobile/src/i18n/`, tests del app |
 
-Los archivos compartidos (`Dashboard.jsx`, `package.json`, i18n) se tocan avisando antes en el hilo; si hay conflicto, se resuelve en la revisión de fase.
+Los archivos compartidos en web (`Dashboard.jsx`, `package.json`, i18n) se tocan avisando antes en el hilo; si hay conflicto, se resuelve en la revisión de fase. En `mobile/` pasa lo mismo con el trabajo de PC 2 (Alex, notificaciones T01–T10).
 
 ## 8. Definición de hecho
 
