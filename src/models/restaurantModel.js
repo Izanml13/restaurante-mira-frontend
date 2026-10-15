@@ -486,13 +486,16 @@ const FAMILIAS_COCINA = [
   ['india', ['indian', 'india', 'curry']],
   ['americana', ['burger', 'hamburg', 'mcdonald', 'american', 'diner', 'sandwich', 'bocatta']],
   ['marisco', ['seafood', 'marisc', 'pescad', 'marisqueria']],
-  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco']],
+  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco', 'barbe', 'bbq', 'barbacoa']],
   ['francesa', ['french', 'franc']],
   ['griega', ['greek', 'grieg']],
   ['turca', ['kebab', 'turk', 'leban', 'arab']],
   ['dulce', ['dessert', 'postre', 'helad', 'pastel', 'chocolate', 'crep', 'bakery']],
   ['desayuno', ['breakfast', 'brunch', 'caf']],
   ['vinos', ['wine', 'vino', 'taberna', 'bodega', 'celler']],
+  ['vegana', ['vegan', 'vegetari', 'veggie']],
+  ['copas', ['cocktail', 'pub', 'lounge']],
+  ['fusión', ['fusion']],
 ];
 
 export function familiaCocina(cocina) {
@@ -501,6 +504,21 @@ export function familiaCocina(cocina) {
     if (claves.some((k) => t.includes(k))) return familia;
   }
   return t.replace(/\s*bars?$/i, '').trim() || 'la carta';
+}
+
+/**
+ * Opciones del filtro de cocina: una por familia, sin duplicados entre el
+ * catálogo en español y las categorías de Yelp ('Japonesa', 'Japanese' y
+ * 'Sushi Bars' salen una sola vez como 'Japonesa').
+ * @param {string[]} cocinas
+ * @returns {string[]}
+ */
+export function opcionesCocina(cocinas) {
+  const familias = new Set((cocinas || []).filter(Boolean).map(familiaCocina));
+  familias.delete('la carta');
+  return [...familias]
+    .map((f) => f.charAt(0).toUpperCase() + f.slice(1))
+    .sort((a, b) => a.localeCompare(b, 'es'));
 }
 
 /**

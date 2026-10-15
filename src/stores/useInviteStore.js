@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { invitationsApi } from '../services/api';
+import { invitationsApi } from '../services/api.js';
+
+let ultimaCarga = 0;
 
 const useInviteStore = create((set) => ({
   invitaciones: [],
@@ -7,15 +9,28 @@ const useInviteStore = create((set) => ({
   aceptadas: 0,
   puntosTotales: 0,
   loading: false,
+  error: '',
+
+  reset: () => {
+    ultimaCarga++;
+    set({ enviadas: [], invitaciones: [], aceptadas: 0, puntosTotales: 0, loading: false, error: '' });
+  },
 
   fetchMyInvites: async () => {
-    set({ loading: true });
+    const carga = ++ultimaCarga;
+    set({ loading: true, error: '', enviadas: [], invitaciones: [], aceptadas: 0, puntosTotales: 0 });
     try {
       const data = await invitationsApi.getMy();
-      set({ ...data, loading: false });
+      if (carga !== ultimaCarga) return;
+      set((state) => {
+        const ids = new Set(data.enviadas.map((inv) => inv.id));
+        const enviadas = [...state.enviadas.filter((inv) => !ids.has(inv.id)), ...data.enviadas];
+        return { ...data, enviadas, invitaciones: enviadas, loading: false };
+      });
     } catch (err) {
+      if (carga !== ultimaCarga) return;
       console.error('Failed to fetch invites:', err);
-      set({ loading: false });
+      set({ loading: false, error: err.message });
     }
   },
 

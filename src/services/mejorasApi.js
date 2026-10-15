@@ -24,6 +24,8 @@ export const jamsApi = {
   salir: (codigo) => api.post(`/v1/jams/${encodeURIComponent(codigo)}/salir`, {}),
   cerrar: (codigo) => api.post(`/v1/jams/${encodeURIComponent(codigo)}/cerrar`, {}),
   cancelar: (codigo) => api.post(`/v1/jams/${encodeURIComponent(codigo)}/cancelar`, {}),
+  /** tipo 'portada' | 'perfil'; dataUrl null quita la foto. */
+  ponerFoto: (codigo, tipo, dataUrl) => api.put(`/v1/jams/${encodeURIComponent(codigo)}/foto`, { tipo, dataUrl }),
   /** Sala en directo (Server-Sent Events). Devuelve la función para cerrar la conexión. */
   enDirecto: (codigo, alCambiar, alError) => {
     const es = new EventSource(`${BASE_URL}/v1/jams/${encodeURIComponent(codigo)}/stream`);

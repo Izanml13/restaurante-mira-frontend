@@ -70,20 +70,44 @@ Reparto por archivos: Codex se queda con el dashboard de restaurante, la exporta
 | [BUG-112](BUG-112.md) | Resto de textos fijos sin traducir (continuación de BUG-019) | i18n | claude | en revisión | fix/claude-tanda3 |
 | [BUG-113](BUG-113.md) | Seguridad P2 pendiente del backend | backend | codex | en revisión | fix/claude-tanda3 |
 
+
 ## Tanda 4
 
-Hallazgos del usuario tras la tanda 3 (modo oscuro, admin y modales). Rama: `fix/claude-tanda4`.
+Base: `main`. Ramas: **Claude** → `fix/claude-tanda4` · **Codex** → `fix/codex-tanda4` (worktree `../codex-tanda4`; backend en `../restaurante-mira-backend`).
+
+Reparto por archivos: Claude se queda con todo lo de `App.jsx` (card, JAM, filtros, racha, mapa). Codex, con invitaciones (Mi cuenta + backend) y con incidencias del admin (`Admin.jsx` + backend). Codex no toca `App.jsx`; si lo necesita, lo avisa.
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-114](BUG-114.md) | Botón en modo oscuro no se oscurece al pasar el cursor | tema | claude | en revisión | fix/claude-tanda4 |
-| [BUG-115](BUG-115.md) | La mascota de MiraClub se ve transparente en modo oscuro | tema/miraclub | claude | pendiente | |
-| [BUG-116](BUG-116.md) | Texto de «reclamar MiraClub» ilegible en modo oscuro | tema/miraclub | claude | pendiente | |
-| [BUG-117](BUG-117.md) | Avatar de MiraAI: cuadrado blanco en el círculo en modo oscuro | mira/tema | claude | en revisión | fix/claude-tanda4 |
-| [BUG-118](BUG-118.md) | Desaparece la opción de ver cómo piensa MiraAI | mira | claude | pendiente | |
-| [BUG-119](BUG-119.md) | Los iconos de admin tardan en cargar | admin | claude | pendiente | |
-| [BUG-120](BUG-120.md) | Botones rojos de eliminar demasiado claros en modo oscuro | tema | claude | en revisión | fix/claude-tanda4 |
-| [BUG-121](BUG-121.md) | Los modales se centran en la página y no en la pantalla | ui-global | claude | pendiente | |
-| [BUG-122](BUG-122.md) | Ayuda visual de primera vez en Admin para el menú lateral | admin/ux | claude | pendiente | |
-| [BUG-123](BUG-123.md) | El menú desplegable izquierdo de Admin baja de más | admin | claude | pendiente | |
+| [BUG-114](BUG-114.md) | La card del restaurante no se cierra al crear una JAM | card/jam | claude | hecho | fix/claude-tanda4 |
+| [BUG-115](BUG-115.md) | Rediseño visual de la JAM (card, mini cards y fotos) | jam/ui | claude | hecho | fix/claude-tanda4 |
+| [BUG-116](BUG-116.md) | Tipos de cocina repetidos en el filtro | buscador | claude | hecho | fix/claude-tanda4 |
+| [BUG-117](BUG-117.md) | Filtro de zona: solo las 4 provincias de Cataluña | buscador | claude | hecho | fix/claude-tanda4 |
+| [BUG-118](BUG-118.md) | Racha: modo oscuro, popup al entrar y scroll del fondo | racha | claude | hecho | fix/claude-tanda4 |
+| [BUG-119](BUG-119.md) | Al volver a Mapa no empieza arriba | mapa | claude | hecho | fix/claude-tanda4 |
+| [BUG-120](BUG-120.md) | Invitaciones: mensaje, lista tras F5 y envío real del correo | invitaciones | codex | hecho | fix/codex-tanda4 |
+| [BUG-121](BUG-121.md) | Incidencias del admin: resolución y gráficos | admin/incidencias | codex | hecho | fix/codex-tanda4 |
 
+
+## Tanda 4b — revisión visual (Claude)
+
+Segunda pasada de hallazgos del usuario (colores y modo oscuro). Rama: `fix/claude-tanda4`.
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-123](BUG-123.md) | Botón en modo oscuro no se oscurece al pasar el cursor | tema | claude | en revisión | fix/claude-tanda4 |
+| [BUG-124](BUG-124.md) | La mascota de MiraClub se ve transparente en modo oscuro | tema/miraclub | claude | pendiente | |
+| [BUG-125](BUG-125.md) | Texto de «reclamar MiraClub» ilegible en modo oscuro | tema/miraclub | claude | pendiente | |
+| [BUG-126](BUG-126.md) | Avatar de MiraAI: cuadrado blanco en el círculo en modo oscuro | mira/tema | claude | en revisión | fix/claude-tanda4 |
+| [BUG-127](BUG-127.md) | Desaparece la opción de ver cómo piensa MiraAI | mira | claude | pendiente | |
+| [BUG-128](BUG-128.md) | Los iconos de admin tardan en cargar | admin | claude | pendiente | |
+| [BUG-129](BUG-129.md) | Botones rojos de eliminar demasiado claros en modo oscuro | tema | claude | en revisión | fix/claude-tanda4 |
+| [BUG-130](BUG-130.md) | Los modales se centran en la página y no en la pantalla | ui-global | claude | pendiente | |
+| [BUG-131](BUG-131.md) | Ayuda visual de primera vez en Admin para el menú lateral | admin/ux | claude | pendiente | |
+| [BUG-132](BUG-132.md) | El menú desplegable izquierdo de Admin baja de más | admin | claude | pendiente | |
+
+## Seguimiento de la prueba real de invitaciones
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-122](BUG-122.md) | Brevo acepta el envío pero el error posterior no cambia el estado | invitaciones/backend | codex | hecho | fix/BUG-122-brevo-error |

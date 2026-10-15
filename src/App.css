@@ -4198,6 +4198,7 @@ button.btn-texto {
   width: 100%;
   max-height: 92vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   position: relative;
   box-shadow: 0 25px 60px -15px rgba(0,0,0,0.4);
   border: 4px solid rgba(0, 106, 85, 0.1);
@@ -4786,6 +4787,22 @@ button.btn-texto {
   z-index: 800;
   border-radius: 2px;
 }
+
+/* Racha en modo oscuro: los fondos negros translúcidos no se ven sobre papel oscuro. */
+[data-theme='dark'] .streak-overlay { background: rgba(0, 0, 0, 0.72); }
+[data-theme='dark'] .streak-modal { background: var(--fondo); border-color: var(--borde); box-shadow: 0 25px 60px -15px rgba(0,0,0,0.8); }
+[data-theme='dark'] .streak-modal__close { background: rgba(255,255,255,0.08); color: var(--tinta); }
+[data-theme='dark'] .streak-modal__close:hover { background: rgba(255,255,255,0.16); }
+[data-theme='dark'] .streak-modal__speech { background: var(--fondo-suave); }
+[data-theme='dark'] .streak-day { background: var(--fondo-suave); border-color: var(--borde); }
+[data-theme='dark'] .streak-day--done { background: var(--verde-suave); border-color: var(--verde); }
+[data-theme='dark'] .streak-day--today,
+[data-theme='dark'] .streak-day--wheel { background: var(--recompensa-fondo); border-color: #F59E0B; }
+[data-theme='dark'] .streak-modal__calendar-prize { background: var(--recompensa-fondo); color: var(--recompensa-tinta); border-color: rgba(254, 214, 91, 0.35); }
+[data-theme='dark'] .streak-modal__balance { background: var(--fondo-suave); border-color: var(--borde); }
+[data-theme='dark'] .streak-modal__balance-bar { background: rgba(255,255,255,0.1); }
+[data-theme='dark'] .streak-claim-btn--claimed { background: #3a403c; color: var(--gris); box-shadow: 0 4px 0 #2a2f2b; }
+[data-theme='dark'] .streak-modal__footer { background: rgba(255,255,255,0.03); border-color: var(--borde); color: var(--gris); }
 
 /* ===== Wheel Modal ===== */
 .wheel-overlay {

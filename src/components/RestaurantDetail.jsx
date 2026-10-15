@@ -560,8 +560,11 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
                 </button>
               </div>
               {!usuario && <p className="det-nota-login">{t('otros.debes')} <a href="#/login">{t('otros.iniciarSesion')}</a> {t('detail.reservar')}.</p>}
-              <a className="det-grupo" href={`#/jam/nueva?r=${encodeURIComponent(restaurant.id)}`}>
-                <span aria-hidden="true">👥</span> {t('tx.detVaisGrupo')} <strong>{t('tx.detVotadJam')}</strong> {t('tx.detReservamosGanadora')}
+              <a className="det-grupo" href={`#/jam/nueva?r=${encodeURIComponent(restaurant.id)}`} onClick={onClose}>
+                <span className="det-grupo-marca">MIRA <b>JAM</b></span>
+                <strong className="det-grupo-titulo">{t('tx.detVaisGrupo')}</strong>
+                <span className="det-grupo-texto">{t('tx.detVotadJam')} {t('tx.detReservamosGanadora')}</span>
+                <span className="det-grupo-cta">{t('tx.detJamCta')} <span aria-hidden="true">→</span></span>
               </a>
             </form>
             {confirmacion && (

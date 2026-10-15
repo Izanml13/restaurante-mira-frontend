@@ -124,6 +124,14 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   const [reintento, setReintento] = useState(0);
   const [seleccionado, setSeleccionado] = useState(null);
 
+  // Al entrar (también con «atrás») la página empieza siempre arriba: el navegador
+  // restaura el scroll anterior y Leaflet puede moverlo al montar el lienzo.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const id = requestAnimationFrame(() => window.scrollTo(0, 0));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   // Datos: usa lo ya cargado y mejora a colección completa en fondo sin bloquear el mapa.
   useEffect(() => {
     let vivo = true;

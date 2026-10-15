@@ -682,9 +682,29 @@
 .det-espera { margin: 0.6rem 0; padding: 0.8rem 0.9rem; border-radius: 14px; background: var(--fondo-suave); border: 1px dashed var(--borde); display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
 .det-espera p { margin: 0; font-size: 0.9rem; }
 .det-espera--tuya { border-style: solid; border-color: var(--dorado, #c9a227); background: color-mix(in srgb, var(--dorado, #c9a227) 14%, transparent); font-weight: 600; }
-.det-grupo { display: block; margin-top: 1rem; padding: 1.2rem; min-height: 100px; border: 2px solid var(--dorado); border-radius: var(--radio-xl); background: var(--verde-suave); color: var(--tinta); font-size: 1rem; text-decoration: none; box-shadow: var(--sombra-card); transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
-.det-grupo > span { float: left; font-size: 2.5rem; margin-right: 0.8rem; }
-.det-grupo strong { display: block; color: var(--verde); font-size: 1.15rem; }
-.det-grupo:hover { box-shadow: var(--sombra-card-hover); }
-.det-grupo:focus-visible { outline: 3px solid var(--verde); outline-offset: 3px; }
+.det-grupo {
+  --neon: #1ed760;
+  position: relative; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 1rem;
+  padding: 1.3rem 1.2rem 1.1rem; min-height: 150px; justify-content: flex-end; overflow: hidden;
+  border: 1.5px solid var(--neon); border-radius: var(--radio-xl); color: #f3f7f4; text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(8, 14, 12, 0.35) 0%, rgba(8, 14, 12, 0.88) 70%),
+    url('/jam-grupo.jpg') center / cover, /* foto de Unsplash (licencia Unsplash, uso libre), guardada en public/ */
+    #0d1512;
+  box-shadow: 0 0 0 1px rgba(30, 215, 96, 0.25), 0 0 22px -4px rgba(30, 215, 96, 0.55);
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms ease;
+}
+.det-grupo-marca { position: absolute; top: 0.9rem; left: 1.2rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.24em; color: rgba(243, 247, 244, 0.85); }
+.det-grupo-marca b { color: var(--neon); text-shadow: 0 0 10px rgba(30, 215, 96, 0.8); }
+.det-grupo-titulo { font-family: var(--fuente-display); font-size: 1.45rem; line-height: 1.1; color: #fff; }
+.det-grupo-texto { font-size: 0.9rem; color: rgba(243, 247, 244, 0.82); }
+.det-grupo-cta {
+  align-self: flex-start; margin-top: 0.5rem; padding: 0.45rem 0.95rem; border-radius: 999px;
+  background: var(--neon); color: #06110c; font-weight: 800; font-size: 0.86rem;
+  box-shadow: 0 0 16px rgba(30, 215, 96, 0.6);
+}
+.det-grupo:focus-visible { outline: 3px solid var(--neon); outline-offset: 3px; }
 .det-grupo:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .det-grupo:hover { box-shadow: 0 0 0 1px rgba(30, 215, 96, 0.45), 0 0 32px -2px rgba(30, 215, 96, 0.75); }
+}
