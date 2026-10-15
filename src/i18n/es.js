@@ -1199,6 +1199,7 @@ export default {
     "reintentar": "Escanear otro",
     "llegadasTitulo": "Llegadas de hoy",
     "sinLlegadas": "Todavía no ha llegado nadie con QR.",
+    "errorLista": "No se pudo cargar la lista de llegadas.",
     "ofertaGenerico": "Oferta de llegada",
     "descuento": "{{pct}} % de descuento",
     "estadoOk": "Llegada confirmada. Aplica la oferta en la cuenta.",

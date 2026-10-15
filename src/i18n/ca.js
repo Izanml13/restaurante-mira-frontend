@@ -1199,6 +1199,7 @@ export default {
     "reintentar": "Escanejar un altre",
     "llegadasTitulo": "Arribades d'avui",
     "sinLlegadas": "Encara no ha arribat ningú amb QR.",
+    "errorLista": "No s'ha pogut carregar la llista d'arribades.",
     "ofertaGenerico": "Oferta d'arribada",
     "descuento": "{{pct}} % de descompte",
     "estadoOk": "Arribada confirmada. Aplica l'oferta al compte.",

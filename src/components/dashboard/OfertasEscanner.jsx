@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
+import { api } from "../../services/httpClient.js";
 import { useT } from "../../i18n/index.jsx";
-import { ESTADOS, normalizarCodigo, claveMensajeEstado, estadoDesdeError, agregarLlegada } from "../../models/escanerModel.js";
+import { ESTADOS, normalizarCodigo, claveMensajeEstado, estadoDesdeError, aLlegada, agregarLlegada } from "../../models/escanerModel.js";
 import es from "../../i18n/es.js";
 import ca from "../../i18n/ca.js";
 import en from "../../i18n/en.js";
@@ -9,35 +10,53 @@ import en from "../../i18n/en.js";
 const TRADS = { es, ca, en };
 
 /**
- * Escáner de QR de llegada (G10, fase 3). Componente independiente de la
- * sección «Ofertas» del dashboard; no se monta solo.
+ * Escáner de QR de llegada (G10, fase 3). Se monta en el panel de ofertas
+ * del dashboard con el restaurante activo.
  *
  * Props:
- *  - onValidar(codigo) → Promise<{ estado, oferta?, visitaId? }> (obligatoria):
- *      quien lo monta decide la fuente — API real (POST .../visitas/validar)
- *      o el mock local (`resultadoMock` de src/models/escanerModel.js).
- *      Si rechaza con err.status, el componente traduce el estado con
- *      `estadoDesdeError` (403 otro restaurante, 409 ya usado, 410 caducado...).
- *  - onValidada(visita) → callback opcional tras validar; `visita` es
- *      { visitaId, oferta, hora } para que quien monta actualice su lista.
- *  - onEstado(estado) → callback opcional del estado visible (idle, escaneando,
- *      validando, ok, error...), por si el panel exterior quiere reaccionar.
+ *  - restauranteId (obligatorio): valida contra POST /v1/visitas/validar y
+ *    carga la lista del día con GET /v1/visitas/restaurante.
+ *  - onValidar / onCargarLista (opcional): sustituyen las llamadas reales
+ *    (útil para tests o datos simulados); reciben lo mismo que la API.
  */
-export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
+export default function OfertasEscanner({ restauranteId, onValidar, onCargarLista }) {
   const t = useT(TRADS);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const loopRef = useRef(null);
   const validoRef = useRef(false);
+  const montadoRef = useRef(true);
 
   const [camara, setCamara] = useState("inactiva"); // inactiva | activa | sin_permiso | no_disponible
   const [estado, setEstado] = useState("idle");     // idle | escaneando | validando | resultado
-  const [resultado, setResultado] = useState(null); // { estado: ESTADOS.*, oferta?, error? }
+  const [resultado, setResultado] = useState(null); // { estado: ESTADOS.*, cliente?, texto?, descuentoPct? }
   const [manual, setManual] = useState("");
   const [llegadas, setLlegadas] = useState([]);
+  const [errorLista, setErrorLista] = useState(false);
 
-  const notificar = useCallback((e) => { setEstado(e); onEstado?.(e); }, [onEstado]);
+  useEffect(() => {
+    montadoRef.current = true;
+    return () => { montadoRef.current = false; };
+  }, []);
+
+  const cargarLista = useCallback(async () => {
+    if (!restauranteId) return;
+    try {
+      const q = new URLSearchParams({ restauranteId: String(restauranteId) });
+      const d = onCargarLista
+        ? await onCargarLista(restauranteId)
+        : await api.get(`/v1/visitas/restaurante?${q}`);
+      if (!montadoRef.current) return;
+      const filas = (Array.isArray(d?.data) ? d.data : []).map(aLlegada).filter(Boolean);
+      setLlegadas(filas);
+      setErrorLista(false);
+    } catch {
+      if (montadoRef.current) setErrorLista(true);
+    }
+  }, [restauranteId, onCargarLista]);
+
+  useEffect(() => { cargarLista(); }, [cargarLista]);
 
   const pararCamara = useCallback(() => {
     if (loopRef.current) cancelAnimationFrame(loopRef.current);
@@ -53,22 +72,29 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
     const limpio = normalizarCodigo(codigo);
     if (!limpio) {
       setResultado({ estado: ESTADOS.INVALIDO });
-      notificar("resultado");
+      setEstado("resultado");
       return;
     }
-    notificar("validando");
+    setEstado("validando");
     try {
-      const r = await onValidar(limpio);
-      const visita = { visitaId: r?.visitaId || limpio, oferta: r?.oferta, hora: new Date().toISOString() };
-      setLlegadas((prev) => agregarLlegada(prev, visita));
-      setResultado({ estado: ESTADOS.OK, oferta: r?.oferta });
-      onValidada?.(visita);
+      const r = onValidar ? await onValidar(limpio) : await api.post("/v1/visitas/validar", { qr: limpio });
+      const llegada = aLlegada({ ...r?.visita, cliente: r?.cliente });
+      if (montadoRef.current && llegada) setLlegadas((prev) => agregarLlegada(prev, llegada));
+      setResultado({
+        estado: ESTADOS.OK,
+        cliente: r?.cliente?.nombre || llegada?.cliente || null,
+        texto: r?.aplicar?.texto || llegada?.texto || null,
+        descuentoPct: r?.aplicar?.descuentoPct ?? llegada?.descuentoPct ?? null,
+      });
     } catch (e) {
-      setResultado({ estado: estadoDesdeError(e) });
+      if (montadoRef.current) setResultado({ estado: estadoDesdeError(e) });
     } finally {
-      notificar("resultado");
+      if (montadoRef.current) {
+        setEstado("resultado");
+        cargarLista();
+      }
     }
-  }, [onValidar, onValidada, notificar]);
+  }, [onValidar, cargarLista]);
 
   const bucle = useCallback(() => {
     const video = videoRef.current;
@@ -105,24 +131,28 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
         video: { facingMode: { ideal: "environment" } },
         audio: false,
       });
+      if (!montadoRef.current) { // se desmontó mientras esperaba el permiso
+        stream.getTracks().forEach((tr) => tr.stop());
+        return;
+      }
       streamRef.current = stream;
       validoRef.current = false;
       setCamara("activa");
-      notificar("escaneando");
+      setEstado("escaneando");
       const video = videoRef.current;
       video.srcObject = stream;
       await video.play();
       loopRef.current = requestAnimationFrame(bucle);
     } catch {
-      setCamara("sin_permiso");
+      if (montadoRef.current) setCamara("sin_permiso");
     }
-  }, [bucle, notificar]);
+  }, [bucle]);
 
   const cerrarCamara = useCallback(() => {
     pararCamara();
     setCamara("inactiva");
-    notificar("idle");
-  }, [pararCamara, notificar]);
+    setEstado("idle");
+  }, [pararCamara]);
 
   function enviarManual(e) {
     e.preventDefault();
@@ -132,7 +162,7 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
   function reiniciar() {
     setResultado(null);
     setManual("");
-    notificar("idle");
+    setEstado("idle");
   }
 
   const iconoEstado = {
@@ -145,7 +175,7 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
   };
 
   return (
-    <div className="op-panel">
+    <div className="op-panel" data-test="escaner-panel">
       <div className="op-panel-head">
         <h3 className="op-panel-title">
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>qr_code_scanner</span>
@@ -155,20 +185,23 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
       </div>
 
       {resultado ? (
-        <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+        <div style={{ marginTop: "0.75rem", textAlign: "center" }} data-test="escaner-resultado">
           <span className="material-symbols-outlined" style={{
             fontSize: 48, color: resultado.estado === ESTADOS.OK ? "var(--op-primary)" : "var(--op-error, #d9534f)",
           }}>{iconoEstado[resultado.estado]}</span>
           <p style={{ fontWeight: 700, margin: "0.4rem 0" }}>{t(claveMensajeEstado(resultado.estado))}</p>
-          {resultado.estado === ESTADOS.OK && resultado.oferta && (
+          {resultado.estado === ESTADOS.OK && (
             <div style={{
               background: "var(--op-surface-container)", borderRadius: "0.6rem", padding: "0.75rem",
               margin: "0.5rem auto", maxWidth: 360,
             }}>
-              <strong>{resultado.oferta.titulo}</strong>
-              <p style={{ margin: "0.35rem 0 0", fontSize: "0.82rem" }}>
-                {resultado.oferta.nivel?.texto} · {t("escaner.descuento", { pct: resultado.oferta.nivel?.descuentoPct })}
-              </p>
+              {resultado.cliente && <strong>{resultado.cliente}</strong>}
+              {resultado.texto && (
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.82rem" }}>
+                  {resultado.texto}
+                  {resultado.descuentoPct != null && ` · ${t("escaner.descuento", { pct: resultado.descuentoPct })}`}
+                </p>
+              )}
             </div>
           )}
           <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
@@ -219,20 +252,23 @@ export default function OfertasEscanner({ onValidar, onValidada, onEstado }) {
         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>how_to_reg</span>
         {t("escaner.llegadasTitulo")}
       </h4>
-      <ul style={{ listStyle: "none", padding: 0, margin: "0.4rem 0 0" }}>
+      {errorLista && (
+        <p className="ofertas-error" role="alert">{t("escaner.errorLista")}</p>
+      )}
+      <ul style={{ listStyle: "none", padding: 0, margin: "0.4rem 0 0" }} data-test="escaner-lista">
         {llegadas.map((v) => (
-          <li key={v.visitaId} style={{
+          <li key={v.id} style={{
             display: "flex", justifyContent: "space-between", gap: "0.5rem",
             padding: "0.5rem 0", borderBottom: "1px solid var(--op-border)", fontSize: "0.8rem",
           }}>
-            <span>{v.oferta?.titulo || t("escaner.ofertaGenerico")}</span>
+            <span>{v.cliente || v.texto || t("escaner.ofertaGenerico")}</span>
             <span style={{ color: "var(--op-on-variant)", whiteSpace: "nowrap" }}>
-              {v.oferta?.nivel ? t("escaner.descuento", { pct: v.oferta.nivel.descuentoPct }) + " · " : ""}
-              {new Date(v.hora).toLocaleTimeString(t("modelos.locale"), { hour: "2-digit", minute: "2-digit" })}
+              {v.descuentoPct != null ? t("escaner.descuento", { pct: v.descuentoPct }) + " · " : ""}
+              {v.hora ? new Date(v.hora).toLocaleTimeString(t("modelos.locale"), { hour: "2-digit", minute: "2-digit" }) : ""}
             </span>
           </li>
         ))}
-        {llegadas.length === 0 && <li className="op-empty">{t("escaner.sinLlegadas")}</li>}
+        {!errorLista && llegadas.length === 0 && <li className="op-empty">{t("escaner.sinLlegadas")}</li>}
       </ul>
     </div>
   );

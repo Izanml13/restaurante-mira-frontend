@@ -1199,6 +1199,7 @@ export default {
     "reintentar": "Scan another",
     "llegadasTitulo": "Today's arrivals",
     "sinLlegadas": "No one has arrived with a QR yet.",
+    "errorLista": "Could not load the arrivals list.",
     "ofertaGenerico": "Arrival offer",
     "descuento": "{{pct}} % discount",
     "estadoOk": "Arrival confirmed. Apply the offer to the bill.",
