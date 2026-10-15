@@ -1,0 +1,80 @@
+# PC 4 (Marco) — Instrucciones de trabajo
+
+> Eres **Marco (PC 4)**, agente **Opencode**. Trabajas en paralelo con **Ruben (PC 3)**, también Opencode.
+> Proyecto: **ofertas por geolocalización**, parte del panel del restaurante de MIRA.
+> El plan y el objetivo son los mismos que los de PC 3; solo cambia el reparto.
+
+## 1. Antes de empezar
+
+1. `git pull` en el repo del frontend.
+2. Leer `AGENTS.md` (normas del repo; es la fuente única).
+3. Leer este fichero y lo último de `docs/coordenacion/HILO-PC3-PC4.md`.
+4. No cojas tareas de PC 3 ni toques su rama o su worktree.
+
+## 2. Objetivo del proyecto (resumen)
+
+- El usuario comparte su ubicación con consentimiento (RGPD: se puede desactivar, no se guarda el recorrido).
+- Ofertas que mejoran al acercarse: **1 km → 500 m → 100 m**; a **20 m**, «¡Ya has llegado!» con un **QR único por visita** (firmado y con caducidad) que el restaurante escanea desde su panel.
+- Modelo fijo de oferta: 4 niveles `[1000, 500, 100, 20]`, cada uno `{ distancia, texto (1-140), descuentoPct (0-100) }`, descuento monótono creciente, vigencia `desde`/`hasta`, **una sola oferta activa por restaurante**.
+- La web no sigue ubicación en segundo plano; la prueba real de llegada es el QR.
+- Las 3 fases del proyecto terminan con unión de ramas, revisión cruzada y prueba conjunta. PC 1 (Izan) publica el contrato de la API al empezar cada fase; se programa contra mock hasta entonces.
+
+## 3. Reparto PC 3 / PC 4
+
+| Fase | Tarea | Quién |
+|---|---|---|
+| 1 · Base | **G04** Editor de ofertas (modelo, servicio, componente, integración en Dashboard) | **PC 3 (Ruben)** |
+| 1 · Base | Preparación de G07 y G10: lógica pura + componentes sueltos + tests, contra mock/contrato asumido | **PC 4 (Marco)** |
+| 2 · Embudo | **G07** Estadísticas de ofertas (gráficos con Recharts) | **PC 4 (Marco)** |
+| 3 · Llegada | **G10** Escáner de QR y lista de llegadas | **PC 4 (Marco)** |
+
+Mientras PC 3 cierra la fase 1, PC 4 prepara en paralelo la fase 3 (escáner) y la 2 (estadísticas):
+
+- **G10 — escáner**: componente `OfertasEscanner.jsx` independiente con **jsQR + fallback manual** (campo para pegar el código si no hay cámara). `getUserMedia` + canvas, estados de resultado (válido / caducado / ya usado / de otro restaurante / inválido / error de red). La llamada real será `POST .../validar` cuando PC 1 publique el contrato de la fase 3; mientras tanto, contra un mock local documentado en el hilo.
+- **G07 — estadísticas**: modelo puro de transformación API → series de Recharts y componente `OfertasStats.jsx` de prueba, con datos simulados por nivel y por fecha.
+
+Cuando PC 1 publique cada contrato (está en la bóveda del equipo: `Proyecto/Contratos API.md`, repo `Alex-Oses/mira-boveda-equipo`, legible en el navegador de GitHub), PC 4 ajusta lo preparado a la forma real.
+
+**En fase 1 no se toca `src/components/dashboard/Dashboard.jsx` por parte de PC 4**: la sección «Ofertas» la monta PC 3 en G04. PC 4 deja sus componentes listos para integrarlos (props documentadas) cuando se mergee G04 o en la revisión de fase.
+
+## 4. Comunicación por git (ficheros .md)
+
+Ya usáis git, así que la mensajería no requiere instalar nada:
+
+- `docs/coordenacion/HILO-PC3-PC4.md` es el hilo. Cada mensaje: añadir entrada abajo del todo con el formato del fichero y `git add` + `commit` + `push`. Se responde citando el mensaje.
+- Avisad en el hilo antes de cambiar un archivo compartido (`Dashboard.jsx`, `package.json`, i18n) o si esperáis un contrato de PC 1.
+- Si necesitáis algo interactivo sin instalar nada: GitHub en el navegador → Issues o comentarios de commit/PR, y `github.dev` para editar `.md` directamente en el navegador.
+- Cuando programeis contra un contrato todavía no publicado, PC 4 documenta lo que asume en `docs/coordenacion/CONTRATOS-ASUMIDOS.md` (firmas de endpoint y formas de respuesta) y lo avisa en el hilo.
+
+## 5. Ramas y worktrees
+
+- Una rama por tarea, con worktree propio (no se pisa el checkout de otro agente):
+  - PC 3: `feat/G04-editor-ofertas` (base `origin/feat/G01-contrato-ofertas`).
+  - PC 4: `feat/G10-escaner-qr`, `feat/G07-estadisticas-ofertas`.
+- Nada de pushes a `main`. Se avanza sobre la propia rama y el merge lo hace una revisión cruzada al final de la fase.
+
+## 6. Normas (resumen; AGENTS.md manda)
+
+- Commits en español con Conventional Commits; scope `ofertas` para este proyecto: `feat(ofertas): escáner de QR con fallback manual (G10)`.
+- Cambios mínimos y centrados en la tarea; sin refactors no pedidos; imitar el estilo del código que rodea al cambio.
+- Lógica pura en `src/models/` (o `services/` si es utilidad) con tests en `test/` con `node --test`.
+- i18n: claves nuevas en `es.js`, `ca.js` y `en.js` (faltan las 3 o no se usan).
+- Estilos con las clases `op-*` y tokens de `dashboard.css` (claro/oscuro automáticos).
+- `mobile/` no se toca en este proyecto.
+- Orden de despliegue: backend (Render) primero, frontend (Vercel) después.
+
+## 7. Archivos por tarea (no solaparse)
+
+| Tarea | Crea / cambia |
+|---|---|
+| G04 (PC 3) | `src/models/ofertasModel.js`, `src/services/ofertasApi.js`, `src/components/dashboard/OfertasPanel.jsx`, sección en `Dashboard.jsx`, claves `ofertas.*` en i18n, `test/ofertasModel.test.js` |
+| G07 (PC 4) | `src/models/ofertasStatsModel.js`, `src/components/dashboard/OfertasStats.jsx`, claves `ofertasStats.*`, tests |
+| G10 (PC 4) | `src/components/dashboard/OfertasEscanner.jsx`, lógica de lectura/estados (pura, testeable), dependencia `jsQR` en `package.json`, claves `escaner.*`, tests |
+
+Los archivos compartidos (`Dashboard.jsx`, `package.json`, i18n) se tocan avisando antes en el hilo; si hay conflicto, se resuelve en la revisión de fase.
+
+## 8. Definición de hecho
+
+1. `npm test` y `npm run build` en verde en tu rama.
+2. Entrada en `HILO-PC3-PC4.md`: qué hiciste, rama, qué falta o bloquea.
+3. Tarea en revisión: PC 3 y PC 4 se revisan mutuamente antes del merge de fase.
