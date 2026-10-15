@@ -68,8 +68,11 @@ export default function RestaurantCard({
   const cerrado =
     disp === t('card.cerradoLunes') || disp === t('card.cerradoMartes');
 
+  const dU = restaurant.distanciaUsuarioM;
   const kmTxt =
-    distanciaKm == null
+    Number.isFinite(dU)
+      ? (dU < 1000 ? t('ofertasCerca.aDistancia', { m: dU }) : t('movil.kmDeTi', { km: (dU / 1000).toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 }) }))
+      : distanciaKm == null
       ? t('card.centroNoDisponible')
       : t('card.kmCentro', { km: distanciaKm.toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 }) });
 

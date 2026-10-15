@@ -720,6 +720,7 @@ export default {
     "multiplicadorValor": "{{multi}}"
   },
   "movil": {
+    "kmDeTi": "{{km}} km away",
     "saludo": "Where shall we eat today?",
     "hola": "Hi, {{nombre}}",
     "filtros": "Filters",

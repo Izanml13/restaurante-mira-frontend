@@ -21,7 +21,7 @@ html,body,#m{margin:0;height:100%;background:#e8ece9}
 .t{font-weight:700;font-size:14px}.x{color:#414844;margin-top:2px}
 .b{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;background:#16382C;color:#fff;font-weight:700;border:0}
 </style></head><body><div id="m"></div><script>
-var mapa=L.map('m',{zoomControl:false,attributionControl:true}).setView([41.6,1.8],8);
+var mapa=L.map('m',{zoomControl:true,attributionControl:true,tap:false}).setView([41.6,1.8],8);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);
 var capa=L.layerGroup().addTo(mapa);
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -68,6 +68,8 @@ export default function MapaLeaflet({ puntos = [], encuadre = null, onPulsar, st
       javaScriptEnabled
       domStorageEnabled
       setSupportMultipleWindows={false}
+      nestedScrollEnabled
+      scrollEnabled={false}
       onMessage={(e) => {
         try {
           const m = JSON.parse(e.nativeEvent.data);

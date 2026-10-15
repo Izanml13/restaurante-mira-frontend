@@ -796,6 +796,7 @@ export default {
     "multiplicadorValor": "{{multi}}"
   },
   "movil": {
+    "kmDeTi": "A {{km}} km de ti",
     "saludo": "¿Dónde comemos hoy?",
     "hola": "Hola, {{nombre}}",
     "filtros": "Filtros",

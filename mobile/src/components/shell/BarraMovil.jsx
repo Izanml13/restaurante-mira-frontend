@@ -45,7 +45,7 @@ export default function BarraMovil({ oculto = false, onAltoChange }) {
 
   const ruta = rutaDesdePath(pathname);
   const conAtras = !RAICES.includes(ruta) && router.canGoBack();
-  const { usuario, esAdmin, perfil, noLeidos } = auth;
+  const { usuario, perfil, noLeidos } = auth;
 
   useEffect(() => {
     Animated.timing(anim, { toValue: oculto ? -alto : 0, duration: 220, useNativeDriver: true }).start();
@@ -122,6 +122,18 @@ export default function BarraMovil({ oculto = false, onAltoChange }) {
               </>
             )}
 
+            {perfil?.tipo === 'empresa' && (
+              <Pressable
+                onPress={() => ir('/dashboard')}
+                accessibilityRole="link"
+                accessibilityLabel={t('nav.miRestaurante')}
+                style={({ pressed }) => [styles.chip, { backgroundColor: colores.primaryContainer }, pressed && { opacity: 0.8 }]}
+              >
+                <IconoRejilla size={16} color="#fff" />
+                <Text style={[styles.chipTxt, { color: '#fff' }]}>Panel</Text>
+              </Pressable>
+            )}
+
             <Pressable onPress={() => setMenu(true)} accessibilityRole="button" accessibilityLabel={t('nav.abrirMenu')} style={btnIcono}>
               <IconoMenu color={colores.tinta} />
               {noLeidos > 0 && <View style={[styles.punto, { backgroundColor: colores.tertiaryContainer }]} />}
@@ -153,7 +165,6 @@ export default function BarraMovil({ oculto = false, onAltoChange }) {
               />
             )}
             <Fila icono={<IconoCorazon color={colores.verde} />} texto={t('nav.favoritos')} onPress={() => ir('/favoritos')} colores={colores} />
-            {esAdmin && <Fila icono={<IconoRejilla color={colores.verde} />} texto={t('nav.admin')} onPress={() => ir('/admin')} colores={colores} />}
             {perfil?.tipo === 'empresa' && (
               <Fila icono={<IconoRejilla color={colores.verde} />} texto={t('nav.miRestaurante')} onPress={() => ir('/dashboard')} colores={colores} />
             )}

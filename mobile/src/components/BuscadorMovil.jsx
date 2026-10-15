@@ -114,9 +114,14 @@ export default function BuscadorMovil({ filtros, opciones, hayFiltrosActivos, on
           <View style={[styles.asa, { backgroundColor: colores.borde }]} />
           <View style={styles.hojaCab}>
             <Text style={[styles.hojaTitulo, { color: colores.tinta }]}>{t('movil.filtros')}</Text>
-            <Pressable onPress={onClear} disabled={!hayFiltrosActivos} hitSlop={8}>
-              <Text style={[styles.limpiar, { color: hayFiltrosActivos ? colores.primaryContainer : colores.textoSec }]}>{t('busqueda.limpiar')}</Text>
-            </Pressable>
+            <View style={styles.hojaAcciones}>
+              <Pressable onPress={onClear} disabled={!hayFiltrosActivos} hitSlop={8}>
+                <Text style={[styles.limpiar, { color: hayFiltrosActivos ? colores.primaryContainer : colores.textoSec }]}>{t('busqueda.limpiar')}</Text>
+              </Pressable>
+              <Pressable onPress={() => setHoja(false)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('nav.cerrarMenu')} style={[styles.cerrarHoja, { backgroundColor: colores.fondoSuave }]}>
+                <IconoCerrar size={20} color={colores.tinta} />
+              </Pressable>
+            </View>
           </View>
           <ScrollView contentContainerStyle={styles.hojaCuerpo} keyboardShouldPersistTaps="handled">
             {selects}
@@ -151,6 +156,8 @@ const styles = StyleSheet.create({
   hojaCab: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
   hojaTitulo: { fontFamily: FUENTES.display, fontSize: 22 },
   limpiar: { fontFamily: FUENTES.textoBold, fontSize: 15 },
+  hojaAcciones: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  cerrarHoja: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   hojaCuerpo: { paddingHorizontal: 20, gap: 14, paddingBottom: 12 },
   verBtn: { marginHorizontal: 20, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
   verTxt: { color: '#fff', fontFamily: FUENTES.textoBold, fontSize: 16 },

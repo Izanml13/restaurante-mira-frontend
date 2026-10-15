@@ -16,6 +16,8 @@ import { PRECIOS, DISTANCIAS, ORDENES } from '../models/restaurantModel.js';
 import Hero from '../components/Hero';
 import SearchBar from '../components/SearchBar';
 import RestaurantList, { Rejilla, columnasDe } from '../components/RestaurantList';
+import useUbicacion from '../hooks/useUbicacion.js';
+import { distanciaM } from '../models/avisosOfertasModel.js';
 import RestaurantSkeleton from '../components/RestaurantSkeleton';
 import PromoBanner from '../components/PromoBanner';
 import { useTheme } from '../theme/ThemeContext';
@@ -31,6 +33,7 @@ export default function Index() {
   const { colores } = useTheme();
   const { width } = useWindowDimensions();
   const { scrollRef, headerH } = useShell();
+  const ubicacion = useUbicacion();
 
   const {
     filtros,
@@ -94,6 +97,20 @@ export default function Index() {
 
   return (
     <AppShell onCercaFinal={cercaFinal}>
+      {esMovil && ubicacion.consentimiento.estado === 'pendiente' && (
+        <View style={[styles.pedirUbic, { marginHorizontal: gutter, backgroundColor: colores.verdeSuave, borderColor: colores.primaryContainer }]}>
+          <Text style={[styles.pedirUbicTitulo, { color: colores.tinta }]}>📍 {t('ubicacion.modalTitulo')}</Text>
+          <Text style={[styles.pedirUbicTxt, { color: colores.gris }]}>{t('ubicacion.modalIntro')} {t('ubicacion.puntoRecorrido')}</Text>
+          <View style={styles.pedirUbicBotones}>
+            <Pressable onPress={ubicacion.aceptar} accessibilityRole="button" style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}>
+              <Text style={btnCta(colores, { peq: true })}>{t('ubicacion.aceptar')}</Text>
+            </Pressable>
+            <Pressable onPress={ubicacion.rechazar} accessibilityRole="button" hitSlop={8}>
+              <Text style={[styles.pedirUbicTxt, { color: colores.tinta, fontFamily: FUENTES.textoSemi }]}>{t('ubicacion.ahoraNo')}</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
       {esMovil ? (
         <View style={[styles.intro, { paddingHorizontal: gutter }]}>
           <Text style={[styles.introHola, { color: colores.dorado }]}>
@@ -166,7 +183,13 @@ export default function Index() {
             )}
 
             <RestaurantList
-              restaurants={visibles}
+              restaurants={
+                ubicacion.posicion
+                  ? visibles.map((r) => (r.coords && Number.isFinite(Number(r.coords.lat))
+                    ? { ...r, distanciaUsuarioM: Math.round(distanciaM(ubicacion.posicion, { lat: Number(r.coords.lat), lng: Number(r.coords.lng) })) }
+                    : r))
+                  : visibles
+              }
               filtros={filtros}
               onClear={limpiarFiltros}
               onSelect={abrirDetalle}
@@ -187,6 +210,10 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  pedirUbic: { marginTop: 16, borderWidth: 1, borderRadius: RADIO.md, padding: 14, gap: 6 },
+  pedirUbicTitulo: { fontFamily: FUENTES.textoBold, fontSize: 16 },
+  pedirUbicTxt: { fontFamily: FUENTES.texto, fontSize: 14, lineHeight: 20 },
+  pedirUbicBotones: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 4 },
   intro: {
     paddingTop: 20,
     paddingBottom: 16,
