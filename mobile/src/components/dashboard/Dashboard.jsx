@@ -11,6 +11,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Sharing } from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { useShell } from '../shell/AppShell';
+import * as WebBrowser from 'expo-web-browser';
 import { dashboardApi } from '../../services/api.js';
 import { proponerNegocio, listarMisNegocios } from '../../services/negocioApi.js';
 import { RevenueLineChart, ReservationsPieChart } from './Charts.jsx';
@@ -793,6 +794,12 @@ export default function Dashboard({ usuario }) {
             </OpBtnGhost>
             <OpBtnGhost onPress={() => setShowFicha((v) => !v)}>
               <Simbolo name="storefront" size={16} color={op.onSurface} /> Ficha
+            </OpBtnGhost>
+            {/* Ofertas por distancia, escáner de QR y estadísticas (G04/G10/G07): de momento en el panel web. */}
+            <OpBtnGhost
+              onPress={() => WebBrowser.openBrowserAsync(`${(process.env.EXPO_PUBLIC_WEB_URL || 'https://restaurante-mira-frontend.vercel.app').replace(/\/$/, '')}/#/dashboard`)}
+            >
+              <Simbolo name="local_offer" size={16} color={op.onSurface} /> Ofertas por distancia
             </OpBtnGhost>
           </View>
         </View>
