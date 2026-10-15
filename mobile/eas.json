@@ -7,14 +7,27 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "android": { "buildType": "apk" }
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_GEOAPIFY_KEY": "f9344e461230414d876dacaf31f54822"
+      }
     },
     "preview": {
       "distribution": "internal",
-      "android": { "buildType": "apk" }
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_GEOAPIFY_KEY": "f9344e461230414d876dacaf31f54822"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_GEOAPIFY_KEY": "f9344e461230414d876dacaf31f54822"
+      }
     }
   },
   "submit": {
