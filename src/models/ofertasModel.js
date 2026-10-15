@@ -77,8 +77,13 @@ export function paraGuardar(d, restauranteId) {
   };
 }
 
+/** Fecha de hoy (AAAA-MM-DD) en la zona horaria de Madrid, la misma que usa el backend. */
+export function hoyMadrid(ahora = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(ahora);
+}
+
 /** 'activa' | 'fueraVigencia' | 'inactiva' para el distintivo de la lista. */
-export function estadoOferta(o, hoy = new Date().toISOString().slice(0, 10)) {
+export function estadoOferta(o, hoy = hoyMadrid()) {
   if (!o?.activa) return 'inactiva';
   if ((o.desde && o.desde > hoy) || (o.hasta && o.hasta < hoy)) return 'fueraVigencia';
   return 'activa';

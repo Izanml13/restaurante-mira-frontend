@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DISTANCIAS, claveNivel, ofertaVacia, ofertaAFormulario, nivelesMejoran,
-  validarOferta, paraGuardar, estadoOferta, erroresDeApi, claveErrorApi,
+  validarOferta, paraGuardar, estadoOferta, hoyMadrid, erroresDeApi, claveErrorApi,
 } from '../src/models/ofertasModel.js';
 
 const buenos = () => DISTANCIAS.map((distancia, i) => ({ distancia, texto: `Nivel ${i}`, descuentoPct: [5, 10, 15, 20][i] }));
@@ -59,6 +59,13 @@ test('estadoOferta distingue activa, fuera de vigencia e inactiva', () => {
   assert.equal(estadoOferta({ activa: true, desde: '2026-10-01', hasta: '2026-10-31' }, hoy), 'activa');
   assert.equal(estadoOferta({ activa: true, hasta: '2026-10-14' }, hoy), 'fueraVigencia');
   assert.equal(estadoOferta({ activa: false }, hoy), 'inactiva');
+});
+
+test('hoyMadrid usa la fecha de Madrid, la misma que el backend', () => {
+  assert.equal(hoyMadrid(new Date('2026-10-15T23:30:00Z')), '2026-10-16');
+  assert.equal(hoyMadrid(new Date('2026-10-15T01:00:00Z')), '2026-10-15');
+  assert.match(hoyMadrid(), /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(estadoOferta({ activa: true }), estadoOferta({ activa: true }, hoyMadrid()));
 });
 
 test('erroresDeApi traduce los details del 400 y devuelve null sin detalles', () => {

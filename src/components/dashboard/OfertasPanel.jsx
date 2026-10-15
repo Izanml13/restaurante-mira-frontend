@@ -196,6 +196,10 @@ export default function OfertasPanel({ restauranteId }) {
           {errores.niveles && <p className="ofertas-error">{t(`ofertas.${errores.niveles[0]}`)}</p>}
           {!mejoran && <p className="ofertas-aviso-mejora" data-test="ofertas-aviso-mejora">{t("ofertas.avisoMejora")}</p>}
 
+          {errorGeneral && (
+            <p className="ofertas-error" role="alert" data-test="ofertas-error-form">{errorGeneral}</p>
+          )}
+
           <div className="ofertas-acciones">
             <button type="button" className="op-btn-primary" onClick={guardar} disabled={guardando} data-test="ofertas-guardar">
               {guardando ? t("ofertas.guardando") : t("ofertas.guardar")}
