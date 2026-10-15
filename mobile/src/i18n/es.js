@@ -472,6 +472,7 @@ export default {
     "km": "km"
   },
   "libro": {
+    "pasarPagina": "Toca la derecha para avanzar y la izquierda para volver",
     "cartaDe": "Carta de {{nombre}}",
     "cerrarCarta": "Cerrar",
     "leyenda": "Leyenda",
