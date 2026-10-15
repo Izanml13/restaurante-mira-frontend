@@ -8,7 +8,7 @@ import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-na
 import MapaLeaflet from './MapaLeaflet';
 import { fetchRestaurantesMapa } from '../services/restaurantApi.js';
 import { ZONAS_CATALUNA } from '../models/restaurantModel.js';
-import { centroDeZona, CENTRO_CATALUNA } from '../services/cityCenters.js';
+import { centroDeZona, CENTRO_CATALUNA, zonaPrincipal } from '../services/cityCenters.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -77,26 +77,23 @@ export default function Mapa({ todos, total, onVerDetalle }) {
   const porZona = useMemo(() => {
     const m = {};
     fuente.forEach((r) => {
-      const z = r.zona || t('otros.sinZona');
-      m[z] = (m[z] || 0) + 1;
+      const z = zonaPrincipal(r);
+      if (z) m[z] = (m[z] || 0) + 1;
     });
     return m;
-  }, [fuente, t]);
+  }, [fuente]);
 
   const visibles = useMemo(
     () =>
       fuente.filter(
         (r) =>
           coordsValidas(r) &&
-          (!zona || (r.zona || t('otros.sinZona')) === zona),
+          (!zona || zonaPrincipal(r) === zona),
       ),
-    [fuente, zona, t],
+    [fuente, zona],
   );
 
-  const zonas = useMemo(
-    () => [...new Set([...ZONAS_CATALUNA, ...Object.keys(porZona)])],
-    [porZona],
-  );
+  const zonas = ZONAS_CATALUNA;
 
   // Encuadre: con puntos, Leaflet los encuadra todos; sin puntos, la zona o Cataluña.
   const encuadre = useMemo(() => {

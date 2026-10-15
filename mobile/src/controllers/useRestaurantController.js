@@ -194,12 +194,10 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
     const set = new Set([...COCINAS, ...datos.map((r) => r.cocina).filter(Boolean)]);
     return [...set].sort((a, b) => a.localeCompare(b, 'es'));
   }, [datos]);
+  // Solo las 4 provincias: cada local cuenta en la suya (zonaPrincipal).
   const zonasDisponibles = useMemo(
-    () =>
-      [...new Set([...ZONAS_CATALUNA, ...datos.map((r) => r.zona).filter(Boolean)])].sort((a, b) =>
-        a.localeCompare(b, 'es'),
-      ),
-    [datos],
+    () => [...ZONAS_CATALUNA].sort((a, b) => a.localeCompare(b, 'es')),
+    [],
   );
 
   const filtrados = useMemo(() => {

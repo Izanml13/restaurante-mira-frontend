@@ -2,6 +2,7 @@
  * Model — reglas de filtrado y ordenación (funciones puras, sin side-effects).
  */
 import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APTOS, aptoAccesibilidad, accesibilidadActiva } from '../models/restaurantModel.js';
+import { zonaPrincipal } from './cityCenters.js';
 
 /**
  * Filtra la lista en cliente. Todos los filtros son opcionales.
@@ -24,7 +25,7 @@ export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona
       const candidatas = [r.cocina, ...(r.categorias || [])].map(normalizeText);
       if (!candidatas.includes(nCocina)) return false;
     }
-    if (zona && (r.zona ?? '') !== zona) return false;
+    if (zona && zonaPrincipal(r) !== zona) return false;
     if (maxKm != null && (r.distanciaKm == null || !(r.distanciaKm <= maxKm))) return false;
     if (query) {
       const haystack = normalizeText(`${r.nombre} ${r.cocina} ${r.descripcion} ${r.ciudad ?? ''} ${r.zona ?? ''}`);
