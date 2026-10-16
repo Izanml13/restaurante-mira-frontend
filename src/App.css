@@ -126,6 +126,32 @@
   justify-content: flex-end;
 }
 
+/* El header es una sola fila en escritorio: al ser admin/empresa se añaden
+   Admin, Mi panel, cuenta y salir, y dejaba de caber. Cuando falta espacio se
+   aprieta todo (huecos, tipografía y el nombre) antes que desbordar. */
+@media (min-width: 768px) and (max-width: 1439px) {
+  .site-header { gap: 1rem; padding: 0.5rem 0.9rem; }
+  .nav-list { gap: 1rem; }
+  .nav-list a { font-size: 0.86rem; }
+  .header-cuentas { gap: 0.4rem; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .site-header { gap: 0.75rem; padding: 0.5rem 0.75rem; }
+  .nav-list { gap: 0.7rem; }
+  .nav-list a { font-size: 0.8rem; }
+  .header-cuentas { gap: 0.3rem; }
+  .header-cuenta-nombre { max-width: 5rem; }
+  .header-dashboard-link { padding: 0.3rem 0.5rem; font-size: 0.76rem; }
+  .header-logout span { display: none; }
+}
+@media (min-width: 768px) and (max-width: 919px) {
+  .nav-list { gap: 0.5rem; }
+  .nav-list a { font-size: 0.76rem; }
+  .header-cuenta-nombre { display: none; }
+  .header-dashboard-link span { display: none; }
+  .header-dashboard-link { padding: 0.3rem; }
+}
+
 /* Hamburger — mobile only */
 .menu-boton {
   display: none;

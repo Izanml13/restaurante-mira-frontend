@@ -6,7 +6,7 @@ export default {
     "filtrarZona": "Filter by area",
     "mapa": "Map",
     "contacto": "Contact",
-    "app": "MIRAPP",
+    "app": "App",
     "reservas": "My bookings",
     "favoritos": "Favourites",
     "admin": "Admin",
