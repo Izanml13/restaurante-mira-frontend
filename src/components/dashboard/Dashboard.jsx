@@ -433,7 +433,7 @@ const restDropdownRef = useRef(null);
   const restId = restaurante.id ? `#RES-${String(restaurante.id).slice(-4).toUpperCase()}` : '#RES-????';
 
   return (
-    <section className="auth-pagina pagina-ancha" style={{background:'#F8FAFC', margin:0, padding:'1rem 1.5rem 2rem'}}>
+    <section className="auth-pagina pagina-ancha" style={{background:'var(--fondo)', margin:0, padding:'1rem 1.5rem 2rem'}}>
       <div style={{maxWidth:1280, margin:'0 auto', width:'100%'}} className="op-hub-wrap">
         <div className="op-hub">
           {/* Top Operational Control Bar */}

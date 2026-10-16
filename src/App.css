@@ -1403,7 +1403,10 @@ code {
 }
 .header-dashboard-link:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .header-dashboard-admin { background: #b44d3e; color: #fff; }
-.header-dashboard-restaurante { background: var(--primary-container); color: var(--primary); }
+/* Fondo verde oscuro en ambos temas → texto claro (en claro `--primary` sobre
+   `--primary-container` era ilegible, igual que en los MiraPoints). */
+.header-dashboard-restaurante { background: var(--primary-container); color: #fff; }
+[data-theme='dark'] .header-dashboard-restaurante { color: var(--primary); }
 
 /* Dashboard banner in Cuenta */
 .cuenta-dashboard-banner {
@@ -2911,14 +2914,18 @@ button.btn-texto {
   color: var(--primary);
 }
 
+/* Insignia con fondo verde oscuro en ambos temas: texto claro (en claro,
+   `--primary` sobre `--primary-container` no llegaba a leerse). */
 .balance-card__badge {
   background: var(--primary-container);
-  color: var(--primary);
+  color: #fff;
   padding: 0.3rem 0.8rem;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
 }
+
+[data-theme='dark'] .balance-card__badge { color: var(--primary); }
 .balance-card__coin {
   width: 28px;
   height: 28px;
@@ -3718,12 +3725,14 @@ button.btn-texto {
 }
 
 /* Header Points Pill */
+/* Fondo verde oscuro en ambos temas: el texto debe ser claro. En claro,
+   `--primary` (#002218) sobre `--primary-container` (#16382C) no se leía. */
 .header-points-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   background: linear-gradient(135deg, var(--primary-container), var(--dorado));
-  color: var(--primary);
+  color: #fff;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   font-size: 0.85rem;
@@ -3732,6 +3741,8 @@ button.btn-texto {
   transition: transform 0.2s, box-shadow 0.2s;
   white-space: nowrap;
 }
+
+[data-theme='dark'] .header-points-pill { color: var(--primary); }
 
 .header-points-pill:hover {
   transform: scale(1.05);
@@ -3898,18 +3909,22 @@ button.btn-texto {
 }
 
 /* Points badge on cards */
+/* Fondo verde oscuro en ambos temas → texto claro (en claro `--primary` sobre
+   `--primary-container` era ilegible, igual que en los MiraPoints). */
 .card-points {
   position: absolute;
   bottom: 8px;
   right: 8px;
   background: var(--primary-container);
-  color: var(--primary);
+  color: #fff;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-size: 0.7rem;
   font-weight: 700;
   z-index: 2;
 }
+
+[data-theme='dark'] .card-points { color: var(--primary); }
 
 /* ===== Dashboard Panel ===== */
 .dash-header {
