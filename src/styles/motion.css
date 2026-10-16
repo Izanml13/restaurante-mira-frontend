@@ -9,9 +9,13 @@
 
 html { scroll-behavior: smooth; }
 
-/* ── Cambio de página: la vista nueva entra con un fundido corto ── */
+/* ── Cambio de página: la vista nueva entra con un fundido corto ──
+   fill-mode `backwards`, no `both`: con `both` el `translate: 0 0` del
+   keyframe final se queda aplicado al terminar, y un `translate` distinto
+   de `none` convierte `.ruta` en bloque contenedor de los `position: fixed`
+   → los modales se centraban en la página y no en la pantalla (BUG-130). */
 .ruta {
-  animation: ruta-entra 0.5s var(--ease-expo) both;
+  animation: ruta-entra 0.5s var(--ease-expo) backwards;
 }
 @keyframes ruta-entra {
   from { opacity: 0; translate: 0 14px; }
