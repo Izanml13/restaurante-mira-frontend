@@ -1,0 +1,6 @@
+# Finales LF en todas las máquinas: los tests leen el código fuente con regex de 
+.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.apk binary
