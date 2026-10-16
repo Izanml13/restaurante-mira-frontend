@@ -32,7 +32,7 @@ import { guardarPerfil } from '../services/perfilApi.js';
 import { crearReserva, SLOTS } from '../services/reservaApi.js';
 import { dashboardApi } from '../services/api.js';
 import { listaDias, barajar, slotDe, esPasada, importeTicket } from './dataTestPlan.js';
-import { ALERGIAS } from '../models/restaurantModel.js';
+import { ALERGENOS } from '../models/restaurantModel.js';
 
 export const TOTAL_USUARIOS = 10; // valor por defecto; el número de usuarios es configurable
 export const MAX_USUARIOS = 999; // tope por seguridad (≈2,5 s de pausa por usuario)
@@ -83,7 +83,7 @@ function preferenciasDe(i) {
     vegano: i % 4 === 0,
     vegetariano: i % 4 === 1,
     sinGluten: i % 5 === 0,
-    alergias: i % 3 === 0 ? [ALERGIAS[i % ALERGIAS.length]] : [],
+    alergias: i % 3 === 0 ? [ALERGENOS[i % ALERGENOS.length].key] : [],
   };
 }
 
@@ -100,7 +100,6 @@ async function altaUsuario(i, identidad) {
     nombre,
     email,
     lang: 'es',
-    plataforma: 'web',
     preferencias: preferenciasDe(i),
   };
   let cred;
