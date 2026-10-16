@@ -1,3 +1,4 @@
+import AccesoLlegada from './AccesoLlegada.jsx';
 /**
  * Detalle premium — espejo de RestaurantDetail.jsx web (modal):
  * info + acciones + carta + reserva + mapa/parkings + reseñas con likes.
@@ -423,6 +424,7 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
     <View style={[styles.raiz, { backgroundColor: colores.papel }]}>
       <View style={[styles.barraDorada, { backgroundColor: colores.dorado }]} />
       <ScrollView ref={scrollRef} contentContainerStyle={[styles.scroll, apilado && { paddingBottom: 120 }]}>
+        <AccesoLlegada restauranteId={restaurant.id} />
         <View style={styles.fotoWrap}>
           <Image
             source={{ uri }}

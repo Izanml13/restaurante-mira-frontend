@@ -3,7 +3,7 @@
  */
 import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
-import { Sharing } from 'expo-sharing';
+import { compartirArchivo } from '../../services/compartirArchivo.js';
 import { api } from '../../services/httpClient.js';
 
 /** Comisión real si la reserva ya tiene ticket; si no, null (no inventar). */
@@ -138,13 +138,11 @@ export async function descargarCSV(nombre, cabeceras, filas) {
   try {
     const uri = `${FileSystem.cacheDirectory}${nombre}`;
     await FileSystem.writeAsStringAsync(uri, '\uFEFF' + lineas.join('\n'), { encoding: FileSystem.EncodingType.UTF8 });
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(uri, {
+    if (!(await compartirArchivo(() => import('expo-sharing'), uri, {
         mimeType: 'text/csv',
         dialogTitle: nombre,
         UTI: 'public.comma-separated-values-text',
-      });
-    }
+      }))) Alert.alert('MIRA', 'Compartir no está disponible en esta instalación.');
   } catch (e) {
     Alert.alert('MIRA', e?.message || 'No se pudo exportar el CSV');
   }

@@ -1,4 +1,30 @@
 export default {
+  "apk": {
+    "verQR": "Mostrar QR de llegada",
+    "mira": "MIRA SI",
+    "explorar": "Explorar",
+    "personal": "Tu espacio",
+    "gestion": "Gestión",
+    "preferencias": "Preferencias",
+    "chat": {
+      "nueva": "Nuevo chat",
+      "intro": "Hola, soy MIRA. Puedo ayudarte a descubrir restaurantes y gestionar tus reservas. Te pediré confirmación antes de realizar cambios.",
+      "sinRespuesta": "No he recibido una respuesta. Puedes volver a intentarlo.",
+      "errorAccion": "No se pudo completar la acción",
+      "limite": "Hay demasiadas consultas. Espera un momento antes de reintentar.",
+      "sesion": "Inicia sesión para continuar con esta acción.",
+      "timeout": "La respuesta ha tardado demasiado. Puedes reintentar.",
+      "error": "No se pudo conectar con MIRA. Puedes reintentar.",
+      "confirmar": "Confirmar",
+      "confirmacion": "¿Confirmas esta acción?",
+      "cancelar": "Cancelar",
+      "pensando": "MIRA está respondiendo…",
+      "reintentar": "Reintentar",
+      "escribir": "Escribe a MIRA",
+      "parar": "Parar",
+      "enviar": "Enviar"
+    }
+  },
   "nav": {
     "descubrir": "Descubrir",
     "mapa": "Mapa",

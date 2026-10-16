@@ -11,8 +11,9 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CLAVE_UBICACION, VERSION_CONSENTIMIENTO } from '../models/ubicacionModel.js';
-import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, CLAVE_VISTOS, soloAvisables, CLAVE_FAVS_AVISOS } from '../models/avisosOfertasModel.js';
+import { debeConsultar, soloAvisables, CLAVE_FAVS_AVISOS } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from './ofertasCercaApi.js';
+import { seleccionarAvisos } from './sesionesAvisos.js';
 import { notificarLocal } from './notificaciones.js';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -20,7 +21,7 @@ import en from '../i18n/en.js';
 
 export const TAREA = 'mira-avisos-fondo';
 const CLAVE_FONDO = 'mira:ubicacionFondo';
-const CLAVE_ULTIMA = 'mira:avisosFondoUltima';
+let ultimaConsulta = null; // posición efímera, nunca persistida
 const TEXTOS = { es, ca, en };
 
 async function leerJSON(clave) {
@@ -32,29 +33,20 @@ async function consentimientoAceptado() {
   return d?.estado === 'aceptado' && d?.version === VERSION_CONSENTIMIENTO;
 }
 
-/** Adaptador síncrono de un valor ya leído de AsyncStorage (para leerVistos/guardarVistos). */
-function almacenEnMemoria(clave, crudo) {
-  let valor = crudo;
-  return { getItem: (k) => (k === clave ? valor : null), setItem: (k, v) => { if (k === clave) valor = v; }, leer: () => valor };
-}
-
 async function procesar(coords) {
   // Con la app abierta ya avisa useAvisosOfertas: aquí no se duplica.
   if (AppState.currentState === 'active') return;
   if (!(await consentimientoAceptado()) || !(await leerJSON(CLAVE_FONDO))?.activo) return;
 
   const posicion = { lat: coords.latitude, lng: coords.longitude };
-  const ultima = await leerJSON(CLAVE_ULTIMA);
-  if (!debeConsultar(ultima, posicion)) return;
-  await AsyncStorage.setItem(CLAVE_ULTIMA, JSON.stringify({ ...posicion, t: Date.now() }));
+  if (!debeConsultar(ultimaConsulta, posicion)) return;
+  ultimaConsulta = { ...posicion, t: Date.now() };
 
   const resultados = await ofertasCerca(posicion);
-  const almacen = almacenEnMemoria(CLAVE_VISTOS, await AsyncStorage.getItem(CLAVE_VISTOS));
   const favoritos = (await leerJSON(CLAVE_FAVS_AVISOS)) || [];
-  const { nuevos, vistos } = filtrarNuevos(soloAvisables(resultados, favoritos), leerVistos(almacen));
-  if (!nuevos.length) return;
-  guardarVistos(almacen, vistos);
-  await AsyncStorage.setItem(CLAVE_VISTOS, almacen.leer());
+  const nuevos = await seleccionarAvisos(soloAvisables(resultados, favoritos), Infinity,
+    () => AppState.currentState !== 'active');
+  if (!nuevos.length || !(await consentimientoAceptado())) return;
 
   const lang = (await AsyncStorage.getItem('mira_lang')) || 'es';
   const oc = (TEXTOS[lang] || es).ofertasCerca;

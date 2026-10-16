@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert, TextInput } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
-import { Sharing } from 'expo-sharing';
+import { compartirArchivo } from '../../services/compartirArchivo.js';
 import * as DocumentPicker from 'expo-document-picker';
 import { useShell } from '../shell/AppShell';
 import * as WebBrowser from 'expo-web-browser';
@@ -339,13 +339,11 @@ export default function Dashboard({ usuario }) {
     try {
       const uri = `${FileSystem.cacheDirectory}${nombre}`;
       await FileSystem.writeAsStringAsync(uri, '\uFEFF' + csv, { encoding: FileSystem.EncodingType.UTF8 });
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri, {
+      if (!(await compartirArchivo(() => import('expo-sharing'), uri, {
           mimeType: 'text/csv',
           dialogTitle: nombre,
           UTI: 'public.comma-separated-values-text',
-        });
-      }
+        }))) Alert.alert('MIRA', 'Compartir no está disponible en esta instalación.');
     } catch (e) {
       Alert.alert('MIRA', e?.message || 'No se pudo exportar la liquidación');
     }

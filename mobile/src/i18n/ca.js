@@ -1,4 +1,30 @@
 export default {
+  "apk": {
+    "verQR": "Mostra el QR d’arribada",
+    "mira": "MIRA SI",
+    "explorar": "Explora",
+    "personal": "El teu espai",
+    "gestion": "Gestió",
+    "preferencias": "Preferències",
+    "chat": {
+      "nueva": "Xat nou",
+      "intro": "Hola, soc MIRA. Et puc ajudar a descobrir restaurants i gestionar les teves reserves. Et demanaré confirmació abans de fer canvis.",
+      "sinRespuesta": "No he rebut cap resposta. Pots tornar-ho a provar.",
+      "errorAccion": "No s’ha pogut completar l’acció",
+      "limite": "Hi ha massa consultes. Espera un moment abans de tornar-ho a provar.",
+      "sesion": "Inicia sessió per continuar amb aquesta acció.",
+      "timeout": "La resposta ha trigat massa. Pots tornar-ho a provar.",
+      "error": "No s’ha pogut connectar amb MIRA. Pots tornar-ho a provar.",
+      "confirmar": "Confirma",
+      "confirmacion": "Confirmes aquesta acció?",
+      "cancelar": "Cancel·la",
+      "pensando": "MIRA està responent…",
+      "reintentar": "Torna-ho a provar",
+      "escribir": "Escriu a MIRA",
+      "parar": "Atura",
+      "enviar": "Envia"
+    }
+  },
   "nav": {
     "descubrir": "Descobrir",
     "mapa": "Mapa",

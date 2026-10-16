@@ -1,7 +1,7 @@
 /**
- * Tabla comparativa conjunta (2-3 restaurantes) â€” espejo de Comparador.jsx web.
+ * Tabla comparativa conjunta (2-3 restaurantes) — espejo de Comparador.jsx web.
  * Solo la tabla (sin fichas): foto + nombre + Quitar por columna; scroll
- * horizontal en mÃ³vil; resaltado del ganador por fila.
+ * horizontal en móvil; resaltado del ganador por fila.
  */
 import { useState } from 'react';
 import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
@@ -17,15 +17,15 @@ import en from '../i18n/en.js';
 const TRADS = { es, ca, en };
 
 function fmtDistancia(km, t) {
-  if (km == null) return 'â€”';
+  if (km == null) return '—';
   return `${km.toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 })} ${t('comparador.km')}`;
 }
 
 function fmtNota(v, locale) {
-  return v > 0 ? `â˜… ${v.toLocaleString(locale)}` : 'â€”';
+  return v > 0 ? `★ ${v.toLocaleString(locale)}` : '—';
 }
 
-// Filas comparables: get numÃ©rico para el resaltado, fmt para pintar.
+// Filas comparables: get numérico para el resaltado, fmt para pintar.
 function filasDe(conAptos, t, locale, gris) {
   const filas = [
     {
@@ -43,20 +43,20 @@ function filasDe(conAptos, t, locale, gris) {
     { label: t('comparador.mejorNota'), get: (s) => (s.mejorNota > 0 ? s.mejorNota : null), fmt: (s) => fmtNota(s.mejorNota, locale), mejor: 'max' },
     { label: t('comparador.precio'), get: (s) => s.precio.length, fmt: (s) => s.precio, mejor: 'min' },
     { label: t('comparador.distancia'), get: (s) => s.distanciaKm, fmt: (s) => fmtDistancia(s.distanciaKm, t), mejor: 'min' },
-    { label: t('comparador.ciudad'), get: null, fmt: (s) => s.ciudad || 'â€”', mejor: null },
+    { label: t('comparador.ciudad'), get: null, fmt: (s) => s.ciudad || '—', mejor: null },
   ];
   if (conAptos) {
-    filas.push({ label: t('comparador.aptosParaTi'), get: (s) => s.aptos, fmt: (s) => s.aptos ?? 'â€”', mejor: 'max' });
+    filas.push({ label: t('comparador.aptosParaTi'), get: (s) => s.aptos, fmt: (s) => s.aptos ?? '—', mejor: 'max' });
   }
   filas.push(
     {
       label: t('comparador.carta'),
       get: null,
-      fmt: (s) => `${s.secciones} ${t('comparador.secciones')} Â· ${s.platos} ${t('comparador.platos')}`,
+      fmt: (s) => `${s.secciones} ${t('comparador.secciones')} · ${s.platos} ${t('comparador.platos')}`,
       mejor: null,
     },
-    { label: t('comparador.masBarato'), get: null, fmt: (s) => (s.barato ? `${s.barato.nombre} (${s.barato.precio} â‚¬)` : 'â€”'), mejor: null },
-    { label: t('comparador.masCaro'), get: null, fmt: (s) => (s.caro ? `${s.caro.nombre} (${s.caro.precio} â‚¬)` : 'â€”'), mejor: null },
+    { label: t('comparador.masBarato'), get: null, fmt: (s) => (s.barato ? `${s.barato.nombre} (${s.barato.precio} €)` : '—'), mejor: null },
+    { label: t('comparador.masCaro'), get: null, fmt: (s) => (s.caro ? `${s.caro.nombre} (${s.caro.precio} €)` : '—'), mejor: null },
   );
   return filas;
 }
