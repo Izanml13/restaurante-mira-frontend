@@ -55,10 +55,26 @@ export default function useLlegada(restauranteId, posicion) {
   useEffect(() => {
     if (fase !== 'qr' || estado !== 'pendiente') return undefined;
     const reloj = setInterval(() => setAhora(Date.now()), 1000);
-    const sondeo = setInterval(() => {
-      verVisita(visita.id).then((v) => v && setVisita(v)).catch(() => { /* reintenta en el siguiente */ });
+    let vivo = true;
+    let consultando = false;
+    const sondeo = setInterval(async () => {
+      if (consultando) return;
+      consultando = true;
+      try {
+        const v = await verVisita(visita.id);
+        if (vivo && v) setVisita(v);
+      } catch (e) {
+        // Una sesión perdida o una visita inaccesible no se arreglan sondeando.
+        if (vivo && [401, 403, 404].includes(e?.status)) {
+          setQr('');
+          setVisita(null);
+          setFase(e.status === 401 ? 'sinSesion' : 'error');
+        }
+      } finally {
+        consultando = false;
+      }
     }, SONDEO_MS);
-    return () => { clearInterval(reloj); clearInterval(sondeo); };
+    return () => { vivo = false; clearInterval(reloj); clearInterval(sondeo); };
   }, [fase, estado, visita?.id]);
 
   return { fase, visita, qr, estado, distanciaM, ahora, pedir };
