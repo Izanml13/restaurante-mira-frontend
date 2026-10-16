@@ -26,7 +26,7 @@ export default function useAvisosOfertas() {
     enCurso.current = true;
     ofertasCerca(posicion)
       .then((resultados) => {
-        const { nuevos, vistos } = filtrarNuevos(resultados, leerVistos(almacenamiento()));
+        const { nuevos, vistos } = filtrarNuevos(resultados, leerVistos(almacenamiento()), 3);
         if (!nuevos.length) return;
         guardarVistos(almacenamiento(), vistos);
         // El nivel nuevo sustituye al anterior del mismo restaurante.
