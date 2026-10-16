@@ -1,7 +1,7 @@
 /**
- * Mis reservas â€” espejo de Reservas.jsx ('#/reservas'): calendario con
- * meteorologÃ­a de los dÃ­as con reserva, lista del dÃ­a seleccionado y
- * pestaÃ±as prÃ³ximas/pasadas/canceladas con cancelaciÃ³n (Alert nativo).
+ * Mis reservas — espejo de Reservas.jsx ('#/reservas'): calendario con
+ * meteorología de los días con reserva, lista del día seleccionado y
+ * pestañas próximas/pasadas/canceladas con cancelación (Alert nativo).
  */
 import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Alert, Platform } from 'react-native';
@@ -15,6 +15,7 @@ import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
+import { IconoAtras, IconoFlecha } from '../components/shell/Iconos';
 import { useTheme } from '../theme/ThemeContext';
 import { FUENTES, RADIO } from '../theme/tokens';
 import { btnCta, btnSecundario } from '../theme/ui';
@@ -74,7 +75,7 @@ export default function Reservas() {
     };
   }, [usuario?.uid]);
 
-  // Meteo de los dÃ­as con reserva del mes visible (gratis, con cachÃ©).
+  // Meteo de los días con reserva del mes visible (gratis, con caché).
   useEffect(() => {
     const prefijo = `${mesVista.anio}-${String(mesVista.mes).padStart(2, '0')}`;
     const porDiaPre = new Map();
@@ -130,7 +131,7 @@ export default function Reservas() {
   const canceladas = lista.filter((r) => r.estado === 'cancelada');
   const visibles = tab === 'proximas' ? proximas : tab === 'pasadas' ? pasadas : canceladas;
 
-  // Calendario: reservas por dÃ­a + meteo del dÃ­a seleccionado.
+  // Calendario: reservas por día + meteo del día seleccionado.
   const porDia = new Map();
   lista.forEach((r) => {
     if (!r.fecha || r.estado === 'cancelada') return;
@@ -172,14 +173,14 @@ export default function Reservas() {
               <Text style={[estilos.sub, { color: colores.tinta }]}>{t('reservas.calendario')}</Text>
 
               <View style={estilos.calCab}>
-                <Pressable onPress={() => moverMes(-1)} accessibilityLabel={t('reservas.mesAnterior')}>
-                  <Text style={btnSecundario(colores, { peq: true })}>â†</Text>
+                <Pressable onPress={() => moverMes(-1)} accessibilityLabel={t('reservas.mesAnterior')} hitSlop={12} style={{ minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
+                  <IconoAtras size={24} color={colores.tinta} />
                 </Pressable>
                 <Text style={[estilos.calMes, { color: colores.tinta }]}>
                   {MESES[mesVista.mes - 1]} {mesVista.anio}
                 </Text>
-                <Pressable onPress={() => moverMes(1)} accessibilityLabel={t('reservas.mesSiguiente')}>
-                  <Text style={btnSecundario(colores, { peq: true })}>â†’</Text>
+                <Pressable onPress={() => moverMes(1)} accessibilityLabel={t('reservas.mesSiguiente')} hitSlop={12} style={{ minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
+                  <IconoFlecha size={24} color={colores.tinta} />
                 </Pressable>
               </View>
 
@@ -227,7 +228,7 @@ export default function Reservas() {
                           )}
                           {meteo[c.fecha] && meteo[c.fecha].tempMax != null && (
                             <Text style={[estilos.calTemp, { color: colores.gris }]} numberOfLines={1}>
-                              {Math.round(meteo[c.fecha].tempMax)}Â°
+                              {Math.round(meteo[c.fecha].tempMax)}°
                             </Text>
                           )}
                         </Pressable>
@@ -256,10 +257,10 @@ export default function Reservas() {
                       <View style={estilos.registroCuerpo}>
                         <Text style={[estilos.registroTitulo, { color: colores.tinta }]}>{r.nombreRestaurante}</Text>
                         <Text style={[estilos.detalle, { color: colores.gris }]}>
-                          {r.hora} Â· {r.comensales}{' '}
-                          {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} Â·{' '}
+                          {r.hora} · {r.comensales}{' '}
+                          {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} ·{' '}
                           <Text style={estilos.codigo}>{r.codigo}</Text>
-                          {m && m.tempMax != null ? <> Â· {Math.round(m.tempMax)}Â° {m.resumen}</> : null}
+                          {m && m.tempMax != null ? <> · {Math.round(m.tempMax)}° {m.resumen}</> : null}
                         </Text>
                         {aviso ? (
                           <Text style={[estilos.detalle, estilos.avisoMeteo]} accessibilityLiveRegion="polite">
@@ -303,12 +304,12 @@ export default function Reservas() {
                     <View style={estilos.registroCuerpo}>
                       <Text style={[estilos.registroTitulo, { color: colores.tinta }]}>{r.nombreRestaurante}</Text>
                       <Text style={[estilos.detalle, { color: colores.gris }]}>
-                        {r.fecha} a las {r.hora} Â· {r.comensales}{' '}
-                        {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} Â·{' '}
-                        <Text style={estilos.codigo}>{r.codigo}</Text> Â· {r.estado}
+                        {r.fecha} a las {r.hora} · {r.comensales}{' '}
+                        {Number(r.comensales) === 1 ? t('modelos.persona') : t('modelos.personas')} ·{' '}
+                        <Text style={estilos.codigo}>{r.codigo}</Text> · {r.estado}
                       </Text>
                       {r.comentarios ? (
-                        <Text style={[estilos.detalle, { color: colores.gris }]}>â€œ{r.comentarios}â€</Text>
+                        <Text style={[estilos.detalle, { color: colores.gris }]}>“{r.comentarios}”</Text>
                       ) : null}
                     </View>
                     {String(r.estado || '').toLowerCase() !== 'cancelada' && r.fecha >= hoy && (

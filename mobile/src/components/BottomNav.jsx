@@ -15,7 +15,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { useBreakpoint } from '../theme/responsive';
 import { FUENTES } from '../theme/tokens';
 import { IconoBusqueda, IconoCalendario, IconoCorazon, IconoMapa, IconoPersona } from './shell/Iconos';
-import { rutaDesdePath } from './shell/rutas';
+import { pestanaActiva } from './shell/rutas';
 
 const TRADS = { es, ca, en };
 
@@ -30,7 +30,7 @@ export default function BottomNav({ numReservas = 0 }) {
 
   if (!esMovil) return null;
 
-  const ruta = rutaDesdePath(pathname);
+  const ruta = pestanaActiva(pathname);
   const numFavoritos = auth.favoritos?.length || 0;
 
   const tabs = [
@@ -78,7 +78,7 @@ export default function BottomNav({ numReservas = 0 }) {
       <View style={styles.inner}>
         {tabs.map((tab) => {
           const activa = ruta === tab.id;
-          const color = activa ? colores.primaryContainer : colores.gris;
+          const color = activa ? colores.verde : colores.gris;
           return (
             <Pressable
               key={tab.id}
@@ -86,10 +86,10 @@ export default function BottomNav({ numReservas = 0 }) {
               accessibilityRole="link"
               accessibilityState={{ selected: activa }}
               accessibilityLabel={tab.label}
-              style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [styles.item, activa && { backgroundColor: colores.verdeSuave, borderColor: colores.verde }, pressed && { opacity: 0.7 }]}
             >
               {tab.icon(color)}
-              <Text style={[styles.itemTxt, { color }]} numberOfLines={1}>
+              <Text style={[styles.itemTxt, { color, fontWeight: activa ? '800' : '600' }]} numberOfLines={1}>
                 {tab.label}
               </Text>
               {tab.badge > 0 && (
@@ -125,9 +125,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2.4,
     paddingVertical: 4.8,
-    paddingHorizontal: 9.6,
+    paddingHorizontal: 2,
     position: 'relative',
-    minWidth: 56,
+    flex: 1,
+    minWidth: 48,
+    minHeight: 48,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   itemTxt: {
     fontSize: 10.88,

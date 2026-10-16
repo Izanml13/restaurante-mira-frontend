@@ -1,6 +1,6 @@
 /**
- * Mensajes â€” espejo de Mensajes.jsx ('#/mensajes'): buzÃ³n interno con
- * acordeÃ³n por mensaje, marcado de leÃ­do y enlace de parking.
+ * Mensajes — espejo de Mensajes.jsx ('#/mensajes'): buzón interno con
+ * acordeón por mensaje, marcado de leído y enlace de parking.
  */
 import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Linking } from 'react-native';
@@ -68,7 +68,7 @@ export default function Mensajes() {
         setLista((prev) => prev.map((x) => (x.id === m.id ? { ...x, leido: true } : x)));
         auth.recargarMensajes();
       } catch {
-        /* queda como no leÃ­do */
+        /* queda como no leído */
       }
     }
   }
@@ -116,13 +116,13 @@ export default function Mensajes() {
                     accessibilityState={{ expanded: esAbierto }}
                   >
                     <Text style={[estilos.punto, { color: sinLeer ? colores.primaryContainer : colores.borde }]}>
-                      {sinLeer ? 'â—' : 'â—‹'}
+                      {sinLeer ? '●' : '○'}
                     </Text>
                     <Text style={{ color: colores.tinta, flex: 1 }}>
                       <Text style={estilos.mensajeTitulo}>{m.titulo}</Text>
                       <Text style={[estilos.detalle, { color: colores.gris }]}>
                         {' '}
-                        Â· {m.fecha || ''} {m.hora || ''}
+                        · {m.fecha || ''} {m.hora || ''}
                       </Text>
                     </Text>
                   </Pressable>

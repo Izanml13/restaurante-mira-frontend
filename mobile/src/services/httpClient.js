@@ -15,7 +15,7 @@ async function getToken() {
   }
 }
 
-export async function apiFetch(path, { method = 'GET', body, headers = {}, auth = true } = {}) {
+export async function apiFetch(path, { method = 'GET', body, headers = {}, auth = true, signal } = {}) {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
   const finalHeaders = { ...headers };
   if (body !== undefined && !(body instanceof FormData)) {
@@ -24,17 +24,18 @@ export async function apiFetch(path, { method = 'GET', body, headers = {}, auth 
   if (auth) {
     const token = await getToken();
     // Sin sesión: no llamar a la API autenticada (evita 401 MISSING_TOKEN en consola).
-    if (!token) {
+    if (!token && auth !== 'opcional') {
       const err = new Error('No hay sesión activa');
       err.status = 401;
       err.noSession = true;
       throw err;
     }
-    finalHeaders.Authorization = `Bearer ${token}`;
+    if (token) finalHeaders.Authorization = `Bearer ${token}`;
   }
 
   const res = await fetch(url, {
     method,
+    signal,
     headers: finalHeaders,
     body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
   });

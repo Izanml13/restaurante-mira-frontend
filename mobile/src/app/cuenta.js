@@ -319,7 +319,7 @@ export default function Cuenta() {
               <Text
                 style={[
                   styles.rachaValor,
-                  { color: tema === 'oscuro' ? colores.secondaryContainer : colores.dorado },
+                  { color: colores.dorado },
                 ]}
               >
                 {multiTexto}
@@ -398,7 +398,7 @@ export default function Cuenta() {
             ]}
           >
             <View style={styles.saldo}>
-              <Text style={[styles.saldoAmount, { color: colores.primary }]}>{saldoActual}</Text>
+              <Text style={[styles.saldoAmount, { color: colores.tinta }]}>{saldoActual}</Text>
               <Text style={[styles.saldoLabel, { color: colores.gris }]}>{t('points.balance')}</Text>
             </View>
             {rachaLogin?.dias > 0 && (

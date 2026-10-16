@@ -73,6 +73,7 @@ function RootStack() {
         <Stack.Screen name="invitar" />
         <Stack.Screen name="ticket/[id]" />
         <Stack.Screen name="llegada" />
+        <Stack.Screen name="mira" />
         <Stack.Screen name="detalle" options={{ presentation: 'modal' }} />
         <Stack.Screen
           name="carta"

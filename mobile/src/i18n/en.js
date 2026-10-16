@@ -1,4 +1,30 @@
 export default {
+  "apk": {
+    "verQR": "Show arrival QR",
+    "mira": "MIRA SI",
+    "explorar": "Explore",
+    "personal": "Your space",
+    "gestion": "Management",
+    "preferencias": "Preferences",
+    "chat": {
+      "nueva": "New chat",
+      "intro": "Hi, I’m MIRA. I can help you discover restaurants and manage your bookings. I’ll ask for confirmation before making changes.",
+      "sinRespuesta": "No reply was received. You can try again.",
+      "errorAccion": "The action could not be completed",
+      "limite": "Too many requests. Wait a moment before retrying.",
+      "sesion": "Sign in to continue with this action.",
+      "timeout": "The reply took too long. You can retry.",
+      "error": "Could not connect to MIRA. You can retry.",
+      "confirmar": "Confirm",
+      "confirmacion": "Confirm this action?",
+      "cancelar": "Cancel",
+      "pensando": "MIRA is replying…",
+      "reintentar": "Retry",
+      "escribir": "Message MIRA",
+      "parar": "Stop",
+      "enviar": "Send"
+    }
+  },
   "nav": {
     "descubrir": "Discover",
     "mapa": "Map",

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, View, Text, Pressable, Image, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../theme/ThemeContext';
@@ -27,6 +27,7 @@ function construirCamino(dias, yaReclamado, esDia7) {
 
 export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, onWheel, onClose }) {
   const { colores } = useTheme();
+  const styles = useMemo(() => crearEstilos(colores), [colores]);
   const [claimed, setClaimed] = useState(yaReclamado || false);
   const [showToast, setShowToast] = useState(false);
   const [animSaldo, setAnimSaldo] = useState(saldo || 0);
@@ -121,7 +122,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
           </View>
         )}
 
-        <View style={[styles.modal, { borderColor: 'rgba(0, 106, 85, 0.1)' }]}>
+        <View style={[styles.modal, { borderColor: colores.borde }]}>
           <ScrollView contentContainerStyle={styles.scrollContenido} showsVerticalScrollIndicator={false}>
             {/* Cintillo superior */}
             <View style={styles.header}>
@@ -130,7 +131,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
                   <LogoCircular width={22} height={22} />
                 </View>
                 <View>
-                  <Text style={[styles.brandNombre, { color: colores.primaryContainer }]}>MIRA CLUB</Text>
+                  <Text style={[styles.brandNombre, { color: colores.verde }]}>MIRA CLUB</Text>
                   <Text style={[styles.brandSub, { color: colores.gris }]}>Recompensa Diaria</Text>
                 </View>
               </View>
@@ -188,7 +189,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
             {/* Grid 7 días */}
             <View style={styles.calendario}>
               <View style={styles.calendarioHeader}>
-                <Text style={[styles.calendarioTitulo, { color: colores.primaryContainer }]}>
+                <Text style={[styles.calendarioTitulo, { color: colores.verde }]}>
                   Camino del Foodie <Text style={[styles.calendarioSemana, { color: colores.gris }]}>· 7 días</Text>
                 </Text>
                 {esDia7 && (
@@ -212,7 +213,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
                       key={dia}
                       style={[
                         styles.dia,
-                        completado && { backgroundColor: 'rgba(0, 106, 85, 0.08)', borderColor: colores.primaryContainer },
+                        completado && { backgroundColor: colores.verdeSuave, borderColor: colores.verde },
                         esHoy && !esDia7 && styles.diaHoy,
                         esRueda && styles.diaRueda,
                         bloqueado && styles.diaLocked,
@@ -239,7 +240,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
                       {dia === 7 ? (
                         <Text style={styles.diaPuntosRueda}>🎡 Ruleta</Text>
                       ) : (
-                        <Text style={[styles.diaPuntos, { color: colores.primaryContainer }]}>+{puntos}</Text>
+                        <Text style={[styles.diaPuntos, { color: colores.verde }]}>+{puntos}</Text>
                       )}
                       <Text style={[styles.diaUnidad, { color: colores.gris }]}>MIRA</Text>
                     </View>
@@ -250,7 +251,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
 
             {/* Saldo + botón */}
             <View style={styles.acciones}>
-              <View style={[styles.balance, { backgroundColor: 'rgba(0,0,0,0.03)', borderColor: 'rgba(0,0,0,0.06)' }]}>
+              <View style={[styles.balance, { backgroundColor: colores.fondoSuave, borderColor: colores.borde }]}>
                 <View style={styles.balanceIcono}>
                   <Image source={IMG.moneda} style={styles.balanceMoneda} resizeMode="contain" />
                 </View>
@@ -258,7 +259,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
                   <Text style={[styles.balanceLabel, { color: colores.gris }]}>Tu saldo de MIRA Points</Text>
                   <View style={styles.balanceAmount}>
                     <Text style={[styles.balanceNum, { color: colores.tinta }]}>{animSaldo}</Text>
-                    <Text style={[styles.balanceTexto, { color: colores.primaryContainer }]}>acumulados</Text>
+                    <Text style={[styles.balanceTexto, { color: colores.verde }]}>acumulados</Text>
                   </View>
                 </View>
               </View>
@@ -271,7 +272,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
                     end={{ x: 0, y: 1 }}
                     style={[styles.claimBtn, styles.claimBtnRueda]}
                   >
-                    <Text style={styles.claimTxt}>{btnLabel}</Text>
+                    <Text style={[styles.claimTxt, { color: '#181c1a' }]}>{btnLabel}</Text>
                   </LinearGradient>
                 ) : (
                   <View
@@ -288,7 +289,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
             </View>
 
             {/* Footer */}
-            <View style={[styles.footer, { backgroundColor: 'rgba(0,0,0,0.02)', borderTopColor: 'rgba(0,0,0,0.05)' }]}>
+            <View style={[styles.footer, { backgroundColor: colores.fondoSuave, borderTopColor: colores.borde }]}>
               <Text style={[styles.footerTxt, { color: colores.gris }]}>
                 🛡️ Protector de racha activo: si olvidas entrar mañana, tu racha no se pierde.
               </Text>
@@ -300,7 +301,7 @@ export default function DailyStreakPopup({ racha, saldo, yaReclamado, onClaim, o
   );
 }
 
-const styles = StyleSheet.create({
+function crearEstilos(colores) { return StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 20, 15, 0.65)',
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 720,
     maxHeight: '92%',
-    backgroundColor: '#FCFBF8',
+    backgroundColor: colores.papel,
     borderRadius: 32,
     borderWidth: 4,
     overflow: 'hidden',
@@ -356,14 +357,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: colores.fondoSuave,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeTxt: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#414844',
+    color: colores.gris,
   },
   hero: {
     paddingHorizontal: 25.6,
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: 8,
-    backgroundColor: '#fff',
+    backgroundColor: colores.papel,
     borderWidth: 2,
     borderColor: '#F59E0B',
     borderRadius: 16,
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
   speechTxt: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#181c1a',
+    color: colores.tinta,
     fontFamily: FUENTES.textoExtra,
   },
   speechFlecha: {
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
     left: 20,
     width: 10,
     height: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colores.papel,
     borderRightWidth: 2,
     borderBottomWidth: 2,
     borderColor: '#F59E0B',
@@ -447,17 +448,17 @@ const styles = StyleSheet.create({
     fontFamily: FUENTES.display,
     fontSize: 27,
     fontWeight: '900',
-    color: '#181c1a',
+    color: colores.tinta,
     textAlign: 'center',
     marginTop: 8,
     marginBottom: 6,
     lineHeight: 32,
   },
   fuego: {
-    color: '#F59E0B',
+    color: colores.dorado,
   },
   subtitulo: {
-    color: '#414844',
+    color: colores.gris,
     fontSize: 14.1,
     fontWeight: '600',
     textAlign: 'center',
@@ -504,7 +505,7 @@ const styles = StyleSheet.create({
   calendarioPremioTxt: {
     fontSize: 10.9,
     fontWeight: '800',
-    color: '#D97706',
+    color: '#92400E',
     fontFamily: FUENTES.textoExtra,
   },
   grid: {
@@ -516,21 +517,21 @@ const styles = StyleSheet.create({
     width: '13.5%',
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: colores.fondoSuave,
     borderWidth: 2,
-    borderColor: 'rgba(0,0,0,0.06)',
+    borderColor: colores.borde,
     borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 1,
     position: 'relative',
   },
   diaHoy: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: colores.verdeSuave,
     borderColor: '#F59E0B',
     zIndex: 2,
   },
   diaRueda: {
-    backgroundColor: '#FDE68A',
+    backgroundColor: colores.verdeSuave,
     borderColor: '#F59E0B',
     zIndex: 2,
   },
@@ -550,7 +551,7 @@ const styles = StyleSheet.create({
   diaTagTxt: {
     fontSize: 7.5,
     fontWeight: '900',
-    color: '#fff',
+    color: '#181c1a',
     fontFamily: FUENTES.textoExtra,
   },
   diaNombre: {
@@ -598,7 +599,7 @@ const styles = StyleSheet.create({
   diaPuntosRueda: {
     fontSize: 8.8,
     fontWeight: '900',
-    color: '#D97706',
+    color: colores.dorado,
     fontFamily: FUENTES.textoExtra,
     textAlign: 'center',
   },
@@ -739,4 +740,4 @@ const styles = StyleSheet.create({
     marginTop: 1,
     fontFamily: FUENTES.texto,
   },
-});
+}); }

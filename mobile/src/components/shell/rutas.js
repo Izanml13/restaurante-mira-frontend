@@ -3,7 +3,7 @@
  * (misma semántica que rutaActual() de App.jsx).
  */
 export function rutaDesdePath(pathname) {
-  const p = pathname || '/';
+  const p = (pathname || '/').split('?')[0].replace(/\/+$/, '') || '/';
   if (p === '/') return 'home';
   if (p === '/login') return 'login';
   if (p === '/recuperar') return 'recuperar';
@@ -26,8 +26,17 @@ export function rutaDesdePath(pathname) {
   if (p === '/detalle') return 'detalle';
   if (p === '/carta') return 'carta';
   if (p === '/llegada') return 'llegada';
+  if (p === '/mira') return 'mira';
   return 'home';
 }
 
 /** Rutas de auth: sin aviso de email verificado (igual que el web). */
 export const RUTAS_AUTH = ['login', 'registro', 'recuperar', 'restablecer'];
+
+/** Destino principal al que pertenece cada pantalla secundaria. */
+export function pestanaActiva(pathname) {
+  const ruta = rutaDesdePath(pathname);
+  if (['mapa', 'reservas', 'favoritos', 'cuenta'].includes(ruta)) return ruta;
+  if (['puntos', 'historialPuntos', 'mensajes', 'login', 'registro', 'recuperar', 'restablecer', 'admin', 'dashboard', 'negocio', 'invitar', 'privacidad', 'contacto'].includes(ruta)) return 'cuenta';
+  return 'home';
+}

@@ -88,3 +88,46 @@ export function guardarVistos(storage, vistos, ahora = Date.now()) {
     storage?.setItem(CLAVE_VISTOS, JSON.stringify({ fecha: hoy(ahora), claves: [...vistos] }));
   } catch { /* almacenamiento lleno o bloqueado */ }
 }
+
+// Otra visita: salida con histéresis durante 10 minutos (100 m tras la llegada).
+// No se rearma por tiempo sin GPS dentro del restaurante ni por descartar un aviso.
+export const AUSENCIA_VISITA_MS = 10 * 60_000;
+export const CLAVE_SESIONES = 'mira:avisosOfertas:visitas';
+
+export function prepararAvisos(resultados, anterior, ahora = Date.now(), limite = Infinity) {
+  const fecha = hoy(ahora);
+  const mismoDia = anterior?.fecha === fecha;
+  const claves = new Set(mismoDia && Array.isArray(anterior.claves) ? anterior.claves : []);
+  const presencias = mismoDia && anterior.presencias
+    ? Object.fromEntries(Object.entries(anterior.presencias).map(([id, p]) => [id, { ...p }])) : {};
+  const presentes = new Set((resultados || []).map(r => String(r?.restaurante?.id || '')).filter(Boolean));
+  const porId = new Map((resultados || []).map(r => [String(r?.restaurante?.id || ''), r]));
+  const dentro = id => {
+    const r = porId.get(id);
+    if (!r) return false;
+    const niveles = [...claves].filter(k => k.startsWith(`${id}:`)).map(k => Number(k.split(':')[1]));
+    const mejor = niveles.length ? Math.min(...niveles) : 1000;
+    const salida = mejor <= 20 ? 100 : mejor <= 100 ? 500 : 1000;
+    return !Number.isFinite(r.distanciaM) || r.distanciaM <= salida;
+  };
+  for (const k of claves) presencias[k.split(':')[0]] ||= { ausenteDesde: null };
+  for (const [id, presencia] of Object.entries(presencias)) {
+    if (!dentro(id)) {
+      if (presencia.ausenteDesde == null) presencia.ausenteDesde = ahora;
+    } else {
+      if (presencia.ausenteDesde != null && ahora - presencia.ausenteDesde >= AUSENCIA_VISITA_MS) {
+        for (const k of claves) if (k.startsWith(`${id}:`)) claves.delete(k);
+      }
+      presencia.ausenteDesde = null;
+    }
+  }
+  for (const id of presentes) presencias[id] ||= { ausenteDesde: null };
+  const nuevos = [];
+  for (const r of resultados || []) {
+    if (nuevos.length >= limite) break;
+    const filtrado = filtrarNuevos([r], claves);
+    nuevos.push(...filtrado.nuevos);
+    for (const k of filtrado.vistos) claves.add(k);
+  }
+  return { nuevos, estado: { fecha, claves: [...claves], presencias } };
+}
