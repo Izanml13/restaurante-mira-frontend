@@ -787,6 +787,7 @@ export default {
     "irACuenta": "Go to My account",
     "sinSesion": "Sign in to get your arrival QR.",
     "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "soloCliente": "The arrival QR is only generated with a customer account (yours is a business or admin account).",
     "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
     "error": "We couldn't create your QR."
   },

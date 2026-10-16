@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useUbicacion from './useUbicacion.js';
-import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos } from '../models/avisosOfertasModel.js';
+import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, soloAvisables, leerFavoritosAvisos } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from '../services/ofertasCercaApi.js';
 
 function almacenamiento() {
@@ -26,7 +26,8 @@ export default function useAvisosOfertas() {
     enCurso.current = true;
     ofertasCerca(posicion)
       .then((resultados) => {
-        const { nuevos, vistos } = filtrarNuevos(resultados, leerVistos(almacenamiento()));
+        const avisables = soloAvisables(resultados, leerFavoritosAvisos(almacenamiento()));
+        const { nuevos, vistos } = filtrarNuevos(avisables, leerVistos(almacenamiento()));
         if (!nuevos.length) return;
         guardarVistos(almacenamiento(), vistos);
         // El nivel nuevo sustituye al anterior del mismo restaurante.

@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useUbicacion from './useUbicacion.js';
-import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos } from '../models/avisosOfertasModel.js';
+import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, soloAvisables, leerFavoritosAvisos } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from '../services/ofertasCercaApi.js';
 import { notificarLocal } from '../services/notificaciones.js';
 
@@ -26,7 +26,7 @@ export default function useAvisosOfertas(t) {
     ofertasCerca(posicion)
       .then((resultados) => {
         const storage = globalThis.localStorage;
-        const { nuevos, vistos } = filtrarNuevos(resultados, leerVistos(storage));
+        const { nuevos, vistos } = filtrarNuevos(soloAvisables(resultados, leerFavoritosAvisos(storage)), leerVistos(storage));
         if (!nuevos.length) return;
         guardarVistos(storage, vistos);
         const ids = new Set(nuevos.map((n) => String(n.restaurante.id)));

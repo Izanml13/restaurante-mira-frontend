@@ -6,6 +6,7 @@ import {
   editarRestauranteAdmin,
   eliminarRestauranteAdmin,
   enviarMensajeDueno,
+  cambiarPartnerAdmin,
 } from './opsData.js';
 import { useT } from '../../i18n/index.jsx';
 import es from '../../i18n/es.js';
@@ -45,6 +46,23 @@ export default function OpsRestaurantes() {
   const [mensaje, setMensaje] = useState('');
   const [guardando, setGuardando] = useState(false);
   const peticionRef = useRef(0);
+  const [partnerEnCurso, setPartnerEnCurso] = useState(null);
+
+  // G11: un clic marca o desmarca partner; sus ofertas avisan por distancia a todos.
+  async function alternarPartner(rest) {
+    setPartnerEnCurso(rest.id);
+    setError('');
+    setOk('');
+    try {
+      const r = await cambiarPartnerAdmin(rest.id, !rest.partner);
+      setItems((lista) => lista.map((x) => (x.id === rest.id ? { ...x, partner: r.partner } : x)));
+      setOk(t(r.partner ? 'ops.partnerActivado' : 'ops.partnerQuitado', { nombre: rest.nombre }));
+    } catch (e) {
+      setError(mensajeErrorFirestore(e));
+    } finally {
+      setPartnerEnCurso(null);
+    }
+  }
 
   const cargarPrimera = useCallback(async (texto) => {
     const id = ++peticionRef.current;
@@ -262,6 +280,11 @@ export default function OpsRestaurantes() {
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <button type="button" className={`ops-btn ${r.partner ? 'primary' : 'soft'} sm`} aria-pressed={r.partner === true}
+                        disabled={partnerEnCurso === r.id} onClick={() => alternarPartner(r)} title={t('ops.tituloPartner')}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: -2 }}>handshake</span>
+                        {' '}{t('ops.partnerBtn')}
+                      </button>
                       <button type="button" className="ops-btn soft sm" onClick={() => abrirModal('mensaje', r)} title={t('ops.tituloEnviarMensaje')}>
                         <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: -2 }}>mail</span>
                         {' '}{t('ops.mensajeBtn')}

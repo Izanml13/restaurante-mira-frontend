@@ -131,6 +131,11 @@ export async function listarRestaurantesAdmin({ q = '', cursor = null, limit = 2
   };
 }
 
+export async function cambiarPartnerAdmin(id, partner) {
+  return conAuditoria('restaurante_editado', { entidadTipo: 'restaurante', entidadId: String(id), cambios: [{ campo: 'partner', antes: !partner, despues: partner }] },
+    api.put(`/v1/dashboard/restaurant/${encodeURIComponent(id)}/partner`, { partner }), { panel: true });
+}
+
 export async function editarRestauranteAdmin(id, data, antes = {}) {
   return conAuditoria('restaurante_editado', { entidadTipo: 'restaurante', entidadId: String(id), entidadNombre: antes?.nombre, cambios: diffCambios(antes, data) },
     api.put(`/v1/dashboard/restaurant/${encodeURIComponent(id)}`, data), { panel: true });

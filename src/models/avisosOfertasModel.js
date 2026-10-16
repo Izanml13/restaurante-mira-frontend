@@ -6,8 +6,24 @@
  *   mejor (más cerca), no se avisa uno peor.
  * - leerVistos / guardarVistos: lo ya avisado, solo hoy (no se guarda ninguna
  *   posición, solo "restaurante:nivel").
+ * - soloAvisables (G11): solo restaurantes partner o en favoritos del usuario.
  */
 export const CLAVE_VISTOS = 'mira:avisosOfertas';
+// Copia de los favoritos para filtrar avisos (la tarea en segundo plano no tiene React).
+export const CLAVE_FAVS_AVISOS = 'mira:favoritosAvisos';
+
+/** G11: avisar solo si el restaurante es partner o está en favoritos. */
+export function soloAvisables(resultados, favoritos) {
+  const favs = new Set((favoritos || []).map(String));
+  return (resultados || []).filter((r) => r?.restaurante?.partner === true || favs.has(String(r?.restaurante?.id)));
+}
+
+export function leerFavoritosAvisos(storage) {
+  try {
+    const d = JSON.parse(storage?.getItem(CLAVE_FAVS_AVISOS) || '[]');
+    return Array.isArray(d) ? d : [];
+  } catch { return []; }
+}
 export const INTERVALO_MS = 30_000;
 export const DISTANCIA_M = 50;
 

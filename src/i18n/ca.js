@@ -1453,6 +1453,10 @@ export default {
     "campoMaxReservas": "Màx. reserves/hora",
     "asuntoDefault": "Consulta MIRA — {{nombre}}",
     "restActualizado": "Restaurant «{{nombre}}» actualitzat.",
+    "partnerBtn": "Partner",
+    "tituloPartner": "Partner: les seves ofertes avisen tots els usuaris propers",
+    "partnerActivado": "{{nombre}} ara és partner.",
+    "partnerQuitado": "{{nombre}} ja no és partner.",
     "mensajeEnviado": "Missatge enviat a l'amo de «{{nombre}}».",
     "restEliminado": "«{{nombre}}» eliminat del catàleg.",
     "cargados": "{{n}} carregats",
@@ -1960,6 +1964,7 @@ export default {
     "irACuenta": "Anar a El meu compte",
     "sinSesion": "Inicia sessió per generar el QR d'arribada.",
     "sinOferta": "Aquest restaurant ara no té cap oferta activa.",
+    "soloCliente": "El QR d'arribada només es genera amb un compte de client (el teu és d'empresa o admin).",
     "noDisponible": "Els QR d'arribada encara no estan disponibles. Prova-ho d'aquí a una estona.",
     "error": "No hem pogut generar el teu QR."
   }

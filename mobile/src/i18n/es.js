@@ -863,6 +863,7 @@ export default {
     "irACuenta": "Ir a Mi cuenta",
     "sinSesion": "Inicia sesión para generar tu QR de llegada.",
     "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
+    "soloCliente": "El QR de llegada solo se genera con una cuenta de cliente (la tuya es de empresa o admin).",
     "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
     "error": "No hemos podido generar tu QR."
   },

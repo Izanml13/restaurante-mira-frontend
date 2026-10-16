@@ -1453,6 +1453,10 @@ export default {
     "campoMaxReservas": "Max bookings/hour",
     "asuntoDefault": "MIRA enquiry — {{nombre}}",
     "restActualizado": "Restaurant «{{nombre}}» updated.",
+    "partnerBtn": "Partner",
+    "tituloPartner": "Partner: its offers notify all nearby users",
+    "partnerActivado": "{{nombre}} is now a partner.",
+    "partnerQuitado": "{{nombre}} is no longer a partner.",
     "mensajeEnviado": "Message sent to the owner of «{{nombre}}».",
     "restEliminado": "«{{nombre}}» removed from the catalogue.",
     "cargados": "{{n}} loaded",
@@ -1960,6 +1964,7 @@ export default {
     "irACuenta": "Go to My account",
     "sinSesion": "Sign in to get your arrival QR.",
     "sinOferta": "This restaurant doesn't have an active offer right now.",
+    "soloCliente": "The arrival QR is only generated with a customer account (yours is a business or admin account).",
     "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
     "error": "We couldn't create your QR."
   }
