@@ -5,12 +5,12 @@
  * - Qué avisos recibir (T10): GET/PUT /v1/push/preferencias, solo con sesión;
  *   si la API no lo tiene (o falla), los interruptores no se muestran.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Switch, Pressable, StyleSheet, AppState, Linking, Platform } from 'react-native';
 import { api } from '../services/httpClient.js';
 import { consultarPermisoNotificaciones, pedirPermisoNotificaciones, registrarPush, borrarPush } from '../services/notificaciones.js';
 import { leerConsentimientos, decidirConsentimiento, suscribirConsentimientos } from '../services/consentimientosApi.js';
-import { estadoNotificaciones } from '../models/notificacionesModel.js';
+import { estadoNotificaciones, debeRegistrarAlRecuperar } from '../models/notificacionesModel.js';
 import { alVolverAPrimerPlano } from '../services/primerPlano.js';
 import { btnCta, btnSecundario } from '../theme/ui';
 import { useT } from '../i18n/index.jsx';
@@ -22,6 +22,13 @@ import { FUENTES } from '../theme/tokens';
 
 const TRADS = { es, ca, en };
 const CATEGORIAS = ['reservas', 'mensajes', 'promociones'];
+// Texto del botón según el estado (notificacionesModel); la acción va en pulsar().
+const ACCIONES = {
+  desactivadas: { clave: 'avisos.activar', cta: true },
+  faltaPermiso: { clave: 'ubicacion.darPermiso', cta: true },
+  bloqueado: { clave: 'ubicacion.abrirAjustes', cta: true },
+  activas: { clave: 'avisos.desactivar', cta: false },
+};
 
 export default function PreferenciasAvisos({ Sub }) {
   const t = useT(TRADS);
@@ -39,8 +46,20 @@ export default function PreferenciasAvisos({ Sub }) {
   }, []);
 
   // Permiso real del sistema: al entrar y al volver de Ajustes (solo consulta, nunca pide).
+  // Si acaba de concederse con las notificaciones aceptadas, registra el dispositivo
+  // (sin preguntar): cambiar solo la etiqueta dejaría el móvil sin push.
+  const permisoRef = useRef(null);
   const reconsultar = useCallback(() => {
-    consultarPermisoNotificaciones().then(setPermiso).catch(() => setPermiso(null));
+    consultarPermisoNotificaciones()
+      .then((nuevo) => {
+        const antes = permisoRef.current;
+        permisoRef.current = nuevo;
+        setPermiso(nuevo);
+        if (debeRegistrarAlRecuperar(antes, nuevo, leerConsentimientos().notificaciones)) {
+          registrarPush(globalThis.localStorage?.getItem('mira_lang') || 'es');
+        }
+      })
+      .catch(() => { permisoRef.current = null; setPermiso(null); });
   }, []);
   useEffect(() => { reconsultar(); return alVolverAPrimerPlano(AppState, reconsultar); }, [reconsultar]);
   useEffect(() => suscribirConsentimientos(() => setConsentimiento(leerConsentimientos().notificaciones)), []);
@@ -66,12 +85,12 @@ export default function PreferenciasAvisos({ Sub }) {
     } finally { setOcupado(false); }
   }
 
-  const accion = {
-    desactivadas: { texto: t('avisos.activar'), onPress: activar, cta: true },
-    faltaPermiso: { texto: t('ubicacion.darPermiso'), onPress: activar, cta: true },
-    bloqueado: { texto: t('ubicacion.abrirAjustes'), onPress: () => Linking.openSettings().catch(() => {}), cta: true },
-    activas: { texto: t('avisos.desactivar'), onPress: desactivar, cta: false },
-  }[estado];
+  const accion = ACCIONES[estado];
+  function pulsar() {
+    if (estado === 'activas') return desactivar();
+    if (estado === 'bloqueado') return Linking.openSettings().catch(() => {});
+    return activar(); // desactivadas o faltaPermiso: pide el permiso del sistema
+  }
 
   async function cambiar(cat, valor) {
     const antes = prefs;
@@ -91,8 +110,8 @@ export default function PreferenciasAvisos({ Sub }) {
       {Platform.OS !== 'web' ? (
         <View style={styles.estado}>
           <Text style={[styles.txt, { color: colores.tinta }]} accessibilityLiveRegion="polite">{t(`avisos.estadoMovil.${estado}`)}</Text>
-          <Pressable onPress={accion.onPress} disabled={ocupado} accessibilityRole="button" style={({ pressed }) => [{ alignSelf: 'flex-start', opacity: pressed || ocupado ? 0.7 : 1 }]}>
-            <Text style={[accion.cta ? btnCta(colores, { peq: true }) : btnSecundario(colores, { peq: true }), { marginTop: 0 }]}>{accion.texto}</Text>
+          <Pressable onPress={pulsar} disabled={ocupado} accessibilityRole="button" style={({ pressed }) => [{ alignSelf: 'flex-start', opacity: pressed || ocupado ? 0.7 : 1 }]}>
+            <Text style={[accion.cta ? btnCta(colores, { peq: true }) : btnSecundario(colores, { peq: true }), { marginTop: 0 }]}>{t(accion.clave)}</Text>
           </Pressable>
         </View>
       ) : null}
