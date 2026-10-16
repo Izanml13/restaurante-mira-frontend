@@ -42,7 +42,7 @@ import Llegada from './components/Llegada.jsx';
 import LibroCarta from './components/LibroCarta.jsx';
 import PromoBanner from './components/PromoBanner.jsx';
 import RestaurantSkeleton from './components/RestaurantSkeleton.jsx';
-import CookieBanner from './components/CookieBanner.jsx';
+import PrimerArranque from './components/PrimerArranque.jsx';
 import Footer from './components/Footer.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import FloatingReservation from './components/FloatingReservation.jsx';
@@ -582,7 +582,7 @@ function AppContent({ auth, tema, setTema }) {
       </main>
       <Footer />
       <AvisosOfertas />
-      <CookieBanner usuario={usuario} />
+      <PrimerArranque usuario={usuario} lang={lang} />
       {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
       {ruta !== 'admin' && (

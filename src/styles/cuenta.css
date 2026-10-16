@@ -366,3 +366,7 @@
 /* G03: consentimiento de ubicación */
 .ubicacion-modal { max-width: 520px; }
 .ubicacion-puntos { margin: 0.6rem 0 1rem; padding-left: 1.2rem; display: grid; gap: 0.35rem; color: var(--tinta); }
+
+/* C02: primer arranque (mismo aspecto que el banner de cookies) */
+.primer-arranque-paso { margin: 0 0 0.2rem; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); }
+.primer-arranque .ubicacion-puntos { margin: 0.5rem 0 0; }

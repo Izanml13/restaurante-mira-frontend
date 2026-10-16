@@ -11,7 +11,7 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function CookieBanner({ usuario }) {
+export default function CookieBanner({ usuario, onDecidido }) {
   const t = useT(TRADS);
   const [visible, setVisible] = useState(false);
   const [configurando, setConfigurando] = useState(false);
@@ -40,17 +40,20 @@ export default function CookieBanner({ usuario }) {
     const datos = { ...COOKIE_DEFAULT, necesarias: true, preferencias: true, analiticas: true, marketing: true };
     await guardarCookies(datos, usuario?.uid);
     setVisible(false);
+    onDecidido?.();
   }
 
   async function rechazar() {
     await guardarCookies({ ...COOKIE_DEFAULT }, usuario?.uid);
     setVisible(false);
+    onDecidido?.();
   }
 
   async function guardarConfig() {
     await guardarCookies({ ...prefs, necesarias: true }, usuario?.uid);
     setVisible(false);
     setConfigurando(false);
+    onDecidido?.();
   }
 
   function toggle(key) {

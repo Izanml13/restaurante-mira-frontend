@@ -1962,5 +1962,16 @@ export default {
     "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
     "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
     "error": "No hemos podido generar tu QR."
+  },
+  "bienvenida": {
+    "paso": "Paso {{n}} de {{total}}",
+    "aceptar": "Aceptar",
+    "ahoraNo": "Ahora no",
+    "notifTitulo": "¿Te avisamos?",
+    "notifTexto": "Te enviamos notificaciones solo de lo que te interesa.",
+    "notifPunto1": "Cuando un restaurante confirma o cancela tu reserva, y cuando tienes un mensaje.",
+    "notifPunto2": "Las promociones solo si las activas tú en Mi cuenta.",
+    "notifPunto3": "Puedes desactivarlas cuando quieras desde Mi cuenta.",
+    "notifIos": "En iPhone, primero instala MIRA en la pantalla de inicio: te explicamos cómo."
   }
 }
