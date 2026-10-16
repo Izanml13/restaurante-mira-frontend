@@ -50,10 +50,11 @@ const clave = (restauranteId, nivel) => `${restauranteId}:${nivel}`;
  * Resultados de /v1/ofertas/cerca → avisos nuevos (y el conjunto de vistos
  * actualizado). Niveles: 1000 > 500 > 100 > 20 (menor distancia = mejor).
  */
-export function filtrarNuevos(resultados, vistos) {
+export function filtrarNuevos(resultados, vistos, limite = Infinity) {
   const siguiente = new Set(vistos);
   const nuevos = [];
   for (const r of resultados || []) {
+    if (nuevos.length >= limite) break;
     const id = r?.restaurante?.id;
     const nivel = r?.nivel?.distancia;
     if (!id || !Number.isFinite(nivel)) continue;

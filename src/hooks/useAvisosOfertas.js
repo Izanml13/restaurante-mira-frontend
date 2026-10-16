@@ -43,7 +43,8 @@ export default function useAvisosOfertas() {
     ofertasCerca(posicion)
       .then((resultados) => {
         const avisables = soloAvisables(resultados, leerFavoritosAvisos(almacenamiento()));
-        const { nuevos, vistos } = filtrarNuevos(avisables, leerVistos(almacenamiento()));
+        // Solo se marcan y cuentan los que caben en pantalla (máximo 3, revisión R01).
+        const { nuevos, vistos } = filtrarNuevos(avisables, leerVistos(almacenamiento()), 3);
         if (!nuevos.length) return;
         guardarVistos(almacenamiento(), vistos);
         // El nivel nuevo sustituye al anterior del mismo restaurante.

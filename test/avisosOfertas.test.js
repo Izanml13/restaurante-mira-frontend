@@ -80,3 +80,14 @@ test('G11: lee la copia de favoritos y tolera datos corruptos', () => {
   mem.set(CLAVE_FAVS_AVISOS, '{roto');
   assert.deepEqual(leerFavoritosAvisos(s), []);
 });
+
+test('límite visual: solo se deduplican y cuentan los tres avisos mostrados', () => {
+  const candidatos = [r(1, 100), r(2, 100), r(3, 100), r(4, 100), r(5, 100)];
+  const primera = filtrarNuevos(candidatos, new Set(), 3);
+  assert.deepEqual(primera.nuevos.map(x => x.restaurante.id), ['1', '2', '3']);
+  assert.deepEqual([...primera.vistos], ['1:100', '2:100', '3:100']);
+  // Los descartados no se pierden: pueden mostrarse y contarse en otra consulta.
+  const segunda = filtrarNuevos(candidatos, primera.vistos, 3);
+  assert.deepEqual(segunda.nuevos.map(x => x.restaurante.id), ['4', '5']);
+  assert.equal(filtrarNuevos(candidatos, segunda.vistos, 3).nuevos.length, 0);
+});
