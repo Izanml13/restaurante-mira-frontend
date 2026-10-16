@@ -122,11 +122,11 @@ Segunda pasada de hallazgos del usuario (colores y modo oscuro). Rama: `fix/clau
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-138](BUG-138.md) | El APK falla al consultar isAvailableAsync | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-139](BUG-139.md) | Los avisos cercanos no se rearman en otra visita | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-140](BUG-140.md) | Símbolos corruptos en Reservas y otras pantallas | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-141](BUG-141.md) | MiraClub y el saldo pierden contraste en modo oscuro | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-142](BUG-142.md) | La barra inferior no destaca la sección activa | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-143](BUG-143.md) | Falta acceso al QR de llegada desde la ficha | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-144](BUG-144.md) | El chat del agente MIRA no está en la app | app | codex | en revisión | fix/codex-apk-138-145 |
-| [BUG-145](BUG-145.md) | El menú móvil necesita organización y mejores zonas táctiles | app | codex | en revisión | fix/codex-apk-138-145 |
+| [BUG-138](BUG-138.md) | El APK falla al consultar isAvailableAsync | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-139](BUG-139.md) | Los avisos cercanos no se rearman en otra visita | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-140](BUG-140.md) | Símbolos corruptos en Reservas y otras pantallas | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-141](BUG-141.md) | MiraClub y el saldo pierden contraste en modo oscuro | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-142](BUG-142.md) | La barra inferior no destaca la sección activa | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-143](BUG-143.md) | Falta acceso al QR de llegada desde la ficha | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-144](BUG-144.md) | El chat del agente MIRA no está en la app | app | codex | hecho | fix/codex-apk-138-145 |
+| [BUG-145](BUG-145.md) | El menú móvil necesita organización y mejores zonas táctiles | app | codex | hecho | fix/codex-apk-138-145 |
