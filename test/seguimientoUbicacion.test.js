@@ -8,8 +8,9 @@ function locationFalso() {
   const espera = (k) => new Promise((ok) => { pend[k] = ok; });
   const L = {
     Accuracy: { High: 4 },
-    watches: 0, removes: 0, callbackPos: null,
-    requestForegroundPermissionsAsync: () => espera('permiso'),
+    watches: 0, removes: 0, callbackPos: null, pedidos: 0, consultas: 0,
+    requestForegroundPermissionsAsync: () => { L.pedidos++; return espera('permiso'); },
+    getForegroundPermissionsAsync: () => { L.consultas++; return espera('permiso'); },
     hasServicesEnabledAsync: () => espera('servicios'),
     watchPositionAsync: (_o, cb) => { L.watches++; L.callbackPos = cb; return espera('sub'); },
   };
@@ -17,9 +18,11 @@ function locationFalso() {
 }
 const tic = () => new Promise((r) => setImmediate(r));
 
-function arrancar(L) {
-  const estado = { activa: true, posiciones: [], errores: [] };
+function arrancar(L, { pedir = true } = {}) {
+  const estado = { activa: true, posiciones: [], errores: [], concedido: 0 };
   const parar = iniciarSeguimiento(L, {
+    pedir,
+    onConcedido: () => { estado.concedido++; },
     sigueActiva: () => estado.activa,
     onPosicion: (c) => estado.posiciones.push(c),
     onError: (e) => estado.errores.push(e),
@@ -71,10 +74,40 @@ test('desactivar mientras se crea la suscripción: se elimina al llegar y los av
 
 test('permiso denegado o servicios apagados: error y sin seguimiento', async () => {
   const a = locationFalso(); const ra = arrancar(a.L);
-  a.pend.permiso({ status: 'denied' }); await tic();
-  assert.deepEqual(ra.estado.errores, ['errorPermiso']);
+  a.pend.permiso({ status: 'denied', canAskAgain: true }); await tic();
+  assert.deepEqual(ra.estado.errores, ['permisoPendiente']);
   const b = locationFalso(); const rb = arrancar(b.L);
   b.pend.permiso({ status: 'granted' }); await tic(); b.pend.servicios(false); await tic();
   assert.deepEqual(rb.estado.errores, ['errorNoDisponible']);
   assert.equal(a.L.watches + b.L.watches, 0);
+});
+
+test('C02: al abrir la app solo consulta el permiso, no lo pide', async () => {
+  const { L, pend, sub } = locationFalso();
+  const { estado } = arrancar(L, { pedir: false });
+  pend.permiso({ status: 'granted' }); await tic();
+  pend.servicios(true); await tic();
+  pend.sub(sub()); await tic();
+  assert.equal(L.pedidos, 0);
+  assert.equal(L.consultas, 1);
+  assert.equal(L.watches, 1);
+  assert.equal(estado.concedido, 0, 'solo avisa a las demás pantallas si lo acaba de pedir');
+});
+
+test('C02: sin permiso al abrir → «pendiente»; bloqueado por el sistema → «bloqueado»', async () => {
+  const a = locationFalso(); const ra = arrancar(a.L, { pedir: false });
+  a.pend.permiso({ status: 'denied', canAskAgain: true }); await tic();
+  assert.deepEqual(ra.estado.errores, ['permisoPendiente']);
+  const b = locationFalso(); const rb = arrancar(b.L, { pedir: true });
+  b.pend.permiso({ status: 'denied', canAskAgain: false }); await tic();
+  assert.deepEqual(rb.estado.errores, ['permisoBloqueado']);
+  assert.equal(a.L.watches + b.L.watches, 0);
+});
+
+test('C02: al pedirlo y concederse, avisa para que las demás pantallas vuelvan a consultar', async () => {
+  const { L, pend } = locationFalso();
+  const { estado } = arrancar(L, { pedir: true });
+  pend.permiso({ status: 'granted' }); await tic();
+  assert.equal(L.pedidos, 1);
+  assert.equal(estado.concedido, 1);
 });

@@ -12,6 +12,7 @@ import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilAp
 import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { contarNoLeidos } from '../services/mensajesApi.js';
 import { registrarPush, borrarPush } from '../services/notificaciones.js';
+import { sincronizarConsentimientos, leerConsentimientos } from '../services/consentimientosApi.js';
 
 const LS_DIETA = 'mira:dieta';
 const LS_FAVS = 'mira:favoritos';
@@ -85,10 +86,15 @@ export function useAuth() {
     }
   }), []);
 
-  // Push: registra el dispositivo al entrar (una vez por usuario).
+  // Al entrar: decisión más reciente entre dispositivo y perfil (C02) y, si las
+  // notificaciones están aceptadas, registra el dispositivo SIN volver a pedir permiso.
   useEffect(() => {
     if (!usuario?.uid) return;
-    registrarPush(localStorage.getItem('mira_lang') || 'es');
+    sincronizarConsentimientos().finally(() => {
+      if (leerConsentimientos().notificaciones?.estado === 'aceptado') {
+        registrarPush(localStorage.getItem('mira_lang') || 'es');
+      }
+    });
   }, [usuario?.uid]);
 
   // Perfil remoto + fusión de favoritos locales al entrar.

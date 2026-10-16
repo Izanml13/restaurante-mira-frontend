@@ -1,7 +1,8 @@
 /**
  * Notificaciones push (Android vía Expo Push / FCM).
- * - registrarPush(lang): pide permiso, crea el canal de Android, saca el token
+ * - registrarPush(lang, { pedir }): crea el canal de Android, saca el token
  *   Expo y lo manda a POST /v1/push/tokens. Devuelve el id del dispositivo.
+ *   Solo pide el permiso del sistema con { pedir: true } (C02: tras un toque).
  * - borrarPush(): DELETE /v1/push/tokens/:id al cerrar sesión.
  * Mientras mira-api no tenga el módulo push (T04), el token sale por consola.
  * Las remotas no van en Expo Go: hace falta un development build.
@@ -24,7 +25,18 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function sacarToken() {
+/**
+ * Pide el permiso de notificaciones (solo desde un toque: paso 3 del primer
+ * arranque o Mi cuenta). Devuelve 'granted' | 'denied' | 'undetermined'.
+ */
+export async function pedirPermisoNotificaciones() {
+  if (Platform.OS === 'web') return 'denied';
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status;
+}
+
+/** C02: el permiso solo se pide si `pedir` (toque del usuario); si no, solo se consulta. */
+async function sacarToken({ pedir = false } = {}) {
   if (!Device.isDevice) {
     console.log('[MIRA push] Emulador o web: sin notificaciones remotas.');
     return null;
@@ -37,7 +49,7 @@ async function sacarToken() {
     });
   }
   let { status } = await Notifications.getPermissionsAsync();
-  if (status !== 'granted') ({ status } = await Notifications.requestPermissionsAsync());
+  if (status !== 'granted' && pedir) ({ status } = await Notifications.requestPermissionsAsync());
   if (status !== 'granted') return null;
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
@@ -49,10 +61,10 @@ async function sacarToken() {
   return data;
 }
 
-export async function registrarPush(lang = 'es') {
+export async function registrarPush(lang = 'es', { pedir = false } = {}) {
   if (Platform.OS === 'web') return null;
   try {
-    const token = await sacarToken();
+    const token = await sacarToken({ pedir });
     if (!token) return null;
     console.log('[MIRA push] Token Expo:', token);
     const r = await api.post('/v1/push/tokens', { token, tipo: 'expo', plataforma: Platform.OS, idioma: lang });
