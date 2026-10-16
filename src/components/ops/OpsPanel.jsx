@@ -13,6 +13,7 @@ import OpsUsuarios from './OpsUsuarios.jsx';
 import OpsAjustes from './OpsAjustes.jsx';
 import OpsAuditoria from './OpsAuditoria.jsx';
 import OpsCargaDirecto from './OpsCargaDirecto.jsx';
+import OpsOfertas from './OpsOfertas.jsx';
 import { track, trackPanel } from '../../services/auditoria.js';
 import { leerEstadoUrl } from '../../services/auditoriaCore.js';
 import { crearOverviewSimulado } from './opsDemo.js';
@@ -33,6 +34,7 @@ const SECCIONES = [
   { id: 'dashboard', clave: 'ops.seccDashboard', icono: 'dashboard' },
   { id: 'restaurantes', clave: 'ops.seccRestaurantes', icono: 'restaurant' },
   { id: 'reservas', clave: 'ops.seccReservas', icono: 'calendar_month', live: true },
+  { id: 'ofertas', clave: 'ops.seccOfertas', icono: 'local_offer' },
   { id: 'finanzas', clave: 'ops.seccFinanzas', icono: 'payments' },
   { id: 'incidencias', clave: 'ops.seccIncidencias', icono: 'report_problem', badgeCrit: true },
   { id: 'usuarios', clave: 'ops.seccUsuarios', icono: 'group' },
@@ -239,6 +241,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
             {seccion === 'dashboard' && <OpsDashboard key={simulado ? 'sim' : 'real'} usuario={usuario} esAdmin={esAdmin} todos={todos} demo={simulado ? demo : null} />}
             {seccion === 'restaurantes' && <OpsRestaurantes />}
             {seccion === 'reservas' && <OpsReservas busquedaInicial={consultaCabecera.q} revisionBusqueda={consultaCabecera.revision} />}
+            {seccion === 'ofertas' && <OpsOfertas />}
             {seccion === 'finanzas' && <OpsFinanzas key={simulado ? 'sim' : 'real'} demo={simulado ? demo : null} />}
             {seccion === 'incidencias' && <OpsIncidencias />}
             {seccion === 'usuarios' && <OpsUsuarios />}
