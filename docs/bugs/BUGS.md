@@ -116,4 +116,4 @@ Segunda pasada de hallazgos del usuario (colores y modo oscuro). Rama: `fix/clau
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-137](BUG-137.md) | Verificar el correo lleva a restablecer contraseña | auth (web) | codex | en revisión | fix/BUG-137-verificar-correo |
+| [BUG-137](BUG-137.md) | Verificar el correo lleva a restablecer contraseña | auth (web) | codex | hecho | fix/BUG-137-verificar-correo |
