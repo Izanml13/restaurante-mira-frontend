@@ -35,6 +35,13 @@ export async function pedirPermisoNotificaciones() {
   return status;
 }
 
+/** Permiso actual sin preguntar nada: { status, canAskAgain } (null en web). */
+export async function consultarPermisoNotificaciones() {
+  if (Platform.OS === 'web') return null;
+  const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+  return { status, canAskAgain };
+}
+
 /** C02: el permiso solo se pide si `pedir` (toque del usuario); si no, solo se consulta. */
 async function sacarToken({ pedir = false } = {}) {
   if (!Device.isDevice) {

@@ -65,11 +65,14 @@ export default function PrimerArranque({ usuario, lang }) {
   }, [releer]);
 
   // Al iniciar sesión: decisión más reciente entre dispositivo y perfil, y push si ya se aceptó.
+  // Ligado a la sesión: si se sale o cambia de cuenta antes de terminar, no se registra nada.
   useEffect(() => {
-    if (!usuario?.uid) return;
-    sincronizarConsentimientos().finally(() => {
-      if (leerConsentimientos().notificaciones?.estado === 'aceptado') registrarSiAceptado(lang);
+    if (!usuario?.uid) return undefined;
+    let vivo = true;
+    sincronizarConsentimientos(usuario.uid, () => vivo).then((vigente) => {
+      if (vigente && vivo && leerConsentimientos().notificaciones?.estado === 'aceptado') registrarSiAceptado(lang);
     });
+    return () => { vivo = false; };
   }, [usuario?.uid, lang]);
 
   if (cookiesDecididas === null || push === null) return null;

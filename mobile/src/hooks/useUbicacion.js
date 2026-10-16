@@ -4,12 +4,13 @@
  * La posición vive en memoria y no se envía ni se guarda.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Linking } from 'react-native';
+import { AppState, Linking } from 'react-native';
 import * as Location from 'expo-location';
 import { leerConsentimiento, posicionVisible } from '../models/ubicacionModel.js';
 import { iniciarSeguimiento } from '../services/seguimientoUbicacion.js';
 import { desactivarFondo } from '../services/ubicacionFondo.js';
 import { decidirConsentimiento, suscribirConsentimientos } from '../services/consentimientosApi.js';
+import { alVolverAPrimerPlano } from '../services/primerPlano.js';
 
 // Compartido entre instancias: el toque de «Aceptar» en una pantalla hace que la
 // primera que arranque pida el permiso; al concederse, las demás vuelven a consultar.
@@ -31,6 +32,13 @@ export default function useUbicacion() {
     return () => { reintentos.delete(reintentar); };
   }, []);
 
+  // Al volver de Ajustes (u otra app) se vuelve a CONSULTAR el permiso, nunca a
+  // pedirlo: si se concedió allí arranca el seguimiento; si se revocó, se para.
+  useEffect(() => {
+    if (!activa) return undefined;
+    return alVolverAPrimerPlano(AppState, () => setIntento((n) => n + 1));
+  }, [activa]);
+
   useEffect(() => {
     if (!activa) { setPosicion(null); setError(''); return undefined; }
     let vigente = true;
@@ -42,7 +50,7 @@ export default function useUbicacion() {
       onConcedido: () => { for (const f of reintentos) f(); },
       sigueActiva: () => vigente,
       onPosicion: (coords) => { setPosicion(posicionVisible(coords)); setError(''); },
-      onError: setError,
+      onError: (e) => { setError(e); setPosicion(null); },
     });
     return () => { vigente = false; parar(); };
   }, [activa, intento]);

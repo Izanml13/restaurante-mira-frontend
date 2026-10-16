@@ -871,6 +871,14 @@ export default {
     "error": "No hemos podido generar tu QR."
   },
   "avisos": {
+    "activar": "Activar notificaciones",
+    "desactivar": "Desactivar notificaciones",
+    "estadoMovil": {
+      "desactivadas": "Las notificaciones de este móvil están desactivadas.",
+      "activas": "Las notificaciones de este móvil están activadas.",
+      "faltaPermiso": "Aceptaste las notificaciones, pero falta el permiso de este móvil.",
+      "bloqueado": "El permiso de notificaciones está bloqueado. Actívalo en los ajustes del móvil."
+    },
     "titulo": "Notificaciones",
     "queRecibir": "Qué quieres recibir",
     "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",

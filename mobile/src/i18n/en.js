@@ -795,6 +795,14 @@ export default {
     "error": "We couldn't create your QR."
   },
   "avisos": {
+    "activar": "Turn on notifications",
+    "desactivar": "Turn off notifications",
+    "estadoMovil": {
+      "desactivadas": "Notifications on this phone are off.",
+      "activas": "Notifications on this phone are on.",
+      "faltaPermiso": "You accepted notifications, but this phone's permission is missing.",
+      "bloqueado": "Notification permission is blocked. Turn it on in your phone settings."
+    },
     "titulo": "Notifications",
     "queRecibir": "What to receive",
     "error": "Couldn't turn on alerts. Please try again.",

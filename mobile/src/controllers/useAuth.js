@@ -88,13 +88,17 @@ export function useAuth() {
 
   // Al entrar: decisión más reciente entre dispositivo y perfil (C02) y, si las
   // notificaciones están aceptadas, registra el dispositivo SIN volver a pedir permiso.
+  // Ligado a la sesión: si se sale o cambia de cuenta antes de terminar, no se
+  // registra nada (el ciclo completo del registro push es R01-A01).
   useEffect(() => {
-    if (!usuario?.uid) return;
-    sincronizarConsentimientos().finally(() => {
-      if (leerConsentimientos().notificaciones?.estado === 'aceptado') {
+    if (!usuario?.uid) return undefined;
+    let vivo = true;
+    sincronizarConsentimientos(usuario.uid, () => vivo).then((vigente) => {
+      if (vigente && vivo && leerConsentimientos().notificaciones?.estado === 'aceptado') {
         registrarPush(localStorage.getItem('mira_lang') || 'es');
       }
     });
+    return () => { vivo = false; };
   }, [usuario?.uid]);
 
   // Perfil remoto + fusión de favoritos locales al entrar.

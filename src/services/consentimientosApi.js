@@ -5,7 +5,7 @@
  * el campo, el perfil falla en silencio y el dispositivo sigue mandando.
  */
 import { api } from './httpClient.js';
-import { leer, escribir, decidir, fusionar, TIPOS } from '../models/consentimientosModel.js';
+import { leer, escribir, decidir, sincronizar, TIPOS } from '../models/consentimientosModel.js';
 
 /** Evento para que todas las pantallas relean (useUbicacion ya escucha 'mira:ubicacion'). */
 export const EVENTO = 'mira:consentimientos';
@@ -39,13 +39,32 @@ export async function decidirConsentimiento(tipo, estado) {
   return valor;
 }
 
-/** Al iniciar sesión: gana la decisión más reciente entre dispositivo y perfil. */
-export async function sincronizarConsentimientos() {
-  let remoto = {};
-  try { remoto = (await api.get('/v1/users/me'))?.consentimientos || {}; } catch { return; }
-  const { aLocal, aPerfil } = fusionar(leerConsentimientos(), remoto);
+async function uidActual() {
+  try {
+    const { getAuth } = await import('firebase/auth');
+    const { getFirebaseApp } = await import('./firebase.js');
+    return getAuth(getFirebaseApp()).currentUser?.uid || null;
+  } catch { return null; }
+}
+
+/**
+ * Al iniciar sesión: gana la decisión más reciente entre dispositivo y perfil.
+ * Ligada a la sesión `uid`: si mientras tanto se sale o se cambia de cuenta (o
+ * `sigueVigente()` devuelve false), no aplica ni sube nada. Devuelve true si terminó vigente.
+ */
+export async function sincronizarConsentimientos(uid, sigueVigente = () => true) {
+  let actual = uid;
+  const vigente = () => Boolean(uid) && actual === uid && sigueVigente();
   const s = almacenamiento();
-  for (const [tipo, valor] of Object.entries(aLocal)) escribir(s, tipo, valor);
-  if (Object.keys(aLocal).length) avisar();
-  await subir(aPerfil);
+  return sincronizar({
+    leerRemoto: async () => {
+      const remoto = (await api.get('/v1/users/me'))?.consentimientos || {};
+      actual = await uidActual();
+      return remoto;
+    },
+    leerLocal: leerConsentimientos,
+    escribirLocal: (tipo, valor) => { escribir(s, tipo, valor); avisar(); },
+    subir: async (c) => { actual = await uidActual(); if (vigente()) await subir(c); },
+    sigueVigente: vigente,
+  });
 }

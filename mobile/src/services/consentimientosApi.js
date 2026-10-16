@@ -5,7 +5,7 @@
  * Las pantallas se suscriben con suscribirConsentimientos() para releer.
  */
 import { api } from './httpClient.js';
-import { leer, escribir, decidir, fusionar, TIPOS } from '../models/consentimientosModel.js';
+import { leer, escribir, decidir, sincronizar, TIPOS } from '../models/consentimientosModel.js';
 
 const oyentes = new Set();
 
@@ -37,12 +37,30 @@ export async function decidirConsentimiento(tipo, estado) {
   return valor;
 }
 
-/** Al iniciar sesión: gana la decisión más reciente entre dispositivo y perfil. */
-export async function sincronizarConsentimientos() {
-  let remoto = {};
-  try { remoto = (await api.get('/v1/users/me'))?.consentimientos || {}; } catch { return; }
-  const { aLocal, aPerfil } = fusionar(leerConsentimientos(), remoto);
-  for (const [tipo, valor] of Object.entries(aLocal)) escribir(globalThis.localStorage, tipo, valor);
-  if (Object.keys(aLocal).length) avisar();
-  await subir(aPerfil);
+async function uidActual() {
+  try {
+    const { getFirebaseAuth } = await import('./firebase.js');
+    return getFirebaseAuth().currentUser?.uid || null;
+  } catch { return null; }
+}
+
+/**
+ * Al iniciar sesión: gana la decisión más reciente entre dispositivo y perfil.
+ * Ligada a la sesión `uid` (revisión de Codex): si mientras tanto se sale o se
+ * cambia de cuenta, no aplica ni sube nada. Devuelve true si terminó vigente.
+ */
+export async function sincronizarConsentimientos(uid, sigueVigente = () => true) {
+  let actual = uid;
+  const vigente = () => Boolean(uid) && actual === uid && sigueVigente();
+  return sincronizar({
+    leerRemoto: async () => {
+      const remoto = (await api.get('/v1/users/me'))?.consentimientos || {};
+      actual = await uidActual();
+      return remoto;
+    },
+    leerLocal: leerConsentimientos,
+    escribirLocal: (tipo, valor) => { escribir(globalThis.localStorage, tipo, valor); avisar(); },
+    subir: async (c) => { actual = await uidActual(); if (vigente()) await subir(c); },
+    sigueVigente: vigente,
+  });
 }

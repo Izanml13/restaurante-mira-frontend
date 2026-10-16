@@ -48,3 +48,54 @@ test('pasoPendiente sigue el orden cookies → ubicación → notificaciones', (
   assert.equal(pasoPendiente({ cookiesDecididas: true, ubicacion: c('rechazado', 'x'), notificaciones: null }), 'notificaciones');
   assert.equal(pasoPendiente({ cookiesDecididas: true, ubicacion: {}, notificaciones: {} }), null);
 });
+
+import { sincronizar } from '../src/models/consentimientosModel.js';
+
+function escenario({ local = {}, remoto = {} } = {}) {
+  const estado = { local: { ...local }, subidas: [], vigente: true, resolverGet: null };
+  const deps = {
+    leerRemoto: () => new Promise((ok) => { estado.resolverGet = () => ok(remoto); }),
+    leerLocal: () => ({ ...estado.local }),
+    escribirLocal: (t, v) => { estado.local[t] = v; },
+    subir: async (c) => { estado.subidas.push(c); },
+    sigueVigente: () => estado.vigente,
+  };
+  return { estado, deps };
+}
+const tic = () => new Promise((r) => setImmediate(r));
+const viejo = { estado: 'aceptado', version: 1, fecha: '2026-10-10T00:00:00.000Z' };
+const nuevo = { estado: 'rechazado', version: 1, fecha: '2026-10-16T00:00:00.000Z' };
+
+test('sincronizar con la sesión vigente: baja lo del perfil y sube lo del dispositivo', async () => {
+  const { estado, deps } = escenario({ local: { ubicacion: nuevo }, remoto: { notificaciones: viejo } });
+  const p = sincronizar(deps); await tic(); estado.resolverGet();
+  assert.equal(await p, true);
+  assert.deepEqual(estado.local.notificaciones, viejo);
+  assert.deepEqual(estado.subidas, [{ ubicacion: nuevo }]);
+});
+
+test('cambio de cuenta antes de que llegue el GET de la anterior: no toca nada', async () => {
+  const { estado, deps } = escenario({ local: { ubicacion: nuevo }, remoto: { notificaciones: viejo } });
+  const p = sincronizar(deps); await tic();
+  estado.vigente = false; // salir o entrar con otra cuenta
+  estado.resolverGet();
+  assert.equal(await p, false);
+  assert.equal(estado.local.notificaciones, undefined, 'no se aplica el perfil de la cuenta anterior');
+  assert.deepEqual(estado.subidas, [], 'no se sube nada con la sesión nueva');
+});
+
+test('cambio de cuenta después del GET: lo ya leído no se sube con la sesión nueva', async () => {
+  const { estado, deps } = escenario({ local: { ubicacion: nuevo }, remoto: {} });
+  deps.escribirLocal = (t, v) => { estado.local[t] = v; estado.vigente = false; };
+  deps.leerRemoto = async () => ({ notificaciones: viejo });
+  assert.equal(await sincronizar(deps), false);
+  assert.deepEqual(estado.subidas, []);
+});
+
+test('sin sesión desde el principio o con error de red: no hace nada', async () => {
+  const a = escenario(); a.estado.vigente = false;
+  assert.equal(await sincronizar(a.deps), false);
+  const b = escenario(); b.deps.leerRemoto = async () => { throw new Error('red'); };
+  assert.equal(await sincronizar(b.deps), false);
+  assert.deepEqual(b.estado.subidas, []);
+});

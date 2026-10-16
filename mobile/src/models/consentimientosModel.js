@@ -55,3 +55,24 @@ export function pasoPendiente({ cookiesDecididas, ubicacion, notificaciones }) {
   if (!notificaciones) return 'notificaciones';
   return null;
 }
+
+/**
+ * Sincronización con el perfil ligada a una sesión (C02, revisión de Codex):
+ * `sigueVigente()` debe devolver false si se cerró sesión o se cambió de cuenta.
+ * Se comprueba después del GET y antes de cada escritura, para no mezclar los
+ * consentimientos de la cuenta anterior con el dispositivo ni subirlos con el
+ * Bearer de la nueva. Devuelve true si llegó al final con la sesión vigente.
+ */
+export async function sincronizar({ leerRemoto, leerLocal, escribirLocal, subir, sigueVigente }) {
+  if (!sigueVigente()) return false;
+  let remoto;
+  try { remoto = await leerRemoto(); } catch { return false; }
+  if (!sigueVigente()) return false;
+  const { aLocal, aPerfil } = fusionar(leerLocal(), remoto || {});
+  for (const [tipo, valor] of Object.entries(aLocal)) escribirLocal(tipo, valor);
+  if (Object.keys(aPerfil).length) {
+    if (!sigueVigente()) return false;
+    await subir(aPerfil);
+  }
+  return sigueVigente();
+}
