@@ -97,20 +97,6 @@ export default function Index() {
 
   return (
     <AppShell onCercaFinal={cercaFinal}>
-      {esMovil && ubicacion.consentimiento.estado === 'pendiente' && (
-        <View style={[styles.pedirUbic, { marginHorizontal: gutter, backgroundColor: colores.verdeSuave, borderColor: colores.primaryContainer }]}>
-          <Text style={[styles.pedirUbicTitulo, { color: colores.tinta }]}>📍 {t('ubicacion.modalTitulo')}</Text>
-          <Text style={[styles.pedirUbicTxt, { color: colores.gris }]}>{t('ubicacion.modalIntro')} {t('ubicacion.puntoRecorrido')}</Text>
-          <View style={styles.pedirUbicBotones}>
-            <Pressable onPress={ubicacion.aceptar} accessibilityRole="button" style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}>
-              <Text style={btnCta(colores, { peq: true })}>{t('ubicacion.aceptar')}</Text>
-            </Pressable>
-            <Pressable onPress={ubicacion.rechazar} accessibilityRole="button" hitSlop={8}>
-              <Text style={[styles.pedirUbicTxt, { color: colores.tinta, fontFamily: FUENTES.textoSemi }]}>{t('ubicacion.ahoraNo')}</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
       {esMovil ? (
         <View style={[styles.intro, { paddingHorizontal: gutter }]}>
           <Text style={[styles.introHola, { color: colores.dorado }]}>
@@ -210,10 +196,6 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  pedirUbic: { marginTop: 16, borderWidth: 1, borderRadius: RADIO.md, padding: 14, gap: 6 },
-  pedirUbicTitulo: { fontFamily: FUENTES.textoBold, fontSize: 16 },
-  pedirUbicTxt: { fontFamily: FUENTES.texto, fontSize: 14, lineHeight: 20 },
-  pedirUbicBotones: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 4 },
   intro: {
     paddingTop: 20,
     paddingBottom: 16,

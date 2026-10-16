@@ -49,6 +49,22 @@ async function registroSW() {
   return (await navigator.serviceWorker.getRegistration('/')) || navigator.serviceWorker.register('/sw.js');
 }
 
+/**
+ * Paso «notificaciones» del primer arranque: solo pide el permiso del navegador
+ * (desde un clic). Sin sesión no hay a quién registrar el token: se registra al
+ * iniciar sesión con registrarSiAceptado().
+ */
+export async function pedirPermisoPush() {
+  if (!('Notification' in window)) return 'no-soportado';
+  return Notification.requestPermission();
+}
+
+/** Con sesión, permiso ya concedido y sin token registrado: lo registra (sin preguntar nada). */
+export async function registrarSiAceptado(lang = 'es') {
+  if ((await estadoPush()) !== 'inactivo' || Notification.permission !== 'granted') return false;
+  try { return (await activarPush(lang)).ok; } catch { return false; }
+}
+
 export async function activarPush(lang = 'es') {
   const permiso = await Notification.requestPermission();
   if (permiso !== 'granted') return { ok: false, motivo: permiso === 'denied' ? 'bloqueado' : 'cancelado' };

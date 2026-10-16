@@ -15,7 +15,7 @@ import { FUENTES } from '../../theme/tokens';
 import Header from '../Header';
 import BottomNav from '../BottomNav';
 import Footer from '../Footer';
-import CookieBanner from '../CookieBanner';
+import PrimerArranque from '../PrimerArranque.jsx';
 import { rutaDesdePath, RUTAS_AUTH } from './rutas';
 
 /** Acceso al scroll interno del shell (Hero → buscador, scroll infinito). */
@@ -117,7 +117,7 @@ export function AppShell({
           </View>
         )}
         {!ocultarBottomNav && <BottomNav />}
-        <CookieBanner usuario={auth.usuario} />
+        <PrimerArranque usuario={auth.usuario} />
       </View>
     </ShellContext.Provider>
   );

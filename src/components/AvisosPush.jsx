@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 import { estadoPush, activarPush, desactivarPush, leerPreferenciasPush, guardarPreferenciaPush } from '../services/pushWeb.js';
+import { decidirConsentimiento } from '../services/consentimientosApi.js';
 
 const CATEGORIAS = ['reservas', 'mensajes', 'promociones'];
 
@@ -25,9 +26,9 @@ export default function AvisosPush({ t, lang }) {
     setOcupado(true); setError('');
     try {
       const r = await activarPush(lang);
-      if (!r.ok && r.motivo === 'bloqueado') setEstado('bloqueado');
+      if (!r.ok && r.motivo === 'bloqueado') { setEstado('bloqueado'); decidirConsentimiento('notificaciones', 'rechazado'); }
       else if (!r.ok) setError(t('avisos.error'));
-      else setEstado('activo');
+      else { setEstado('activo'); decidirConsentimiento('notificaciones', 'aceptado'); }
     } catch (e) {
       console.warn('[MIRA push]', e);
       setError(t('avisos.error'));
@@ -39,6 +40,7 @@ export default function AvisosPush({ t, lang }) {
   async function desactivar() {
     setOcupado(true);
     await desactivarPush();
+    decidirConsentimiento('notificaciones', 'rechazado');
     setEstado('inactivo');
     setOcupado(false);
   }

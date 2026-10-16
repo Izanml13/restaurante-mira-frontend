@@ -836,7 +836,11 @@ export default {
     "errorDesconocido": "No se ha podido obtener tu posición.",
     "puntoAbiertaApp": "De momento solo se usa con la app abierta.",
     "noSeEnviaApp": "Solo la ve este móvil; no se envía ni se guarda.",
-    "errorPermisoApp": "No has dado permiso de ubicación. Actívalo en los ajustes del móvil para usar esta función."
+    "errorPermisoApp": "No has dado permiso de ubicación. Actívalo en los ajustes del móvil para usar esta función.",
+    "permisoPendiente": "Falta el permiso de ubicación del móvil.",
+    "permisoBloqueado": "El permiso de ubicación está bloqueado. Actívalo en los ajustes del móvil.",
+    "darPermiso": "Dar permiso",
+    "abrirAjustes": "Abrir ajustes"
   },
   "ofertasCerca": {
     "verQR": "Mi QR",
@@ -868,6 +872,14 @@ export default {
     "error": "No hemos podido generar tu QR."
   },
   "avisos": {
+    "activar": "Activar notificaciones",
+    "desactivar": "Desactivar notificaciones",
+    "estadoMovil": {
+      "desactivadas": "Las notificaciones de este móvil están desactivadas.",
+      "activas": "Las notificaciones de este móvil están activadas.",
+      "faltaPermiso": "Aceptaste las notificaciones, pero falta el permiso de este móvil.",
+      "bloqueado": "El permiso de notificaciones está bloqueado. Actívalo en los ajustes del móvil."
+    },
     "titulo": "Notificaciones",
     "queRecibir": "Qué quieres recibir",
     "error": "No se pudieron activar los avisos. Inténtalo de nuevo.",
@@ -884,5 +896,15 @@ export default {
     "error": "No se ha podido activar. Inténtalo de nuevo.",
     "servicioTitulo": "MIRA busca ofertas cerca de ti",
     "servicioTexto": "Desactívalo cuando quieras en Mi cuenta."
+  },
+  "bienvenida": {
+    "paso": "Paso {{n}} de {{total}}",
+    "aceptar": "Aceptar",
+    "ahoraNo": "Ahora no",
+    "notifTitulo": "¿Te avisamos?",
+    "notifTexto": "Te enviamos notificaciones solo de lo que te interesa.",
+    "notifPunto1": "Cuando un restaurante confirma o cancela tu reserva, y cuando tienes un mensaje.",
+    "notifPunto2": "Las promociones solo si las activas tú en Mi cuenta.",
+    "notifPunto3": "Puedes desactivarlas cuando quieras desde Mi cuenta."
   }
 }

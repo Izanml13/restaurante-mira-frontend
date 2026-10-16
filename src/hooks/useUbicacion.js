@@ -4,7 +4,8 @@
  * y no se envía ni se guarda (los avisos por distancia, G06, la usarán después).
  */
 import { useCallback, useEffect, useState } from 'react';
-import { leerConsentimiento, guardarConsentimiento, claveErrorUbicacion, posicionVisible } from '../models/ubicacionModel.js';
+import { leerConsentimiento, claveErrorUbicacion, posicionVisible } from '../models/ubicacionModel.js';
+import { decidirConsentimiento } from '../services/consentimientosApi.js';
 
 function almacenamiento() {
   try { return window.localStorage; } catch { return null; }
@@ -37,9 +38,11 @@ export default function useUbicacion() {
     return () => navigator.geolocation.clearWatch(id);
   }, [activa]);
 
+  // Guarda en el dispositivo (y en el perfil si hay sesión) y avisa a las demás
+  // instancias. Aceptar pone en marcha watchPosition, que lanza el permiso del navegador.
   const decidir = useCallback((estado) => {
-    setConsentimiento(guardarConsentimiento(almacenamiento(), estado));
-    window.dispatchEvent(new Event(EVENTO));
+    decidirConsentimiento('ubicacion', estado);
+    setConsentimiento(leerConsentimiento(almacenamiento()));
   }, []);
 
   return {

@@ -760,7 +760,11 @@ export default {
     "errorDesconocido": "No s'ha pogut obtenir la teva posició.",
     "puntoAbiertaApp": "De moment només s'utilitza amb l'app oberta.",
     "noSeEnviaApp": "Només la veu aquest mòbil; no s'envia ni es desa.",
-    "errorPermisoApp": "No has donat permís d'ubicació. Activa'l a la configuració del mòbil per fer servir aquesta funció."
+    "errorPermisoApp": "No has donat permís d'ubicació. Activa'l a la configuració del mòbil per fer servir aquesta funció.",
+    "permisoPendiente": "Falta el permís d'ubicació del mòbil.",
+    "permisoBloqueado": "El permís d'ubicació està bloquejat. Activa'l a la configuració del mòbil.",
+    "darPermiso": "Donar permís",
+    "abrirAjustes": "Obrir la configuració"
   },
   "ofertasCerca": {
     "verQR": "El meu QR",
@@ -792,6 +796,14 @@ export default {
     "error": "No hem pogut generar el teu QR."
   },
   "avisos": {
+    "activar": "Activar les notificacions",
+    "desactivar": "Desactivar les notificacions",
+    "estadoMovil": {
+      "desactivadas": "Les notificacions d'aquest mòbil estan desactivades.",
+      "activas": "Les notificacions d'aquest mòbil estan activades.",
+      "faltaPermiso": "Vas acceptar les notificacions, però falta el permís d'aquest mòbil.",
+      "bloqueado": "El permís de notificacions està bloquejat. Activa'l a la configuració del mòbil."
+    },
     "titulo": "Notificacions",
     "queRecibir": "Què vols rebre",
     "error": "No s'han pogut activar els avisos. Torna-ho a provar.",
@@ -808,5 +820,15 @@ export default {
     "error": "No s'ha pogut activar. Torna-ho a provar.",
     "servicioTitulo": "MIRA busca ofertes a prop teu",
     "servicioTexto": "Desactiva-ho quan vulguis a El meu compte."
+  },
+  "bienvenida": {
+    "paso": "Pas {{n}} de {{total}}",
+    "aceptar": "Acceptar",
+    "ahoraNo": "Ara no",
+    "notifTitulo": "T'avisem?",
+    "notifTexto": "T'enviem notificacions només del que t'interessa.",
+    "notifPunto1": "Quan un restaurant confirma o cancel·la la teva reserva, i quan tens un missatge.",
+    "notifPunto2": "Les promocions només si les actives tu a El meu compte.",
+    "notifPunto3": "Les pots desactivar quan vulguis des de El meu compte."
   }
 }

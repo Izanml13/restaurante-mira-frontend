@@ -1971,5 +1971,16 @@ export default {
     "soloCliente": "The arrival QR is only generated with a customer account (yours is a business or admin account).",
     "noDisponible": "Arrival QR codes aren't available yet. Try again later.",
     "error": "We couldn't create your QR."
+  },
+  "bienvenida": {
+    "paso": "Step {{n}} of {{total}}",
+    "aceptar": "Accept",
+    "ahoraNo": "Not now",
+    "notifTitulo": "Shall we keep you posted?",
+    "notifTexto": "We only send you notifications about what matters to you.",
+    "notifPunto1": "When a restaurant confirms or cancels your booking, and when you get a message.",
+    "notifPunto2": "Promotions only if you turn them on in My account.",
+    "notifPunto3": "You can turn them off whenever you like from My account.",
+    "notifIos": "On iPhone, first add MIRA to your home screen: we'll show you how."
   }
 }

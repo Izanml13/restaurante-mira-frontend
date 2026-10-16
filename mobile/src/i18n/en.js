@@ -760,7 +760,11 @@ export default {
     "errorDesconocido": "Your position couldn't be obtained.",
     "puntoAbiertaApp": "For now it's only used while the app is open.",
     "noSeEnviaApp": "Only this phone sees it; it isn't sent or stored.",
-    "errorPermisoApp": "You haven't allowed location. Turn it on in your phone settings to use this feature."
+    "errorPermisoApp": "You haven't allowed location. Turn it on in your phone settings to use this feature.",
+    "permisoPendiente": "Your phone's location permission is missing.",
+    "permisoBloqueado": "Location permission is blocked. Turn it on in your phone settings.",
+    "darPermiso": "Give permission",
+    "abrirAjustes": "Open settings"
   },
   "ofertasCerca": {
     "verQR": "My QR",
@@ -792,6 +796,14 @@ export default {
     "error": "We couldn't create your QR."
   },
   "avisos": {
+    "activar": "Turn on notifications",
+    "desactivar": "Turn off notifications",
+    "estadoMovil": {
+      "desactivadas": "Notifications on this phone are off.",
+      "activas": "Notifications on this phone are on.",
+      "faltaPermiso": "You accepted notifications, but this phone's permission is missing.",
+      "bloqueado": "Notification permission is blocked. Turn it on in your phone settings."
+    },
     "titulo": "Notifications",
     "queRecibir": "What to receive",
     "error": "Couldn't turn on alerts. Please try again.",
@@ -808,5 +820,15 @@ export default {
     "error": "Couldn't turn it on. Please try again.",
     "servicioTitulo": "MIRA is looking for offers near you",
     "servicioTexto": "Turn it off any time in My account."
+  },
+  "bienvenida": {
+    "paso": "Step {{n}} of {{total}}",
+    "aceptar": "Accept",
+    "ahoraNo": "Not now",
+    "notifTitulo": "Shall we keep you posted?",
+    "notifTexto": "We only send you notifications about what matters to you.",
+    "notifPunto1": "When a restaurant confirms or cancels your booking, and when you get a message.",
+    "notifPunto2": "Promotions only if you turn them on in My account.",
+    "notifPunto3": "You can turn them off whenever you like from My account."
   }
 }
