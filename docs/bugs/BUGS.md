@@ -102,9 +102,20 @@ Segunda pasada de hallazgos del usuario (colores y modo oscuro). Rama: `fix/clau
 | [BUG-127](BUG-127.md) | Desaparece la opción de ver cómo piensa MiraAI | mira | claude | pendiente | |
 | [BUG-128](BUG-128.md) | Los iconos de admin tardan en cargar | admin | claude | pendiente | |
 | [BUG-129](BUG-129.md) | Botones rojos de eliminar demasiado claros en modo oscuro | tema | claude | en revisión | fix/claude-tanda4 |
-| [BUG-130](BUG-130.md) | Los modales se centran en la página y no en la pantalla | ui-global | claude | pendiente | |
+| [BUG-130](BUG-130.md) | Los modales se centran en la página y no en la pantalla | ui-global | claude | en revisión | fix/errores-ui-web |
 | [BUG-131](BUG-131.md) | Ayuda visual de primera vez en Admin para el menú lateral | admin/ux | claude | pendiente | |
 | [BUG-132](BUG-132.md) | El menú desplegable izquierdo de Admin baja de más | admin | claude | pendiente | |
+
+## Tanda de errores de UI (usuario) — oct 2026
+
+Cinco bugs pedidos directamente por el usuario sobre la web. Rama única: **`fix/errores-ui-web`** (worktree propio), merge a `main` al final. BUG-130 ya estaba registrado y se cierra en esta tanda. El bug 1 es de backend: rama `fix/ia-respuesta-idioma` en `mira-api` (deploy en Render antes que el frontend).
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-133](BUG-133.md) | La IA responde en español aunque se le hable en inglés | mira/backend | opencode | en revisión | fix/ia-respuesta-idioma |
+| [BUG-134](BUG-134.md) | De admin no cabe todo en el header («MIRAPP» → «App» + compresión) | header | opencode | en revisión | fix/errores-ui-web |
+| [BUG-135](BUG-135.md) | Botón de favorito arriba a la izquierda en la ficha | detalle | opencode | en revisión | fix/errores-ui-web |
+| [BUG-136](BUG-136.md) | «Mi panel» y MiraPoints en modo claro: colores | tema/dashboard/puntos | opencode | en revisión | fix/errores-ui-web |
 
 ## Seguimiento de la prueba real de invitaciones
 
