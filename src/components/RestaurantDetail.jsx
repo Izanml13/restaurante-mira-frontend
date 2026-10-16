@@ -109,7 +109,7 @@ function colorAvatar(nombre = '') {
   return `hsl(${h} 38% 42%)`;
 }
 
-export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta, onReservado }) {
+export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCarta, onReservado, esFavorito, onToggleFavorito }) {
   const t = useT(TRADS);
   const locale = t('modelos.locale');
   const { descuentoPendiente, fetchBalance } = usePointsStore();
@@ -316,6 +316,20 @@ export default function RestaurantDetail({ restaurant, usuario, onClose, onVerCa
         <button type="button" className="modal-cerrar det-cerrar" onClick={onClose} aria-label={t('otros.cerrar')} autoFocus>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
+
+        {/* Favorito arriba a la izquierda, para poder marcarlo también desde la ficha (antes solo desde la card) */}
+        {onToggleFavorito && (
+          <button
+            type="button"
+            className={`modal-cerrar det-fav${esFavorito ? ' det-fav-activo' : ''}`}
+            aria-pressed={Boolean(esFavorito)}
+            aria-label={esFavorito ? `${t('card.quitarFavoritos')} ${restaurant.nombre}` : `${t('card.guardarFavoritos')} ${restaurant.nombre}`}
+            title={esFavorito ? t('card.quitarFavoritos') : t('card.guardarFavoritos')}
+            onClick={() => onToggleFavorito(restaurant.id)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={esFavorito ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1.1 1L12 21l7.7-7.7 1.1-1a5.5 5.5 0 000-7.7z" /></svg>
+          </button>
+        )}
 
         {/* ── Portada ── */}
         <header className="det-portada">

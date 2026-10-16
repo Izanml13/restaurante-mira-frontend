@@ -24,6 +24,13 @@
 }
 .det-cerrar:hover { background: rgba(10, 20, 15, 0.7); }
 
+/* Favorito de la ficha: mismo look que el cerrar, pero anclado arriba a la izquierda.
+   Se usa `.modal-cerrar.det-fav` (más específico) porque en el bundle App.css va
+   después de detalle.css y `.modal-cerrar` reescribiría top/right/color con el mismo peso. */
+.modal-cerrar.det-fav { top: 0.6rem; right: auto; left: 0.6rem; }
+.modal-cerrar.det-fav:hover { transform: scale(1.08); }
+.modal-cerrar.det-fav-activo, .modal-cerrar.det-fav-activo:hover { color: var(--estrella); }
+
 /* ── Portada ── */
 .det-portada {
   position: relative;
