@@ -15,6 +15,7 @@ import {
   sendEmailVerification,
   verifyPasswordResetCode,
   confirmPasswordReset,
+  applyActionCode,
 } from 'firebase/auth';
 import { track } from './auditoria.js';
 import { getFirebaseApp } from './firebase.js';
@@ -62,6 +63,16 @@ export function urlContinuacionReset() {
   return window.location.origin + '/#/restablecer';
 }
 
+/** Continuación tras verificar el correo: volver a MIRA, sin pedir contraseña. */
+export function urlContinuacionVerificacion() {
+  return window.location.origin + '/#/';
+}
+
+/** Verifica el correo con el código del enlace, sin exigir sesión iniciada. */
+export function verificarCorreo(oobCode) {
+  return applyActionCode(auth(), oobCode);
+}
+
 /**
  * Crea la cuenta, guarda el nombre visible y crea el perfil en `usuarios/{uid}`
  * (tipo 'cliente' o 'empresa'). 1 escritura extra, solo al registrarse.
@@ -81,7 +92,7 @@ export async function crearCuenta({ nombre, email, password, tipo = 'cliente', p
     if (preferencias) perfil.preferencias = preferencias;
     if (accesibilidad) perfil.accesibilidad = accesibilidad;
     await guardarPerfil(cred.user.uid, perfil);
-    sendEmailVerification(cred.user, { url: urlContinuacionReset() }).catch(() => {});
+    sendEmailVerification(cred.user, { url: urlContinuacionVerificacion() }).catch(() => {});
     track('registro_completado', { datos: { tipoCuenta: perfil.tipo, conPreferencias: Boolean(preferencias) } });
     return { nombre: nombre.trim(), email: cred.user.email };
   } catch (e) {
@@ -229,7 +240,7 @@ export async function enviarVerificacionEmail(lang = 'es') {
   const u = auth().currentUser;
   if (!u) throw new Error('No hay sesión activa.');
   setEmailLang(lang);
-  await sendEmailVerification(u, { url: urlContinuacionReset() });
+  await sendEmailVerification(u, { url: urlContinuacionVerificacion() });
 }
 
 /** Recarga el usuario de Firebase para obtener el emailVerified actualizado. */

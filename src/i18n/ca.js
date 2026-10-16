@@ -567,6 +567,18 @@ export default {
     "enviando": "Enviant…",
     "enviarEnlace": "Enviar enllaç de recuperació"
   },
+  "accionCorreo": {
+      "titulo": "Acció de correu",
+      "verificado": "Correu verificat.",
+      "inicio": "Tornar a l’inici",
+      "enlaceInvalido": "L’enllaç de verificació no és vàlid o ja s’ha utilitzat. Demana’n un altre des del Meu compte.",
+      "caducado": "L’enllaç de verificació ha caducat. Demana’n un altre des del Meu compte.",
+      "error": "No s’ha pogut verificar el correu. Torna-ho a provar més tard.",
+      "pedirNuevo": "Anar al Meu compte",
+      "noCompatible": "Aquest tipus d’enllaç no està disponible.",
+      "recuperar": "Aquest enllaç és per recuperar el teu correu anterior, no per canviar la contrasenya. Contacta amb suport per completar la recuperació.",
+      "soporte": "Contactar amb suport"
+  },
   "restablecer": {
     "titulo": "Restablir contrasenya",
     "verificando": "Verificant enllaç…",

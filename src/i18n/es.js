@@ -567,6 +567,18 @@ export default {
     "enviando": "Enviando…",
     "enviarEnlace": "Enviar enlace de recuperación"
   },
+  "accionCorreo": {
+      "titulo": "Acción de correo",
+      "verificado": "Correo verificado.",
+      "inicio": "Volver al inicio",
+      "enlaceInvalido": "El enlace de verificación no es válido o ya se ha utilizado. Solicita otro desde Mi cuenta.",
+      "caducado": "El enlace de verificación ha caducado. Solicita otro desde Mi cuenta.",
+      "error": "No se ha podido verificar el correo. Inténtalo de nuevo más tarde.",
+      "pedirNuevo": "Ir a Mi cuenta",
+      "noCompatible": "Este tipo de enlace no está disponible.",
+      "recuperar": "Este enlace es para recuperar tu correo anterior, no para cambiar la contraseña. Contacta con soporte para completar la recuperación.",
+      "soporte": "Contactar con soporte"
+  },
   "restablecer": {
     "titulo": "Restablecer contraseña",
     "verificando": "Verificando enlace…",

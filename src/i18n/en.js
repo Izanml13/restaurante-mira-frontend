@@ -567,6 +567,18 @@ export default {
     "enviando": "Sending…",
     "enviarEnlace": "Send recovery link"
   },
+  "accionCorreo": {
+      "titulo": "Email action",
+      "verificado": "Email verified.",
+      "inicio": "Back to home",
+      "enlaceInvalido": "This verification link is invalid or has already been used. Request another from My account.",
+      "caducado": "This verification link has expired. Request another from My account.",
+      "error": "Your email could not be verified. Please try again later.",
+      "pedirNuevo": "Go to My account",
+      "noCompatible": "This type of link is not supported.",
+      "recuperar": "This link is for recovering your previous email address, not changing your password. Contact support to complete recovery.",
+      "soporte": "Contact support"
+  },
   "restablecer": {
     "titulo": "Reset password",
     "verificando": "Verifying link…",

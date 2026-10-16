@@ -111,3 +111,9 @@ Segunda pasada de hallazgos del usuario (colores y modo oscuro). Rama: `fix/clau
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
 | [BUG-122](BUG-122.md) | Brevo acepta el envío pero el error posterior no cambia el estado | invitaciones/backend | codex | hecho | fix/BUG-122-brevo-error |
+
+## Bugs de Izan (octubre 2026)
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-137](BUG-137.md) | Verificar el correo lleva a restablecer contraseña | auth (web) | codex | en revisión | fix/BUG-137-verificar-correo |

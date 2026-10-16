@@ -62,6 +62,11 @@ export function urlContinuacionReset() {
   return WEB_URL + '/#/restablecer';
 }
 
+/** Continuación web tras verificar: inicio, nunca el formulario de contraseña. */
+export function urlContinuacionVerificacion() {
+  return WEB_URL + '/#/';
+}
+
 /**
  * Crea la cuenta, guarda el nombre visible y crea el perfil en `usuarios/{uid}`
  * (tipo 'cliente' o 'empresa'). 1 escritura extra, solo al registrarse.
@@ -81,7 +86,7 @@ export async function crearCuenta({ nombre, email, password, tipo = 'cliente', p
     if (preferencias) perfil.preferencias = preferencias;
     if (accesibilidad) perfil.accesibilidad = accesibilidad;
     await guardarPerfil(cred.user.uid, perfil);
-    sendEmailVerification(cred.user, { url: urlContinuacionReset() }).catch(() => {});
+    sendEmailVerification(cred.user, { url: urlContinuacionVerificacion() }).catch(() => {});
     return { nombre: nombre.trim(), email: cred.user.email };
   } catch (e) {
     throw new Error(mensajeError(e.code, 'No se pudo crear la cuenta. Inténtalo de nuevo.'));
@@ -219,7 +224,7 @@ export async function enviarVerificacionEmail(lang = 'es') {
   const u = auth().currentUser;
   if (!u) throw new Error('No hay sesión activa.');
   setEmailLang(lang);
-  await sendEmailVerification(u, { url: urlContinuacionReset() });
+  await sendEmailVerification(u, { url: urlContinuacionVerificacion() });
 }
 
 /** Recarga el usuario de Firebase para obtener el emailVerified actualizado. */

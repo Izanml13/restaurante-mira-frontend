@@ -1,9 +1,10 @@
 /**
- * Página pública #/restablecer — confirmar nueva contraseña con oobCode del email.
+ * Página pública #/restablecer — acciones de correo por mode (verificar o reset).
  * Firebase gestiona el token (oobCode). Esta página solo lo valida y aplica.
  */
-import { useState, useEffect } from 'react';
-import { verificarCodigoReset, confirmarNuevaContrasena, enmascararEmail, extraerOobCode } from '../services/authApi.js';
+import { useState, useEffect, useRef } from 'react';
+import { verificarCodigoReset, confirmarNuevaContrasena, enmascararEmail, verificarCorreo } from '../services/authApi.js';
+import { leerAccionCorreo } from '../services/accionesCorreo.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -13,7 +14,7 @@ const TRADS = { es, ca, en };
 
 export default function Restablecer() {
   const t = useT(TRADS);
-  const [paso, setPaso] = useState('cargando'); // cargando | formulario | error | exito
+  const [paso, setPaso] = useState('cargando'); // cargando | formulario | error | exito | verificado | recuperarCorreo
   const [email, setEmail] = useState('');
   const [nueva, setNueva] = useState('');
   const [repetir, setRepetir] = useState('');
@@ -21,15 +22,40 @@ export default function Restablecer() {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
 
-  const oobCode = extraerOobCode();
+  const { accion, oobCode } = leerAccionCorreo(window.location);
+  const esReset = accion === 'resetPassword';
+  // applyActionCode consume el enlace: compartir la promesa entre los efectos
+  // repetidos de StrictMode y los cambios de idioma evita aplicarlo dos veces.
+  const verificacion = useRef(null);
 
   useEffect(() => {
+    setPaso('cargando');
+    setError('');
+    if (accion === 'recoverEmail') { setPaso('recuperarCorreo'); return; }
+    if (accion === 'desconocida') {
+      setPaso('error'); setError(t('accionCorreo.noCompatible')); return;
+    }
     if (!oobCode) {
       setPaso('error');
-      setError(t('restablecer.enlaceInvalido'));
+      setError(t(esReset ? 'restablecer.enlaceInvalido' : 'accionCorreo.enlaceInvalido'));
       return;
     }
     let vivo = true;
+    if (!esReset) {
+      if (verificacion.current?.code !== oobCode) {
+        verificacion.current = { code: oobCode, promesa: verificarCorreo(oobCode) };
+      }
+      verificacion.current.promesa.then(() => {
+        if (vivo) setPaso('verificado');
+      }).catch((err) => {
+        if (!vivo) return;
+        const clave = err?.code === 'auth/expired-action-code' ? 'accionCorreo.caducado'
+          : err?.code === 'auth/invalid-action-code' ? 'accionCorreo.enlaceInvalido' : 'accionCorreo.error';
+        setError(t(clave));
+        setPaso('error');
+      });
+      return () => { vivo = false; };
+    }
     verificarCodigoReset(oobCode)
       .then((emailRecuperado) => {
         if (!vivo) return;
@@ -42,7 +68,7 @@ export default function Restablecer() {
         setPaso('error');
       });
     return () => { vivo = false; };
-  }, [oobCode, t]);
+  }, [accion, esReset, oobCode, t]);
 
   async function manejarEnvio(e) {
     e.preventDefault();
@@ -64,7 +90,7 @@ export default function Restablecer() {
   return (
     <section className="auth-pagina" aria-labelledby="restablecer-titulo">
       <div className="auth-tarjeta">
-        <h1 id="restablecer-titulo">{t('restablecer.titulo')}</h1>
+        <h1 id="restablecer-titulo">{t(esReset ? 'restablecer.titulo' : 'accionCorreo.titulo')}</h1>
 
         {paso === 'cargando' && <p className="cargando" role="status">{t('restablecer.verificando')}</p>}
 
@@ -72,8 +98,25 @@ export default function Restablecer() {
           <div role="alert">
             <p style={{ margin: '0 0 0.8rem' }}>{error}</p>
             <p>
-              <a href="#/recuperar" className="btn-cta btn-peq">{t('restablecer.pedirNuevo')}</a>
+              {esReset
+                ? <a href="#/recuperar" className="btn-cta btn-peq">{t('restablecer.pedirNuevo')}</a>
+                : <a href="#/cuenta" className="btn-cta btn-peq">{t('accionCorreo.pedirNuevo')}</a>}
             </p>
+          </div>
+        )}
+
+        {paso === 'verificado' && (
+          <div role="status">
+            <p>{t('accionCorreo.verificado')}</p>
+            <p><a href="#/login" className="btn-cta btn-peq">{t('restablecer.iniciarSesion')}</a></p>
+            <p><a href="#/">{t('accionCorreo.inicio')}</a></p>
+          </div>
+        )}
+
+        {paso === 'recuperarCorreo' && (
+          <div role="status">
+            <p>{t('accionCorreo.recuperar')}</p>
+            <a href="#/contacto">{t('accionCorreo.soporte')}</a>
           </div>
         )}
 
