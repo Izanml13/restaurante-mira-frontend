@@ -11,7 +11,7 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CLAVE_UBICACION, VERSION_CONSENTIMIENTO } from '../models/ubicacionModel.js';
-import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, CLAVE_VISTOS } from '../models/avisosOfertasModel.js';
+import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, CLAVE_VISTOS, soloAvisables, CLAVE_FAVS_AVISOS } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from './ofertasCercaApi.js';
 import { notificarLocal } from './notificaciones.js';
 import es from '../i18n/es.js';
@@ -50,7 +50,8 @@ async function procesar(coords) {
 
   const resultados = await ofertasCerca(posicion);
   const almacen = almacenEnMemoria(CLAVE_VISTOS, await AsyncStorage.getItem(CLAVE_VISTOS));
-  const { nuevos, vistos } = filtrarNuevos(resultados, leerVistos(almacen));
+  const favoritos = (await leerJSON(CLAVE_FAVS_AVISOS)) || [];
+  const { nuevos, vistos } = filtrarNuevos(soloAvisables(resultados, favoritos), leerVistos(almacen));
   if (!nuevos.length) return;
   guardarVistos(almacen, vistos);
   await AsyncStorage.setItem(CLAVE_VISTOS, almacen.leer());

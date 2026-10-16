@@ -6,6 +6,7 @@
  * Las Views reciben todo por props.
  */
 import { useEffect, useState } from 'react';
+import { CLAVE_FAVS_AVISOS } from '../models/avisosOfertasModel.js';
 import { desactivarPush } from '../services/pushWeb.js';
 import { suscribirSesion, crearCuenta, iniciarSesion, iniciarSesionGoogle as iniciarSesionGoogleFn, cerrarSesion, enviarVerificacionEmail, recargarEmailVerified } from '../services/authApi.js';
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
@@ -67,6 +68,9 @@ export function useAuth() {
   const [noLeidos, setNoLeidos] = useState(0);
   const [favoritos, setFavoritos] = useState([]);
   const [fusionadoUid, setFusionadoUid] = useState(null);
+
+  // G11: copia para filtrar los avisos por distancia (también la lee la tarea de fondo de la app).
+  useEffect(() => { guardarJSON(CLAVE_FAVS_AVISOS, favoritos); }, [favoritos]);
 
   useEffect(() => suscribirSesion((u) => {
     setUsuario(u);

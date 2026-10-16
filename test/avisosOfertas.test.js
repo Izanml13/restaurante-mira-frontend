@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   distanciaM, debeConsultar, filtrarNuevos, leerVistos, guardarVistos, INTERVALO_MS,
+  soloAvisables, leerFavoritosAvisos, CLAVE_FAVS_AVISOS,
 } from '../src/models/avisosOfertasModel.js';
 
 const P = { lat: 41.3874, lng: 2.1686 };
@@ -60,4 +61,22 @@ test('vistos: se guardan sin posiciones y se reinician al cambiar de día', () =
   assert.equal(leerVistos(s, new Date(2026, 9, 16, 9).getTime()).size, 0);
   s.setItem('mira:avisosOfertas', '{roto');
   assert.equal(leerVistos(s, hoy).size, 0);
+});
+
+test('G11: solo avisa de restaurantes partner o en favoritos', () => {
+  const partner = { ...r(1, 1000), restaurante: { id: '1', partner: true } };
+  const res = soloAvisables([partner, r(2, 500), r(3, 100)], ['3']);
+  assert.deepEqual(res.map((x) => x.restaurante.id), ['1', '3']);
+  assert.deepEqual(soloAvisables([r(2, 500)], []), []);
+  assert.deepEqual(soloAvisables(null, ['1']), []);
+});
+
+test('G11: lee la copia de favoritos y tolera datos corruptos', () => {
+  const mem = new Map();
+  const s = { getItem: (k) => mem.get(k) ?? null };
+  assert.deepEqual(leerFavoritosAvisos(s), []);
+  mem.set(CLAVE_FAVS_AVISOS, '["a","b"]');
+  assert.deepEqual(leerFavoritosAvisos(s), ['a', 'b']);
+  mem.set(CLAVE_FAVS_AVISOS, '{roto');
+  assert.deepEqual(leerFavoritosAvisos(s), []);
 });

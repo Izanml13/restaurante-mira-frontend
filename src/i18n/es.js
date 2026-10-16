@@ -1457,6 +1457,10 @@ export default {
     "campoMaxReservas": "Máx. reservas/hora",
     "asuntoDefault": "Consulta MIRA — {{nombre}}",
     "restActualizado": "Restaurante «{{nombre}}» actualizado.",
+    "partnerBtn": "Partner",
+    "tituloPartner": "Partner: sus ofertas avisan a todos los usuarios cercanos",
+    "partnerActivado": "{{nombre}} ahora es partner.",
+    "partnerQuitado": "{{nombre}} ya no es partner.",
     "mensajeEnviado": "Mensaje enviado al dueño de «{{nombre}}».",
     "restEliminado": "«{{nombre}}» eliminado del catálogo.",
     "cargados": "{{n}} cargados",
@@ -1964,6 +1968,7 @@ export default {
     "irACuenta": "Ir a Mi cuenta",
     "sinSesion": "Inicia sesión para generar tu QR de llegada.",
     "sinOferta": "Este restaurante no tiene ahora una oferta activa.",
+    "soloCliente": "El QR de llegada solo se genera con una cuenta de cliente (la tuya es de empresa o admin).",
     "noDisponible": "Los QR de llegada aún no están disponibles. Prueba en un rato.",
     "error": "No hemos podido generar tu QR."
   }

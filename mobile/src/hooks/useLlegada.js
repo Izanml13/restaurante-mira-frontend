@@ -13,6 +13,7 @@ import { estadoVisible, SONDEO_MS } from '../models/llegadaModel.js';
 function faseDeError(e) {
   if (e?.status === 422) return 'lejos';
   if (e?.status === 401) return 'sinSesion';
+  if (e?.status === 403) return 'soloCliente'; // admin/empresa: el QR es solo para cuentas de cliente
   if (e?.status === 404) return 'sinOferta';
   if (e?.status === 503) return 'noDisponible';
   return 'error';
