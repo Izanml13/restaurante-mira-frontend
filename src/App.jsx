@@ -583,7 +583,7 @@ function AppContent({ auth, tema, setTema }) {
       <Footer />
       <AvisosOfertas />
       <PrimerArranque usuario={usuario} lang={lang} />
-      {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} />}
+      {seleccionado && <RestaurantDetail restaurant={seleccionado} usuario={usuario} onClose={cerrarDetalle} onVerCarta={abrirCarta} onReservado={irAMisReservas} esFavorito={esFavorito(seleccionado.id)} onToggleFavorito={toggleFavorito} />}
       {libro && <LibroCarta restaurant={libro} dieta={dieta} onClose={cerrarCarta} />}
       {ruta !== 'admin' && (
         <BottomNav ruta={ruta} numFavoritos={favoritos.length} numReservas={0} puntosSaldo={puntosSaldo} esAdmin={esAdmin} perfil={perfil} usuario={usuario} onStreakClick={openStreakPopup} fetchStreakData={fetchStreakData} onAbrirMira={AI_HABILITADO ? abrirMira : undefined} miraActiva={miraAbierta} />

@@ -60,7 +60,7 @@ export default function ReservationActions({ reserva, onStatusChange, t, comisio
     <div className="dash-reservation-actions" style={{display:'flex', flexDirection:'column', gap:'0.4rem', minWidth:'180px'}}>
       {error && <span style={{color:'#b44d3e', fontSize:'0.78rem', background:'#ffdad6', padding:'0.3rem 0.5rem', borderRadius:'0.4rem'}}>{error}</span>}
       {activa && !yaTieneTicket && (
-        <div style={{display:'flex', flexDirection:'column', gap:'0.25rem', background:'var(--op-surface-low, #f0f3ff)', padding:'0.5rem', borderRadius:'0.5rem'}}>
+        <div style={{display:'flex', flexDirection:'column', gap:'0.25rem', background:'var(--op-surface-low, #f1f4f1)', padding:'0.5rem', borderRadius:'0.5rem'}}>
           <label style={{fontSize:'0.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.04em', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
             <span>{tt("dashboard.precioBase","Importe ticket")}</span>
             <button type="button" onClick={()=> setShowPrice(v=>!v)} style={{fontSize:'0.62rem', background:'none', border:'none', color:'var(--op-primary)', cursor:'pointer', fontWeight:700}}>{showPrice? tt("dashboard.ocultar","Ocultar") : tt("dashboard.conTicket","Con ticket")}</button>
@@ -78,7 +78,7 @@ export default function ReservationActions({ reserva, onStatusChange, t, comisio
         </div>
       )}
       {activa && yaTieneTicket && (
-        <div style={{fontSize:'0.62rem', color:'var(--op-on-variant, #3f4942)', background:'var(--op-surface-low, #f0f3ff)', padding:'0.4rem 0.5rem', borderRadius:'0.5rem'}}>
+        <div style={{fontSize:'0.62rem', color:'var(--op-on-variant, #3f4942)', background:'var(--op-surface-low, #f1f4f1)', padding:'0.4rem 0.5rem', borderRadius:'0.5rem'}}>
           {tt("dashboard.ticketYaReserva","Ticket ya registrado para esta reserva (máx. 1 por reserva).")}
         </div>
       )}
