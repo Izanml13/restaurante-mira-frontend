@@ -30,6 +30,15 @@ function leerSimulado() {
   try { return localStorage.getItem(CLAVE_SIM) !== 'no'; } catch { return true; }
 }
 
+const CLAVE_PISTA_MENU = 'mira_admin_hint_v1';
+/** La pista solo se muestra la primera vez y solo en escritorio (en móvil ya hay hamburguesa). */
+function leerPistaMenu() {
+  try {
+    if (localStorage.getItem(CLAVE_PISTA_MENU)) return false;
+    return window.matchMedia('(min-width: 1025px)').matches;
+  } catch { return false; }
+}
+
 const SECCIONES = [
   { id: 'dashboard', clave: 'ops.seccDashboard', icono: 'dashboard' },
   { id: 'restaurantes', clave: 'ops.seccRestaurantes', icono: 'restaurant' },
@@ -55,8 +64,20 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   const [consultaCabecera, setConsultaCabecera] = useState({ q: '', revision: 0 });
   const [criticas, setCriticas] = useState(0);
   const [sidebarFija, setSidebarFija] = useState(false);
+  const [pistaMenu, setPistaMenu] = useState(leerPistaMenu);
   const [simulado, setSimulado] = useState(leerSimulado);
   const [demo] = useState(crearOverviewSimulado);
+
+  function cerrarPistaMenu() {
+    setPistaMenu(false);
+    try { localStorage.setItem(CLAVE_PISTA_MENU, '1'); } catch { /* sin almacenamiento */ }
+  }
+
+  useEffect(() => {
+    if (!esAdmin || !pistaMenu) return;
+    const id = setTimeout(cerrarPistaMenu, 6000);
+    return () => clearTimeout(id);
+  }, [esAdmin, pistaMenu]);
 
   function cambiarSimulado() {
     setSimulado((v) => {
@@ -122,7 +143,21 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
   return (
     <div className="ops-shell">
       <div className="ops-body">
-          <div className="ops-sidebar-trigger" onMouseEnter={() => setSidebarFija(true)} />
+          <div className="ops-sidebar-trigger" onMouseEnter={() => { setSidebarFija(true); cerrarPistaMenu(); }} />
+          {pistaMenu && (
+            <button
+              type="button"
+              className="ops-menu-hint"
+              onClick={() => { setSidebarFija(true); cerrarPistaMenu(); }}
+              aria-label={t('ops.pistaMenu')}
+              title={t('ops.pistaMenu')}
+            >
+              <span className="ops-menu-hint-icon" aria-hidden="true">
+                <span className="material-symbols-outlined">chevron_right</span>
+              </span>
+              <span>{t('ops.pistaMenu')}</span>
+            </button>
+          )}
           <aside className={`ops-sidebar${menuMovil ? ' open' : ''}${sidebarFija ? ' pinned' : ''}`}
             onMouseLeave={() => setSidebarFija(false)}
             aria-label={t('ops.navPanel')}>
@@ -153,7 +188,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
                   </span>
                   {s.badge && <span className="ops-badge">{s.badge}</span>}
                   {s.live && <span className="ops-dot-live" aria-label={t('ops.enDirecto')} />}
-                  {s.badgeCrit && criticas > 0 && <span className="ops-badge crit">{t('ops.criticas', { n: criticas })}</span>}
+                  {s.badgeCrit && criticas > 0 && <span className="ops-badge crit">{t(criticas === 1 ? 'ops.criticaSingular' : 'ops.criticas', { n: criticas })}</span>}
                 </button>
               ))}
             </nav>

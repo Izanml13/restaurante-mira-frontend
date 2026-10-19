@@ -7,12 +7,17 @@
   --pn-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-/* ── Entrada escalonada de KPIs y tarjetas ── */
+/* ── Entrada escalonada de KPIs y tarjetas ──
+   fill-mode `backwards`, no `both`: con `both` el estado final de la
+   animación deja un `transform` identidad (matrix(1,0,0,1,0,0)) que NO es
+   `none`, y eso convierte la tarjeta en bloque contenedor de los
+   `position: fixed`. Los modales de admin se centraban en la tarjeta (o sea,
+   en la página) en vez de en la pantalla (BUG-152). */
 @keyframes pn-subir { from { opacity: 0; transform: translateY(10px); } }
 @keyframes pn-aparecer { from { opacity: 0; transform: translateY(14px) scale(0.99); } }
 
 .ops-kpis > *, .op-kpi-grid > * {
-  animation: pn-subir 420ms var(--pn-ease-out) both;
+  animation: pn-subir 420ms var(--pn-ease-out) backwards;
 }
 .ops-kpis > :nth-child(2), .op-kpi-grid > :nth-child(2) { animation-delay: 50ms; }
 .ops-kpis > :nth-child(3), .op-kpi-grid > :nth-child(3) { animation-delay: 100ms; }
@@ -21,7 +26,7 @@
 .ops-kpis > :nth-child(6), .op-kpi-grid > :nth-child(6) { animation-delay: 250ms; }
 
 .ops-hero, .ops-grid-8-4 > *, .ops-grid-2 > *, .ops-content > .ops-card, .op-panel, .dash-chart {
-  animation: pn-aparecer 520ms var(--pn-ease-out) both;
+  animation: pn-aparecer 520ms var(--pn-ease-out) backwards;
   animation-delay: 180ms;
 }
 .ops-grid-8-4 > :nth-child(2), .ops-grid-2 > :nth-child(2) { animation-delay: 240ms; }
@@ -51,8 +56,8 @@
   .ops-table tbody tr:hover, .op-table tbody tr:hover { background: rgba(14, 107, 71, 0.05); }
 }
 
-/* Feed en vivo: tarjetas que entran en cascada */
-.ops-feed > * { animation: pn-subir 380ms var(--pn-ease-out) both; }
+/* Feed en vivo: tarjetas que entran en cascada (backwards: ver nota arriba) */
+.ops-feed > * { animation: pn-subir 380ms var(--pn-ease-out) backwards; }
 .ops-feed > :nth-child(2) { animation-delay: 40ms; }
 .ops-feed > :nth-child(3) { animation-delay: 80ms; }
 .ops-feed > :nth-child(4) { animation-delay: 120ms; }

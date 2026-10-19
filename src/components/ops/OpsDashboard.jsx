@@ -224,7 +224,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
             <span className="material-symbols-outlined ops-kpi-icon red">warning</span>
           </div>
           <div className="ops-kpi-value danger">{kpis.incidenciasPendientes} <small>{t('ops.pendientes')}</small></div>
-          <div className="ops-kpi-trend"><span className="ops-pill warn">{t('ops.criticas', { n: kpis.criticas })}</span><span>{t('ops.noShowCargo')}</span></div>
+          <div className="ops-kpi-trend"><span className="ops-pill warn">{t(kpis.criticas === 1 ? 'ops.criticaSingular' : 'ops.criticas', { n: kpis.criticas })}</span><span>{t('ops.noShowCargo')}</span></div>
           <div className="ops-kpi-sub"><span>{t('ops.porRevisar')}</span><strong>{kpis.incidenciasPendientes}</strong></div>
           <div className="ops-bar"><i className="red" style={{ width: `${Math.min(100, kpis.incidenciasPendientes * 10)}%` }} /></div>
         </div>
@@ -302,7 +302,7 @@ export default function OpsDashboard({ demo = null, esAdmin = false, todos = [] 
         <div className="ops-card">
           <div className="ops-card-head">
             <h2><span style={{ color: 'var(--ops-error)' }}>●</span> {t('ops.incidenciasDisputas')}</h2>
-            {kpis.criticas > 0 && <span className="ops-pill warn">{t('ops.criticasAtencion', { n: kpis.criticas })}</span>}
+            {kpis.criticas > 0 && <span className="ops-pill warn">{t(kpis.criticas === 1 ? 'ops.criticaAtencionSingular' : 'ops.criticasAtencion', { n: kpis.criticas })}</span>}
           </div>
           <div className="ops-inc-list">
             {incidenciasPreview.length === 0 && <p className="ops-empty">{t('ops.sinIncidenciasTodo')}</p>}

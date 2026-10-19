@@ -205,8 +205,12 @@
 .ops-kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 8px; }
 .ops-kpi-value small { font-size: 16px; font-weight: 600; color: var(--ops-on-variant); }
 .ops-kpi-value.danger { color: var(--ops-error); }
-.ops-kpi-trend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ops-on-variant); margin-top: 4px; }
-.ops-pill { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; background: var(--ops-secondary-container); color: var(--ops-on-secondary-container); }
+.ops-kpi-trend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ops-on-variant); margin-top: 4px; min-width: 0; }
+.ops-pill { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; background: var(--ops-secondary-container); color: var(--ops-on-secondary-container); white-space: nowrap; }
+/* El KPI de incidencias es estrecho: el número y la palabra no deben partirse
+   en dos líneas ("1" / "críticas"). El badge de la sidebar tampoco. */
+.ops-kpi-trend .ops-pill, .ops-badge.crit { white-space: nowrap; }
+.ops-kpi-trend > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ops-pill.warn { background: var(--ops-error-container); color: var(--ops-on-error-container); }
 .ops-pill.info { background: var(--ops-surface-container); color: var(--ops-primary); }
 .ops-bar { height: 6px; border-radius: 999px; background: var(--ops-surface-high); overflow: hidden; margin-top: 8px; }
@@ -489,3 +493,39 @@ code.ops-code { font-family: ui-monospace, monospace; font-size: 11px; backgroun
 .informe-bloques li { margin: 4px 0; }
 .informe-error { color: var(--ops-error); font-weight: 600; }
 .informe-json { max-height: 50vh; overflow: auto; font-size: 11px; background: var(--ops-surface-low); padding: 8px; border-radius: 8px; }
+
+/* ---------- Pista de menú lateral (solo la primera vez) ---------- */
+.ops-menu-hint {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 73;
+  display: flex; align-items: center; gap: 8px; max-width: 220px;
+  padding: 10px 16px 10px 10px; border: 1px solid var(--ops-outline-variant);
+  border-radius: 0 999px 999px 0; border-left: none;
+  background: var(--ops-surface-lowest); color: var(--ops-on-surface);
+  font-family: var(--ops-font); font-size: 12px; font-weight: 700; line-height: 1.25;
+  text-align: left; cursor: pointer; box-shadow: var(--ops-shadow-lg);
+  animation: ops-hint-in 0.45s ease both;
+}
+.ops-menu-hint:hover { background: var(--ops-surface-low); }
+.ops-menu-hint:focus-visible { outline: 2px solid var(--ops-primary-container); outline-offset: 2px; }
+.ops-menu-hint-icon {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--ops-primary-container); color: #fff;
+  animation: ops-hint-nudge 1.8s ease-in-out infinite;
+}
+.ops-menu-hint-icon .material-symbols-outlined { font-size: 20px; }
+@keyframes ops-hint-in {
+  from { opacity: 0; transform: translate(-12px, -50%); }
+  to { opacity: 1; transform: translate(0, -50%); }
+}
+@keyframes ops-hint-nudge {
+  0%, 55%, 100% { transform: translateX(0); }
+  70% { transform: translateX(4px); }
+  85% { transform: translateX(1px); }
+}
+@media (max-width: 1024px) {
+  .ops-menu-hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ops-menu-hint, .ops-menu-hint-icon { animation: none !important; }
+}

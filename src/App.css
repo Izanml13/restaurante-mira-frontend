@@ -2544,6 +2544,12 @@ button.btn-texto {
   pointer-events: none;
   user-select: none;
 }
+/* El cuerpo del skeleton respira como el de una card real: antes las barras
+   iban con 4px de gap y se veían pegadas unas a otras (BUG-146). */
+.skeleton-card .card-cuerpo {
+  gap: 0.5rem;
+  padding-top: 1.15rem;
+}
 .skeleton-bar {
   border-radius: 4px;
   background: linear-gradient(90deg, var(--fondo-suave) 25%, var(--borde) 50%, var(--fondo-suave) 75%);
@@ -2557,16 +2563,17 @@ button.btn-texto {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
-.skeleton-titulo { height: 1.05rem; width: 70%; margin-bottom: 0.15rem; }
+.skeleton-titulo { height: 1.1rem; width: 70%; margin-bottom: 0.1rem; }
 .skeleton-nota   { height: 0.85rem; width: 50%; }
 .skeleton-gris   { height: 0.75rem; width: 55%; }
 .skeleton-gris-short { height: 0.75rem; width: 35%; }
-.skeleton-desc   { height: 0.7rem; width: 90%; }
-.skeleton-desc-short { height: 0.7rem; width: 60%; }
+.skeleton-desc   { height: 0.8rem; width: 90%; margin-top: 0.2rem; }
+.skeleton-desc-short { height: 0.8rem; width: 60%; }
 .skeleton-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
 }
 .skeleton-btn {
   height: 2rem;
@@ -5098,6 +5105,57 @@ button.btn-texto {
   .streak-day { padding: 5px 0; border-radius: 10px; }
   .streak-day__icon { width: 24px; height: 24px; }
   .streak-modal__title { font-size: 1.2rem; }
+}
+
+/* ── BUG-147: el popup de MIRA Club debe caber entero en pantalla ──
+   En un portátil de 1366×768 (≈657 px de viewport) el contenido medía
+   676 px fijos y obligaba a hacer scroll dentro del modal, así que la
+   tarjeta aparecía cortada por abajo. En alturas cortas se compacta la
+   tarjeta y se limita al viewport real (dvh, con fallback vh). */
+.streak-modal,
+.wheel-modal {
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+}
+
+@media (max-height: 800px) {
+  .streak-modal__header { padding: 0.55rem 1.4rem; }
+  .streak-modal__brand-icon { width: 30px; height: 30px; }
+  .streak-modal__close { width: 30px; height: 30px; }
+  .streak-modal__hero { padding: 0.15rem 1.4rem 0.5rem; }
+  .streak-modal__mascot-area { margin: 0.1rem 0 0.35rem; }
+  .streak-modal__mascot-img { width: 104px; height: 104px; }
+  .streak-modal__speech { top: -2px; right: -26px; padding: 4px 10px; font-size: 0.68rem; }
+  .streak-modal__coin { width: 44px; height: 44px; }
+  .streak-modal__day-badge { margin-bottom: 4px; padding: 3px 12px; }
+  .streak-modal__title { font-size: 1.45rem; margin-bottom: 3px; }
+  .streak-modal__subtitle { font-size: 0.8rem; line-height: 1.35; }
+  .streak-modal__calendar { margin: 0.45rem 0; padding: 0 1.4rem; }
+  .streak-modal__calendar-header { margin-bottom: 6px; }
+  .streak-day { padding: 5px 2px; border-radius: 12px; }
+  .streak-day__icon { width: 28px; height: 28px; margin: 3px 0; }
+  .streak-day__check { width: 28px; height: 28px; font-size: 0.8rem; }
+  .streak-day__coin, .streak-day__wheel-icon { width: 26px; height: 26px; }
+  .streak-modal__actions { padding: 0.4rem 1.4rem 0.55rem; }
+  .streak-modal__balance { padding: 7px 12px; }
+  .streak-modal__balance-icon { width: 34px; height: 34px; }
+  .streak-modal__balance-icon img { width: 24px; height: 24px; }
+  .streak-claim-btn { padding: 11px 24px; }
+  .streak-modal__footer { padding: 6px 1.4rem; }
+  .wheel-modal__header { padding: 0.7rem 1.4rem 0; }
+  .wheel-modal__body { padding: 0.2rem 1.4rem 0.6rem; }
+  .wheel-modal__title { font-size: 1.2rem; }
+  .wheel-modal__subtitle { margin-bottom: 0.5rem; }
+  .wheel-container { width: 232px; height: 232px; margin-bottom: 0.7rem; }
+  .wheel-spin-btn { padding: 11px 30px; }
+}
+
+/* Pantallas muy bajas y estrechas: fuera adornos, el contenido manda. */
+@media (max-height: 700px) and (max-width: 560px) {
+  .streak-modal__mascot-area { display: none; }
+  .streak-modal__footer { display: none; }
+  .streak-modal__balance-icon { display: none; }
+  .streak-modal__coin { display: none; }
 }
 
 /* ── Responsive: Mis Puntos ── */

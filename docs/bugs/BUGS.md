@@ -141,3 +141,19 @@ Cinco bugs pedidos directamente por el usuario sobre la web. Rama única: **`fix
 | [BUG-143](BUG-143.md) | Falta acceso al QR de llegada desde la ficha | app | codex | hecho | fix/codex-apk-138-145 |
 | [BUG-144](BUG-144.md) | El chat del agente MIRA no está en la app | app | codex | hecho | fix/codex-apk-138-145 |
 | [BUG-145](BUG-145.md) | El menú móvil necesita organización y mejores zonas táctiles | app | codex | hecho | fix/codex-apk-138-145 |
+
+## Tanda 2 de UI (usuario) — oct 2026
+
+Siete bugs de interfaz reportados por el usuario. Rama única: **`fix/tanda2-ui`**
+(worktree propio), merge a `main` al final. Solo frontend: no se toca el backend
+ni la app móvil.
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-146](BUG-146.md) | Los skeletons de la landing se ven pegados | landing | opencode | en revisión | fix/tanda2-ui |
+| [BUG-147](BUG-147.md) | El popup de MIRA Club no cabe entero en pantalla | miraclub/landing | opencode | en revisión | fix/tanda2-ui |
+| [BUG-148](BUG-148.md) | El buscador de JAM se ve oscuro en modo claro | jam | opencode | en revisión | fix/tanda2-ui |
+| [BUG-149](BUG-149.md) | El KPI muestra «1 críticas» y parte el texto en dos líneas | admin/dashboard | opencode | en revisión | fix/tanda2-ui |
+| [BUG-150](BUG-150.md) | No se puede cambiar el idioma desde Ajustes del admin | admin/ajustes | opencode | en revisión | fix/tanda2-ui |
+| [BUG-151](BUG-151.md) | Falta una pista visual del menú lateral en el admin | admin/ux | opencode | en revisión | fix/tanda2-ui |
+| [BUG-152](BUG-152.md) | Los modales del admin se centran en la página, no en la pantalla | admin/ui | opencode | en revisión | fix/tanda2-ui |
