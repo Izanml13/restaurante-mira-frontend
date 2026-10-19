@@ -1,7 +1,7 @@
 /** OpsAjustes — tema, sesión, registro de auditoría y referencias operativas. */
 import { useEffect, useState } from 'react';
 import { auditoriaApi } from '../../services/auditoria.js';
-import { useT } from '../../i18n/index.jsx';
+import { useI18n, useT } from '../../i18n/index.jsx';
 import es from '../../i18n/es.js';
 import ca from '../../i18n/ca.js';
 import en from '../../i18n/en.js';
@@ -56,6 +56,7 @@ function AjustesAuditoria() {
 
 export default function OpsAjustes({ usuario, tema, onCambiarTema }) {
   const t = useT(TRADS);
+  const { lang, setLang, available } = useI18n();
   return (
     <>
     <AjustesAuditoria />
@@ -76,6 +77,22 @@ export default function OpsAjustes({ usuario, tema, onCambiarTema }) {
             <span className="material-symbols-outlined">{tema === 'oscuro' ? 'dark_mode' : 'light_mode'}</span>
             {tema === 'oscuro' ? t('ops.oscuro') : t('ops.claro')}
           </button>
+        </div>
+        <div className="ops-list-item">
+          <div>
+            <strong>{t('ops.idioma')}</strong>
+            <div className="ops-muted">{t('ops.idiomaAyuda')}</div>
+          </div>
+          <select
+            className="ops-selectbox"
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            aria-label={t('ops.idioma')}
+          >
+            {Object.entries(available).map(([codigo, nombre]) => (
+              <option key={codigo} value={codigo}>{nombre}</option>
+            ))}
+          </select>
         </div>
         <div className="ops-list-item">
           <div>
