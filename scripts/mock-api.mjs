@@ -145,7 +145,7 @@ function enviar(res, status, body) {
   res.writeHead(status, {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Idempotency-Key',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   });
   res.end(JSON.stringify(body));
@@ -162,7 +162,26 @@ http
     console.log(req.method, req.url);
 
     if (p === '/v1/restaurants/count') return enviar(res, 200, { total: docs.length });
-    if (p === '/v1/restaurants') return enviar(res, 200, { items: docs, cursor: null, terminado: true });
+    if (p === '/v1/restaurants') {
+      const q = (url.searchParams.get('q') || '').trim().toLowerCase();
+      const items = q ? docs.filter((d) => d.nombre.toLowerCase().includes(q)) : docs;
+      return enviar(res, 200, { items, cursor: null, terminado: true });
+    }
+    // Datos ligeros para #/mapa (mismo contrato que mira-api). Va antes de /:id.
+    if (p === '/v1/restaurants/mapa') {
+      const items = docs.map((d) => ({
+        id: d.id,
+        nombre: d.nombre,
+        categorias: d.categorias,
+        precio: d.precio,
+        rating_yelp: d.rating_yelp,
+        total_resenas_yelp: d.total_resenas_yelp,
+        imagen_url: d.imagen_url,
+        coordenadas: d.coordenadas,
+        zona_busqueda: d.zona_busqueda,
+      }));
+      return enviar(res, 200, { items });
+    }
     const porId = p.match(/^\/v1\/restaurants\/([^/]+)$/);
     if (porId) {
       const d = docs.find((x) => x.id === decodeURIComponent(porId[1]));
@@ -207,6 +226,18 @@ http
       }
     }
     if (p.startsWith('/v1/promotions')) return enviar(res, 200, { data: [] });
+    // Agente MIRA: el contrato real vive en mira-api; aquí basta una respuesta fija
+    // para que la UI del chat no rompa al pulsar una sugerencia.
+    if (p === '/v1/ai/agent' && req.method === 'POST') {
+      const mensaje = String(datos.message || '').slice(0, 200);
+      return enviar(res, 200, {
+        reply: `Soy MIRA en modo mock. He recibido: "${mensaje}".`,
+        actions: [],
+        needsConfirm: false,
+        provider: 'mock',
+        model: 'mock',
+      });
+    }
     if (p === '/v1/ofertas/cerca' && req.method === 'GET') {
       const lat = Number(url.searchParams.get('lat'));
       const lng = Number(url.searchParams.get('lng'));

@@ -1,0 +1,21 @@
+# Flujos E2E (Selenium). Excluye monkey y suites unitarias.
+# Uso:  bzt qa/bzt/01-flujo.yml      (desde la raíz del frontend)
+settings:
+  artifacts-dir: qa/artifacts/bzt/%Y-%m-%d_%H-%M-%S
+
+execution:
+- executor: pytest
+  scenario: e2e
+
+scenarios:
+  e2e:
+    script: qa/tests
+    additional-args: "-k 'not monkey and not suite_'"
+
+reporting:
+- module: final-stats
+  summary: true
+# El runner de pytest de Taurus siempre sale con 0: el veredicto lo da passfail.
+- module: passfail
+  criteria:
+  - "fail>0, continue as failed"

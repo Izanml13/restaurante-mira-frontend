@@ -1,0 +1,20 @@
+# Regresión completa: suites unitarias (frontend + backend), flujos E2E y monkey.
+# Uso:  bzt qa/bzt/03-regresion.yml
+settings:
+  artifacts-dir: qa/artifacts/bzt/regresion-%Y-%m-%d_%H-%M-%S
+
+execution:
+- executor: pytest
+  scenario: regresion
+
+scenarios:
+  regresion:
+    script: qa/tests
+    additional-args: "--unitarias --monkey-acciones 40 --monkey-seed 20261020"
+
+reporting:
+- module: final-stats
+  summary: true
+- module: passfail
+  criteria:
+  - "fail>0, continue as failed"
