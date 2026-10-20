@@ -882,7 +882,7 @@ export default {
     "buscando": "Comprobando que estás en el local…",
     "ensenalo": "Enséñaselo al personal",
     "caducaEn": "caduca en {{t}}",
-    "aplicada": "Oferta aplicada",
+    "aplicada": "Oferta canjeada",
     "aplicadaTexto": "El restaurante ha validado tu visita. ¡Que aproveche!",
     "caducado": "Este QR ha caducado.",
     "otroQR": "Pedir otro QR",
