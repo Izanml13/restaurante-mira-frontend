@@ -17,6 +17,7 @@ import { proponerNegocio, listarMisNegocios } from '../../services/negocioApi.js
 import { RevenueLineChart, ReservationsPieChart } from './Charts.jsx';
 import ReservationActions from './ReservationActions.jsx';
 import TicketUpload from './TicketUpload.jsx';
+import EscanerLlegadas from './EscanerLlegadas.jsx';
 import {
   OpBtnPrimary,
   OpBtnGhost,
@@ -793,7 +794,7 @@ export default function Dashboard({ usuario }) {
             <OpBtnGhost onPress={() => setShowFicha((v) => !v)}>
               <Simbolo name="storefront" size={16} color={op.onSurface} /> Ficha
             </OpBtnGhost>
-            {/* Ofertas por distancia, escáner de QR y estadísticas (G04/G10/G07): de momento en el panel web. */}
+            {/* Editor y estadísticas de ofertas (G04/G07): en el panel web. El escáner está aquí debajo. */}
             <OpBtnGhost
               onPress={() => WebBrowser.openBrowserAsync(`${(process.env.EXPO_PUBLIC_WEB_URL || 'https://restaurante-mira-frontend.vercel.app').replace(/\/$/, '')}/#/dashboard`)}
             >
@@ -801,6 +802,9 @@ export default function Dashboard({ usuario }) {
             </OpBtnGhost>
           </View>
         </View>
+
+        {/* Escáner de QR de llegada y llegadas de hoy (G10). */}
+        {restaurante.id ? <EscanerLlegadas restauranteId={restaurante.id} /> : null}
 
         {/* Inline Ficha edit (collapsible) */}
         {showFicha ? (

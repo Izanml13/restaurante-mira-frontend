@@ -50,6 +50,13 @@
           "isAndroidBackgroundLocationEnabled": true,
           "isAndroidForegroundServiceEnabled": true
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "MIRA usa la cámara para escanear el QR de llegada de tus clientes.",
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {
