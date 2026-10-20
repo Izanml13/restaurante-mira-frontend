@@ -91,7 +91,7 @@ function mapearDocBase(id, d) {
  * - copia en sessionStorage para que recargar la pestaña tampoco la repita.
  * Los errores no se cachean: el siguiente intento vuelve a pedirlo.
  */
-export const CATALOGO_TTL_MS = 10 * 60 * 1000;
+export const CATALOGO_TTL_MS = 60 * 1000;
 const CLAVE_SESION = 'mira:catalogo:v1';
 
 let catalogo = null; // { items, guardado }
@@ -155,7 +155,7 @@ export async function fetchRestaurants({ forzar = false } = {}) {
  * imagen y ciudad; el resto se pide al abrir la ficha. `ciudad` filtra en el
  * servidor (~60 KB). Caché en memoria por ciudad, alineada con el max-age=300.
  */
-const MAPA_TTL_MS = 5 * 60 * 1000;
+const MAPA_TTL_MS = 60 * 1000;
 const cacheMapa = new Map(); // ciudad|'' -> { items, guardado } | { promesa }
 
 export async function fetchRestaurantesMapa({ ciudad = '' } = {}) {

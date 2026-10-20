@@ -19,6 +19,8 @@ const ESTADO_CLAVE = { activa: "estadoActiva", fueraVigencia: "estadoFuera", ina
  * Lista + crear/editar con un formulario por nivel (1 km, 500 m, 100 m, llegada)
  * y aviso si un nivel no mejora al anterior.
  */
+const REFRESCO_MS = 15000;
+
 export default function OfertasPanel({ restauranteId }) {
   const t = useT(TRADS);
   const [ofertas, setOfertas] = useState([]);
@@ -33,9 +35,9 @@ export default function OfertasPanel({ restauranteId }) {
   const [aviso, setAviso] = useState(""); // creada | editada | borrada
   const [borrarId, setBorrarId] = useState(null);
 
-  const recargar = useCallback(async () => {
+  const recargar = useCallback(async (silencioso = false) => {
     if (!restauranteId) { setOfertas([]); setCargando(false); return; }
-    setCargando(true);
+    if (!silencioso) setCargando(true);
     setErrorCargar(false);
     try {
       setOfertas(await ofertasApi.listarMias(restauranteId));
@@ -47,6 +49,12 @@ export default function OfertasPanel({ restauranteId }) {
   }, [restauranteId]);
 
   useEffect(() => { recargar(); }, [recargar]);
+
+  // Se vuelve a pedir cada poco (sin parpadeo) para ver los cambios sin recargar.
+  useEffect(() => {
+    const id = setInterval(() => { if (!document.hidden) recargar(true); }, REFRESCO_MS);
+    return () => clearInterval(id);
+  }, [recargar]);
 
   useEffect(() => {
     if (!aviso) return undefined;
@@ -215,7 +223,7 @@ export default function OfertasPanel({ restauranteId }) {
       {modo === "lista" && errorCargar && (
         <div className="ofertas-vacio">
           <p className="ofertas-error" role="alert">{t("ofertas.errorCargar")}</p>
-          <button type="button" className="op-btn-ghost" onClick={recargar}>{t("ofertas.reintentar")}</button>
+          <button type="button" className="op-btn-ghost" onClick={() => recargar()}>{t("ofertas.reintentar")}</button>
         </div>
       )}
       {modo === "lista" && !cargando && !errorCargar && ofertas.length === 0 && (
