@@ -3,6 +3,9 @@ import { useState } from 'react';
 import OfertasPanel from '../dashboard/OfertasPanel.jsx';
 import OfertasStats from '../dashboard/OfertasStats.jsx';
 import '../dashboard/dashboard.css';
+import RestaurantCard from '../RestaurantCard.jsx';
+import { mapearDoc } from '../../services/restaurantApi.js';
+import { completarRestaurante } from '../../models/restaurantModel.js';
 import { listarRestaurantesAdmin, mensajeErrorFirestore } from './opsData.js';
 import { useT } from '../../i18n/index.jsx';
 import es from '../../i18n/es.js';
@@ -25,7 +28,7 @@ export default function OpsOfertas() {
     setError('');
     try {
       const r = await listarRestaurantesAdmin({ q: q.trim(), limit: 10 });
-      setItems(r.items);
+      setItems(r.items.map((d) => completarRestaurante(mapearDoc(d.id, d))));
     } catch (e) {
       setError(mensajeErrorFirestore(e));
     } finally {
@@ -47,27 +50,23 @@ export default function OpsOfertas() {
       {!rest && (
         <>
           <div className="ops-toolbar" role="search">
-            <input className="ops-input" type="search" placeholder={t('ops.phBuscarRestaurante')} value={q}
+            <input className="ops-input ops-ofertas-buscar" type="search" placeholder={t('ops.phBuscarRestaurante')} value={q}
               onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') buscar(); }} />
             <button type="button" className="ops-btn primary sm" disabled={buscando} onClick={buscar}>{t('ops.buscar')}</button>
           </div>
           {error && <p role="alert">{error}</p>}
-          <ul className="ops-ofertas-lista">
+          <div className="grid ops-ofertas-lista">
             {items.map((r) => (
-              <li key={r.id}>
-                <button type="button" className="ops-btn soft sm" onClick={() => setRest(r)}>
-                  {r.nombre}{r.ciudad ? ` · ${r.ciudad}` : ''}
-                </button>
-              </li>
+              <RestaurantCard key={r.id} restaurant={r} onSelect={setRest} />
             ))}
-          </ul>
+          </div>
         </>
       )}
       {rest && (
-        <>
+        <div className="op-hub">
           <OfertasPanel restauranteId={rest.id} />
           <OfertasStats restauranteId={rest.id} />
-        </>
+        </div>
       )}
     </div>
   );
