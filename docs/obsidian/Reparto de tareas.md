@@ -12,9 +12,10 @@ Criterio: cada uno trabaja sobre el código que mejor conoce, en **ramas separad
 | T2 | Endurecer `firestore.rules` (C1, C3, C4, A1–A4) + tests con emulador | [[Rubén]] | 🔴 | `fix/firestore-rules` | [[Codex/T2 Reglas Firestore]] |
 | T3 | Puntos/racha/ruleta/canje a Cloud Functions con transacción (C2, A5, A6) | [[Alex]] | 🔴 | `feat/points-functions` | [[Codex/T3 Cloud Functions puntos]] |
 | T4 | Tests unitarios de racha (`calcRachaLogin`) con Vitest | [[Alex]] | 🟠 | `test/racha` | [[Codex/T4 Tests racha]] |
-| T5 | Selenium: tests de flujo + monkey test | [[Izan]] | 🟠 | `test/e2e-selenium` | [[Codex/T5 Selenium y monkey]] |
-| T6 | Regresión: GitHub Actions (build + E2E en cada PR) | [[Izan]] | 🟠 | `test/e2e-selenium` | [[Codex/T6 CI regresion]] |
-| T7 | Taurus 10 / 20 / 50 usuarios | [[Izan]] | 🟡 | `test/carga-taurus` | [[Codex/T7 Taurus]] |
+| T5a | Selenium: tests de flujo | [[Rubén]] | 🟠 | `test/qa-selenium-taurus` | [[Codex/T5 Selenium y monkey]] |
+| T5b | **Monkey test** (gremlins.js) | [[Izan]] | 🟠 | `test/monkey` | [[Codex/T5b Monkey test]] |
+| T6 | Regresión: GitHub Actions (build + E2E + monkey en cada PR) | [[Rubén]] + [[Izan]] | 🟠 | `test/qa-selenium-taurus` | [[Codex/T6 CI regresion]] |
+| T7 | Taurus 10 / 20 / 50 usuarios | [[Rubén]] | 🟡 | `test/qa-selenium-taurus` | [[Codex/T7 Taurus]] |
 | T8 | Diseño: verde + cards inferiores 10px | [[Izan]] | 🟡 | `style/verde-cards` | [[Codex/T8 Diseno]] |
 | T9 | Rendimiento: `React.lazy` + imágenes WebP | [[Rubén]] | 🟡 | `perf/lazy-webp` | [[Codex/T9 Rendimiento]] |
 | T10 | Presentación miércoles | Todos | 🟠 | — | [[Presentación miércoles]] |
@@ -22,8 +23,9 @@ Criterio: cada uno trabaja sobre el código que mejor conoce, en **ramas separad
 ## Orden
 1. **T1 primero** (todo lo demás parte de ahí).
 2. T2 y T3 en paralelo — son el bloqueo de seguridad.
-3. T8 antes que T5/T6 → así la demo de regresión muestra el cambio de diseño pasando los tests.
-4. T7 el último, con el build final.
+3. El monkey test reutiliza el `conftest.py`/driver de Rubén cuando suba su rama, para no duplicar setup.
+4. T8 antes que T5/T6 → así la demo de regresión muestra el cambio de diseño pasando los tests.
+5. T7 el último, con el build final.
 
 ## Reglas para trabajar con Codex
 - Un prompt = una rama = un PR pequeño.
