@@ -11,6 +11,8 @@ import subprocess
 
 import pytest
 
+import servers  # noqa: E402
+
 RAIZ_QA = pathlib.Path(__file__).resolve().parent.parent
 RAIZ_FRONT = RAIZ_QA.parent
 RAIZ_REPO = RAIZ_FRONT.parents[0].parent  # .../Restaurante Mira
@@ -28,7 +30,7 @@ def unitarias(pytestconfig) -> bool:
 
 def _npm_test(cwd: pathlib.Path) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["npm.cmd", "test"],
+        [servers.NPM, "test"],
         cwd=str(cwd),
         capture_output=True,
         text=True,

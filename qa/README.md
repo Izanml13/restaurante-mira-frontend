@@ -20,12 +20,15 @@ lo que hace falta para un monkey test, flujos de usuario y regresión visual-fun
 | `tests/test_flujo_home.py` | Landing, buscador (Enter), ficha de restaurante, cierre |
 | `tests/test_flujo_favoritos.py` | Marcar/quitar favorito, contador del header, panel |
 | `tests/test_flujo_navegacion.py` | Regresión de las 10 rutas públicas y la protegida |
+| `tests/test_flujo_auth.py` | Login (validación), recuperar contraseña y guard de reserva sin sesión |
 | `tests/test_monkey.py` | Monkey con seed fija: 40 acciones aleatorias, cero incidencias |
 | `tests/test_regresion_unitaria.py` | `npm test` de frontend y backend (solo con `MIRA_UNITARIAS=1`) |
 | `monkey/monkey_web.py` | Monkey ejecutable aparte, con `--acciones`, `--seed`, `--visible` |
 | `bzt/01-flujo.yml` | Taurus: flujos E2E (sin monkey) |
 | `bzt/02-monkey.yml` | Taurus: monkey de 80 acciones |
 | `bzt/03-regresion.yml` | Taurus: unitarias + E2E + monkey |
+| `docs/bitacora.md` | Registro cronológico: qué se hizo, resultados, hallazgos y decisiones |
+| `docs/ESTADO.md` | Handoff: cómo retomar, qué está verde y qué queda pendiente |
 | `artifacts/` | Screenshots, logs de consola y reportes de Taurus (ignorado por git) |
 
 ---
@@ -126,7 +129,7 @@ código de salida y un único reporte: si algo se rompe, se ve qué capa fue.
 
 | Capa | Resultado |
 |---|---|
-| E2E Selenium (16 tests) | **verde** |
+| E2E Selenium (21 tests) | **verde** |
 | Monkey 40 y 80 acciones (seed fija) | **verde**, sin incidencias |
 | Backend `npm test` | **210/210 verde** |
 | Frontend `npm test` | **38 fallos / 309** — preexistente, no lo causa esta suite |
@@ -151,10 +154,14 @@ El monkey destapó dos cosas que no eran bugs de la app sino del mock:
 
 ## Qué NO cubre todavía (y cómo ampliarlo)
 
-- **Login/registro reales**: la app usa Firebase Auth; haría falta un usuario de
-  prueba y credenciales, o mockear Auth. Hoy `#/reservas` se prueba como ruta
-  protegida, no el flujo autenticado.
+- **Login/registro reales**: la validación de formularios y el guard de reserva
+  ya están cubiertos (`test_flujo_auth.py`), pero el camino feliz no: la app usa
+  Firebase Auth y haría falta un usuario de prueba con credenciales o mockear
+  Auth. Hoy `#/reservas` se prueba como ruta protegida, no el flujo autenticado.
 - **Reserva completa, puntos, panel admin, empresa**: requieren sesión.
+- **CI**: no hay workflow todavía; el plan está en `docs/ESTADO.md`.
+- **Bug candidato**: `Login.jsx` rechaza contraseñas de menos de 6 caracteres,
+  pero el mensaje dice "al menos 8". Ver `docs/bitacora.md`.
 - **Visual regression** (comparación de imágenes): Selenium saca capturas, pero
   no hay diff contra una baseline. Se puede añadir con `pytest-playwright` o
   `percy`/`backstop`.

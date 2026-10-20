@@ -30,6 +30,9 @@ API_URL = os.environ.get("MIRA_API_URL", "http://localhost:3101").rstrip("/")
 HEADLESS = os.environ.get("MIRA_HEADLESS", "1") not in ("0", "false", "False")
 ARTIFACTOS = pathlib.Path(os.environ.get("MIRA_ARTIFACTS", RAIZ_QA / "artifacts"))
 
+# Windows necesita npm.cmd; Linux/macOS usan npm.
+NPM = "npm.cmd" if os.name == "nt" else "npm"
+
 
 def responde(url: str, timeout: float = 2.0) -> bool:
     try:
@@ -67,12 +70,19 @@ def _lanzar(args: list[str], env_extra: dict[str, str] | None = None) -> subproc
 def _matar(proc: subprocess.Popen) -> None:
     if proc.poll() is not None:
         return
-    subprocess.run(
-        ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        check=False,
-    )
+    if os.name == "nt":
+        subprocess.run(
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+    else:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
 
 
 @contextlib.contextmanager
@@ -83,9 +93,9 @@ def servidores():
         return
 
     puerto_api = API_URL.rsplit(":", 1)[-1]
-    mock = _lanzar(["npm.cmd", "run", "mock-api"], {"MOCK_PORT": puerto_api})
+    mock = _lanzar([NPM, "run", "mock-api"], {"MOCK_PORT": puerto_api})
     vite = _lanzar(
-        ["npm.cmd", "run", "dev", "--", "--port", "5173", "--strictPort"],
+        [NPM, "run", "dev", "--", "--port", "5173", "--strictPort"],
         {"VITE_API_URL": API_URL},
     )
     try:
