@@ -793,6 +793,7 @@ export default {
     "abrirAjustes": "Obrir la configuració"
   },
   "ofertasCerca": {
+    "enZona": "Ets a {{nombre}}",
     "verQR": "El meu QR",
     "ver": "Veure",
     "cerrar": "Tancar avís",

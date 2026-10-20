@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useUbicacion from './useUbicacion.js';
-import { debeConsultar, filtrarNuevos, leerVistos, guardarVistos, soloAvisables, leerFavoritosAvisos } from '../models/avisosOfertasModel.js';
+import { debeConsultar, ofertaEnZona, filtrarNuevos, leerVistos, guardarVistos, soloAvisables, leerFavoritosAvisos } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from '../services/ofertasCercaApi.js';
 
 function almacenamiento() {
@@ -32,6 +32,7 @@ function notificarSistema({ restaurante, nivel }) {
 export default function useAvisosOfertas() {
   const { activa, posicion } = useUbicacion();
   const [avisos, setAvisos] = useState([]);
+  const [enZona, setEnZona] = useState(null);
   const ultima = useRef(null);
   const enCurso = useRef(false);
 
@@ -42,6 +43,7 @@ export default function useAvisosOfertas() {
     enCurso.current = true;
     ofertasCerca(posicion)
       .then((resultados) => {
+        setEnZona(ofertaEnZona(resultados));
         const avisables = soloAvisables(resultados, leerFavoritosAvisos(almacenamiento()));
         // Solo se marcan y cuentan los que caben en pantalla (máximo 3, revisión R01).
         const { nuevos, vistos } = filtrarNuevos(avisables, leerVistos(almacenamiento()), 3);
@@ -61,10 +63,10 @@ export default function useAvisosOfertas() {
 
   // Al desactivar la ubicación desaparecen los avisos y se olvida la última consulta.
   useEffect(() => {
-    if (!activa) { setAvisos([]); ultima.current = null; }
+    if (!activa) { setAvisos([]); setEnZona(null); ultima.current = null; }
   }, [activa]);
 
   const descartar = useCallback((aviso) => setAvisos((a) => a.filter((x) => x !== aviso)), []);
 
-  return { avisos, descartar };
+  return { avisos, descartar, enZona };
 }

@@ -102,3 +102,12 @@ test('una oferta nueva o editada del mismo restaurante vuelve a avisar el mismo 
   const otra = { ...v1, oferta: { id: 'b', actualizado: '2026-10-20T07:00:00.000Z' } };
   assert.equal(filtrarNuevos([otra], primera.vistos).nuevos.length, 1, 'oferta nueva: avisa otra vez');
 });
+
+test('ofertaEnZona: el restaurante con oferta más cercano a ≤ 50 m, o null', async () => {
+  const { ofertaEnZona } = await import('../src/models/avisosOfertasModel.js');
+  const c = (id, d, oferta = true) => ({ restaurante: { id }, oferta: oferta ? { id: `o${id}` } : null, distanciaM: d, nivel: { distancia: 20 } });
+  assert.equal(ofertaEnZona([c('a', 80)]), null);
+  assert.equal(ofertaEnZona([c('a', 40), c('b', 12)]).restaurante.id, 'b');
+  assert.equal(ofertaEnZona([c('a', 10, false)]), null);
+  assert.equal(ofertaEnZona([]), null);
+});

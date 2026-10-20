@@ -4,7 +4,7 @@
  */
 import { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
@@ -58,16 +58,39 @@ function Aviso({ aviso, onCerrar, t }) {
   );
 }
 
+/** Acceso fijo al QR mientras el cliente está en un restaurante con oferta (no depende del aviso). */
+function BotonQRZona({ oferta, t }) {
+  const { colores } = useTheme();
+  const router = useRouter();
+  const { restaurante } = oferta;
+  return (
+    <Pressable
+      onPress={() => router.push({ pathname: '/llegada', params: { id: String(restaurante.id) } })}
+      accessibilityRole="button"
+      style={({ pressed }) => [styles.zona, { backgroundColor: colores.primaryContainer }, sombraFlotante(colores), pressed && { opacity: 0.9 }]}
+    >
+      <Text style={styles.icono}>📍</Text>
+      <Text numberOfLines={1} style={styles.zonaTxt}>{t('ofertasCerca.enZona', { nombre: restaurante.nombre })}</Text>
+      <View style={styles.zonaBoton}>
+        <Text style={[styles.zonaBotonTxt, { color: colores.primaryContainer }]}>{t('ofertasCerca.verQR')}</Text>
+      </View>
+    </Pressable>
+  );
+}
+
 export default function AvisosOfertas() {
   const t = useT(TRADS);
   const insets = useSafeAreaInsets();
-  const { avisos, descartar } = useAvisosOfertas(t);
-  if (!avisos.length) return null;
+  const pathname = usePathname();
+  const { avisos, descartar, enZona } = useAvisosOfertas(t);
+  const verZona = enZona && pathname !== '/llegada';
+  if (!avisos.length && !verZona) return null;
   return (
     <View pointerEvents="box-none" style={[styles.pila, { bottom: insets.bottom + 72 }]}>
       {avisos.map((a) => (
         <Aviso key={`${a.restaurante.id}:${a.nivel.distancia}`} aviso={a} onCerrar={() => descartar(a)} t={t} />
       ))}
+      {verZona && <BotonQRZona oferta={enZona} t={t} />}
     </View>
   );
 }
@@ -83,4 +106,8 @@ const styles = StyleSheet.create({
   ver: { height: 36, paddingHorizontal: 16, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   verTxt: { color: '#fff', fontFamily: FUENTES.textoBold, fontSize: 14 },
   cerrar: { width: 28, alignItems: 'center' },
+  zona: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 999 },
+  zonaTxt: { flex: 1, minWidth: 0, color: '#fff', fontFamily: FUENTES.textoBold, fontSize: 14 },
+  zonaBoton: { height: 32, paddingHorizontal: 14, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  zonaBotonTxt: { fontFamily: FUENTES.textoBold, fontSize: 14 },
 });

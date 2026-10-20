@@ -793,6 +793,7 @@ export default {
     "abrirAjustes": "Open settings"
   },
   "ofertasCerca": {
+    "enZona": "You are at {{nombre}}",
     "verQR": "My QR",
     "ver": "View",
     "cerrar": "Close alert",

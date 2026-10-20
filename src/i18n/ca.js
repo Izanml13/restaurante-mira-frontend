@@ -1921,6 +1921,7 @@ export default {
     "errorDesconocido": "No s'ha pogut obtenir la teva posició."
   },
   "ofertasCerca": {
+    "enZona": "Ets a {{nombre}}",
     "verQR": "El meu QR",
     "ver": "Veure",
     "cerrar": "Tancar avís",
