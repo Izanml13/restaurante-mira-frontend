@@ -75,15 +75,17 @@
   box-shadow: var(--op-shadow-card);
   border: 1px solid var(--op-border);
 }
-@media (min-width: 1280px) {
+/* En fila solo si caben los 7 botones sin aplastar el selector de restaurante. */
+@media (min-width: 1760px) {
   .op-topbar { flex-direction: row; align-items: center; justify-content: space-between; }
+  .op-topbar-actions { flex-shrink: 0; }
 }
 .op-topbar-left { display:flex; flex-direction: column; gap: 0.25rem; flex:1; min-width:0; }
 .op-live-badge {
   display:inline-flex; align-items:center; gap:0.35rem;
   padding: 0.15rem 0.6rem; border-radius: var(--op-radius-full);
   background: var(--op-secondary-container); color: var(--op-on-secondary-container);
-  font-size: 10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
+  font-size: 10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; white-space:nowrap;
 }
 .op-live-dot { width:0.38rem; height:0.38rem; border-radius:50%; background: var(--op-secondary); animation: opPulse 1.6s infinite; }
 @keyframes opPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
@@ -127,7 +129,7 @@
 .op-rest-sub { font-family: ui-monospace, monospace; font-size:0.68rem; color: var(--op-on-variant); }
 .op-date-chip { display:flex; align-items:center; gap:0.4rem; background: var(--op-surface-low); padding:0.45rem 0.65rem; border-radius:0.5rem; font-size:0.78rem; font-weight:600; }
 .op-date-chip select { background:transparent; border:none; font:inherit; color: var(--op-on-surface); cursor:pointer; outline:none; }
-.op-premium-badge { display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.6rem; border-radius:var(--op-radius-full); background: #a1f4c6; color:#002112; font-size:10px; font-weight:700; }
+.op-premium-badge { white-space:nowrap; display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.6rem; border-radius:var(--op-radius-full); background: #a1f4c6; color:#002112; font-size:10px; font-weight:700; }
 .op-topbar-actions { display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; }
 .op-btn-primary {
   display:inline-flex; align-items:center; gap:0.4rem;
@@ -523,3 +525,8 @@
 @media (max-width: 640px) {
   .ofertas-nivel, .ofertas-form-fila { grid-template-columns: 1fr; gap: 0.3rem; }
 }
+
+/* Acción rápida: cada bloque dice de qué reserva es. */
+.op-accion-rapida { display:flex; flex-direction:column; gap:0.35rem; padding:0.55rem 0.65rem; border-radius:0.6rem; background: var(--op-surface-low); }
+.op-accion-rapida-quien { font-size:0.75rem; font-weight:700; color: var(--op-on-surface); }
+@media (max-width: 640px) { .op-topbar-sep { display: none; } }
