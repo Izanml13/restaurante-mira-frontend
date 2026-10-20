@@ -85,9 +85,20 @@ test('límite visual: solo se deduplican y cuentan los tres avisos mostrados', (
   const candidatos = [r(1, 100), r(2, 100), r(3, 100), r(4, 100), r(5, 100)];
   const primera = filtrarNuevos(candidatos, new Set(), 3);
   assert.deepEqual(primera.nuevos.map(x => x.restaurante.id), ['1', '2', '3']);
-  assert.deepEqual([...primera.vistos], ['1:100', '2:100', '3:100']);
+  assert.deepEqual([...primera.vistos], ['1~o1:100', '2~o2:100', '3~o3:100']);
   // Los descartados no se pierden: pueden mostrarse y contarse en otra consulta.
   const segunda = filtrarNuevos(candidatos, primera.vistos, 3);
   assert.deepEqual(segunda.nuevos.map(x => x.restaurante.id), ['4', '5']);
   assert.equal(filtrarNuevos(candidatos, segunda.vistos, 3).nuevos.length, 0);
+});
+
+test('una oferta nueva o editada del mismo restaurante vuelve a avisar el mismo día', () => {
+  const v1 = { restaurante: { id: '67' }, oferta: { id: 'a', actualizado: '2026-10-20T07:00:00.000Z' }, nivel: { distancia: 100 } };
+  const primera = filtrarNuevos([v1], new Set());
+  assert.equal(primera.nuevos.length, 1);
+  assert.equal(filtrarNuevos([v1], primera.vistos).nuevos.length, 0, 'la misma oferta no se repite');
+  const editada = { ...v1, oferta: { ...v1.oferta, actualizado: '2026-10-20T08:00:00.000Z' } };
+  assert.equal(filtrarNuevos([editada], primera.vistos).nuevos.length, 1, 'editada: avisa otra vez');
+  const otra = { ...v1, oferta: { id: 'b', actualizado: '2026-10-20T07:00:00.000Z' } };
+  assert.equal(filtrarNuevos([otra], primera.vistos).nuevos.length, 1, 'oferta nueva: avisa otra vez');
 });

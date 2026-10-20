@@ -51,7 +51,7 @@ test('BUG-139: una salida breve no rearma y desaparecer de cerca durante diez mi
 
 test('BUG-139: cambia de día incluso quieto; lo excluido por el límite no queda marcado', () => {
   const primero = prepararAvisos([oferta(), oferta('r2')], null, ahora, 1);
-  assert.deepEqual(primero.estado.claves, ['r1:20']);
+  assert.deepEqual(primero.estado.claves, ['r1~o-r1:20']);
   assert.equal(prepararAvisos([oferta(), oferta('r2')], primero.estado, ahora + 30000, 1).nuevos[0].restaurante.id, 'r2');
   assert.equal(prepararAvisos([oferta()], primero.estado, ahora + 86400000).nuevos.length, 1);
   assert.equal(debeConsultar({ lat: 1, lng: 1, t: ahora }, { lat: 1, lng: 1 }, ahora + 30000), true);

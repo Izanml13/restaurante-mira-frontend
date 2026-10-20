@@ -47,6 +47,20 @@ export function debeConsultar(ultima, posicion, ahora = Date.now()) {
 const clave = (restauranteId, nivel) => `${restauranteId}:${nivel}`;
 
 /**
+ * Identificador del aviso: restaurante + oferta + su última edición. Si el
+ * restaurante cambia o edita la oferta, vuelve a avisar el mismo día.
+ * Sin «:» (separa el nivel en las claves).
+ */
+export function idAviso(r) {
+  const id = r?.restaurante?.id;
+  if (!id) return null;
+  const oferta = r?.oferta?.id;
+  if (!oferta) return String(id);
+  const editada = Date.parse(r.oferta.actualizado || r.oferta.creado || '');
+  return `${id}~${oferta}${Number.isFinite(editada) ? `~${editada}` : ''}`;
+}
+
+/**
  * Resultados de /v1/ofertas/cerca → avisos nuevos (y el conjunto de vistos
  * actualizado). Niveles: 1000 > 500 > 100 > 20 (menor distancia = mejor).
  */
@@ -54,7 +68,7 @@ export function filtrarNuevos(resultados, vistos) {
   const siguiente = new Set(vistos);
   const nuevos = [];
   for (const r of resultados || []) {
-    const id = r?.restaurante?.id;
+    const id = idAviso(r);
     const nivel = r?.nivel?.distancia;
     if (!id || !Number.isFinite(nivel)) continue;
     // Ya avisado este nivel o uno mejor (más cercano) para este restaurante.
@@ -100,8 +114,8 @@ export function prepararAvisos(resultados, anterior, ahora = Date.now(), limite 
   const claves = new Set(mismoDia && Array.isArray(anterior.claves) ? anterior.claves : []);
   const presencias = mismoDia && anterior.presencias
     ? Object.fromEntries(Object.entries(anterior.presencias).map(([id, p]) => [id, { ...p }])) : {};
-  const presentes = new Set((resultados || []).map(r => String(r?.restaurante?.id || '')).filter(Boolean));
-  const porId = new Map((resultados || []).map(r => [String(r?.restaurante?.id || ''), r]));
+  const presentes = new Set((resultados || []).map(r => idAviso(r) || '').filter(Boolean));
+  const porId = new Map((resultados || []).map(r => [idAviso(r) || '', r]));
   const dentro = id => {
     const r = porId.get(id);
     if (!r) return false;
