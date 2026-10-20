@@ -47,6 +47,20 @@ export function debeConsultar(ultima, posicion, ahora = Date.now()) {
 const clave = (restauranteId, nivel) => `${restauranteId}:${nivel}`;
 
 /**
+ * Identificador del aviso: restaurante + oferta + su última edición. Si el
+ * restaurante cambia o edita la oferta, vuelve a avisar el mismo día.
+ * Sin «:» (separa el nivel en las claves).
+ */
+export function idAviso(r) {
+  const id = r?.restaurante?.id;
+  if (!id) return null;
+  const oferta = r?.oferta?.id;
+  if (!oferta) return String(id);
+  const editada = Date.parse(r.oferta.actualizado || r.oferta.creado || '');
+  return `${id}~${oferta}${Number.isFinite(editada) ? `~${editada}` : ''}`;
+}
+
+/**
  * Resultados de /v1/ofertas/cerca → avisos nuevos (y el conjunto de vistos
  * actualizado). Niveles: 1000 > 500 > 100 > 20 (menor distancia = mejor).
  */
@@ -55,7 +69,7 @@ export function filtrarNuevos(resultados, vistos, limite = Infinity) {
   const nuevos = [];
   for (const r of resultados || []) {
     if (nuevos.length >= limite) break;
-    const id = r?.restaurante?.id;
+    const id = idAviso(r);
     const nivel = r?.nivel?.distancia;
     if (!id || !Number.isFinite(nivel)) continue;
     // Ya avisado este nivel o uno mejor (más cercano) para este restaurante.

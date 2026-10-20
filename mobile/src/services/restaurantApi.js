@@ -72,7 +72,7 @@ export async function fetchRestaurants() {
  * imagen y ciudad; el resto se pide al abrir la ficha. `ciudad` filtra en el
  * servidor (~60 KB). Caché en memoria por ciudad, alineada con el max-age=300.
  */
-const MAPA_TTL_MS = 5 * 60 * 1000;
+const MAPA_TTL_MS = 60 * 1000;
 const cacheMapa = new Map(); // ciudad|'' -> { items, guardado } | { promesa }
 
 export async function fetchRestaurantesMapa({ ciudad = '' } = {}) {

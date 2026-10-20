@@ -7,6 +7,8 @@
  *   antes de migrar, sin pintar cientos de cards de golpe).
  */
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { AppState } from 'react-native';
+import { alVolverAPrimerPlano } from '../services/primerPlano.js';
 import {
   fetchPrimeraPagina,
   fetchSiguientePagina,
@@ -67,6 +69,9 @@ export function useRestaurantController({ dieta = null, accesibilidad = null } =
   const [ignorarDieta, setIgnorarDieta] = useState(false); // ver todo igual (solo sesión)
   const reqId = useRef(0); // evita que una carga vieja pise a la nueva
   const cargandoRef = useRef(false); // evita doble tanda si el centinela dispara 2 veces
+
+  // Al volver a la app se recarga: así se ven los cambios hechos desde el panel.
+  useEffect(() => alVolverAPrimerPlano(AppState, () => setIntento((i) => i + 1)), []);
 
   // Total barato (agregado) + recarga con Reintentar.
   useEffect(() => {
