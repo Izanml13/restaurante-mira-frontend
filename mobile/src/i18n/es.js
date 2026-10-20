@@ -869,6 +869,7 @@ export default {
     "abrirAjustes": "Abrir ajustes"
   },
   "ofertasCerca": {
+    "enZona": "Estás en {{nombre}}",
     "verQR": "Mi QR",
     "ver": "Ver",
     "cerrar": "Cerrar aviso",

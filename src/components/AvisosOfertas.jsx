@@ -2,7 +2,7 @@
  * Avisos por distancia (G06) en la web: tarjetas flotantes abajo con el nivel
  * de oferta alcanzado. "Ver" abre la ficha del restaurante (#/r/<id>).
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useAvisosOfertas from '../hooks/useAvisosOfertas.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
@@ -41,15 +41,35 @@ function Aviso({ aviso, onCerrar, t }) {
   );
 }
 
+/** Acceso fijo al QR mientras el cliente está en un restaurante con oferta (no depende del aviso). */
+function BotonQRZona({ oferta, t }) {
+  const [hash, setHash] = useState(() => window.location.hash);
+  useEffect(() => {
+    const alCambiar = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', alCambiar);
+    return () => window.removeEventListener('hashchange', alCambiar);
+  }, []);
+  if (hash.startsWith('#/llegada')) return null;
+  const { restaurante } = oferta;
+  return (
+    <a className="boton-qr-zona" href={`#/llegada/${encodeURIComponent(restaurante.id)}`} data-test="boton-qr-zona">
+      <span aria-hidden="true">📍</span>
+      <span className="boton-qr-zona-texto">{t('ofertasCerca.enZona', { nombre: restaurante.nombre })}</span>
+      <strong>{t('ofertasCerca.verQR')}</strong>
+    </a>
+  );
+}
+
 export default function AvisosOfertas() {
   const t = useT(TRADS);
-  const { avisos, descartar } = useAvisosOfertas();
-  if (!avisos.length) return null;
+  const { avisos, descartar, enZona } = useAvisosOfertas();
+  if (!avisos.length && !enZona) return null;
   return (
     <div className="avisos-ofertas" aria-live="polite">
       {avisos.map((a) => (
         <Aviso key={`${a.restaurante.id}:${a.nivel.distancia}`} aviso={a} onCerrar={() => descartar(a)} t={t} />
       ))}
+      {enZona && <BotonQRZona oferta={enZona} t={t} />}
     </div>
   );
 }

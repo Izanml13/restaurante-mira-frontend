@@ -145,3 +145,20 @@ export function prepararAvisos(resultados, anterior, ahora = Date.now(), limite 
   }
   return { nuevos, estado: { fecha, claves: [...claves], presencias } };
 }
+
+/** Radio de llegada que acepta POST /v1/visitas (la API lo vuelve a comprobar). */
+export const RADIO_QR_M = 50;
+
+/**
+ * Restaurante con oferta más cercano dentro del radio de llegada, o null. Sirve
+ * para enseñar siempre el acceso al QR, aunque se haya perdido el aviso.
+ */
+export function ofertaEnZona(resultados) {
+  let mejor = null;
+  for (const r of resultados || []) {
+    if (!r?.restaurante?.id || !r?.oferta?.id || !Number.isFinite(r.distanciaM)) continue;
+    if (r.distanciaM < 0 || r.distanciaM > RADIO_QR_M) continue;
+    if (!mejor || r.distanciaM < mejor.distanciaM) mejor = r;
+  }
+  return mejor;
+}

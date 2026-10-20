@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import useUbicacion from './useUbicacion.js';
-import { debeConsultar, soloAvisables, leerFavoritosAvisos, INTERVALO_MS } from '../models/avisosOfertasModel.js';
+import { debeConsultar, ofertaEnZona, soloAvisables, leerFavoritosAvisos, INTERVALO_MS } from '../models/avisosOfertasModel.js';
 import { ofertasCerca, registrarAviso } from '../services/ofertasCercaApi.js';
 import { notificarLocal } from '../services/notificaciones.js';
 import { seleccionarAvisos } from '../services/sesionesAvisos.js';
@@ -11,6 +11,7 @@ import { alVolverAPrimerPlano } from '../services/primerPlano.js';
 export default function useAvisosOfertas(t) {
   const { activa, posicion } = useUbicacion();
   const [avisos, setAvisos] = useState([]);
+  const [enZona, setEnZona] = useState(null);
   const ultima = useRef(null);
   const enCurso = useRef(false);
   const tRef = useRef(t);
@@ -20,7 +21,7 @@ export default function useAvisosOfertas(t) {
   useEffect(() => { posRef.current = posicion; consultarRef.current?.(); }, [posicion]);
 
   useEffect(() => {
-    if (!activa) { setAvisos([]); ultima.current = null; return undefined; }
+    if (!activa) { setAvisos([]); setEnZona(null); ultima.current = null; return undefined; }
     let vigente = true;
     const consultar = async () => {
       const p = posRef.current;
@@ -30,6 +31,7 @@ export default function useAvisosOfertas(t) {
       try {
         const resultados = await ofertasCerca(p);
         if (!vigente || AppState.currentState !== 'active') return;
+        setEnZona(ofertaEnZona(resultados));
         const candidatos = soloAvisables(resultados, leerFavoritosAvisos(globalThis.localStorage));
         const nuevos = await seleccionarAvisos(candidatos, 3, () => vigente && AppState.currentState === 'active');
         if (!vigente || !nuevos.length) return;
@@ -55,5 +57,5 @@ export default function useAvisosOfertas(t) {
   }, [activa]);
 
   const descartar = useCallback(aviso => setAvisos(a => a.filter(x => x !== aviso)), []);
-  return { avisos, descartar };
+  return { avisos, descartar, enZona };
 }
