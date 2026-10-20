@@ -8,6 +8,12 @@ import ca from "../../i18n/ca.js";
 import en from "../../i18n/en.js";
 
 const TRADS = { es, ca, en };
+const LISTA_MS = 10000;
+const ETIQUETA_ESTADO = {
+  confirmada: "escaner.listaConfirmada",
+  pendiente: "escaner.listaPendiente",
+  caducada: "escaner.listaCaducada",
+};
 
 /**
  * Escáner de QR de llegada (G10, fase 3). Se monta en el panel de ofertas
@@ -57,6 +63,12 @@ export default function OfertasEscanner({ restauranteId, onValidar, onCargarList
   }, [restauranteId, onCargarLista]);
 
   useEffect(() => { cargarLista(); }, [cargarLista]);
+
+  // Recarga la lista cada poco para ver llegar al cliente y que pase a «canjeada».
+  useEffect(() => {
+    const id = setInterval(() => { if (!document.hidden) cargarLista(); }, LISTA_MS);
+    return () => clearInterval(id);
+  }, [cargarLista]);
 
   const pararCamara = useCallback(() => {
     if (loopRef.current) cancelAnimationFrame(loopRef.current);
@@ -266,6 +278,12 @@ export default function OfertasEscanner({ restauranteId, onValidar, onCargarList
               {v.descuentoPct != null ? t("escaner.descuento", { pct: v.descuentoPct }) + " · " : ""}
               {v.hora ? new Date(v.hora).toLocaleTimeString(t("modelos.locale"), { hour: "2-digit", minute: "2-digit" }) : ""}
             </span>
+            {ETIQUETA_ESTADO[v.estado] && (
+              <span data-test="escaner-estado" style={{
+                fontWeight: 700, whiteSpace: "nowrap",
+                color: v.estado === "confirmada" ? "var(--op-primary)" : "var(--op-on-variant)",
+              }}>{t(ETIQUETA_ESTADO[v.estado])}</span>
+            )}
           </li>
         ))}
         {!errorLista && llegadas.length === 0 && <li className="op-empty">{t("escaner.sinLlegadas")}</li>}

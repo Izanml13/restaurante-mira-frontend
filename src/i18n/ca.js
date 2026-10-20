@@ -1221,7 +1221,10 @@ export default {
     "estadoYaUsado": "Aquest QR ja s'ha fet servir en una visita anterior.",
     "estadoOtroRestaurante": "Aquest QR pertany a un altre restaurant.",
     "estadoInvalido": "El codi no és vàlid.",
-    "estadoErrorRed": "No s'ha pogut connectar. Comprova la connexió i reintenta."
+    "estadoErrorRed": "No s'ha pogut connectar. Comprova la connexió i reintenta.",
+    "listaConfirmada": "Bescanviada",
+    "listaPendiente": "Pendent",
+    "listaCaducada": "Caducada"
   },
   "ops": {
     "seccDashboard": "Panell general",
@@ -1974,7 +1977,7 @@ export default {
     "buscando": "Comprovant que ets al local…",
     "ensenalo": "Ensenya'l al personal",
     "caducaEn": "caduca en {{t}}",
-    "aplicada": "Oferta aplicada",
+    "aplicada": "Oferta bescanviada",
     "aplicadaTexto": "El restaurant ha validat la teva visita. Bon profit!",
     "caducado": "Aquest QR ha caducat.",
     "otroQR": "Demanar un altre QR",

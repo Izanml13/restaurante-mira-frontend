@@ -1221,7 +1221,10 @@ export default {
     "estadoYaUsado": "This QR was already used on a previous visit.",
     "estadoOtroRestaurante": "This QR belongs to another restaurant.",
     "estadoInvalido": "The code is not valid.",
-    "estadoErrorRed": "Could not connect. Check the connection and try again."
+    "estadoErrorRed": "Could not connect. Check the connection and try again.",
+    "listaConfirmada": "Redeemed",
+    "listaPendiente": "Pending",
+    "listaCaducada": "Expired"
   },
   "ops": {
     "seccDashboard": "General Dashboard",
@@ -1974,7 +1977,7 @@ export default {
     "buscando": "Checking that you are at the restaurant…",
     "ensenalo": "Show it to the staff",
     "caducaEn": "expires in {{t}}",
-    "aplicada": "Offer applied",
+    "aplicada": "Offer redeemed",
     "aplicadaTexto": "The restaurant has validated your visit. Enjoy!",
     "caducado": "This QR has expired.",
     "otroQR": "Get a new QR",
