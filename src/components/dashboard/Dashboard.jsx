@@ -441,7 +441,7 @@ const restDropdownRef = useRef(null);
             <div className="op-topbar-left">
               <div style={{display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap'}}>
                 <span className="op-live-badge"><span className="op-live-dot"></span> {t('tx.dashHubEnDirecto')}</span>
-                <span style={{fontSize:'0.68rem', color:'var(--op-outline)'}}>/</span>
+                <span className="op-topbar-sep" style={{fontSize:'0.68rem', color:'var(--op-outline)'}}>/</span>
                 <span style={{fontSize:'0.68rem', fontWeight:600, color:'var(--op-on-variant)'}}>{t("dashboard.gestionRendimiento")}</span>
               </div>
               <div className="op-topbar-meta">
@@ -642,7 +642,7 @@ const restDropdownRef = useRef(null);
               >
                 <div className="op-drop-icon"><span className="material-symbols-outlined" style={{fontSize:28}}>upload_file</span></div>
                 <h4 style={{fontWeight:700, fontSize:'0.85rem', marginTop:'0.6rem'}}>{t("dashboard.registrarTicketsTitulo")}</h4>
-                <p style={{fontSize:'0.72rem', color:'var(--op-on-variant)', marginTop:'0.2rem'}}>{t("dashboard.registrarTicketsIntro")} <strong style={{fontFamily:'ui-monospace', color:'var(--op-on-surface)'}}>{t("dashboard.registrarTicketsFuerte")}</strong>{t("dashboard.registrarTicketsOutro")}</p>
+                <p style={{fontSize:'0.72rem', color:'var(--op-on-variant)', marginTop:'0.2rem'}}>{t("dashboard.registrarTicketsIntro")} <strong style={{fontFamily:'ui-monospace, monospace', color:'var(--op-on-surface)'}}>{t("dashboard.registrarTicketsFuerte")}</strong>{t("dashboard.registrarTicketsOutro")}</p>
                 <div style={{display:'flex', gap:'0.5rem', marginTop:'0.6rem', alignItems:'center'}}>
                   <button className="op-btn-ghost" style={{background:'var(--op-surface-lowest)', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}} onClick={e=>{e.stopPropagation(); abrirModalTickets();}} type="button"><span className="material-symbols-outlined" style={{fontSize:14, color:'var(--op-primary)'}}>folder_open</span> {t("dashboard.verReservasSinTicket")}</button>
                   <span style={{fontSize:'0.68rem', color:'var(--op-outline)'}}>{t("dashboard.soltarFicheroAqui")}</span>
@@ -663,7 +663,7 @@ const restDropdownRef = useRef(null);
                       </div>
                     </div>
                     <div style={{textAlign:'right', flex:'0 0 auto', marginLeft:'0.5rem'}}>
-                      <div style={{fontFamily:'ui-monospace', fontWeight:700, fontSize:'0.72rem'}}>{euro(item.totalPagado ?? item.total ?? 0)}</div>
+                      <div style={{fontFamily:'ui-monospace, monospace', fontWeight:700, fontSize:'0.72rem'}}>{euro(item.totalPagado ?? item.total ?? 0)}</div>
                       <span style={{display:'inline-flex', alignItems:'center', gap:'0.2rem', fontSize:'0.58rem', fontWeight:700, padding:'0.1rem 0.3rem', borderRadius:'0.3rem', background: String(item.estado).includes('Revisi')? '#ffdad6':'var(--op-secondary-container)', color: String(item.estado).includes('Revisi')? '#93000a':'var(--op-on-secondary-container)'}}><span style={{width:'0.25rem', height:'0.25rem', borderRadius:'50%', background:'currentColor'}}></span>{item.estado || t("dashboard.registrado")}</span>
                     </div>
                   </div>
@@ -685,7 +685,7 @@ const restDropdownRef = useRef(null);
                 </div>
               </div>
               <div className="op-occupancy">
-                <div className="op-occupancy-head"><span>{aforo ? t("dashboard.ocupacionEstimada", { pct: ocupacion }) : t("dashboard.paxHoySinAforo")}</span><span style={{fontFamily:'ui-monospace', color:'var(--op-primary)'}}>{hoyComensales}{aforo ? ` / ${aforo} ${t("dashboard.asientos")}` : ' pax'}</span></div>
+                <div className="op-occupancy-head"><span>{aforo ? t("dashboard.ocupacionEstimada", { pct: ocupacion }) : t("dashboard.paxHoySinAforo")}</span><span style={{fontFamily:'ui-monospace, monospace', color:'var(--op-primary)'}}>{hoyComensales}{aforo ? ` / ${aforo} ${t("dashboard.asientos")}` : ' pax'}</span></div>
                 <div className="op-bar"><div className="op-bar-almuerzo" style={{width: `${pctAlm}%`}} title={t("dashboard.almuerzo")}></div><div className="op-bar-cena" style={{width: `${pctCena}%`}} title={t("dashboard.cena")}></div><div className="op-bar-libre" style={{width:`${pctLibre}%`}}></div></div>
                 <div className="op-legend"><span style={{display:'flex', alignItems:'center', gap:'0.25rem'}}><span className="op-legend-dot" style={{background:'var(--op-primary)'}}></span>{t("dashboard.almuerzoPax", { n: almuerzo })}</span><span style={{display:'flex', alignItems:'center', gap:'0.25rem'}}><span className="op-legend-dot" style={{background:'#4ae183'}}></span>{t("dashboard.cenaPax", { n: cena })}</span><span style={{display:'flex', alignItems:'center', gap:'0.25rem'}}><span className="op-legend-dot" style={{background:'var(--op-outline-variant)'}}></span>{t("dashboard.disponiblePax", { n: aforo ? Math.max(0,aforo-hoyComensales) : '—' })}</span></div>
               </div>
@@ -737,12 +737,12 @@ const restDropdownRef = useRef(null);
                       const ticket = r.ticketTotal != null ? euro(r.ticketTotal) : (r.totalPagado != null ? euro(r.totalPagado) : t("dashboard.pendienteServicio"));
                       return (
                         <tr key={r.id}>
-                          <td><div className="op-mono" style={{fontWeight:800}}>{r.hora||'-'}</div><span style={{fontFamily:'ui-monospace', fontSize:'0.62rem', color:'var(--op-outline)'}}>{codigo}</span></td>
+                          <td><div className="op-mono" style={{fontWeight:800}}>{r.hora||'-'}</div><span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.62rem', color:'var(--op-outline)'}}>{codigo}</span></td>
                           <td><div style={{fontWeight:700, fontSize:'0.78rem'}}>{comensal}</div><span style={{fontSize:'0.62rem', color:'var(--op-on-variant)'}}>{r.comentarios ? r.comentarios.slice(0,28) : (String(r.usuarioEmail||'').includes('vip') || Number(r.comensales)>=6 ? 'MIRA VIP' : t("dashboard.sinNotas"))}</span></td>
                           <td style={{textAlign:'center'}} className="op-mono">{r.comensales||0}</td>
                           <td><span className="op-mesa">{mesa}</span></td>
                           <td><span className={`op-status ${badge.cls}`}><span className="op-status-dot"></span>{badge.label}</span></td>
-                          <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:700}}>{String(ticket).includes(t("dashboard.pendienteServicio")) ? (<span style={{fontSize:'0.62rem', color:'var(--op-outline)', fontWeight:400}}>{ticket}</span>) : ticket}</td>
+                          <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:700}}>{String(ticket).includes(t("dashboard.pendienteServicio")) ? (<span style={{fontSize:'0.62rem', color:'var(--op-outline)', fontWeight:400}}>{ticket}</span>) : ticket}</td>
                         </tr>
                       );
                     });
@@ -758,14 +758,16 @@ const restDropdownRef = useRef(null);
               {(()=>{ const allMap3=new Map(); [...(reservasHoyList||[]), ...(proximasReservas||[])].forEach(x=> allMap3.set(x.id,x)); let base2; if(filtroTodas) base2=Array.from(allMap3.values()).filter(r=> r.fecha>=hoyISO && !isCanceladaLocal(r.estado)).sort((a,b)=> `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`)); else if(selectedForecast) base2=Array.from(allMap3.values()).filter(r=> r.fecha===selectedForecast && !isCanceladaLocal(r.estado)).sort((a,b)=> String(a.hora).localeCompare(String(b.hora))); else base2=Array.from(allMap3.values()).filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).sort((a,b)=> String(a.hora).localeCompare(String(b.hora))); const vis = base2.slice(0,3); if(vis.length===0) return null; return (
                 <div style={{marginTop:'0.5rem', display:'flex', flexDirection:'column', gap:'0.4rem'}}>
                   <span style={{fontSize:'0.68rem', fontWeight:700, color:'var(--op-on-variant)'}}>{t("dashboard.accionRapidaSobre", { x: filtroTodas? t("dashboard.proximas") : fechaFiltro })}</span>
-                  <div style={{display:'flex', flexWrap:'wrap', gap:'0.4rem'}}>
-                    {vis.map(r=> <ReservationActions key={'act-'+r.id} reserva={r} comisionPct={comisionPct} onStatusChange={(id, act)=>{ handleReservationChange(id, act); if(act==='confirmar' || act==='no_show' || act==='cancelada'){ setTimeout(()=> dashboardApi.getMyRestaurant().then(d=> setData(prev=> ({...prev, ...d, restaurante: d.restaurante || prev.restaurante })) ).catch(()=>{}), 400); } }} t={t} />)}
+                  <div style={{display:'flex', flexDirection:'column', gap:'0.5rem'}}>
+                    {vis.map(r=> <div key={'act-'+r.id} className="op-accion-rapida">
+                      <div className="op-accion-rapida-quien"><span className="op-mono">{r.hora || '--:--'}</span> · {r.nombre || r.email || r.id}{r.personas ? ` · ${r.personas} pax` : ''}</div>
+                      <ReservationActions reserva={r} comisionPct={comisionPct} onStatusChange={(id, act)=>{ handleReservationChange(id, act); if(act==='confirmar' || act==='no_show' || act==='cancelada'){ setTimeout(()=> dashboardApi.getMyRestaurant().then(d=> setData(prev=> ({...prev, ...d, restaurante: d.restaurante || prev.restaurante })) ).catch(()=>{}), 400); } }} t={t} /></div>)}
                   </div>
                 </div>
               ); })()}
             </div>
 
-            <div className="op-panel">
+            <div className="op-panel" style={{alignSelf:'start'}}>
               <div className="op-panel-head">
                 <div><div className="op-panel-title">{t("dashboard.previsionCalendario")}</div><p style={{fontSize:'0.68rem', color:'var(--op-on-variant)'}}>{t("dashboard.proximasReservasReales")}</p></div>
                 <div style={{textAlign:'right'}}><div style={{fontWeight:800, fontSize:'1.1rem', color:'var(--op-primary)', fontVariantNumeric:'tabular-nums'}}>{stats.totalReservas || 0}</div><p style={{fontSize:'0.62rem', color:'var(--op-on-variant)'}}>{t("dashboard.paxAcumulados", { n: totalComensales || 0 })}</p></div>
@@ -780,7 +782,7 @@ const restDropdownRef = useRef(null);
                         <div className="op-forecast-sub">{t("dashboard.paxConfirmadosRes", { pax: d.pax, res: d.res, fecha: d.fecha })}</div>
                       </div>
                     </div>
-                    <div style={{textAlign:'right'}}><div style={{fontFamily:'ui-monospace', fontWeight:800, fontSize:'0.78rem', color: d.pct>=98? 'var(--op-secondary)': 'var(--op-primary)'}}>{d.pct}%</div><p style={{fontFamily:'ui-monospace', fontSize:'0.58rem', color:'var(--op-outline)'}}>{t("dashboard.enEspera", { n: d.res })}</p></div>
+                    <div style={{textAlign:'right'}}><div style={{fontFamily:'ui-monospace, monospace', fontWeight:800, fontSize:'0.78rem', color: d.pct>=98? 'var(--op-secondary)': 'var(--op-primary)'}}>{d.pct}%</div><p style={{fontFamily:'ui-monospace, monospace', fontSize:'0.58rem', color:'var(--op-outline)'}}>{t("dashboard.enEspera", { n: d.res })}</p></div>
                   </div>
                 ))}
               </div>
@@ -813,19 +815,19 @@ const restDropdownRef = useRef(null);
                     <tr><td colSpan={7} className="op-empty">{t("dashboard.alDiaSinTickets")}</td></tr>
                   ) : (
                   <tr className="op-dir-row active">
-                    <td><div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}><span style={{width:'0.45rem', height:'0.45rem', borderRadius:'50%', background:'var(--op-primary)'}}></span><div><div style={{fontWeight:800, fontSize:'0.78rem', color:'var(--op-primary)', display:'flex', gap:'0.2rem', alignItems:'center'}}>{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:10, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>star</span></div><span style={{fontFamily:'ui-monospace', fontSize:'0.62rem', color:'var(--op-outline)'}}>{restId} · {restaurante.ciudad||'-'}</span></div></div></td>
+                    <td><div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}><span style={{width:'0.45rem', height:'0.45rem', borderRadius:'50%', background:'var(--op-primary)'}}></span><div><div style={{fontWeight:800, fontSize:'0.78rem', color:'var(--op-primary)', display:'flex', gap:'0.2rem', alignItems:'center'}}>{nombreCorto} <span className="material-symbols-outlined" style={{fontSize:10, color:'var(--op-secondary)', fontVariationSettings:"'FILL' 1"}}>star</span></div><span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.62rem', color:'var(--op-outline)'}}>{restId} · {restaurante.ciudad||'-'}</span></div></div></td>
                     <td style={{fontSize:'0.72rem'}}>{restaurante.ciudad||'-'} {restaurante.zona? `· ${restaurante.zona}`:''}</td>
-                    <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:800}}>{euro(totalFacturacion)}</td>
-                    <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:700, color:'var(--op-secondary)'}}>{euro(totalComisiones)}</td>
-                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0.3rem', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>1 / 1</span></td>
-                    <td style={{textAlign:'right', fontFamily:'ui-monospace'}}>{t("dashboard.resAbrev", { n: stats.totalReservas })}</td>
+                    <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:800}}>{euro(totalFacturacion)}</td>
+                    <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:700, color:'var(--op-secondary)'}}>{euro(totalComisiones)}</td>
+                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0.3rem', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>1 / 1</span></td>
+                    <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace'}}>{t("dashboard.resAbrev", { n: stats.totalReservas })}</td>
                     <td style={{textAlign:'right'}}><button onClick={()=> window.scrollTo({top:0, behavior:'smooth'})} className="op-btn-primary" style={{padding:'0.25rem 0.5rem', fontSize:'0.68rem'}}>{t("dashboard.panelActivo")}</button></td>
                   </tr>
                   )}
                 </tbody>
               </table>
             </div>
-            <div style={{display:'flex', justifyContent:'space-between', paddingTop:'0.5rem', fontSize:'0.68rem', color:'var(--op-on-variant)'}}><span>{t("dashboard.mostrandoRestaurantes", { n: listaRests.length || 1 })}</span><div style={{display:'flex', gap:'0.25rem', alignItems:'center'}}><span style={{padding:'0.15rem 0.35rem', borderRadius:'0.25rem', background:'var(--op-primary-container)', color:'var(--op-on-primary)', fontFamily:'ui-monospace', fontWeight:800}}>1</span></div></div>
+            <div style={{display:'flex', justifyContent:'space-between', paddingTop:'0.5rem', fontSize:'0.68rem', color:'var(--op-on-variant)'}}><span>{t("dashboard.mostrandoRestaurantes", { n: listaRests.length || 1 })}</span><div style={{display:'flex', gap:'0.25rem', alignItems:'center'}}><span style={{padding:'0.15rem 0.35rem', borderRadius:'0.25rem', background:'var(--op-primary-container)', color:'var(--op-on-primary)', fontFamily:'ui-monospace, monospace', fontWeight:800}}>1</span></div></div>
             {/* Charts kept for data depth, styled with new palette */}
             <div style={{marginTop:'0.75rem', display:'grid', gap:'0.75rem'}}>
               <RevenueLineChart data={ingresosPorMes} title={t("dashboard.evolucionIngresos") || "Evolución ingresos"} />
@@ -834,7 +836,6 @@ const restDropdownRef = useRef(null);
           </div>
 
           {/* Help / Consistency footer */}
-          <div style={{textAlign:'center', fontSize:'0.68rem', color:'var(--op-outline)', padding:'0.5rem'}}>{t("dashboard.consistenciaWeb")}</div>
         </div>
       </div>
 
@@ -900,12 +901,12 @@ const restDropdownRef = useRef(null);
                 <tbody>
                   {ticketsRecientes.length? ticketsRecientes.map(ti=> (
                     <tr key={ti.id}>
-                      <td style={{fontFamily:'ui-monospace', fontSize:'0.72rem'}}>{ti.fecha || (ti.createdAt?.toDate? ti.createdAt.toDate().toLocaleDateString(): '-')}</td>
-                      <td style={{fontFamily:'ui-monospace', fontSize:'0.68rem'}}>{ti.codigoReserva || ti.id.slice(0,6)}</td>
+                      <td style={{fontFamily:'ui-monospace, monospace', fontSize:'0.72rem'}}>{ti.fecha || (ti.createdAt?.toDate? ti.createdAt.toDate().toLocaleDateString(): '-')}</td>
+                      <td style={{fontFamily:'ui-monospace, monospace', fontSize:'0.68rem'}}>{ti.codigoReserva || ti.id.slice(0,6)}</td>
                       <td style={{fontSize:'0.72rem'}}>{ti.clienteNombre || ti.restauranteNombre || '-'}</td>
-                      <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:700}}>{euro(ti.totalPagado||0)}</td>
-                      <td style={{textAlign:'right', fontFamily:'ui-monospace', color:'var(--op-error)'}}>{euro(ti.importeComision!=null ? ti.importeComision : Math.round((ti.totalPagado||0)*(comisionPct/100)*100)/100)}</td>
-                      <td style={{textAlign:'right', fontFamily:'ui-monospace', fontWeight:700, color:'var(--op-primary)'}}>{euro(ti.netoRestaurante!=null ? ti.netoRestaurante : Math.round(((ti.totalPagado||0) - (ti.importeComision!=null ? ti.importeComision : (ti.totalPagado||0)*(comisionPct/100)))*100)/100)}</td>
+                      <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:700}}>{euro(ti.totalPagado||0)}</td>
+                      <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', color:'var(--op-error)'}}>{euro(ti.importeComision!=null ? ti.importeComision : Math.round((ti.totalPagado||0)*(comisionPct/100)*100)/100)}</td>
+                      <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:700, color:'var(--op-primary)'}}>{euro(ti.netoRestaurante!=null ? ti.netoRestaurante : Math.round(((ti.totalPagado||0) - (ti.importeComision!=null ? ti.importeComision : (ti.totalPagado||0)*(comisionPct/100)))*100)/100)}</td>
                       <td><span className={`op-status ${ti.asistio===false?'no_show':'pagado'}`}><span className="op-status-dot"></span>{ti.asistio===false? t("dashboard.noShow") : t("dashboard.registrado")}</span></td>
                     </tr>
                   )) : <tr><td colSpan={7} className="op-empty">{t("dashboard.sinTickets")}</td></tr>}

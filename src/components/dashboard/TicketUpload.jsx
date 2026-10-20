@@ -87,7 +87,7 @@ export default function TicketUpload({ reserva, onUploaded, t, comisionPct = 8 }
     <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:'0.5rem', background:'var(--op-surface-low)', padding:'0.7rem', borderRadius:'0.5rem', border:'1px solid var(--op-border)'}}>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:'0.5rem'}}>
         <strong style={{fontSize:'0.78rem'}}>{reserva.nombreRestaurante || reserva.restaurantName || tt("dashboard.reserva","Reserva")}</strong>
-        <span style={{fontFamily:'ui-monospace', fontSize:'0.62rem', background:'var(--op-surface-lowest)', padding:'0.1rem 0.35rem', borderRadius:'0.3rem'}}>{reserva.codigo || reserva.id?.slice(0,6)}</span>
+        <span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.62rem', background:'var(--op-surface-lowest)', padding:'0.1rem 0.35rem', borderRadius:'0.3rem'}}>{reserva.codigo || reserva.id?.slice(0,6)}</span>
       </div>
       <div style={{fontSize:'0.72rem', color:'var(--op-on-variant)'}}>{reserva.fecha} {reserva.hora} · {reserva.comensales} pax · {reserva.usuarioNombre || reserva.usuarioEmail || tt("dashboard.cliente","Cliente")}</div>
 

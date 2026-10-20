@@ -273,7 +273,7 @@ export default function OfertasEscanner({ restauranteId, onValidar, onCargarList
             display: "flex", justifyContent: "space-between", gap: "0.5rem",
             padding: "0.5rem 0", borderBottom: "1px solid var(--op-border)", fontSize: "0.8rem",
           }}>
-            <span>{v.cliente || v.texto || t("escaner.ofertaGenerico")}</span>
+            <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.cliente || v.texto || t("escaner.ofertaGenerico")}</span>
             <span style={{ color: "var(--op-on-variant)", whiteSpace: "nowrap" }}>
               {v.descuentoPct != null ? t("escaner.descuento", { pct: v.descuentoPct }) + " · " : ""}
               {v.hora ? new Date(v.hora).toLocaleTimeString(t("modelos.locale"), { hour: "2-digit", minute: "2-digit" }) : ""}
