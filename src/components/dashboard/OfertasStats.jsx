@@ -33,6 +33,8 @@ function haceDias(dias) {
   return new Date(Date.now() - dias * 86400000).toISOString().slice(0, 10);
 }
 
+const REFRESCO_MS = 15000;
+
 export default function OfertasStats({ restauranteId }) {
   const t = useT(TRADS);
   const [datos, setDatos] = useState(null);
@@ -40,9 +42,9 @@ export default function OfertasStats({ restauranteId }) {
   const [error, setError] = useState(false);
   const [activa, setActiva] = useState(null);
 
-  const recargar = useCallback(async () => {
+  const recargar = useCallback(async (silencioso = false) => {
     if (!restauranteId) { setDatos(null); setCargando(false); return; }
-    setCargando(true);
+    if (!silencioso) setCargando(true);
     setError(false);
     try {
       const q = new URLSearchParams({
@@ -60,6 +62,12 @@ export default function OfertasStats({ restauranteId }) {
 
   useEffect(() => { recargar(); }, [recargar]);
 
+  // Se vuelve a pedir cada poco (sin parpadeo) para ver los cambios sin recargar.
+  useEffect(() => {
+    const id = setInterval(() => { if (!document.hidden) recargar(true); }, REFRESCO_MS);
+    return () => clearInterval(id);
+  }, [recargar]);
+
   const serieNivel = useMemo(() => aSeriesNivel(datos), [datos]);
   const serieFecha = useMemo(() => aSeriesFechas(datos, t("modelos.locale")), [datos, t]);
   const kpi = useMemo(() => resumen(datos), [datos]);
@@ -69,7 +77,7 @@ export default function OfertasStats({ restauranteId }) {
     return (
       <div className="op-empty">
         <p className="ofertas-error" role="alert">{t("ofertasStats.errorCargar")}</p>
-        <button type="button" className="op-btn-ghost" onClick={recargar}>{t("ofertasStats.reintentar")}</button>
+        <button type="button" className="op-btn-ghost" onClick={() => recargar()}>{t("ofertasStats.reintentar")}</button>
       </div>
     );
   }
