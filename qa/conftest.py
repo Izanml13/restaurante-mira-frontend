@@ -1,6 +1,6 @@
 """Fixtures de la suite E2E de MIRA.
 
-Arranca los servidores si no están levantados y prepara un Edge headless por test.
+Arranca los servidores si no están levantados y prepara un navegador headless por test (Edge o Chrome, ver navegador.py).
 Variables de entorno: ver servers.py.
 """
 from __future__ import annotations
@@ -10,13 +10,12 @@ import time
 import pathlib
 
 import pytest
-from selenium import webdriver
-from selenium.webdriver.edge.options import Options
 
 RAIZ_QA = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RAIZ_QA))
 
 import servers  # noqa: E402
+from navegador import crear_driver  # noqa: E402
 
 
 def pytest_addoption(parser):
@@ -28,6 +27,14 @@ def pytest_addoption(parser):
     )
     grupo.addoption("--monkey-acciones", type=int, default=None, help="acciones del monkey")
     grupo.addoption("--monkey-seed", type=int, default=None, help="semilla del monkey")
+    grupo.addoption(
+        "--monkey-seeds", default=None,
+        help="varias semillas separadas por comas (un test por semilla), p. ej. 1,2,3",
+    )
+    grupo.addoption(
+        "--monkey-movil", action="store_true", default=False,
+        help="el monkey arranca con ventana de móvil (390x844)",
+    )
 
 
 @pytest.fixture(scope="session")
@@ -38,18 +45,8 @@ def servidores() -> str:
 
 @pytest.fixture
 def driver(request):
-    """Edge headless con captura de consola y screenshot automático al fallar."""
-    opts = Options()
-    if servers.HEADLESS:
-        opts.add_argument("--headless=new")
-    opts.add_argument("--window-size=1400,1000")
-    opts.add_argument("--disable-gpu")
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--lang=es-ES")
-    opts.set_capability("goog:loggingPrefs", {"browser": "ALL"})
-
-    d = webdriver.Edge(options=opts)
-    d.set_page_load_timeout(60)
+    """Navegador headless con captura de consola y screenshot automático al fallar."""
+    d = crear_driver(headless=servers.HEADLESS)
 
     fallo: BaseException | None = None
     try:

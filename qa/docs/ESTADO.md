@@ -7,7 +7,8 @@
 
 - Rama: `test/qa-selenium-taurus` (remota, pusheada).
 - Suite E2E de navegador real: **21 tests, verde**.
-- Monkey reproducible por seed: **verde**, 0 incidencias.
+- Monkey reproducible por seed: **verde**, 0 incidencias. Ahora con varias
+  semillas, modo móvil, formularios y ráfagas de clics (ver bitácora 2026-10-20 b).
 - Regresión: el backend está verde (210/210), pero el frontend arrastra
   **38 fallos preexistentes** ajenos a esta suite; por eso `qa:regresion` sale
   en rojo (exit 3) y es correcto.
@@ -23,6 +24,7 @@
 | 16 flujos públicos (landing, buscador, ficha, favoritos, rutas) | verde |
 | 5 flujos de auth sin credenciales (validación, opciones, guard de reserva) | verde |
 | Monkey 40/80 acciones con seed | verde, 0 incidencias |
+| Monkey multisemilla (1,2,3 escritorio · 4,5 móvil), Chrome en Linux | verde, 0 incidencias |
 | Perfiles Taurus con `passfail` (exit 3 si falla) | verde |
 | `npm test` backend (210 tests) | verde |
 | `npm test` frontend | 271/309 (38 fallos preexistentes) |
@@ -45,7 +47,8 @@ Para iterar un solo fichero:
 
 - Taurus/Selenium viven en un venv aparte:
   `C:\Users\<usuario>\tools\taurus\Scripts\python.exe`.
-- Solo hay **Edge** (no Chrome, no Java). El driver lo resuelve Selenium Manager.
+- En el equipo de Rubén solo hay **Edge**. En Linux/CI se usa Chrome con
+  `MIRA_BROWSER=chrome` (ver `navegador.py`). El driver lo resuelve Selenium Manager.
 - El mock escucha en **3101**, no en 3001: ese puerto lo ocupa `AMAgent` y
   Windows permite dos listeners, así que `localhost:3001` era una ruleta.
 - En PowerShell `npm` puede fallar por ExecutionPolicy: usa `npm.cmd`.
@@ -108,7 +111,7 @@ pedido.
 ### 5. Opcionales
 
 - Regresión visual con baseline de capturas (hoy solo se guardan al fallar).
-- Acelerar el monkey (80 acciones ≈ 4 min).
+- Acelerar el monkey (80 acciones ≈ 2 min por semilla en Chromium/Linux).
 - Carga de backend con Taurus (`apiritif`); `jmeter` requiere instalar un JDK.
 
 ## Mapa de ficheros

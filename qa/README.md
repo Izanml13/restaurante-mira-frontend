@@ -1,6 +1,6 @@
 # QA de MIRA: flujos, monkey y regresión con Selenium + Taurus
 
-Suite de pruebas de navegador real (Edge headless) sobre el frontend de MIRA.
+Suite de pruebas de navegador real (Edge o Chrome headless) sobre el frontend de MIRA.
 Taurus orquesta y reporta; **la carga de trabajo la ejecuta Selenium**, que es
 lo que hace falta para un monkey test, flujos de usuario y regresión visual-funcional.
 
@@ -14,18 +14,19 @@ lo que hace falta para un monkey test, flujos de usuario y regresión visual-fun
 
 | Carpeta / fichero | Qué hace |
 |---|---|
-| `conftest.py` | Fixtures de pytest: servidores, Edge headless por test, screenshot y consola al fallar |
+| `conftest.py` | Fixtures de pytest: servidores, navegador headless por test, screenshot y consola al fallar |
+| `navegador.py` | Crea el WebDriver: Edge (por defecto) o Chrome con `MIRA_BROWSER=chrome` |
 | `servers.py` | Arranca mock-api + Vite si no están (lo usan pytest y el CLI del monkey) |
 | `helpers.py` | Navegación, cookies, errores de consola, clicks robustos |
 | `tests/test_flujo_home.py` | Landing, buscador (Enter), ficha de restaurante, cierre |
 | `tests/test_flujo_favoritos.py` | Marcar/quitar favorito, contador del header, panel |
 | `tests/test_flujo_navegacion.py` | Regresión de las 10 rutas públicas y la protegida |
 | `tests/test_flujo_auth.py` | Login (validación), recuperar contraseña y guard de reserva sin sesión |
-| `tests/test_monkey.py` | Monkey con seed fija: 40 acciones aleatorias, cero incidencias |
+| `tests/test_monkey.py` | Monkey con seed fija (o varias con `--monkey-seeds`), escritorio o `--monkey-movil` |
 | `tests/test_regresion_unitaria.py` | `npm test` de frontend y backend (solo con `MIRA_UNITARIAS=1`) |
 | `monkey/monkey_web.py` | Monkey ejecutable aparte, con `--acciones`, `--seed`, `--visible` |
 | `bzt/01-flujo.yml` | Taurus: flujos E2E (sin monkey) |
-| `bzt/02-monkey.yml` | Taurus: monkey de 80 acciones |
+| `bzt/02-monkey.yml` | Taurus: monkey de 80 acciones, 3 semillas escritorio + 2 móvil |
 | `bzt/03-regresion.yml` | Taurus: unitarias + E2E + monkey |
 | `docs/bitacora.md` | Registro cronológico: qué se hizo, resultados, hallazgos y decisiones |
 | `docs/ESTADO.md` | Handoff: cómo retomar, qué está verde y qué queda pendiente |
@@ -40,6 +41,10 @@ lo que hace falta para un monkey test, flujos de usuario y regresión visual-fun
   `C:\Users\<usuario>\tools\taurus\Scripts\python.exe`
   (creado para Taurus; `pip install pytest selenium`).
 - Microsoft Edge (ya viene con Windows). No hace falta Chrome ni Java.
+- **Alternativa Chrome/Chromium** (Linux, macOS, CI): `MIRA_BROWSER=chrome`.
+  Opcionales: `MIRA_CHROME_BINARY` (ruta al navegador) y `MIRA_CHROMEDRIVER`
+  (ruta al driver; si no, lo resuelve Selenium Manager). La versión del driver
+  debe coincidir con la del navegador.
 
 > **Ojo con el puerto 3001**: en este equipo lo ocupa un agente corporativo
 > (`AMAgent`) que responde 404. La suite levanta el mock API en **3101**
@@ -172,3 +177,31 @@ Para añadir un flujo: crea `qa/tests/test_flujo_<area>.py`, usa las fixtures
 `driver` y `servidores`, y apóyate en `helpers.py`. Sin `data-testid` en la app,
 los selectores van por clase/rol; si un flujo se vuelve frágil, lo correcto es
 añadir `data-testid` en el componente.
+
+---
+
+## Monkey test en detalle
+
+Acciones (con peso aproximado): clic 40 · escribir texto basura 12 · selects,
+checkboxes, radios, fechas y números 10 · scroll 12 · cambiar de ruta 12 ·
+ráfaga de 3-6 clics sobre el mismo elemento 5 · atrás 5 · recarga 5 · cambiar
+entre escritorio y móvil 2.
+
+Detecta: pantalla en blanco, errores JS no capturados (`error`,
+`unhandledrejection`) y errores SEVERE de consola de la propia app (incluidas
+respuestas 4xx/5xx de `localhost`).
+
+No pulsa: acciones destructivas o de pago, cerrar sesión ni el login con
+Google (popup externo). Si "atrás" sale de la app, vuelve a la home: no cuenta
+como fallo.
+
+```bash
+# varias semillas, un test por semilla
+python -m pytest qa/tests/test_monkey.py --monkey-acciones 80 --monkey-seeds 1,2,3
+# en móvil
+python -m pytest qa/tests/test_monkey.py --monkey-seeds 4,5 --monkey-movil
+# reproducir una semilla viendo el navegador
+cd qa && python -m monkey.monkey_web --seed 4 --acciones 80 --movil --visible
+```
+
+El registro de cada semilla queda en `qa/artifacts/monkey-seed<N>[-movil].log`.

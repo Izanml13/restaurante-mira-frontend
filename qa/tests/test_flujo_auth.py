@@ -86,7 +86,8 @@ def test_reserva_sin_sesion_manda_al_login(driver, servidores):
 
     # Aviso de que hace falta sesión, con enlace al login.
     nota = modal.find_element(By.CSS_SELECTOR, ".det-nota-login")
-    assert "sesión" in nota.text.lower() or "sesion" in nota.text.lower()
+    texto_nota = h.texto(nota).lower()
+    assert "sesión" in texto_nota or "sesion" in texto_nota
 
     h.click_js(driver, modal.find_element(By.CSS_SELECTOR, ".det-reservar"))
     WebDriverWait(driver, 5).until(lambda d: "#/login" in d.current_url)

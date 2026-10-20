@@ -95,3 +95,41 @@ npm run qa:flujo      # 21 E2E, exit 0
 npm run qa:monkey     # 80 acciones, exit 0
 npm run qa:regresion  # exit 3 por los 38 fallos preexistentes del frontend
 ```
+
+
+## 2026-10-20 (b) — Ampliación del monkey test
+
+### Qué se hizo
+- `qa/navegador.py`: el driver se crea en un solo sitio y admite Chrome
+  (`MIRA_BROWSER=chrome`) además de Edge, para poder ejecutar en Linux/CI.
+- Nuevas acciones: `formulario` (select, checkbox, radio, date, time, number,
+  range con el setter nativo para que React reciba el evento), `rafaga`
+  (3-6 clics seguidos: doble envío) y `redimensionar` (escritorio ↔ móvil).
+- `--monkey-seeds 1,2,3` → un test de pytest por semilla; `--monkey-movil`
+  arranca en 390x844. El log de acciones se guarda siempre en `artifacts/`.
+- Perfil Taurus `02-monkey.yml`: 3 semillas escritorio + 2 móvil.
+
+### Hallazgos (del propio monkey, no de la app)
+1. **"Atrás" salía de la app** hasta la página inicial del navegador (`data:,`)
+   y todo lo siguiente contaba como "pantalla en blanco" (19-24 falsos
+   positivos con las semillas 1 y 2). Ahora vuelve a la home.
+2. **Ruido de Chromium**: "Network location provider ... 400" (geolocalización
+   sin clave de Google) se añadió a `_RUIDO`.
+3. **Login con Google**: el monkey abría el popup, lo cerraba y Firebase
+   registraba `auth/internal-error`. Se añade "google" a `PROHIBIDO`.
+
+### Resultados (Chromium 141, Linux)
+| Ejecución | Resultado |
+|---|---|
+| 60 acciones, semillas 1,2,3, escritorio | 3/3 verde (3 min 27 s) |
+| 80 acciones, semillas 4,5, móvil | 2/2 verde (4 min 10 s) |
+
+### Para que la suite entera funcione en Chrome/Linux
+4. **Idioma**: Chromium en Linux ignora `--lang=es-ES` y la app arrancaba en
+   inglés (11 flujos en rojo por textos). `navegador.py` fuerza
+   `intl.accept_languages` y `LANGUAGE/LANG` a español.
+5. `test_reserva_sin_sesion_manda_al_login` leía `nota.text`, que sale vacío
+   en el modal animado con Chrome; ahora usa `helpers.texto()` (la trampa ya
+   estaba documentada en `ESTADO.md`).
+
+| Suite completa (`pytest qa`, Chrome) | 22 verde, 2 omitidos (unitarias) |

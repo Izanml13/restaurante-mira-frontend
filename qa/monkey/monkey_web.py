@@ -6,6 +6,7 @@ capturados y respuestas 500. Cada acción se registra para poder reproducir.
 Uso directo:
     python -m monkey.monkey_web --acciones 200 --seed 7 --visible
     python -m monkey.monkey_web --acciones 50 --json salida.json
+    python -m monkey.monkey_web --acciones 80 --seed 3 --movil
 """
 from __future__ import annotations
 
@@ -38,12 +39,19 @@ PROHIBIDO = (
     "salir", "cerrar sesión", "cerrar sesion", "eliminar", "borrar",
     "cancelar reserva", "desactivar", "bloquear", "pagar", "comprar",
     "denunciar", "reportar", "darse de baja",
+    # Login con Google abre un popup externo: el monkey lo cierra y Firebase
+    # registra auth/internal-error. No es un fallo de MIRA.
+    "google",
 )
 
 TEXTO_BASURA = [
     "pizza", "MIRA", "😀😀😀", "<script>alert(1)</script>", "   ",
     "a" * 80, "ñáéíóú", "'; DROP TABLE usuarios;--", "1234567890",
 ]
+
+# Tamaños de ventana: escritorio y móvil (BottomNav, menús plegados...).
+ESCRITORIO = (1400, 1000)
+MOVIL = (390, 844)
 
 INYECTAR = """
 window.__miraErrores = window.__miraErrores || [];
@@ -60,8 +68,10 @@ if (!window.__miraEscuchando) {
 
 
 class Monkey:
-    def __init__(self, driver, base_url: str, seed: int = 1234, acciones: int = 50):
+    def __init__(self, driver, base_url: str, seed: int = 1234, acciones: int = 50,
+                 movil: bool = False):
         self.d = driver
+        self.movil = movil
         self.base_url = base_url
         self.rnd = random.Random(seed)
         self.acciones_totales = acciones
@@ -176,6 +186,73 @@ class Monkey:
             return f"escribir + Enter en #{campo.get_attribute('id')}: {texto[:30]!r}"
         return f"escribir en #{campo.get_attribute('id')}: {texto[:30]!r}"
 
+    def accion_formulario(self) -> str:
+        """Selects, checkboxes, radios, fechas y números: lo que escribir() no toca."""
+        controles = [
+            c for c in self.d.find_elements(
+                By.CSS_SELECTOR,
+                "select, input[type=checkbox], input[type=radio], input[type=date],"
+                " input[type=time], input[type=number], input[type=range]",
+            )
+            if c.is_displayed() and c.is_enabled()
+        ]
+        if not controles:
+            return "formulario: sin controles"
+        c = self.rnd.choice(controles)
+        tipo = c.tag_name if c.tag_name == "select" else (c.get_attribute("type") or "").lower()
+        ident = c.get_attribute("id") or c.get_attribute("name") or "?"
+        if tipo == "select":
+            opciones = c.find_elements(By.TAG_NAME, "option")
+            if not opciones:
+                return f"select #{ident}: sin opciones"
+            op = self.rnd.choice(opciones)
+            self.d.execute_script(
+                "const s=arguments[0]; s.value=arguments[1];"
+                "s.dispatchEvent(new Event('change',{bubbles:true}))",
+                c, op.get_attribute("value"),
+            )
+            return f"select #{ident} = {op.get_attribute('value')!r}"
+        if tipo in ("checkbox", "radio"):
+            h.click_js(self.d, c)
+            return f"{tipo} #{ident}"
+        valor = {
+            "date": self.rnd.choice(["2020-01-01", "2026-12-31", "2099-02-28", ""]),
+            "time": self.rnd.choice(["00:00", "13:30", "23:59", ""]),
+            "number": self.rnd.choice(["0", "-1", "1", "999999", "2.5"]),
+            "range": self.rnd.choice(["0", "50", "100"]),
+        }[tipo]
+        # React escucha 'input' a través del setter nativo, no de .value directo.
+        self.d.execute_script(
+            "const el=arguments[0];"
+            "const set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;"
+            "set.call(el, arguments[1]);"
+            "el.dispatchEvent(new Event('input',{bubbles:true}));"
+            "el.dispatchEvent(new Event('change',{bubbles:true}));",
+            c, valor,
+        )
+        return f"{tipo} #{ident} = {valor!r}"
+
+    def accion_rafaga(self) -> str:
+        """Varios clics seguidos sobre el mismo elemento (doble envío, impaciencia)."""
+        candidatos = self._candidatos()
+        if not candidatos:
+            return "ráfaga: sin candidatos"
+        el = self.rnd.choice(candidatos)
+        veces = self.rnd.randint(3, 6)
+        desc = (el.get_attribute("innerText") or el.get_attribute("aria-label") or "")[:40].strip()
+        for _ in range(veces):
+            try:
+                h.click_js(self.d, el)
+            except Exception:
+                break  # el elemento desapareció tras el primer clic: es lo normal
+        return f"ráfaga x{veces} <{el.tag_name}> '{desc}'"
+
+    def accion_redimensionar(self) -> str:
+        self.movil = not self.movil
+        ancho, alto = MOVIL if self.movil else ESCRITORIO
+        self.d.set_window_size(ancho, alto)
+        return f"ventana {ancho}x{alto}"
+
     def accion_scroll(self) -> str:
         dy = self.rnd.choice([-1200, -600, 400, 900, 1800])
         self.d.execute_script(f"window.scrollBy(0, {dy})")
@@ -188,6 +265,12 @@ class Monkey:
 
     def accion_atras(self) -> str:
         self.d.back()
+        # Si "atrás" sale de la app (p. ej. a la página inicial del navegador,
+        # data:,) no es un fallo de MIRA: volvemos a entrar.
+        if not self.d.current_url.startswith(self.base_url):
+            self.d.get(self.base_url + "/")
+            h.esperar_main(self.d)
+            return "atrás (salió de la app: vuelta a la home)"
         return "atrás"
 
     def accion_recarga(self) -> str:
@@ -198,6 +281,8 @@ class Monkey:
     # ---------- bucle ----------
 
     def ejecutar(self) -> list[dict]:
+        if self.movil:
+            self.d.set_window_size(*MOVIL)
         self.d.get(self.base_url + "/")
         h.esperar_main(self.d)
         if not h.aceptar_cookies(self.d):
@@ -207,10 +292,13 @@ class Monkey:
         self._comprobar("inicio")
 
         acciones = [
-            (self.accion_click, 45),
-            (self.accion_escribir, 15),
-            (self.accion_scroll, 15),
-            (self.accion_ruta, 15),
+            (self.accion_click, 40),
+            (self.accion_escribir, 12),
+            (self.accion_formulario, 10),
+            (self.accion_rafaga, 5),
+            (self.accion_scroll, 12),
+            (self.accion_ruta, 12),
+            (self.accion_redimensionar, 2),
             (self.accion_atras, 5),
             (self.accion_recarga, 5),
         ]
@@ -241,35 +329,26 @@ class Monkey:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Monkey test de MIRA (Selenium + Edge)")
+    ap = argparse.ArgumentParser(description="Monkey test de MIRA (Selenium + Edge/Chrome)")
     ap.add_argument("--base-url", default=None, help="si se omite, arranca mock-api + Vite")
     ap.add_argument("--acciones", type=int, default=100)
     ap.add_argument("--seed", type=int, default=1234)
     ap.add_argument("--visible", action="store_true", help="muestra el navegador")
+    ap.add_argument("--movil", action="store_true", help="empieza con ventana de móvil (390x844)")
     ap.add_argument("--json", dest="salida", help="fichero donde volcar las incidencias")
     ap.add_argument("--log", default=str(RAIZ_QA / "artifacts" / "monkey.log"))
     args = ap.parse_args()
 
-    from selenium import webdriver
-    from selenium.webdriver.edge.options import Options
-
-    opts = Options()
-    if not args.visible:
-        opts.add_argument("--headless=new")
-    opts.add_argument("--window-size=1400,1000")
-    opts.add_argument("--disable-gpu")
-    opts.add_argument("--lang=es-ES")
-    opts.set_capability("goog:loggingPrefs", {"browser": "ALL"})
+    from navegador import crear_driver
 
     monkey = None
     incidencias: list[dict] = []
     try:
         with contextlib.ExitStack() as pila:
             base_url = args.base_url or pila.enter_context(servers.servidores())
-            d = webdriver.Edge(options=opts)
-            d.set_page_load_timeout(60)
+            d = crear_driver(headless=not args.visible)
             pila.callback(d.quit)
-            monkey = Monkey(d, base_url, seed=args.seed, acciones=args.acciones)
+            monkey = Monkey(d, base_url, seed=args.seed, acciones=args.acciones, movil=args.movil)
             incidencias = monkey.ejecutar()
     finally:
         if monkey is not None:

@@ -1,16 +1,24 @@
 # Monkey test: acciones aleatorias reproducibles (seed fija).
 # Uso:  bzt qa/bzt/02-monkey.yml
+# Escritorio con 3 semillas + móvil (390x844) con otras 2: cada semilla es un
+# test de pytest, así el reporte dice cuál falla. Reproducir una semilla:
+#   python -m monkey.monkey_web --seed <N> --acciones 80 [--movil] --visible
 settings:
   artifacts-dir: qa/artifacts/bzt/monkey-%Y-%m-%d_%H-%M-%S
 
 execution:
 - executor: pytest
-  scenario: monkey
+  scenario: monkey-escritorio
+- executor: pytest
+  scenario: monkey-movil
 
 scenarios:
-  monkey:
+  monkey-escritorio:
     script: qa/tests/test_monkey.py
-    additional-args: "--monkey-acciones 80 --monkey-seed 20261020"
+    additional-args: "--monkey-acciones 80 --monkey-seeds 20261020,1,2"
+  monkey-movil:
+    script: qa/tests/test_monkey.py
+    additional-args: "--monkey-acciones 80 --monkey-seeds 4,5 --monkey-movil"
 
 reporting:
 - module: final-stats

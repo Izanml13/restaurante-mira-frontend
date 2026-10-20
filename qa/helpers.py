@@ -10,8 +10,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 TIMEOUT = 15
 
 # Ruido que no viene de la aplicación: chrome interno del navegador, favicon,
-# imágenes/teselas de terceros.
-_RUIDO = ("edge://", "chrome-extension://", "favicon.ico", "about:blank")
+# imágenes/teselas de terceros, servicios del propio navegador.
+_RUIDO = (
+    "edge://", "chrome-extension://", "favicon.ico", "about:blank",
+    # Chromium sin clave de Google: el proveedor de geolocalización devuelve 400.
+    "Network location provider",
+)
 
 
 def esperar_main(driver, timeout: float = TIMEOUT):
