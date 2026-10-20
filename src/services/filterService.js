@@ -1,7 +1,8 @@
 /**
  * Model — reglas de filtrado y ordenación (funciones puras, sin side-effects).
  */
-import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APTOS, aptoAccesibilidad, accesibilidadActiva } from '../models/restaurantModel.js';
+import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APTOS, aptoAccesibilidad, accesibilidadActiva, familiaCocina } from '../models/restaurantModel.js';
+import { zonaPrincipal } from './cityCenters.js';
 
 /**
  * Filtra la lista en cliente. Todos los filtros son opcionales.
@@ -9,7 +10,7 @@ import { normalizeText, precioANumero, aptosEnCarta, dietaActiva, MIN_PLATOS_APT
  * @param {{ q?: string, precio?: string, cocina?: string, zona?: string, distanciaMax?: number|string }} filters
  * @returns {import('../models/restaurantModel.js').Restaurant[]}
  */
-export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona = '', distanciaMax = '', dia = '', franja = '', hora = '', dieta = null, accesibilidad = null } = {}) {
+export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona = '', distanciaMax = '', dia = '', franja = '', hora = '', dieta = null, accesibilidad = null, servicios = [], incluirEstimados = false } = {}) {
   const query = normalizeText(q).trim();
   const maxKm = distanciaMax === '' || distanciaMax == null ? null : Number(distanciaMax);
 
@@ -18,13 +19,15 @@ export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona
     // Dieta: el local solo sigue visible con MIN_PLATOS_APTOS platos aptos.
     if (dietaActiva(dieta) && aptosEnCarta(r, dieta) < MIN_PLATOS_APTOS) return false;
     // Accesibilidad: solo locales verificados (el null no vale).
-    if (accesibilidadActiva(accesibilidad) && !aptoAccesibilidad(r, accesibilidad)) return false;
+    if (accesibilidadActiva(accesibilidad) && !aptoAccesibilidad(r, accesibilidad, { incluirEstimados })) return false;
+    // Servicios (menú infantil, tronas, terraza, tranquilo): valen datos reales y estimados.
+    if (servicios.length && !servicios.every((campo) => r[campo] === true)) return false;
     if (cocina) {
-      const nCocina = normalizeText(cocina);
-      const candidatas = [r.cocina, ...(r.categorias || [])].map(normalizeText);
-      if (!candidatas.includes(nCocina)) return false;
+      const familia = familiaCocina(cocina);
+      const candidatas = [r.cocina, ...(r.categorias || [])].filter(Boolean).map(familiaCocina);
+      if (!candidatas.includes(familia)) return false;
     }
-    if (zona && (r.zona ?? '') !== zona) return false;
+    if (zona && zonaPrincipal(r) !== zona) return false;
     if (maxKm != null && (r.distanciaKm == null || !(r.distanciaKm <= maxKm))) return false;
     if (query) {
       const haystack = normalizeText(`${r.nombre} ${r.cocina} ${r.descripcion} ${r.ciudad ?? ''} ${r.zona ?? ''}`);
@@ -53,8 +56,8 @@ export function filterRestaurants(list, { q = '', precio = '', cocina = '', zona
  * resolver sobre una portada parcial: hay que traerlo todo (1 vez).
  * Sin filtros y con orden Relevancia/Valoración basta la portada paginada.
  */
-export function necesitaCargaTotal({ q = '', precio = '', cocina = '', zona = '', distanciaMax = '', orden = 'Relevancia', dia = '', franja = '', hora = '', dieta = null, accesibilidad = null } = {}) {
-  if (q || precio || cocina || zona || distanciaMax || dia || franja || hora || dietaActiva(dieta) || accesibilidadActiva(accesibilidad)) return true;
+export function necesitaCargaTotal({ q = '', precio = '', cocina = '', zona = '', distanciaMax = '', orden = 'Relevancia', dia = '', franja = '', hora = '', dieta = null, accesibilidad = null, servicios = [] } = {}) {
+  if (servicios.length || q || precio || cocina || zona || distanciaMax || dia || franja || hora || dietaActiva(dieta) || accesibilidadActiva(accesibilidad)) return true;
   return orden === 'Distancia' || orden === 'Precio';
 }
 

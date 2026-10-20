@@ -1,12 +1,18 @@
-/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas. */
+/** Página "Mi cuenta": datos + preferencias + idioma + dieta + accesibilidad + 2FA + cookies + negocio + reservas + incidencias + reseñas + puntos. */
 import { useEffect, useState } from 'react';
 import { listarMisReservas } from '../services/reservaApi.js';
+import { obtenerEmblemasUsuario } from '../services/emblemasApi.js';
+import EmblemaAvatar from './EmblemaAvatar.jsx';
+import AvisosPush from './AvisosPush.jsx';
 import { listarMisIncidencias } from '../services/incidenciaApi.js';
 import { listarResenasDeUsuario } from '../services/resenasApi.js';
 import { listarMisNegocios } from '../services/negocioApi.js';
 import { ALERGENOS, normalizarDieta, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { COOKIE_CATEGORIAS, COOKIE_DEFAULT, leerCookies, guardarCookies, tieneConsentimiento } from '../services/cookieService.js';
 import { useI18n } from '../i18n/index.jsx';
+import useInviteStore from '../stores/useInviteStore.js';
+import usePointsStore from '../stores/usePointsStore.js';
+import UbicacionCuenta from './UbicacionCuenta.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
@@ -21,13 +27,27 @@ function hoyISO() {
   return `${h.getFullYear()}-${p(h.getMonth() + 1)}-${p(h.getDate())}`;
 }
 
-export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
+export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, accesibilidad, guardarAccesibilidad, onSalir, onEnviarVerificacion, onRecargarEmailVerified }) {
   const { lang, setLang, available } = useI18n();
-  function t(key) {
+  const { saldoActual, rachaLogin, rachaReservas, fetchBalance } = usePointsStore();
+  function t(key, params) {
     const dict = TRADS[lang] || TRADS.es;
-    return key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
+    let val = key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : key), dict);
+    if (params && typeof val === 'string') {
+      val = val.replace(/\{\{(\w+)\}\}/g, (_, k) => (params[k] != null ? params[k] : `{{${k}}}`));
+    }
+    return val;
   }
   const [proximas, setProximas] = useState([]);
+  const [emblemaEstado, setEmblemaEstado] = useState({
+    totalReservas: 0,
+    desbloqueados: [],
+    emblema: null,
+    multi: 1,
+    multiTexto: 'x1.00',
+    siguiente: null,
+    faltan: 0,
+  });
   const [incidencias, setIncidencias] = useState([]);
   const [misResenas, setMisResenas] = useState([]);
   const [misNegocios, setMisNegocios] = useState([]);
@@ -41,23 +61,35 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
       window.location.hash = '#/login';
       return;
     }
+    fetchBalance();
+    useInviteStore.getState().fetchMyInvites();
     let vivo = true;
-    Promise.all([
-      listarMisReservas(usuario.uid),
-      listarMisIncidencias({ uid: usuario.uid, email: usuario.email }),
-      listarResenasDeUsuario(usuario.uid),
-      listarMisNegocios(usuario.uid).catch(() => []),
-    ])
-      .then(([todas, inc, res, neg]) => {
-        if (!vivo) return;
-        const hoy = hoyISO();
-        setProximas(todas.filter((r) => r.estado === 'activa' && r.fecha >= hoy).slice(0, 3));
-        setIncidencias(inc.slice(0, 5));
-        setMisResenas(res.slice(0, 5));
-        setMisNegocios(neg.slice(0, 5));
-        setCargando(false);
-      })
-      .catch(() => vivo && setCargando(false));
+    (async () => {
+      const [todasRes, incRes, resRes, negRes] = await Promise.allSettled([
+        listarMisReservas(usuario.uid),
+        listarMisIncidencias({ uid: usuario.uid, email: usuario.email }),
+        listarResenasDeUsuario(usuario.uid),
+        listarMisNegocios(usuario.uid),
+      ]);
+      if (!vivo) return;
+      const todas = todasRes.status === 'fulfilled' ? todasRes.value : [];
+      const inc = incRes.status === 'fulfilled' ? incRes.value : [];
+      const res = resRes.status === 'fulfilled' ? resRes.value : [];
+      const neg = negRes.status === 'fulfilled' ? negRes.value : [];
+      const hoy = hoyISO();
+      setProximas(todas.filter((r) => String(r.estado || '').toLowerCase() !== 'cancelada' && r.fecha >= hoy).slice(0, 3));
+      setIncidencias(inc.slice(0, 5));
+      setMisResenas(res.slice(0, 5));
+      setMisNegocios(neg.slice(0, 5));
+      setCargando(false);
+      if (todasRes.status !== 'fulfilled') return;
+      try {
+        const emb = await obtenerEmblemasUsuario(usuario.uid, todas);
+        if (vivo) setEmblemaEstado(emb);
+      } catch {
+        /* emblemas opcionales */
+      }
+    })();
     return () => { vivo = false; };
   }, [usuario]);
 
@@ -136,10 +168,39 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
     ? new Date(usuario.creado).toLocaleDateString(t('modelos.locale'), { day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
 
+  const { totalReservas, emblema, multiTexto, siguiente, faltan } = emblemaEstado;
+  const nombreEmblema = emblema ? t(`emblemas.${emblema.id}`) : '';
+  const nombreSiguiente = siguiente ? t(`emblemas.${siguiente.id}`) : '';
+
+  let textoProgreso;
+  if (totalReservas === 0) {
+    textoProgreso = t('emblemas.sinEmblema');
+  } else if (siguiente && faltan > 0) {
+    textoProgreso = faltan === 1
+      ? t('emblemas.faltaUna', { siguiente: nombreSiguiente })
+      : t('emblemas.faltan', { n: faltan, siguiente: nombreSiguiente });
+  } else {
+    textoProgreso = t('emblemas.maximo');
+  }
+
   return (
     <section className="auth-pagina" aria-labelledby="cuenta-titulo">
-      <div className="auth-tarjeta">
-        <p className="cuenta-avatar" aria-hidden="true">{inicial}</p>
+      <div className="auth-tarjeta cuenta-tarjeta">
+        <div className="emblema-progreso" aria-live="polite">
+          <p className="emblema-progreso-label">{t('emblemas.tituloProgreso')}</p>
+          <p className={`emblema-progreso-titulo${emblema ? ` emblema-progreso-titulo--activo emblema-progreso-titulo--${emblema.id}` : ''}`}>
+            {emblema ? t('emblemas.tituloNivel', { nombre: nombreEmblema }) : ' '}
+          </p>
+          <EmblemaAvatar inicial={inicial} emblema={emblema} size="lg" />
+          <p className="emblema-progreso-texto">{textoProgreso}</p>
+          <p className="emblema-progreso-racha" title={t('emblemas.multiplicador', { multi: multiTexto })}>
+            <span className="emblema-progreso-racha-icono" aria-hidden="true">🔥</span>
+            <span className="emblema-progreso-racha-nombre">{t('emblemas.multiplicador')}</span>
+            <strong className="emblema-progreso-racha-valor">
+              <span className="emblema-progreso-racha-x" aria-hidden="true">x</span>{String(multiTexto).replace(/^x/i, '')}
+            </strong>
+          </p>
+        </div>
         <h1 id="cuenta-titulo">{usuario.nombre || t('cuenta.miCuenta')}</h1>
         <dl className="cuenta-datos">
           <div><dt>{t('cuenta.email')}</dt><dd>{usuario.email}</dd></div>
@@ -151,16 +212,56 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           <button type="button" className="btn-secundario" onClick={onSalir}>{t('cuenta.cerrarSesion')}</button>
         </p>
 
+        {/* --- DASHBOARD PANEL --- */}
+        {(esAdmin || perfil?.tipo === 'empresa') && (
+          <div className="cuenta-dashboard-banner">
+            <h2 className="cuenta-sub">{esAdmin ? t('dashboard.panelAdmin') : t('cuenta.panelRestaurante')}</h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.8rem' }}>
+              {esAdmin ? t('cuenta.gestionaAdmin') : t('cuenta.gestionaRestaurante')}
+            </p>
+            <a href={esAdmin ? '#/admin' : '#/dashboard'} className="btn-cta">
+              {esAdmin ? t('cuenta.abrirPanelAdmin') : t('cuenta.abrirMiPanel')}
+            </a>
+          </div>
+        )}
+
+        {/* --- MIRA POINTS --- */}
+        <h2 className="cuenta-sub">{t('points.title')}</h2>
+        <div className="cuenta-points">
+          <div className="cuenta-points__saldo">
+            <span className="cuenta-points__amount">{saldoActual}</span>
+            <span className="cuenta-points__label">{t('points.balance')}</span>
+          </div>
+          {rachaLogin?.dias > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--gris)', marginBottom: '0.5rem' }}>
+              🔥 {rachaLogin.dias} {t('points.days')} {t('points.streak')} — +{Math.min(5 + 3 * Math.max(0, rachaLogin.dias - 1), 15)} pts/día
+            </p>
+          )}
+          {rachaReservas?.semanasConsecutivas > 0 && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--dorado)', marginBottom: '0.5rem' }}>
+              {t('ui.multiplicadorActivo', { n: rachaReservas.multiplicador })}
+            </p>
+          )}
+          <div className="cuenta-points__actions">
+            <a href="#/puntos" className="btn-cta btn-peq">{t('points.redeem')}</a>
+            <a href="#/puntos/historial" className="btn-secundario btn-peq">{t('points.history')}</a>
+            <a href="#/invitar" className="btn-secundario btn-peq">{t('points.invite')}</a>
+          </div>
+          <div className="cuenta-redemption">
+            {t('ui.equivalenciaSinCaducidad')}
+          </div>
+        </div>
+
         {/* --- DIETA --- */}
         <h2 className="cuenta-sub">{t('cuenta.miDieta')}</h2>
-        <form onSubmit={guardarPrefs} className="prefs-form">
+        <form onSubmit={guardarPrefs} className="prefs-form prefs-card">
           {[['vegano', t('cuenta.vegano')], ['vegetariano', t('cuenta.vegetariano')]].map(([campo, etiqueta]) => (
             <label key={campo} className="campo-check" htmlFor={`pref-${campo}`}>
               <input id={`pref-${campo}`} type="checkbox" checked={Boolean(borrador[campo])} onChange={() => toggleDieta(campo)} />
               {etiqueta}
             </label>
           ))}
-          <fieldset className="prefs-alergias">
+          <fieldset className="prefs-alergias chip-grid">
             <legend>{t('cuenta.misAlergias')}</legend>
             {ALERGENOS.map(({ key, label }) => (
               <label key={key} className="campo-check" htmlFor={`alerg-${key}`}>
@@ -177,7 +278,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
 
         {/* --- ACCESIBILIDAD --- */}
         <h2 className="cuenta-sub">{t('cuenta.miAccesibilidad')}</h2>
-        <form onSubmit={guardarAcc} className="prefs-form">
+        <form onSubmit={guardarAcc} className="prefs-form prefs-card">
           <p className="vacio-texto">{t('cuenta.soloAccesibilidad')}</p>
           <label className="campo-check" htmlFor="acc-silla">
             <input id="acc-silla" type="checkbox" checked={Boolean(borradorAcc.sillaRuedas)} onChange={() => toggleAcc('sillaRuedas')} />
@@ -212,7 +313,7 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
 
         {/* --- Verificación de email --- */}
         <h2 className="cuenta-sub">{t('cuenta.verificacionCorreo')}</h2>
-        <div className="prefs-form">
+        <div className="prefs-form prefs-card">
           {usuario.emailVerified ? (
             <div style={{ padding: '0.8rem', background: 'var(--fondo-suave)', borderRadius: 'var(--radio-peq)' }}>
               <p style={{ color: 'var(--verde)', fontWeight: 600 }}>✓ {t('cuenta.correoVerificado')}</p>
@@ -234,9 +335,15 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
           )}
         </div>
 
+        {/* --- NOTIFICACIONES (T07) --- */}
+        <AvisosPush t={t} lang={lang} />
+
+        {/* --- UBICACIÓN (G03) --- */}
+        <UbicacionCuenta />
+
         {/* --- COOKIES --- */}
         <h2 className="cuenta-sub">{t('cuenta.preferenciasCookies')}</h2>
-        <div className="prefs-form">
+        <div className="prefs-form prefs-card">
           <p className="vacio-texto">{t('cuenta.cookiesDescripcion')}</p>
           {COOKIE_CATEGORIAS.filter((c) => !c.requerida).map((cat) => (
             <div key={cat.key} className="cookie-item">
@@ -259,10 +366,19 @@ export default function Cuenta({ usuario, perfil, dieta, guardarDieta, accesibil
         </div>
 
         {/* --- NEGOCIO --- */}
-        {perfil?.tipo === 'empresa' && (
+        {(perfil?.tipo === 'empresa' || esAdmin) && (
           <>
             <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
-            <p><a href="#/negocio" className="btn-cta btn-peq">{t('cuenta.anadirRestaurante')}</a></p>
+            {perfil?.tipo === 'empresa' && (
+              <p><a
+                href="#/dashboard"
+                className="btn-cta"
+                onClick={() => { try { sessionStorage.setItem('mira_abrir_crear', '1'); } catch { /* ignore */ } }}
+              >{t('cuenta.anadirRestaurante')}</a></p>
+            )}
+            {esAdmin && (
+              <p><a href="#/admin" className="btn-cta">{t('ui.panelAdminTitulo')}</a></p>
+            )}
             {!cargando && misNegocios.length > 0 && (
               <ul className="lista-registros">
                 {misNegocios.map((n) => (

@@ -1,20 +1,48 @@
 /**
- * Model — lectura de la colección 'restaurants' de Firestore.
- * NOTA: el SDK web no soporta proyección de campos (select), así que cada
- * doc viaja completo con sus 50 reseñas (~15 KB/doc, ~10 MB por carga total).
- * Si el tráfico crece, el paso natural es mover 'resenas' a una subcolección
- * y traerla solo al abrir el detalle (ver README).
+ * Model — lectura de restaurantes vía API (intermediario mira-api).
  */
-import { collection, getDocs, getDoc, doc, query, orderBy, limit, startAfter, getCountFromServer } from 'firebase/firestore';
-import { getDb } from './firebase.js';
+import { api, BASE_URL } from './httpClient.js';
+import { imagenParaRestaurante } from '../models/restaurantModel.js';
+import { conServiciosEstimados } from '../models/serviciosEstimados.js';
 
 /** Restaurantes por tanda en la portada (scroll infinito). */
-export const TAMANO_PAGINA = 21;
-import { imagenParaRestaurante } from '../models/restaurantModel.js';
+export const TAMANO_PAGINA = 27;
 
 const PRECIOS_VALIDOS = ['€', '€€', '€€€'];
 
+function toCoordNumber(v) {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
+function extraerCoords(d) {
+  const c = d.coordenadas || {};
+  const lat = toCoordNumber(c.latitud ?? c.lat ?? d.lat);
+  const lng = toCoordNumber(c.longitud ?? c.lng ?? c.lon ?? d.lng);
+  if (lat == null || lng == null) return null;
+  return { lat, lng };
+}
+
 function mapearDoc(id, d) {
+  return conServiciosEstimados(mapearDocBase(id, d));
+}
+
+/**
+ * Foto del restaurante. Las de Google Places no se pueden guardar (condiciones
+ * de Google): la API las sirve al vuelo en /v1/restaurants/:id/foto.
+ */
+function imagenDe(id, d, categorias) {
+  if (d.imagen_fuente === 'google_places' && d.imagen_google?.placeId) {
+    return `${BASE_URL}/v1/restaurants/${encodeURIComponent(id)}/foto`;
+  }
+  return d.imagen_url || imagenParaRestaurante(categorias[0] ?? 'Mediterránea', id);
+}
+
+function mapearDocBase(id, d) {
   const categorias = Array.isArray(d.categorias) ? d.categorias : [];
   const resenas = Array.isArray(d.resenas) ? d.resenas : [];
   return {
@@ -23,85 +51,171 @@ function mapearDoc(id, d) {
     cocina: categorias[0] ?? 'Mediterránea',
     categorias,
     precio: PRECIOS_VALIDOS.includes(d.precio) ? d.precio : '€€',
-    distanciaKm: null, // se calcula en el Controller con tu ubicación
-    coords:
-      typeof d.coordenadas?.latitud === 'number' && typeof d.coordenadas?.longitud === 'number'
-        ? { lat: d.coordenadas.latitud, lng: d.coordenadas.longitud }
-        : null,
+    distanciaKm: null,
+    coords: extraerCoords(d),
     valoracion: typeof d.rating_yelp === 'number' ? d.rating_yelp : 0,
     totalResenasYelp: d.total_resenas_yelp ?? 0,
-    imagen: d.imagen_url || imagenParaRestaurante(categorias[0] ?? 'Mediterránea', id),
+    imagen: imagenDe(id, d, categorias),
+    imagenFuente: d.imagen_fuente || null,
+    // Crédito obligatorio de Google Places (autor de la foto); null en el resto.
+    imagenCredito: d.imagen_fuente === 'google_places' && d.imagen_google?.autor
+      ? { autor: d.imagen_google.autor, url: d.imagen_google.autorUri || null }
+      : null,
     descripcion:
       d.descripcion ||
       [categorias.join(' · '), d.direccion_completa || d.ciudad].filter(Boolean).join(' — ') ||
       'Restaurante recomendado por la guía MIRA.',
     direccion: d.direccion_completa || d.direccion || '',
+    codigoPostal: d.codigo_postal ? String(d.codigo_postal) : '',
     ciudad: d.ciudad || '',
     zona: d.zona_busqueda || '',
     telefono: d.telefono || '',
     yelpUrl: d.yelp_url || '',
-    // La empresa los rellena en su formulario; en los 690 de Yelp no existen (null).
-    accesoDiscapacidad: d.accesoDiscapacidad ?? null, // true | false | null (sin info)
-    menuInfantil: d.menuInfantil ?? null, // true | false | null (sin info)
-    tronas: d.tronas ?? null, // sillas de bebé: true | false | null (sin info)
-    entornoTranquilo: d.entornoTranquilo ?? null, // true | false | null (sin info)
-    terraza: d.terraza ?? null, // true | false | null (sin info)
-    alergenos: d.alergenos || '', // texto libre del local; vacío = sin información
-    resenas, // 50 reseñas sintéticas para el detalle
+    accesoDiscapacidad: d.accesoDiscapacidad ?? null,
+    menuInfantil: d.menuInfantil ?? null,
+    tronas: d.tronas ?? null,
+    entornoTranquilo: d.entornoTranquilo ?? null,
+    terraza: d.terraza ?? null,
+    alergenos: d.alergenos || '',
+    resenas,
+    maxReservasPorHora: d.maxReservasPorHora ?? null,
   };
 }
 
-/**
- * Descarga TODA la colección (1 lectura por doc, ~690 en Cataluña).
- * Solo para vistas que necesitan el conjunto global (filtros/orden).
- * El filtrado posterior es 100% cliente, como exige el brief.
- * @returns {Promise<import('../models/restaurantModel.js').Restaurant[]>}
+/*
+ * Caché del catálogo completo (?all=1).
+ * Cada descarga lee TODOS los documentos en el backend (≈700 lecturas), y la
+ * pedían el buscador en cada cambio de filtro, el mapa y Descubrir. Ahora:
+ * - en memoria: se descarga una vez y se reutiliza durante CATALOGO_TTL_MS;
+ * - peticiones simultáneas comparten la misma descarga (no se duplica);
+ * - copia en sessionStorage para que recargar la pestaña tampoco la repita.
+ * Los errores no se cachean: el siguiente intento vuelve a pedirlo.
  */
-export async function fetchRestaurants() {
-  const snap = await getDocs(collection(getDb(), 'restaurants'));
-  return snap.docs.map((doc) => mapearDoc(doc.id, doc.data()));
+export const CATALOGO_TTL_MS = 10 * 60 * 1000;
+const CLAVE_SESION = 'mira:catalogo:v1';
+
+let catalogo = null; // { items, guardado }
+let enVuelo = null; // Promise<items> mientras hay una descarga en curso
+
+const fresco = (c) => c && Date.now() - c.guardado < CATALOGO_TTL_MS;
+
+function leerSesion() {
+  try {
+    const raw = globalThis.sessionStorage?.getItem(CLAVE_SESION);
+    const c = raw ? JSON.parse(raw) : null;
+    return fresco(c) && Array.isArray(c.items) ? c : null;
+  } catch {
+    return null;
+  }
 }
 
-// Portada ordenada por nota. Solo UN orderBy: usa el índice automático sin
-// composite. Los empates los resuelve el cursor (snapshot completo, preciso).
-function consultaPortada(cursor = null) {
-  const partes = [collection(getDb(), 'restaurants'), orderBy('rating_yelp', 'desc')];
-  if (cursor) partes.push(startAfter(cursor));
-  partes.push(limit(TAMANO_PAGINA));
-  return query(...partes);
+function guardarSesion(c) {
+  try {
+    globalThis.sessionStorage?.setItem(CLAVE_SESION, JSON.stringify(c));
+  } catch {
+    /* sin almacenamiento o cuota llena: basta con la memoria */
+  }
 }
 
-function empaquetarPagina(snap) {
-  const items = snap.docs.map((doc) => mapearDoc(doc.id, doc.data()));
+/** Olvida el catálogo cacheado (p. ej. tras crear o editar un restaurante). */
+export function invalidarCatalogo() {
+  catalogo = null;
+  enVuelo = null;
+  try {
+    globalThis.sessionStorage?.removeItem(CLAVE_SESION);
+  } catch {
+    /* nada que limpiar */
+  }
+}
+
+/** Catálogo completo. `forzar: true` ignora la caché y vuelve a pedirlo. */
+export async function fetchRestaurants({ forzar = false } = {}) {
+  if (!fresco(catalogo)) catalogo = leerSesion();
+  if (!forzar && fresco(catalogo)) return [...catalogo.items];
+  // Descarga ya en curso: es fresca por definición, aunque se pida con `forzar`
+  // (evita duplicar peticiones al montar dos veces o al pulsar Refrescar seguido).
+  if (enVuelo) return [...(await enVuelo)];
+  const descarga = api.get('/v1/restaurants?all=1', { auth: false }).then((d) => {
+    const items = (d.items || d.data || []).map((r) => mapearDoc(r.id, r));
+    catalogo = { items, guardado: Date.now() };
+    guardarSesion(catalogo);
+    return items;
+  });
+  enVuelo = descarga;
+  try {
+    return [...(await descarga)];
+  } finally {
+    if (enVuelo === descarga) enVuelo = null;
+  }
+}
+
+/*
+ * Datos ligeros para el mapa (GET /v1/restaurants/mapa, ~198 KB frente a 1,25 MB
+ * de ?all=1). Solo trae id, nombre, coordenadas, rating, precio, categorías,
+ * imagen y ciudad; el resto se pide al abrir la ficha. `ciudad` filtra en el
+ * servidor (~60 KB). Caché en memoria por ciudad, alineada con el max-age=300.
+ */
+const MAPA_TTL_MS = 5 * 60 * 1000;
+const cacheMapa = new Map(); // ciudad|'' -> { items, guardado } | { promesa }
+
+export async function fetchRestaurantesMapa({ ciudad = '' } = {}) {
+  const clave = ciudad || '';
+  const c = cacheMapa.get(clave);
+  if (c?.items && Date.now() - c.guardado < MAPA_TTL_MS) return [...c.items];
+  if (c?.promesa) return [...(await c.promesa)];
+  const q = clave ? `?ciudad=${encodeURIComponent(clave)}` : '';
+  const promesa = api.get(`/v1/restaurants/mapa${q}`, { auth: false }).then((d) =>
+    (d.items || []).map((r) => {
+      const base = mapearDoc(r.id, r);
+      // Mismo formato que zona_busqueda ('Barcelona, Spain') para que el filtro de zona funcione.
+      return { ...base, zona: base.zona || (r.ciudad ? `${r.ciudad}, Spain` : ''), parcial: true };
+    }),
+  );
+  cacheMapa.set(clave, { promesa });
+  try {
+    const items = await promesa;
+    cacheMapa.set(clave, { items, guardado: Date.now() });
+    return [...items];
+  } catch (err) {
+    cacheMapa.delete(clave);
+    throw err;
+  }
+}
+
+export async function fetchPrimeraPagina() {
+  const d = await api.get(`/v1/restaurants?limit=${TAMANO_PAGINA}`, { auth: false });
   return {
-    items,
-    cursor: snap.docs.length ? snap.docs[snap.docs.length - 1] : null,
-    terminado: snap.docs.length < TAMANO_PAGINA,
+    items: (d.items || []).map((r) => mapearDoc(r.id, r)),
+    cursor: d.cursor ?? null,
+    terminado: Boolean(d.terminado),
   };
 }
 
-/** Primera tanda de la portada (21 lecturas). */
-export async function fetchPrimeraPagina() {
-  return empaquetarPagina(await getDocs(consultaPortada()));
-}
-
-/** Siguiente tanda tras el cursor (21 lecturas). */
 export async function fetchSiguientePagina(cursor) {
   if (!cursor) return { items: [], cursor: null, terminado: true };
-  return empaquetarPagina(await getDocs(consultaPortada(cursor)));
+  const d = await api.get(`/v1/restaurants?limit=${TAMANO_PAGINA}&cursor=${encodeURIComponent(cursor)}`, { auth: false });
+  return {
+    items: (d.items || []).map((r) => mapearDoc(r.id, r)),
+    cursor: d.cursor ?? null,
+    terminado: Boolean(d.terminado),
+  };
 }
 
-/** Total de docs (agregado barato: ~1 lectura por cada 1000). */
 export async function contarRestaurantes() {
-  return (await getCountFromServer(collection(getDb(), 'restaurants'))).data().count;
+  const d = await api.get('/v1/restaurants/count', { auth: false });
+  return d.total ?? d.count ?? 0;
 }
 
-/**
- * Un restaurante por id (1 lectura). Para favoritos guardados aún no cargados.
- * Devuelve null si no existe.
- */
 export async function fetchRestaurantePorId(id) {
-  const snap = await getDoc(doc(getDb(), 'restaurants', String(id)));
-  if (!snap.exists()) return null;
-  return mapearDoc(snap.id, snap.data());
+  // Si el catálogo ya está en memoria, no hace falta otra lectura.
+  const enCache = fresco(catalogo) && catalogo.items.find((r) => String(r.id) === String(id));
+  if (enCache) return enCache;
+  try {
+    const d = await api.get(`/v1/restaurants/${encodeURIComponent(id)}`, { auth: false });
+    if (!d || d.error === 'NOT_FOUND') return null;
+    return mapearDoc(d.id, d);
+  } catch (err) {
+    if (err.status === 404) return null;
+    throw err;
+  }
 }

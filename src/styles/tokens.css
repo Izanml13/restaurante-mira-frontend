@@ -37,6 +37,12 @@
   --radio: 12px;
   --radio-peq: 8px;
   --radio-xl: 24px;
+  --radio-med: var(--radio);
+  --radio-grande: var(--radio-xl);
+  --text-primary: var(--tinta);
+  --text-secondary: var(--texto-sec);
+  --recompensa-fondo: #fff4d6;
+  --recompensa-tinta: #7a4b00;
 
   /* Elevation — warm-tinted shadows (not black) */
   --sombra-card: 0 2px 8px rgba(22, 56, 44, 0.06);
@@ -58,6 +64,13 @@
   --naranja: #c25a1a;
   --azul: #1a56db;
   --texto-sec: #6b7280;
+
+  /* Avisos (error / confirmación): fondo, texto y borde legibles en cada tema */
+  --error-tinte: #fdecea;
+  --error-tinta: #7a1020;
+  --error-borde: #e7a3ad;
+  --confirm-tinte: #fdf6e3;
+  --confirm-tinta: #5c4300;
 }
 
 /* Dark mode */
@@ -70,6 +83,8 @@
   --tertiary: #ffb3c1;
   --tertiary-container: #8f1d14;
 
+  --recompensa-fondo: #332a1a;
+  --recompensa-tinta: #fed65b;
   --fondo: #111411;
   --fondo-suave: #1c201c;
   --tinta: #e2e8e4;
@@ -86,6 +101,12 @@
   --naranja: #e0854a;
   --azul: #5b8def;
   --texto-sec: #a0a8a2;
+
+  --error-tinte: rgba(255, 179, 193, 0.12);
+  --error-tinta: #ffd9e0;
+  --error-borde: rgba(255, 179, 193, 0.45);
+  --confirm-tinte: rgba(254, 214, 91, 0.1);
+  --confirm-tinta: #fde9a8;
 
   --badge-bg: rgba(28, 32, 28, 0.92);
   --fav-bg: rgba(28, 32, 28, 0.88);

@@ -1,0 +1,56 @@
+/**
+ * Hook — ubicación del usuario en la web (G03). Solo sigue la posición con la
+ * página abierta y con el consentimiento aceptado; la posición vive en memoria
+ * y no se envía ni se guarda (los avisos por distancia, G06, la usarán después).
+ */
+import { useCallback, useEffect, useState } from 'react';
+import { leerConsentimiento, claveErrorUbicacion, posicionVisible } from '../models/ubicacionModel.js';
+import { decidirConsentimiento } from '../services/consentimientosApi.js';
+
+function almacenamiento() {
+  try { return window.localStorage; } catch { return null; }
+}
+
+// Todas las instancias del hook (Mi cuenta, avisos de G06…) comparten la decisión.
+const EVENTO = 'mira:ubicacion';
+
+export default function useUbicacion() {
+  const [consentimiento, setConsentimiento] = useState(() => leerConsentimiento(almacenamiento()));
+  const [posicion, setPosicion] = useState(null);
+  const [error, setError] = useState('');
+  const activa = consentimiento.estado === 'aceptado';
+
+  useEffect(() => {
+    const releer = () => setConsentimiento(leerConsentimiento(almacenamiento()));
+    window.addEventListener(EVENTO, releer);
+    window.addEventListener('storage', releer);
+    return () => { window.removeEventListener(EVENTO, releer); window.removeEventListener('storage', releer); };
+  }, []);
+
+  useEffect(() => {
+    if (!activa) { setPosicion(null); setError(''); return undefined; }
+    if (!navigator.geolocation) { setError('errorNoSoportado'); return undefined; }
+    const id = navigator.geolocation.watchPosition(
+      (p) => { setPosicion(posicionVisible(p.coords)); setError(''); },
+      (e) => setError(claveErrorUbicacion(e.code)),
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 },
+    );
+    return () => navigator.geolocation.clearWatch(id);
+  }, [activa]);
+
+  // Guarda en el dispositivo (y en el perfil si hay sesión) y avisa a las demás
+  // instancias. Aceptar pone en marcha watchPosition, que lanza el permiso del navegador.
+  const decidir = useCallback((estado) => {
+    decidirConsentimiento('ubicacion', estado);
+    setConsentimiento(leerConsentimiento(almacenamiento()));
+  }, []);
+
+  return {
+    consentimiento,
+    activa,
+    posicion,
+    error,
+    aceptar: useCallback(() => decidir('aceptado'), [decidir]),
+    rechazar: useCallback(() => decidir('rechazado'), [decidir]),
+  };
+}

@@ -1,10 +1,11 @@
 /** View pura: #/mensajes — buzón interno (avisos de reservas, etc.). */
 import { useEffect, useState } from 'react';
-import { listarMensajes, marcarLeido } from '../services/mensajesApi.js';
+import { listarMensajes, marcarLeido, marcarTodosLeidos } from '../services/mensajesApi.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
+import { urlSegura } from '../utils/urlSegura.js';
 
 const TRADS = { es, ca, en };
 
@@ -13,6 +14,7 @@ export default function Mensajes({ usuario, onLeidos }) {
   const [lista, setLista] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [marcando, setMarcando] = useState(false);
   const [abierto, setAbierto] = useState(null); // id expandido
 
   useEffect(() => {
@@ -45,6 +47,20 @@ export default function Mensajes({ usuario, onLeidos }) {
     }
   }
 
+  async function leerTodos() {
+    setMarcando(true);
+    setError('');
+    try {
+      await marcarTodosLeidos();
+      setLista((prev) => prev.map((m) => ({ ...m, leido: true })));
+      await onLeidos?.();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setMarcando(false);
+    }
+  }
+
   const noLeidos = lista.filter((m) => m.leido !== true).length;
 
   return (
@@ -53,7 +69,12 @@ export default function Mensajes({ usuario, onLeidos }) {
         <h1 id="mensajes-titulo">
           {t('mensajes.titulo')} {noLeidos > 0 && <span className="badge-noleidos">{noLeidos} {t('mensajes.sinLeer')}</span>}
         </h1>
-        {cargando && <p>Cargando…</p>}
+        {!cargando && noLeidos > 0 && (
+          <button type="button" className="btn-secundario btn-peq" disabled={marcando} onClick={leerTodos}>
+            {t('mensajes.marcarTodosLeidos')}
+          </button>
+        )}
+        {cargando && <p>{t('mensajes.cargando')}</p>}
         {error && (
           <p className="auth-error" role="alert">
             {error}
@@ -88,6 +109,9 @@ export default function Mensajes({ usuario, onLeidos }) {
                 {esAbierto && (
                   <>
                     <p className="mensaje-cuerpo" style={{ whiteSpace: 'pre-line' }}>{m.cuerpo}</p>
+                    {m.enlace && /^#\//.test(m.enlace) && (
+                      <p><a className="btn-cta btn-peq" href={urlSegura(m.enlace)}>{m.enlaceTexto || 'Abrir'}</a></p>
+                    )}
                     {(m.parkingLink || m.parkingNombre) && (
                       <p className="mensaje-parking" style={{ fontSize: '0.88rem' }}>
                         🅿️ {t('mensajes.parking')}: {m.parkingNombre || t('mensajes.recomendado')}
@@ -95,7 +119,7 @@ export default function Mensajes({ usuario, onLeidos }) {
                           ? ` a ${m.parkingDistanciaM < 1000 ? `${m.parkingDistanciaM} m` : `${(m.parkingDistanciaM / 1000).toLocaleString(t('modelos.locale'), { maximumFractionDigits: 1 })} km`}`
                           : ''}{' '}
                         {m.parkingLink && (
-                          <a href={m.parkingLink} target="_blank" rel="noreferrer">
+                          <a href={urlSegura(m.parkingLink)} target="_blank" rel="noreferrer">
                             {t('mensajes.comoLlegarParking')}
                           </a>
                         )}

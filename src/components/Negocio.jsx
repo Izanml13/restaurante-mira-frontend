@@ -1,6 +1,6 @@
 /** View pura: formulario para que una cuenta empresa proponga su local. */
 import { useState } from 'react';
-import { ZONAS_CATALUNA } from '../models/restaurantModel.js';
+import { ZONAS_CATALUNA, CIUDADES_CATALUNA } from '../models/restaurantModel.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -54,7 +54,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
             {t('otros.estaPaginaEsParaEmpresas')}
           </p>
           <p>
-            <a href="#buscar">{t('favoritos.volverBuscador')}</a>
+            <a href="#buscar">{t('contacto.volverBuscador')}</a>
           </p>
         </div>
       </section>
@@ -95,7 +95,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
             {t('negocio.revisaremos')} <strong>{form.nombre}</strong> {t('negocio.publicaremos')}
           </p>
           <p>
-            <a href="#buscar">{t('favoritos.volverBuscador')}</a>
+            <a href="#buscar">{t('contacto.volverBuscador')}</a>
           </p>
         </div>
       </section>
@@ -118,7 +118,12 @@ export default function Negocio({ usuario, perfil, onProponer }) {
         </div>
         <div className="campo">
           <label htmlFor="ng-ciudad">{t('negocio.ciudad')}</label>
-          <input id="ng-ciudad" type="text" placeholder="Tarragona" value={form.ciudad} onChange={(e) => set('ciudad', e.target.value)} />
+          <select id="ng-ciudad" value={form.ciudad} onChange={(e) => set('ciudad', e.target.value)} required>
+            <option value="">{t('ui.eligeCiudad')}</option>
+            {CIUDADES_CATALUNA.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
         <div className="campo">
           <label htmlFor="ng-zona">{t('negocio.zona')}</label>
@@ -141,7 +146,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
         </div>
         <div className="campo">
           <label htmlFor="ng-cat">{t('negocio.cocinas')}</label>
-          <input id="ng-cat" type="text" placeholder="Mediterránea, Tapas" value={form.categorias} onChange={(e) => set('categorias', e.target.value)} />
+          <input id="ng-cat" type="text" placeholder={t('negocio.placeholderCategorias')} value={form.categorias} onChange={(e) => set('categorias', e.target.value)} />
         </div>
         <div className="campo">
           <label htmlFor="ng-precio">{t('negocio.precio')}</label>
@@ -211,7 +216,7 @@ export default function Negocio({ usuario, perfil, onProponer }) {
         </div>
         <div className="campo">
           <label htmlFor="ng-alerg">{t('negocio.alergenos')}</label>
-          <textarea id="ng-alerg" rows="2" maxLength="500" placeholder="Ej: disponemos de pan sin gluten; cocina con frutos secos…" value={form.alergenos} onChange={(e) => set('alergenos', e.target.value)} />
+          <textarea id="ng-alerg" rows="2" maxLength="500" placeholder={t('negocio.placeholderAlergenos')} value={form.alergenos} onChange={(e) => set('alergenos', e.target.value)} />
         </div>
         <button type="submit" className="btn-cta btn-grande auth-boton" disabled={enviando}>
           {enviando ? t('negocio.enviando') : t('negocio.enviar')}

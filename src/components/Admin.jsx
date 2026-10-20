@@ -1,20 +1,26 @@
 /** View pura: panel admin — incidencias + locales propuestos. */
 import { useEffect, useState } from 'react';
-import { listarPendientes, resolverIncidencia } from '../services/incidenciaApi.js';
+import { listarPendientes, listarResueltas, resolverIncidencia } from '../services/incidenciaApi.js';
 import { listarNegociosPendientes, aprobarNegocio, rechazarNegocio } from '../services/negocioApi.js';
 import { useT } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
 import en from '../i18n/en.js';
 
+import IncidenciasResueltas from './IncidenciasResueltas.jsx';
+import ResolverIncidenciaModal from './ResolverIncidenciaModal.jsx';
+
 const TRADS = { es, ca, en };
 
 export default function Admin({ usuario, esAdmin }) {
   const t = useT(TRADS);
   const [lista, setLista] = useState([]);
+  const [resueltas, setResueltas] = useState([]);
+  const [vista, setVista] = useState('pendientes');
   const [negocios, setNegocios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [incidencia, setIncidencia] = useState(null);
 
   useEffect(() => {
     if (!usuario?.uid) {
@@ -26,10 +32,11 @@ export default function Admin({ usuario, esAdmin }) {
       return;
     }
     let vivo = true;
-    Promise.all([listarPendientes(), listarNegociosPendientes()])
-      .then(([l, n]) => {
+    Promise.all([listarPendientes().catch(() => []), listarNegociosPendientes().catch(() => []), listarResueltas().catch(() => [])])
+      .then(([l, n, r]) => {
         if (vivo) {
           setLista(l);
+          setResueltas(r);
           setNegocios(n);
           setCargando(false);
         }
@@ -47,14 +54,11 @@ export default function Admin({ usuario, esAdmin }) {
 
   if (!usuario) return null;
 
-  async function handleResolver(id) {
+  async function handleResolver(id, datos) {
     setError('');
-    try {
-      await resolverIncidencia(id);
-      setLista((prev) => prev.filter((x) => x.id !== id));
-    } catch (e) {
-      setError(e.message);
-    }
+    const resuelta = await resolverIncidencia(id, datos);
+    setResueltas((prev) => [resuelta, ...prev.filter((x) => x.id !== id)]);
+    setLista((prev) => prev.filter((x) => x.id !== id));
   }
 
   async function handleAprobar(id) {
@@ -79,10 +83,20 @@ export default function Admin({ usuario, esAdmin }) {
 
   return (
     <section className="auth-pagina pagina-ancha" aria-labelledby="admin-titulo">
+      {incidencia && <ResolverIncidenciaModal
+        onConfirmar={(datos) => handleResolver(incidencia.id, datos)}
+        onCancelar={() => setIncidencia(null)} />}
       <div className="auth-tarjeta tarjeta-ancha">
         <h1 id="admin-titulo">{t('admin.titulo')}</h1>
-        {esAdmin && <h2 className="cuenta-sub">{t('admin.incidenciasPendientes')}</h2>}
-        {cargando && <p>Cargando…</p>}
+        {esAdmin && <>
+          <h2 className="cuenta-sub">{t('admin.incidenciasTitulo')}</h2>
+          <div className="incidencias-vistas">
+            <button type="button" className="btn-secundario" aria-pressed={vista === 'pendientes'} onClick={() => setVista('pendientes')}>{t('admin.incidenciasPendientes')} ({lista.length})</button>
+            <button type="button" className="btn-secundario" aria-pressed={vista === 'resueltas'} onClick={() => setVista('resueltas')}>{t('admin.incidenciasResueltas')} ({resueltas.length})</button>
+          </div>
+          {!cargando && vista === 'resueltas' && <IncidenciasResueltas lista={resueltas} />}
+        </>}
+        {cargando && <p>{t('otros.cargando')}</p>}
         {!cargando && !esAdmin && (
           <p className="auth-error" role="alert">
             {t('admin.sinAcceso')}
@@ -93,10 +107,10 @@ export default function Admin({ usuario, esAdmin }) {
             {error}
           </p>
         )}
-        {!cargando && esAdmin && lista.length === 0 && !error && (
+        {!cargando && esAdmin && vista === 'pendientes' && lista.length === 0 && !error && (
           <p className="vacio-texto">{t('admin.noIncidencias')}</p>
         )}
-        {!cargando && esAdmin && lista.length > 0 && (
+        {!cargando && esAdmin && vista === 'pendientes' && lista.length > 0 && (
           <ul className="lista-registros">
             {lista.map((r) => (
               <li key={r.id} className="registro">
@@ -104,7 +118,7 @@ export default function Admin({ usuario, esAdmin }) {
                   <strong>{r.motivo}</strong> · {r.nombre} ({r.email})
                   <div className="registro-detalle">{r.mensaje}</div>
                 </div>
-                <button type="button" className="btn-cta btn-peq" onClick={() => handleResolver(r.id)}>
+                <button type="button" className="btn-cta btn-peq" onClick={() => setIncidencia(r)}>
                   {t('admin.resolver')}
                 </button>
               </li>
@@ -127,12 +141,12 @@ export default function Admin({ usuario, esAdmin }) {
                     {n.descripcion ? ` — ${n.descripcion}` : ''}
                   </div>
                   <div className="registro-detalle">
-                    Acceso: {n.accesoDiscapacidad == null ? '¿?' : n.accesoDiscapacidad ? 'sí' : 'no'}
-                    {' '}· Infantil: {n.menuInfantil == null ? '¿?' : n.menuInfantil ? 'sí' : 'no'}
-                    {' '}· Tronas: {n.tronas == null ? '¿?' : n.tronas ? 'sí' : 'no'}
-                    {' '}· Tranquilo: {n.entornoTranquilo == null ? '¿?' : n.entornoTranquilo ? 'sí' : 'no'}
-                    {' '}· Terraza: {n.terraza == null ? '¿?' : n.terraza ? 'sí' : 'no'}
-                    {n.alergenos ? ` · Alérgenos: ${n.alergenos}` : ''}
+                    {t('detalle.accesoAdaptado')}: {n.accesoDiscapacidad == null ? t('admin.noInfo') : n.accesoDiscapacidad ? t('admin.si') : t('admin.no')}
+                    {' '}· {t('detalle.menuInfantil')}: {n.menuInfantil == null ? t('admin.noInfo') : n.menuInfantil ? t('admin.si') : t('admin.no')}
+                    {' '}· {t('detalle.tronas')}: {n.tronas == null ? t('admin.noInfo') : n.tronas ? t('admin.si') : t('admin.no')}
+                    {' '}· {t('detalle.entornoTranquilo')}: {n.entornoTranquilo == null ? t('admin.noInfo') : n.entornoTranquilo ? t('admin.si') : t('admin.no')}
+                    {' '}· {t('detalle.terraza')}: {n.terraza == null ? t('admin.noInfo') : n.terraza ? t('admin.si') : t('admin.no')}
+                    {n.alergenos ? ` · ${t('detalle.alergenos')}: ${n.alergenos}` : ''}
                   </div>
                 </div>
                 <span style={{ display: 'flex', gap: '0.4rem' }}>

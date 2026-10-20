@@ -11,7 +11,14 @@ export default function Hero({ total, numZonas }) {
   return (
     <section id="inicio" className="hero" aria-labelledby="hero-titulo">
       <div className="hero-contenido">
-        <h1 id="hero-titulo">{t('hero.titulo')}</h1>
+        <h1 id="hero-titulo" aria-label={t('hero.titulo')}>
+          {t('hero.titulo').split(' ').map((palabra, i) => (
+            <span key={i} aria-hidden="true">
+              {i > 0 && ' '}
+              <span className="hero-palabra" style={{ '--i': i }}>{palabra}</span>
+            </span>
+          ))}
+        </h1>
         <p className="hero-sub">
           {t('hero.subtitulo')}
         </p>
@@ -19,7 +26,7 @@ export default function Hero({ total, numZonas }) {
           {t('hero.buscar')}
         </a>
         {(total > 0 || numZonas > 0) && (
-          <ul className="hero-stats" aria-label="La guía en cifras">
+          <ul className="hero-stats" aria-label={t('hero.cifras')}>
             {total > 0 && (
               <li>
                 <strong>{total.toLocaleString('es-ES')}</strong> {t('hero.restaurantes')}
@@ -36,6 +43,7 @@ export default function Hero({ total, numZonas }) {
           </ul>
         )}
       </div>
+      <a href="#buscar" className="hero-bajar" aria-label={t('hero.buscar')} />
     </section>
   );
 }

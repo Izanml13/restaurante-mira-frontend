@@ -6,11 +6,14 @@
  * Las Views reciben todo por props.
  */
 import { useEffect, useState } from 'react';
+import { CLAVE_FAVS_AVISOS } from '../models/avisosOfertasModel.js';
+import { desactivarPush } from '../services/pushWeb.js';
 import { suscribirSesion, crearCuenta, iniciarSesion, iniciarSesionGoogle as iniciarSesionGoogleFn, cerrarSesion, enviarVerificacionEmail, recargarEmailVerified } from '../services/authApi.js';
 import { esAdmin as comprobarAdmin } from '../services/incidenciaApi.js';
 import { obtenerPerfil, guardarPerfil, PERFIL_VACIO } from '../services/perfilApi.js';
 import { DIETA_VACIA, normalizarDieta, ACCESIBILIDAD_VACIA, normalizarAccesibilidad } from '../models/restaurantModel.js';
 import { contarNoLeidos } from '../services/mensajesApi.js';
+import { track } from '../services/auditoria.js';
 
 const LS_DIETA = 'mira:dieta';
 const LS_FAVS = 'mira:favoritos';
@@ -65,6 +68,9 @@ export function useAuth() {
   const [noLeidos, setNoLeidos] = useState(0);
   const [favoritos, setFavoritos] = useState([]);
   const [fusionadoUid, setFusionadoUid] = useState(null);
+
+  // G11: copia para filtrar los avisos por distancia (también la lee la tarea de fondo de la app).
+  useEffect(() => { guardarJSON(CLAVE_FAVS_AVISOS, favoritos); }, [favoritos]);
 
   useEffect(() => suscribirSesion((u) => {
     setUsuario(u);
@@ -136,6 +142,19 @@ export function useAuth() {
     setSeqPerfil((i) => i + 1);
   }
 
+  /**
+   * Firebase avisa de la sesión nueva antes de que se guarde el perfil, así que
+   * la primera lectura ve un usuario sin perfil ("cliente"). Tras crear la cuenta
+   * se aplica ya el tipo elegido y se vuelve a leer el perfil: si no, una cuenta
+   * de empresa recién creada no podía crear su restaurante hasta recargar.
+   */
+  async function crearCuentaConPerfil(datos) {
+    const r = await crearCuenta(datos);
+    setPerfil((p) => ({ ...p, tipo: datos.tipo === 'empresa' ? 'empresa' : 'cliente', nombre: datos.nombre?.trim() || p.nombre }));
+    recargarPerfil();
+    return r;
+  }
+
   /** Nº de mensajes sin leer (1 query pequeña). */
   async function recargarMensajes() {
     if (!usuario?.uid) {
@@ -189,6 +208,7 @@ export function useAuth() {
     const tiene = favoritos.includes(id);
     const next = tiene ? favoritos.filter((x) => x !== id) : [...favoritos, id];
     setFavoritos(next);
+    track(tiene ? 'favorito_eliminado' : 'favorito_añadido', { entidadTipo: 'restaurante', entidadId: String(id) });
     if (usuario?.uid) {
       try {
         await guardarPerfil(usuario.uid, { favoritos: next });
@@ -234,10 +254,10 @@ export function useAuth() {
     recargarMensajes,
     favoritos,
     toggleFavorito,
-    crearCuenta,
+    crearCuenta: crearCuentaConPerfil,
     iniciarSesion,
     iniciarSesionGoogle: iniciarSesionGoogleFn,
-    cerrarSesion,
+    cerrarSesion: async () => { await desactivarPush(); return cerrarSesion(); },
     enviarVerificacion,
     enviarVerificacionEmail,
     recargarEmailVerified,

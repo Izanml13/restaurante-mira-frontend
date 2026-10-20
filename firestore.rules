@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // La web y la app móvil leen/escriben mediante mira-api; Firebase Auth
+    // identifica al cliente, pero no autoriza escrituras directas a Firestore.
+    // El backend usa Admin SDK (no sujeto a estas reglas) y aplica roles/UID.
+    // No permitir que un cliente modifique tipo, saldo, tickets o aforo ni
+    // que consulte reservas/contactos/invitaciones de otros usuarios.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

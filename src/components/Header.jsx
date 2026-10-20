@@ -3,6 +3,7 @@
  * En móvil el menú colapsa tras el botón hamburguesa (estado solo visual).
  */
 import { useEffect, useState } from 'react';
+import '../styles/logo.css';
 import { useT, useI18n } from '../i18n/index.jsx';
 import es from '../i18n/es.js';
 import ca from '../i18n/ca.js';
@@ -10,11 +11,13 @@ import en from '../i18n/en.js';
 
 const TRADS = { es, ca, en };
 
-export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, tema, onCambiarTema, onSalir }) {
+export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeidos, puntosSaldo, tema, onCambiarTema, onSalir, onStreakClick, fetchStreakData, onAbrirMira, miraOculta }) {
   const t = useT(TRADS);
   const { lang, cycleLang, available } = useI18n();
   const [abierto, setAbierto] = useState(false);
   const [oculto, setOculto] = useState(false);
+  const [compacto, setCompacto] = useState(() => window.scrollY > 40);
+  const [loadingStreak, setLoadingStreak] = useState(false);
 
   useEffect(() => {
     if (!abierto) return undefined;
@@ -26,6 +29,16 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
   }, [abierto]);
 
   useEffect(() => {
+    // Solo en móvil el header se oculta al bajar; en desktop/tablet siempre visible.
+    const mq = window.matchMedia('(max-width: 767px)');
+    if (!mq.matches) {
+      setOculto(false);
+      return undefined;
+    }
+    if (abierto) {
+      setOculto(false);
+      return undefined;
+    }
     let ultimo = window.scrollY;
     let turno = false;
     function alDesplazar() {
@@ -33,17 +46,61 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
       turno = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        setOculto(y > 160 && y > ultimo);
+        const delta = y - ultimo;
+        if (y <= 60 || delta < 0) setOculto(false);
+        else if (delta > 0) setOculto(true);
         ultimo = y;
         turno = false;
       });
     }
     window.addEventListener('scroll', alDesplazar, { passive: true });
     return () => window.removeEventListener('scroll', alDesplazar);
+  }, [abierto]);
+
+  // Logo: palabra completa arriba del todo; monograma «M●» en cuanto se hace scroll.
+  useEffect(() => {
+    let turno = false;
+    function alDesplazar() {
+      if (turno) return;
+      turno = true;
+      requestAnimationFrame(() => {
+        setCompacto(window.scrollY > 40);
+        turno = false;
+      });
+    }
+    alDesplazar();
+    window.addEventListener('scroll', alDesplazar, { passive: true });
+    return () => window.removeEventListener('scroll', alDesplazar);
   }, []);
 
   function cerrar() {
     setAbierto(false);
+  }
+
+  async function handleStreakTap() {
+    if (loadingStreak || !usuario) return;
+    setLoadingStreak(true);
+    try {
+      const data = await fetchStreakData?.();
+      onStreakClick?.(data || { racha: { dias: 0 }, puntos: 0, yaReclamado: false });
+    } catch {
+      onStreakClick?.({ racha: { dias: 0 }, puntos: 0, yaReclamado: false });
+    } finally {
+      setLoadingStreak(false);
+    }
+  }
+
+  // El enlace ya apunta a #/: si estás en la landing no hay cambio de ruta y no pasaba nada.
+  function irALanding(e) {
+    e.preventDefault();
+    cerrar();
+    if (window.location.hash === '#/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    window.location.hash = '#/';
+    // Tras pintar la landing, arriba del todo (sin animación, que el cambio de vista la cortaría).
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   }
 
   function conmutarMensajes(e) {
@@ -56,8 +113,20 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
 
   return (
     <header className={`site-header${oculto ? ' oculto' : ''}`}>
-      <a href="#/" className="logo logo-imagen" aria-label="MIRA - inicio" onClick={cerrar}>
-        <img src="/logo.png" alt="MIRA" />
+      <a
+        href="#/"
+        className={`logo logo-imagen logo-mira${compacto ? ' compacto' : ''}`}
+        aria-label={t('nav.inicio')}
+        onClick={irALanding}
+      >
+        {/* Letras reales para poder plegarlas al hacer scroll (como el logo de Anthropic). */}
+        <span className="lm-letra lm-m" aria-hidden="true">M</span>
+        <span className="lm-i" aria-hidden="true">
+          <span className="lm-palo" />
+          <span className="lm-punto" />
+        </span>
+        <span className="lm-plegable" style={{ '--orden': 1 }} aria-hidden="true">R</span>
+        <span className="lm-plegable" style={{ '--orden': 0 }} aria-hidden="true">A</span>
       </a>
       <button
         type="button"
@@ -89,39 +158,69 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
         {abierto ? '✕' : '☰'}
       </button>
       <div id="menu-movil" className={`header-menu${abierto ? ' abierto' : ''}`}>
-        <nav aria-label="Navegación principal" onClick={cerrar}>
+        <nav aria-label={t('nav.navegacion')} onClick={cerrar}>
           <ul className="nav-list">
-            <li><a href="#inicio">{t('nav.descubrir')}</a></li>
+            <li><a href="#/descubrir">{t('nav.descubrir')}</a></li>
             <li><a href="#/mapa">{t('nav.mapa')}</a></li>
             <li><a href="#/reservas">{t('nav.reservas')}</a></li>
             <li><a href="#/contacto">{t('nav.contacto')}</a></li>
+            <li><a href="#/app">{t('nav.app')}</a></li>
           </ul>
         </nav>
         <div className="header-cuentas" onClick={cerrar}>
+          {onAbrirMira && !miraOculta && (
+            <button
+              type="button"
+              className="header-mira-btn"
+              onClick={onAbrirMira}
+              aria-label={t('mira.abrir')}
+              title={t('mira.abrir')}
+            >
+              <img src="/mochi.gif" alt="" className="header-mira-btn-img" />
+            </button>
+          )}
           {usuario ? (
             <>
-              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/puntos" className="header-points-pill" title={t('points.title')}>
+                <img src="/moneda-mira.png" alt="" className="header-points-pill-coin" />
+                {puntosSaldo || 0}
+              </a>
+              <button
+                type="button"
+                className={`header-streak-btn${loadingStreak ? ' header-streak-btn--loading' : ''}`}
+                onClick={handleStreakTap}
+                aria-label={t('nav.abrirRacha')}
+                title={t('ui.rachaDiaria')}
+              >
+                <img src="/racha-fuego.png" alt="" className="header-streak-btn-img" />
+              </button>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`${t('nav.favoritos')} (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
-              <a href="#/mensajes" className="btn-texto btn-fav" onClick={conmutarMensajes} aria-label={`Mensajes${noLeidos > 0 ? `, ${noLeidos} sin leer` : ''}`}>
+              <a href="#/mensajes" className="btn-texto btn-fav" onClick={conmutarMensajes} aria-label={`${t('mensajes.titulo')}${noLeidos > 0 ? `, ${noLeidos} ${t('mensajes.sinLeer')}` : ''}`}>
                 ✉{noLeidos > 0 ? ` ${noLeidos}` : ''}
               </a>
               {esAdmin && (
-                <a href="#/admin" className="btn-texto">
-                  {t('nav.admin')}
+                <a href="#/admin" className="header-dashboard-link header-dashboard-admin" title={t('ui.panelAdminTitulo')}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>{t('ui.panelAdmin')}</span>
                 </a>
               )}
               {perfil?.tipo === 'empresa' && (
-                <a href="#/negocio" className="btn-texto">
-                  {t('nav.miRestaurante')}
+                <a href="#/dashboard" className="header-dashboard-link header-dashboard-restaurante" title={t('ui.miPanelTitulo')}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>{t('ui.miPanel')}</span>
                 </a>
               )}
-              <a href="#/cuenta" className="header-cuenta-link" title={usuario.email}>
+              <a href="#/cuenta" className="header-cuenta-link" title={usuario.email} aria-label={`${t('nav.miCuenta')}: ${usuario.nombre || usuario.email}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                <span>{t('nav.miCuenta')}</span>
                 <span className="header-cuenta-nombre">{usuario.nombre || usuario.email}</span>
               </a>
               <button type="button" className="btn-texto header-logout" onClick={onSalir} aria-label={t('nav.cerrarSesion')}>
@@ -135,7 +234,7 @@ export default function Header({ usuario, esAdmin, perfil, numFavoritos, noLeido
             </>
           ) : (
             <>
-              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`Favoritos (${numFavoritos})`}>
+              <a href="#/favoritos" className="btn-texto btn-fav" aria-label={`${t('nav.favoritos')} (${numFavoritos})`}>
                 ♥{numFavoritos > 0 ? ` ${numFavoritos}` : ''}
               </a>
               <a href="#/login" className="header-login">

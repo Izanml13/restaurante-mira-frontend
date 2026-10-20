@@ -64,7 +64,7 @@ export default function Recuperar() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                placeholder="tu@correo.com"
+                placeholder={t('ui.correoEjemplo')}
               />
             </div>
             {error && <p className="auth-error" role="alert" style={{ margin: '0.4rem 0' }}>{error}</p>}

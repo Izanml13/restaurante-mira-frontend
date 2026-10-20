@@ -239,6 +239,7 @@ export function ordenarResenas(lista, orden = 'populares') {
  * Se usan para el filtro aunque la portada aún no las haya cargado todas.
  */
 export const ZONAS_CATALUNA = ['Barcelona, Spain', 'Tarragona, Spain', 'Girona, Spain', 'Lleida, Spain'];
+export const CIUDADES_CATALUNA = ['Tarragona', 'Girona', 'Barcelona', 'Lleida'];
 
 // =====================================================
 // Dieta, alérgenos y carta libro (todo determinista, 0 lecturas)
@@ -326,11 +327,14 @@ export function accesibilidadActiva(a) {
  * ¿El local es apto verificado? null/sin dato = NO apto cuando el filtro pide.
  * (Mostrarlo sería mentir a quien no puede arriesgarse.)
  */
-export function aptoAccesibilidad(restaurante, accesibilidad) {
+export function aptoAccesibilidad(restaurante, accesibilidad, { incluirEstimados = false } = {}) {
   const a = normalizarAccesibilidad(accesibilidad);
   if (!a.sillaRuedas && !a.tea) return true;
-  if (a.sillaRuedas && restaurante.accesoDiscapacidad !== true) return false;
-  if (a.tea && restaurante.entornoTranquilo !== true) return false;
+  // Un dato estimado solo cuenta si el usuario pide ver también los «posiblemente aptos».
+  const vale = (campo) =>
+    restaurante[campo] === true && (incluirEstimados || !restaurante.serviciosEstimados?.[campo]);
+  if (a.sillaRuedas && !vale('accesoDiscapacidad')) return false;
+  if (a.tea && !vale('entornoTranquilo')) return false;
   return true;
 }
 
@@ -482,13 +486,16 @@ const FAMILIAS_COCINA = [
   ['india', ['indian', 'india', 'curry']],
   ['americana', ['burger', 'hamburg', 'mcdonald', 'american', 'diner', 'sandwich', 'bocatta']],
   ['marisco', ['seafood', 'marisc', 'pescad', 'marisqueria']],
-  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco']],
+  ['brasa', ['steak', 'grill', 'parrilla', 'asador', 'braseria', 'brass', 'barbecue', 'argentin', 'churrasco', 'barbe', 'bbq', 'barbacoa']],
   ['francesa', ['french', 'franc']],
   ['griega', ['greek', 'grieg']],
   ['turca', ['kebab', 'turk', 'leban', 'arab']],
   ['dulce', ['dessert', 'postre', 'helad', 'pastel', 'chocolate', 'crep', 'bakery']],
   ['desayuno', ['breakfast', 'brunch', 'caf']],
   ['vinos', ['wine', 'vino', 'taberna', 'bodega', 'celler']],
+  ['vegana', ['vegan', 'vegetari', 'veggie']],
+  ['copas', ['cocktail', 'pub', 'lounge']],
+  ['fusión', ['fusion']],
 ];
 
 export function familiaCocina(cocina) {
@@ -497,6 +504,21 @@ export function familiaCocina(cocina) {
     if (claves.some((k) => t.includes(k))) return familia;
   }
   return t.replace(/\s*bars?$/i, '').trim() || 'la carta';
+}
+
+/**
+ * Opciones del filtro de cocina: una por familia, sin duplicados entre el
+ * catálogo en español y las categorías de Yelp ('Japonesa', 'Japanese' y
+ * 'Sushi Bars' salen una sola vez como 'Japonesa').
+ * @param {string[]} cocinas
+ * @returns {string[]}
+ */
+export function opcionesCocina(cocinas) {
+  const familias = new Set((cocinas || []).filter(Boolean).map(familiaCocina));
+  familias.delete('la carta');
+  return [...familias]
+    .map((f) => f.charAt(0).toUpperCase() + f.slice(1))
+    .sort((a, b) => a.localeCompare(b, 'es'));
 }
 
 /**
@@ -546,6 +568,7 @@ export function resumenRestaurante(restaurante, dieta = null) {
     id: restaurante.id,
     nombre: restaurante.nombre,
     imagen: restaurante.imagen,
+    cocina: restaurante.cocina,
     notaYelp,
     totalYelp: restaurante.totalResenasYelp ?? 0,
     notaMira,
@@ -714,3 +737,4 @@ export function completarRestaurante(r, posicion = null) {
     media: r.media ?? mediaResenas(r),
   };
 }
+

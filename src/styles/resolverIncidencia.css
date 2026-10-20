@@ -1,0 +1,8 @@
+.resolver-dialogo { width: min(32rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; box-sizing: border-box; padding: 1.5rem; border: 1px solid var(--borde); border-radius: var(--radio-xl); background: var(--papel); color: var(--tinta); }
+.resolver-dialogo::backdrop { background: rgb(0 0 0 / 55%); }
+.resolver-dialogo form, .resolver-dialogo label { display: grid; gap: 0.6rem; }
+.resolver-dialogo form { gap: 1rem; }
+.resolver-dialogo h2 { margin: 0; }
+.resolver-dialogo input, .resolver-dialogo textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--borde); border-radius: var(--radio-peq); padding: 0.6rem; background: var(--papel); color: var(--tinta); font: inherit; }
+.resolver-dialogo textarea { resize: vertical; }
+.resolver-acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
