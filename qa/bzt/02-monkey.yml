@@ -1,0 +1,20 @@
+# Monkey test: acciones aleatorias reproducibles (seed fija).
+# Uso:  bzt qa/bzt/02-monkey.yml
+settings:
+  artifacts-dir: qa/artifacts/bzt/monkey-%Y-%m-%d_%H-%M-%S
+
+execution:
+- executor: pytest
+  scenario: monkey
+
+scenarios:
+  monkey:
+    script: qa/tests/test_monkey.py
+    additional-args: "--monkey-acciones 80 --monkey-seed 20261020"
+
+reporting:
+- module: final-stats
+  summary: true
+- module: passfail
+  criteria:
+  - "fail>0, continue as failed"
