@@ -27,7 +27,7 @@ function extraerCoords(d) {
   return { lat, lng };
 }
 
-function mapearDoc(id, d) {
+export function mapearDoc(id, d) {
   return conServiciosEstimados(mapearDocBase(id, d));
 }
 

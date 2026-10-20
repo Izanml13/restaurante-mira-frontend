@@ -509,6 +509,8 @@
 .ofertas-fila-acciones { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
 .ofertas-borrar-confirm { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; color: var(--op-error); font-weight: 700; }
 .ofertas-form { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem; }
+.ofertas-form-fila .op-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.ofertas-form-fila input[type="date"] { width: auto; max-width: 100%; align-self: flex-start; }
 .ofertas-form-fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; align-items: end; }
 .ofertas-niveles { display: flex; flex-direction: column; gap: 0.5rem; }
 .ofertas-nivel { display: grid; grid-template-columns: 6.5rem 1fr 5rem; gap: 0.5rem; align-items: center; }
