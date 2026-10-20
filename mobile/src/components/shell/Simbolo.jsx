@@ -81,6 +81,8 @@ const MAPA = {
   date_range: 'date-range',
   radio_button_unchecked: 'radio-button-unchecked',
   upload: 'file-upload',
+  qr_code_scanner: 'qr-code-scanner',
+  photo_camera: 'photo-camera',
 };
 
 export function Simbolo({ name, size = 20, color, style }) {
