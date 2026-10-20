@@ -15,6 +15,8 @@ import OpsAuditoria from './OpsAuditoria.jsx';
 import OpsCargaDirecto from './OpsCargaDirecto.jsx';
 import OpsOfertas from './OpsOfertas.jsx';
 import { track, trackPanel } from '../../services/auditoria.js';
+import { api } from '../../services/httpClient.js';
+import { invalidarCatalogo } from '../../services/restaurantApi.js';
 import { leerEstadoUrl } from '../../services/auditoriaCore.js';
 import { crearOverviewSimulado } from './opsDemo.js';
 import '../../styles/ops.css';
@@ -60,6 +62,16 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
     return SECCIONES.some((x) => x.id === s) ? s : 'dashboard';
   });
   const [menuMovil, setMenuMovil] = useState(false);
+  const [refresco, setRefresco] = useState({ version: 0, cargando: false, error: false });
+
+  // Vacía las cachés de la API y de la web y vuelve a montar la sección para que lo pida todo de nuevo.
+  async function actualizarDatos() {
+    setRefresco((r) => ({ ...r, cargando: true, error: false }));
+    let error = false;
+    try { await api.post('/v1/dashboard/cache/refrescar', {}); } catch { error = true; }
+    invalidarCatalogo();
+    setRefresco((r) => ({ version: r.version + 1, cargando: false, error }));
+  }
   const [busqueda, setBusqueda] = useState('');
   const [consultaCabecera, setConsultaCabecera] = useState({ q: '', revision: 0 });
   const [criticas, setCriticas] = useState(0);
@@ -239,6 +251,11 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
               />
             </div>
             <div className="ops-header-spacer" />
+            <button type="button" className="ops-btn soft sm" onClick={actualizarDatos} disabled={refresco.cargando}
+              title={t('ops.actualizarDatosAyuda')} data-test="ops-actualizar">
+              <span className={`material-symbols-outlined${refresco.cargando ? ' ops-girando' : ''}`} style={{ fontSize: 18 }}>refresh</span>
+              <span className="hide-m">{t(refresco.cargando ? 'ops.actualizando' : refresco.error ? 'ops.actualizarError' : 'ops.actualizarDatos')}</span>
+            </button>
             <button type="button" role="switch" aria-checked={simulado} className={`ops-sim-switch${simulado ? ' on' : ''}`}
               onClick={cambiarSimulado} title="Muestra cifras simuladas en Dashboard y Finanzas (sin consultas)">
               <span className="ops-sim-track"><i /></span>
@@ -272,7 +289,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
             </div>
           </header>
 
-          <main className="ops-content">
+          <main className="ops-content" key={refresco.version}>
             {seccion === 'dashboard' && <OpsDashboard key={simulado ? 'sim' : 'real'} usuario={usuario} esAdmin={esAdmin} todos={todos} demo={simulado ? demo : null} />}
             {seccion === 'restaurantes' && <OpsRestaurantes />}
             {seccion === 'reservas' && <OpsReservas busquedaInicial={consultaCabecera.q} revisionBusqueda={consultaCabecera.revision} />}

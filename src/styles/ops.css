@@ -530,3 +530,7 @@ code.ops-code { font-family: ui-monospace, monospace; font-size: 11px; backgroun
 @media (prefers-reduced-motion: reduce) {
   .ops-menu-hint, .ops-menu-hint-icon { animation: none !important; }
 }
+
+/* Botón «Actualizar datos» */
+@keyframes ops-girar { to { transform: rotate(360deg); } }
+.ops-girando { animation: ops-girar 0.8s linear infinite; }
