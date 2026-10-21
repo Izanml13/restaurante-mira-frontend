@@ -184,8 +184,9 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
   }
 
   return (
-    <section className="auth-pagina" aria-labelledby="cuenta-titulo">
-      <div className="auth-tarjeta cuenta-tarjeta">
+    <section className="auth-pagina cuenta-pagina" aria-labelledby="cuenta-titulo">
+      <div className="cuenta-layout">
+      <aside className="cuenta-perfil">
         <div className="emblema-progreso" aria-live="polite">
           <p className="emblema-progreso-label">{t('emblemas.tituloProgreso')}</p>
           <p className={`emblema-progreso-titulo${emblema ? ` emblema-progreso-titulo--activo emblema-progreso-titulo--${emblema.id}` : ''}`}>
@@ -211,6 +212,17 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           <a href="#buscar" className="btn-cta">{t('cuenta.buscarRestaurantes')}</a>
           <button type="button" className="btn-secundario" onClick={onSalir}>{t('cuenta.cerrarSesion')}</button>
         </p>
+        <nav className="cuenta-nav" aria-label={t('cuenta.navLabel')}>
+          {[['cuenta-puntos', 'navPuntos'], ['cuenta-preferencias', 'navPreferencias'], ['cuenta-ajustes', 'navAjustes'], ['cuenta-actividad', 'navActividad']].map(([id, clave]) => (
+            <button key={id} type="button" className="cuenta-nav-item"
+              onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+              {t(`cuenta.${clave}`)}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <div className="cuenta-main">
 
         {/* --- DASHBOARD PANEL --- */}
         {(esAdmin || perfil?.tipo === 'empresa') && (
@@ -226,6 +238,7 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
         )}
 
         {/* --- MIRA POINTS --- */}
+        <section id="cuenta-puntos" className="cuenta-bloque">
         <h2 className="cuenta-sub">{t('points.title')}</h2>
         <div className="cuenta-points">
           <div className="cuenta-points__saldo">
@@ -252,6 +265,9 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           </div>
         </div>
 
+        </section>
+
+        <section id="cuenta-preferencias" className="cuenta-bloque">
         {/* --- DIETA --- */}
         <h2 className="cuenta-sub">{t('cuenta.miDieta')}</h2>
         <form onSubmit={guardarPrefs} className="prefs-form prefs-card">
@@ -311,6 +327,9 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           ))}
         </div>
 
+        </section>
+
+        <section id="cuenta-ajustes" className="cuenta-bloque">
         {/* --- Verificación de email --- */}
         <h2 className="cuenta-sub">{t('cuenta.verificacionCorreo')}</h2>
         <div className="prefs-form prefs-card">
@@ -365,9 +384,11 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
           {cookiesOk && <p className="vacio-texto" role="status">{cookiesOk}</p>}
         </div>
 
+        </section>
+
         {/* --- NEGOCIO --- */}
         {(perfil?.tipo === 'empresa' || esAdmin) && (
-          <>
+          <section className="cuenta-bloque">
             <h2 className="cuenta-sub">{t('cuenta.miNegocio')}</h2>
             {perfil?.tipo === 'empresa' && (
               <p><a
@@ -393,9 +414,10 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
                 ))}
               </ul>
             )}
-          </>
+          </section>
         )}
 
+        <section id="cuenta-actividad" className="cuenta-bloque">
         {/* --- RESERVAS --- */}
         <h2 className="cuenta-sub">{t('cuenta.proximasReservas')}</h2>
         {cargando && <p>{t('otros.cargando')}</p>}
@@ -448,6 +470,8 @@ export default function Cuenta({ usuario, esAdmin, perfil, dieta, guardarDieta, 
             ))}
           </ul>
         )}
+        </section>
+      </div>
       </div>
     </section>
   );

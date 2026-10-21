@@ -65,8 +65,175 @@
 }
 
 /* ---------- Cuenta ---------- */
-.cuenta-tarjeta {
-  max-width: 640px;
+/* Perfil (BUG-159): ficha lateral fija + bloques en tarjetas claras. */
+.cuenta-pagina {
+  --cuenta-radio: 8px;
+  justify-items: stretch;
+}
+
+.cuenta-layout {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.cuenta-perfil,
+.cuenta-bloque {
+  background: var(--papel);
+  border: 1px solid var(--borde);
+  border-radius: var(--cuenta-radio);
+  box-shadow: var(--sombra-card);
+}
+
+.cuenta-perfil {
+  position: sticky;
+  top: 5.5rem;
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.5rem 1.3rem;
+  overflow: hidden;
+}
+
+/* Franja de marca tras el avatar */
+.cuenta-perfil::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7.6rem;
+  background: var(--primary-container);
+  z-index: 0;
+}
+
+.cuenta-perfil > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cuenta-perfil .emblema-progreso-label,
+.cuenta-perfil .emblema-progreso-titulo {
+  color: #fff;
+}
+
+.cuenta-perfil h1 {
+  font-family: var(--fuente-display);
+  font-size: 1.5rem;
+  margin: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.cuenta-perfil .cuenta-datos > div {
+  grid-template-columns: 1fr;
+  gap: 0.1rem;
+}
+
+.cuenta-perfil .cuenta-acciones > * {
+  flex: 1 1 auto;
+  text-align: center;
+  margin-top: 0;
+}
+
+.cuenta-nav {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--borde);
+}
+
+.cuenta-nav-item {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 0;
+  border-radius: var(--radio-peq);
+  background: transparent;
+  color: var(--tinta);
+  font: 600 0.95rem var(--fuente);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cuenta-nav-item:hover {
+  background: var(--verde-suave);
+  color: var(--primary-container);
+}
+
+[data-theme='dark'] .cuenta-nav-item:hover {
+  color: var(--primary);
+}
+
+.cuenta-nav-item:focus-visible {
+  outline: 3px solid var(--secondary-container);
+  outline-offset: 2px;
+}
+
+.cuenta-main {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.cuenta-bloque {
+  padding: 0.4rem 1.4rem 1.4rem;
+  scroll-margin-top: 5.5rem;
+  min-width: 0;
+}
+
+.cuenta-bloque > .cuenta-sub:first-child,
+.cuenta-bloque > :first-child .cuenta-sub:first-child {
+  border-top: 0;
+}
+
+.cuenta-pagina .cuenta-dashboard-banner {
+  border-radius: var(--cuenta-radio);
+  margin: 0;
+}
+
+.cuenta-pagina .prefs-card {
+  border-radius: var(--cuenta-radio);
+}
+
+@media (max-width: 860px) {
+  .cuenta-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cuenta-perfil {
+    position: relative;
+    top: auto;
+  }
+
+  .cuenta-nav {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cuenta-nav-item {
+    flex: none;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cuenta-pagina {
+    padding-left: var(--gutter-movil);
+    padding-right: var(--gutter-movil);
+  }
+
+  .cuenta-perfil,
+  .cuenta-bloque {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 .prefs-card {
@@ -115,7 +282,7 @@
   margin-left: 0.2rem;
 }
 
-.cuenta-tarjeta .cuenta-sub {
+.cuenta-bloque .cuenta-sub {
   display: flex;
   align-items: center;
   gap: 0.5rem;

@@ -167,3 +167,4 @@ ni la app móvil.
 | [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | en revisión | fix/ui-153-155 |
 | [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | en revisión | fix/ui-153-155 |
 | [BUG-158](BUG-158.md) | Ajuste fino de la redondez (personas, filtros, puntos) | detalle/buscador/puntos | claude | en revisión | fix/ui-153-155 |
+| [BUG-159](BUG-159.md) | Rediseño de la página de perfil | cuenta | claude | en revisión | fix/ui-153-155 |
