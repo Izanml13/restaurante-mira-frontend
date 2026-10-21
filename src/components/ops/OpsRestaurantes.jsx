@@ -330,7 +330,7 @@ export default function OpsRestaurantes() {
               <textarea
                 id="ops-mensaje"
                 className="ops-input"
-                style={{ height: 120, paddingTop: 10, resize: 'vertical', fontFamily: 'inherit' }}
+                style={{ height: 120, paddingTop: 10, resize: 'vertical' }}
                 value={mensaje}
                 onChange={(e) => setMensaje(e.target.value)}
                 placeholder={t('ops.phTextoDueno')}

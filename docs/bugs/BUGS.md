@@ -162,10 +162,11 @@ ni la app móvil.
 
 | ID | Título | Zona | Asignado | Estado | Rama |
 |----|--------|------|----------|--------|------|
-| [BUG-153](BUG-153.md) | La insignia «Recomendado» debe ser verde | buscador/mapa | claude | en revisión | fix/ui-153-155 |
-| [BUG-154](BUG-154.md) | Los botones de cancelar deben ser rojos | global | claude | en revisión | fix/ui-153-155 |
-| [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | en revisión | fix/ui-153-155 |
-| [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | en revisión | fix/ui-153-155 |
-| [BUG-158](BUG-158.md) | Ajuste fino de la redondez (personas, filtros, puntos) | detalle/buscador/puntos | claude | en revisión | fix/ui-153-155 |
-| [BUG-159](BUG-159.md) | Rediseño de la página de perfil | cuenta | claude | en revisión | fix/ui-153-155 |
-| [BUG-160](BUG-160.md) | Scrolls independientes y modo oscuro del perfil | cuenta | claude | en revisión | fix/ui-153-155 |
+| [BUG-153](BUG-153.md) | La insignia «Recomendado» debe ser verde | buscador/mapa | claude | hecho | fix/ui-153-155 |
+| [BUG-154](BUG-154.md) | Los botones de cancelar deben ser rojos | global | claude | hecho | fix/ui-153-155 |
+| [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | hecho | fix/ui-153-155 |
+| [BUG-156](BUG-156.md) | Fuentes de formularios iguales en toda la web | global / formularios | codex | hecho | fix/BUG-156-fuentes-formularios |
+| [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | hecho | fix/ui-153-155 |
+| [BUG-158](BUG-158.md) | Ajuste fino de la redondez (personas, filtros, puntos) | detalle/buscador/puntos | claude | hecho | fix/ui-153-155 |
+| [BUG-159](BUG-159.md) | Rediseño de la página de perfil | cuenta | claude | hecho | fix/ui-153-155 |
+| [BUG-160](BUG-160.md) | Scrolls independientes y modo oscuro del perfil | cuenta | claude | hecho | fix/ui-153-155 |
