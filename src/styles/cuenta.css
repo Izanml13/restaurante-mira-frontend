@@ -199,6 +199,89 @@
   border-radius: var(--cuenta-radio);
 }
 
+/* BUG-160: la ficha lateral se desplaza sola si es más alta que la ventana. */
+@media (min-width: 861px) {
+  .cuenta-perfil {
+    max-height: calc(100svh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--borde) transparent;
+  }
+
+  .cuenta-perfil::-webkit-scrollbar { width: 6px; }
+  .cuenta-perfil::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 999px; }
+}
+
+/* BUG-160: modo oscuro del perfil — superficies verdosas escalonadas. */
+[data-theme='dark'] .cuenta-pagina {
+  --cuenta-sup: #171c19;
+  --cuenta-sup-alta: #1e2521;
+  --cuenta-borde: rgba(168, 213, 186, 0.12);
+  --cuenta-texto-sec: #b3bcb6;
+}
+
+[data-theme='dark'] .cuenta-perfil,
+[data-theme='dark'] .cuenta-bloque {
+  background: var(--cuenta-sup);
+  border-color: var(--cuenta-borde);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .cuenta-perfil::before {
+  background: linear-gradient(180deg, #24463a, #1c3a30);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card,
+[data-theme='dark'] .cuenta-pagina .cuenta-points {
+  background: var(--cuenta-sup-alta);
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-points {
+  background: radial-gradient(120% 140% at 100% 0%, rgba(254, 214, 91, 0.07), transparent 55%), var(--cuenta-sup-alta);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-points__amount {
+  color: #e8cf7a;
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-redemption {
+  background: rgba(168, 213, 186, 0.06);
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-datos > div,
+[data-theme='dark'] .cuenta-nav,
+[data-theme='dark'] .cuenta-bloque .cuenta-sub {
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-datos dt,
+[data-theme='dark'] .cuenta-pagina .vacio-texto,
+[data-theme='dark'] .cuenta-pagina .cuenta-points__label,
+[data-theme='dark'] .cuenta-pagina .registro-detalle {
+  color: var(--cuenta-texto-sec);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check {
+  background: var(--cuenta-sup);
+  border-color: rgba(168, 213, 186, 0.22);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check:hover,
+[data-theme='dark'] .cuenta-nav-item:hover {
+  background: rgba(168, 213, 186, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check:has(input:checked) {
+  background: #2f5a4a;
+  border-color: #2f5a4a;
+  color: #fff;
+}
+
 @media (max-width: 860px) {
   .cuenta-layout {
     grid-template-columns: minmax(0, 1fr);
