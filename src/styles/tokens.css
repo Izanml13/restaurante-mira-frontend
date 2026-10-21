@@ -34,9 +34,9 @@
   --fuente-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
 
   /* Border radius */
-  --radio: 12px;
-  --radio-peq: 8px;
-  --radio-xl: 24px;
+  --radio: 2px;
+  --radio-peq: 0;
+  --radio-xl: 14px;
   --radio-med: var(--radio);
   --radio-grande: var(--radio-xl);
   --text-primary: var(--tinta);

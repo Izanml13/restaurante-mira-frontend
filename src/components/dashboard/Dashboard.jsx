@@ -297,7 +297,7 @@ const restDropdownRef = useRef(null);
     return (
       <section className="auth-pagina pagina-ancha"><div className="auth-tarjeta tarjeta-ancha" style={{maxWidth:760, margin:'0 auto', width:'100%'}}>
         <div className="op-hub" style={{padding: '1rem'}}>
-          <div style={{background:'#fef3c7', border:'1px solid #fde68a', color:'#92400e', padding:'1rem', borderRadius:'0.75rem'}}>
+          <div style={{background:'#fef3c7', border:'1px solid #fde68a', color:'#92400e', padding:'1rem', borderRadius:'2px'}}>
             <p style={{fontWeight:800, display:'flex', alignItems:'center', gap:'0.4rem'}}><span className="material-symbols-outlined" style={{fontSize:18}}>schedule</span> {t("dashboard.propuestaPendienteTitulo")}</p>
             <p style={{fontSize:'0.82rem', marginTop:'0.35rem'}}>{t("dashboard.propuestaPendienteRevision", { nombre: pendingNegocio.nombre, ciudad: pendingNegocio.ciudad })}</p>
           </div>
@@ -331,7 +331,7 @@ const restDropdownRef = useRef(null);
           <h2 style={{fontWeight:800, fontSize:'1.1rem'}}>{data ? t("dashboard.anadirOtroRestaurante") : t("dashboard.crearRestaurante")}</h2>
           {data && <p style={{fontSize:'0.82rem', color:'var(--op-on-variant)', marginTop:'-0.35rem'}}>{t("dashboard.propuestaEnviadaTexto")}</p>}
           {createSuccess ? (
-            <div style={{background:'#d1fae5', color:'#065f46', padding:'1rem', borderRadius:'0.75rem', textAlign:'center'}}>
+            <div style={{background:'#d1fae5', color:'#065f46', padding:'1rem', borderRadius:'2px', textAlign:'center'}}>
               <p style={{fontWeight:800}}>{t("dashboard.restauranteCreado")}</p>
               <p style={{fontSize:'0.82rem', marginTop:'0.25rem'}}>{t("dashboard.propuestaPendienteAdmin")}</p>
             </div>
@@ -622,7 +622,7 @@ const restDropdownRef = useRef(null);
                 <div className="op-reco-title">{t("dashboard.conciliacionTickets")}</div>
                 <p style={{fontSize:'0.72rem', color:'var(--op-on-variant)', marginTop:'0.15rem'}}>{t("dashboard.conciliacionAyuda")}</p>
               </div>
-              <div style={{display:'flex', alignItems:'center', gap:'0.4rem', background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0.5rem', fontFamily:'ui-monospace,monospace', fontSize:'0.68rem'}}>
+              <div style={{display:'flex', alignItems:'center', gap:'0.4rem', background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0', fontFamily:'ui-monospace,monospace', fontSize:'0.68rem'}}>
                 <span style={{width:'0.45rem', height:'0.45rem', borderRadius:'50%', background:'var(--op-secondary)', display:'inline-block', animation:'opPulse 1s infinite'}}></span> {t("dashboard.ticketsRegistradosLabel")} <strong>{totalTickets}</strong>
               </div>
             </div>
@@ -664,7 +664,7 @@ const restDropdownRef = useRef(null);
                     </div>
                     <div style={{textAlign:'right', flex:'0 0 auto', marginLeft:'0.5rem'}}>
                       <div style={{fontFamily:'ui-monospace, monospace', fontWeight:700, fontSize:'0.72rem'}}>{euro(item.totalPagado ?? item.total ?? 0)}</div>
-                      <span style={{display:'inline-flex', alignItems:'center', gap:'0.2rem', fontSize:'0.58rem', fontWeight:700, padding:'0.1rem 0.3rem', borderRadius:'0.3rem', background: String(item.estado).includes('Revisi')? '#ffdad6':'var(--op-secondary-container)', color: String(item.estado).includes('Revisi')? '#93000a':'var(--op-on-secondary-container)'}}><span style={{width:'0.25rem', height:'0.25rem', borderRadius:'50%', background:'currentColor'}}></span>{item.estado || t("dashboard.registrado")}</span>
+                      <span style={{display:'inline-flex', alignItems:'center', gap:'0.2rem', fontSize:'0.58rem', fontWeight:700, padding:'0.1rem 0.3rem', borderRadius:'0', background: String(item.estado).includes('Revisi')? '#ffdad6':'var(--op-secondary-container)', color: String(item.estado).includes('Revisi')? '#93000a':'var(--op-on-secondary-container)'}}><span style={{width:'0.25rem', height:'0.25rem', borderRadius:'50%', background:'currentColor'}}></span>{item.estado || t("dashboard.registrado")}</span>
                     </div>
                   </div>
                 ))}
@@ -680,7 +680,7 @@ const restDropdownRef = useRef(null);
                   <div className="op-panel-title">{filtroTodas ? t("dashboard.reservasFuturas") : t("dashboard.reservasDel", { fecha: new Date(fechaFiltro+'T00:00:00').toLocaleDateString(t('modelos.locale'),{day:'2-digit', month:'short'}) })} <span className="op-panel-date">{filtroTodas ? `${t("dashboard.todasLabel")} · ${stats.totalReservas}` : fechaFiltro===hoyISO ? hoyLabel : fechaFiltro}</span></div>
                   <p style={{fontSize:'0.68rem', color:'var(--op-on-variant)'}}>{filtroTodas ? t("dashboard.todasReservasFuturas") : t("dashboard.filtraPorFecha")}</p>
                 </div>
-                <div style={{background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0.5rem', fontSize:'0.68rem', fontWeight:700, color:'var(--op-primary)', display:'flex', alignItems:'center', gap:'0.25rem'}}>
+                <div style={{background:'var(--op-surface-low)', padding:'0.35rem 0.6rem', borderRadius:'0', fontSize:'0.68rem', fontWeight:700, color:'var(--op-primary)', display:'flex', alignItems:'center', gap:'0.25rem'}}>
                   <span className="material-symbols-outlined" style={{fontSize:14}}>cloud_download</span> {t("dashboard.paxHoy", { n: hoyComensales })} · {(() => { const f=reservasUnicas.filter(r=> r.fecha===fechaFiltro && !isCanceladaLocal(r.estado)).reduce((s,r)=> s+(Number(r.comensales)||0),0); return f; })()} {fechaFiltro===hoyISO ? t("dashboard.hoy") : t("dashboard.enFecha", { fecha: fechaFiltro.slice(5) })}
                 </div>
               </div>
@@ -774,7 +774,7 @@ const restDropdownRef = useRef(null);
               </div>
               <div className="op-forecast-list">
                 {forecastToShow.map(d=>(
-                  <div key={d.fecha} className="op-forecast-item" onClick={()=> setSelectedForecast(prev=> prev===d.fecha? null : d.fecha)} style={{cursor:'pointer', outline: selectedForecast===d.fecha? '2px solid var(--op-primary-container)': 'none', borderRadius:'0.5rem'}}>
+                  <div key={d.fecha} className="op-forecast-item" onClick={()=> setSelectedForecast(prev=> prev===d.fecha? null : d.fecha)} style={{cursor:'pointer', outline: selectedForecast===d.fecha? '2px solid var(--op-primary-container)': 'none', borderRadius:'0'}}>
                     <div style={{display:'flex', alignItems:'center', gap:'0.6rem', flex:1}}>
                       <div className="op-cal"><span className="op-cal-day">{d.dow}</span><span className="op-cal-num">{d.day}</span></div>
                       <div className="op-forecast-meta">
@@ -789,7 +789,7 @@ const restDropdownRef = useRef(null);
               {forecastToShow.length === 0 && (
                 <div style={{fontSize:'0.72rem', color:'var(--op-on-variant)', padding:'0.75rem'}}>{t("dashboard.sinReservasProximasPrever")}</div>
               )}
-              {selectedForecast && <div style={{fontSize:'0.68rem', background:'var(--op-secondary-container)', color:'var(--op-on-secondary-container)', padding:'0.35rem 0.5rem', borderRadius:'0.4rem', display:'flex', justifyContent:'space-between', alignItems:'center'}}><span>{t("dashboard.filtrandoPor")} {selectedForecast}</span><button onClick={()=> setSelectedForecast(null)} style={{background:'none', border:'none', fontWeight:800, cursor:'pointer', color:'inherit'}}>{t("dashboard.quitar")}</button></div>}
+              {selectedForecast && <div style={{fontSize:'0.68rem', background:'var(--op-secondary-container)', color:'var(--op-on-secondary-container)', padding:'0.35rem 0.5rem', borderRadius:'0', display:'flex', justifyContent:'space-between', alignItems:'center'}}><span>{t("dashboard.filtrandoPor")} {selectedForecast}</span><button onClick={()=> setSelectedForecast(null)} style={{background:'none', border:'none', fontWeight:800, cursor:'pointer', color:'inherit'}}>{t("dashboard.quitar")}</button></div>}
               <div style={{display:'flex', justifyContent:'space-between', paddingTop:'0.5rem', borderTop:'1px solid var(--op-surface-low)', fontSize:'0.68rem', color:'var(--op-on-variant)'}}><span>{t("dashboard.aforoHoraConfigurable")}</span><button onClick={()=> { setAforoLimit(data?.restaurante?.maxReservasPorHora||12); setShowAforoModal(true); }} style={{color:'var(--op-primary)', background:'none', border:'none', fontWeight:700, cursor:'pointer'}}>{t("dashboard.configurarAforos")}</button></div>
             </div>
           </div>
@@ -819,7 +819,7 @@ const restDropdownRef = useRef(null);
                     <td style={{fontSize:'0.72rem'}}>{restaurante.ciudad||'-'} {restaurante.zona? `· ${restaurante.zona}`:''}</td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:800}}>{euro(totalFacturacion)}</td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace', fontWeight:700, color:'var(--op-secondary)'}}>{euro(totalComisiones)}</td>
-                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0.3rem', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>1 / 1</span></td>
+                    <td style={{textAlign:'center'}}><span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.68rem', background:'var(--op-surface-lowest)', padding:'0.15rem 0.4rem', borderRadius:'0', boxShadow:'0 1px 2px rgba(0,0,0,0.04)'}}>1 / 1</span></td>
                     <td style={{textAlign:'right', fontFamily:'ui-monospace, monospace'}}>{t("dashboard.resAbrev", { n: stats.totalReservas })}</td>
                     <td style={{textAlign:'right'}}><button onClick={()=> window.scrollTo({top:0, behavior:'smooth'})} className="op-btn-primary" style={{padding:'0.25rem 0.5rem', fontSize:'0.68rem'}}>{t("dashboard.panelActivo")}</button></td>
                   </tr>
@@ -827,7 +827,7 @@ const restDropdownRef = useRef(null);
                 </tbody>
               </table>
             </div>
-            <div style={{display:'flex', justifyContent:'space-between', paddingTop:'0.5rem', fontSize:'0.68rem', color:'var(--op-on-variant)'}}><span>{t("dashboard.mostrandoRestaurantes", { n: listaRests.length || 1 })}</span><div style={{display:'flex', gap:'0.25rem', alignItems:'center'}}><span style={{padding:'0.15rem 0.35rem', borderRadius:'0.25rem', background:'var(--op-primary-container)', color:'var(--op-on-primary)', fontFamily:'ui-monospace, monospace', fontWeight:800}}>1</span></div></div>
+            <div style={{display:'flex', justifyContent:'space-between', paddingTop:'0.5rem', fontSize:'0.68rem', color:'var(--op-on-variant)'}}><span>{t("dashboard.mostrandoRestaurantes", { n: listaRests.length || 1 })}</span><div style={{display:'flex', gap:'0.25rem', alignItems:'center'}}><span style={{padding:'0.15rem 0.35rem', borderRadius:'0', background:'var(--op-primary-container)', color:'var(--op-on-primary)', fontFamily:'ui-monospace, monospace', fontWeight:800}}>1</span></div></div>
             {/* Charts kept for data depth, styled with new palette */}
             <div style={{marginTop:'0.75rem', display:'grid', gap:'0.75rem'}}>
               <RevenueLineChart data={ingresosPorMes} title={t("dashboard.evolucionIngresos") || "Evolución ingresos"} />
@@ -845,18 +845,18 @@ const restDropdownRef = useRef(null);
           <div className="op-modal" onClick={e=> e.stopPropagation()} style={{maxWidth:'38rem', background:'#ffffff', backgroundColor:'#ffffff', opacity:1}}>
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
               <div style={{display:'flex', gap:'0.6rem', alignItems:'center'}}>
-                <div style={{width:'2.2rem', height:'2.2rem', borderRadius:'0.6rem', background:'var(--op-primary-container)', color:'var(--op-on-primary)', display:'grid', placeItems:'center'}}><span className="material-symbols-outlined">receipt</span></div>
+                <div style={{width:'2.2rem', height:'2.2rem', borderRadius:'0', background:'var(--op-primary-container)', color:'var(--op-on-primary)', display:'grid', placeItems:'center'}}><span className="material-symbols-outlined">receipt</span></div>
                 <div><h3 style={{fontWeight:800, fontSize:'0.95rem'}}>{t("dashboard.cargarTicketsFacturas")}</h3><p style={{fontSize:'0.68rem', color:'var(--op-on-variant)'}}>{nombreCorto} · ID {restId} · {t("dashboard.comisionPctLabel", { pct: comisionPct })}</p></div>
               </div>
               <button className="op-btn-ghost" style={{padding:'0.2rem'}} onClick={()=> setShowTicketModal(false)}><span className="material-symbols-outlined">close</span></button>
             </div>
-            <div style={{background:'var(--op-surface-low)', borderRadius:'0.6rem', padding:'0.7rem', display:'flex', gap:'0.5rem', alignItems:'flex-start', border:'1px solid var(--op-outline-variant)'}}>
+            <div style={{background:'var(--op-surface-low)', borderRadius:'0', padding:'0.7rem', display:'flex', gap:'0.5rem', alignItems:'flex-start', border:'1px solid var(--op-outline-variant)'}}>
               <span className="material-symbols-outlined" style={{fontSize:20, color:'var(--op-primary)', marginTop:'0.1rem'}}>info</span>
               <div style={{fontSize:'0.72rem', lineHeight:'1.4'}}>
                 <strong>{t("dashboard.comoFuncionaTitulo")}</strong> {t("dashboard.comoFuncionaTexto", { pct: comisionPct })}
                 <div style={{marginTop:'0.3rem', display:'flex', gap:'0.4rem', flexWrap:'wrap'}}>
-                  <span style={{background:'white', padding:'0.2rem 0.45rem', borderRadius:'0.4rem', border:'1px solid var(--op-outline-variant)', fontSize:'0.68rem'}}>{t("dashboard.ejemploComisionNeto", { comision: euro(50*comisionPct/100), neto: euro(50 - 50*comisionPct/100) })}</span>
-                  <span style={{background:'white', padding:'0.2rem 0.45rem', borderRadius:'0.4rem', border:'1px solid var(--op-outline-variant)', fontSize:'0.68rem'}}>{t("dashboard.asistioLabel")}: <span style={{color:'var(--op-primary)', fontWeight:700}}>{t("dashboard.completada")}</span> · {t("dashboard.noAsistioLabel")}: <span style={{color:'var(--op-error)', fontWeight:700}}>{t("dashboard.noShow")}</span></span>
+                  <span style={{background:'white', padding:'0.2rem 0.45rem', borderRadius:'0', border:'1px solid var(--op-outline-variant)', fontSize:'0.68rem'}}>{t("dashboard.ejemploComisionNeto", { comision: euro(50*comisionPct/100), neto: euro(50 - 50*comisionPct/100) })}</span>
+                  <span style={{background:'white', padding:'0.2rem 0.45rem', borderRadius:'0', border:'1px solid var(--op-outline-variant)', fontSize:'0.68rem'}}>{t("dashboard.asistioLabel")}: <span style={{color:'var(--op-primary)', fontWeight:700}}>{t("dashboard.completada")}</span> · {t("dashboard.noAsistioLabel")}: <span style={{color:'var(--op-error)', fontWeight:700}}>{t("dashboard.noShow")}</span></span>
                 </div>
               </div>
             </div>
@@ -928,7 +928,7 @@ const restDropdownRef = useRef(null);
             <label className="op-field"><span>{t("dashboard.maxReservasHora")}</span>
               <input type="number" min="4" max="30" value={aforoLimit} onChange={e=> setAforoLimit(e.target.value)} className="op-input" />
             </label>
-            <div style={{fontSize:'0.68rem', background:'var(--op-surface-low)', padding:'0.5rem', borderRadius:'0.4rem'}}>{t("dashboard.actual")} <strong>{data?.restaurante?.maxReservasPorHora || 12} pax/hora</strong> · {t("dashboard.nuevo")} <strong>{aforoLimit}</strong></div>
+            <div style={{fontSize:'0.68rem', background:'var(--op-surface-low)', padding:'0.5rem', borderRadius:'0'}}>{t("dashboard.actual")} <strong>{data?.restaurante?.maxReservasPorHora || 12} pax/hora</strong> · {t("dashboard.nuevo")} <strong>{aforoLimit}</strong></div>
             <div style={{display:'flex', justifyContent:'flex-end', gap:'0.4rem'}}>
               <button className="op-btn-ghost btn-cancelar" onClick={()=> setShowAforoModal(false)}>{t("dashboard.cancelar")}</button>
               <button className="op-btn-primary" onClick={handleSaveAforo} disabled={saving}>{saving? t("dashboard.guardando") : t("dashboard.guardarAforo")}</button>

@@ -165,3 +165,4 @@ ni la app móvil.
 | [BUG-153](BUG-153.md) | La insignia «Recomendado» debe ser verde | buscador/mapa | claude | en revisión | fix/ui-153-155 |
 | [BUG-154](BUG-154.md) | Los botones de cancelar deben ser rojos | global | claude | en revisión | fix/ui-153-155 |
 | [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | en revisión | fix/ui-153-155 |
+| [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | en revisión | fix/ui-153-155 |

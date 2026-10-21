@@ -84,7 +84,7 @@
 .chart-toggle:not(.on) i { transform: scale(0.6); }
 
 .chart-tip {
-  min-width: 160px; padding: 10px 12px; border-radius: 12px;
+  min-width: 160px; padding: 10px 12px; border-radius: 2px;
   background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(12px) saturate(1.4);
   -webkit-backdrop-filter: blur(12px) saturate(1.4);
@@ -97,7 +97,7 @@
 .chart-tip-label { font-weight: 800; margin-bottom: 6px; text-transform: capitalize; }
 .chart-tip-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
 .chart-tip-row strong { margin-left: auto; font-variant-numeric: tabular-nums; }
-.chart-tip-dot { width: 8px; height: 8px; border-radius: 3px; }
+.chart-tip-dot { width: 8px; height: 8px; border-radius: 0; }
 [data-theme='dark'] .chart-tip { background: rgba(23, 27, 23, 0.86); border-color: rgba(255,255,255,0.08); color: #e8eee9; }
 [data-theme='dark'] { --chart-grid: #2b332b; --chart-tick: #a7b0a6; }
 
@@ -114,11 +114,11 @@ button.ops-legend-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   width: 100%; border: 0; background: transparent; color: inherit; cursor: pointer;
   font: 600 12px/1.2 inherit; font-family: inherit; text-align: left;
-  padding: 7px 8px; border-radius: 8px;
+  padding: 7px 8px; border-radius: 0;
   transition: background-color 150ms ease;
 }
 button.ops-legend-row.activo { background: rgba(14, 107, 71, 0.08); }
-.ops-legend-row .ops-dot { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 8px; }
+.ops-legend-row .ops-dot { display: inline-block; width: 12px; height: 12px; border-radius: 0; margin-right: 8px; }
 .ops-legend-row strong { font-variant-numeric: tabular-nums; }
 
 @media (prefers-reduced-motion: reduce) {
