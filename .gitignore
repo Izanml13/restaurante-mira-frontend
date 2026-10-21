@@ -15,3 +15,9 @@ Thumbs.db
 .env.example
 # …pero el ejemplo de env de la app móvil sí se versiona
 !mobile/.env.example
+
+# QA (Taurus/Selenium): capturas y reportes
+qa/artifacts/
+__pycache__/
+.pytest_cache/
+
