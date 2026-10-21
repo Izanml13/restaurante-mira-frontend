@@ -47,7 +47,7 @@
 
 /* Portada (hero) con foto de grupo o la que suba el anfitrión */
 .jam-hero {
-  position: relative; margin: 0 auto; padding: 4.5rem 1.4rem 1.4rem; border-radius: 26px; overflow: hidden;
+  position: relative; margin: 0 auto; padding: 4.5rem 1.4rem 1.4rem; border-radius: 16px; overflow: hidden;
   background:
     linear-gradient(180deg, rgba(6, 12, 10, 0.15) 0%, rgba(6, 12, 10, 0.82) 72%),
     var(--jam-portada) center / cover, #0d1512;
@@ -70,7 +70,7 @@
 .jam-foto-btn:has(input:disabled), .jam-foto-btn:disabled { opacity: 0.6; cursor: default; }
 .jam-identidad { display: flex; align-items: flex-end; gap: 1rem; min-width: 0; }
 .jam-perfil {
-  position: relative; flex: none; width: 88px; height: 88px; border-radius: 22px; overflow: visible;
+  position: relative; flex: none; width: 88px; height: 88px; border-radius: 12px; overflow: visible;
   display: grid; place-items: center; background: linear-gradient(135deg, var(--jam-neon), #10a046);
   color: #06110c; font: 800 1.8rem var(--fuente-display);
   box-shadow: 0 0 0 3px rgba(6, 12, 10, 0.8), 0 0 22px rgba(30, 215, 96, 0.55);
@@ -85,7 +85,7 @@
 /* Participantes: mini cards */
 .jam-miembros { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 0.6rem; }
 .jam-miembro {
-  display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.8rem; border-radius: 16px;
+  display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.8rem; border-radius: 6px;
   background: var(--jam-panel); border: 1px solid var(--jam-borde);
   animation: jam-entra 420ms var(--jam-ease) both;
 }
@@ -109,7 +109,7 @@
 @keyframes jam-entra { from { opacity: 0; transform: scale(0.8); } }
 
 /* Reloj y unirse */
-.jam-reloj { margin-top: 1.4rem; display: inline-flex; align-items: baseline; gap: 0.6rem; padding: 0.6rem 1rem; border-radius: 14px; background: var(--jam-panel); border: 1px solid var(--jam-borde); }
+.jam-reloj { margin-top: 1.4rem; display: inline-flex; align-items: baseline; gap: 0.6rem; padding: 0.6rem 1rem; border-radius: 4px; background: var(--jam-panel); border: 1px solid var(--jam-borde); }
 .jam-reloj span { color: var(--jam-sec); font-size: 0.85rem; }
 .jam-reloj strong { font: 800 1.3rem ui-monospace, Menlo, monospace; color: var(--jam-texto); font-variant-numeric: tabular-nums; }
 .jam-unirse { margin-top: 1.4rem; }
@@ -118,7 +118,7 @@
 .jam-restaurantes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 0.8rem; }
 .jam-rest button {
   position: relative; width: 100%; display: grid; grid-template-columns: 84px 1fr auto; align-items: center; gap: 0.9rem;
-  padding: 0.6rem; border-radius: 16px; cursor: pointer; text-align: left; color: inherit; font: inherit;
+  padding: 0.6rem; border-radius: 6px; cursor: pointer; text-align: left; color: inherit; font: inherit;
   background: var(--jam-panel); border: 1px solid var(--jam-borde);
   transition: transform 180ms var(--jam-ease), border-color 180ms ease, background-color 180ms ease;
 }
@@ -126,7 +126,7 @@
 .jam-rest button:not(:disabled):active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) { .jam-rest button:not(:disabled):hover { background: var(--fondo-suave); } }
 [data-theme='dark'] .jam-rest button:not(:disabled):hover { background: rgba(255, 255, 255, 0.09); }
-.jam-rest img { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; background: var(--fondo-suave); }
+.jam-rest img { width: 84px; height: 84px; border-radius: 2px; object-fit: cover; background: var(--fondo-suave); }
 [data-theme='dark'] .jam-rest img { background: #1a2622; }
 .jam-rest-info { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
 .jam-rest-info strong { font-family: var(--fuente-display); font-size: 1.15rem; color: var(--jam-texto); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -144,7 +144,7 @@
 /* Franjas */
 .jam-franjas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .jam-franja {
-  min-width: 132px; padding: 0.8rem 1rem; border-radius: 16px; cursor: pointer; text-align: left;
+  min-width: 132px; padding: 0.8rem 1rem; border-radius: 6px; cursor: pointer; text-align: left;
   display: flex; flex-direction: column; gap: 0.15rem; color: inherit; font: inherit;
   background: var(--jam-panel); border: 1px solid var(--jam-borde);
   transition: transform 160ms var(--jam-ease), border-color 180ms ease, background-color 180ms ease;
@@ -159,7 +159,7 @@
 
 /* Resultado */
 .jam-resultado {
-  margin-top: 1.5rem; padding: 1.6rem 1.5rem; border-radius: 22px; text-align: center;
+  margin-top: 1.5rem; padding: 1.6rem 1.5rem; border-radius: 12px; text-align: center;
   background: linear-gradient(135deg, rgba(30, 215, 96, 0.22), rgba(227, 194, 122, 0.18));
   border: 1px solid var(--jam-borde);
   animation: jam-entra 520ms var(--jam-ease) both;
@@ -183,7 +183,7 @@
 .jam-campo > span, .jam-campo legend { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--jam-sec); }
 .jam-campo legend small { font-weight: 500; text-transform: none; letter-spacing: 0; }
 .jam input, .jam select {
-  padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid var(--jam-borde);
+  padding: 0.75rem 0.9rem; border-radius: 2px; border: 1px solid var(--jam-borde);
   background: var(--jam-panel); color: var(--jam-texto); font: inherit; color-scheme: inherit;
 }
 .jam input:focus-visible, .jam select:focus-visible { outline: 2px solid var(--jam-verde); outline-offset: 1px; }
@@ -192,9 +192,9 @@
 .jam-chip button, .jam-quitar { border: 0; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; background: var(--fondo-suave); color: var(--jam-texto); font-size: 0.72rem; }
 .jam-buscar { position: relative; }
 .jam-buscar input { width: 100%; }
-.jam-buscar ul { list-style: none; margin: 0.35rem 0 0; padding: 0.35rem; border-radius: 14px; background: var(--jam-panel); border: 1px solid var(--jam-borde); }
+.jam-buscar ul { list-style: none; margin: 0.35rem 0 0; padding: 0.35rem; border-radius: 4px; background: var(--jam-panel); border: 1px solid var(--jam-borde); }
 [data-theme='dark'] .jam-buscar ul { background: #16211d; }
-.jam-buscar li button { width: 100%; display: flex; flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.7rem; border: 0; border-radius: 10px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.jam-buscar li button { width: 100%; display: flex; flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.7rem; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .jam-buscar li button span { font-size: 0.78rem; color: var(--jam-sec); }
 @media (hover: hover) and (pointer: fine) { .jam-buscar li button:hover { background: var(--fondo-suave); } }
 [data-theme='dark'] .jam-buscar li button:hover { background: var(--jam-panel); }
@@ -207,9 +207,9 @@
 .jam-mias-acciones form { display: flex; gap: 0.4rem; }
 .jam-mias-acciones input { width: 120px; text-transform: uppercase; letter-spacing: 0.15em; font-family: ui-monospace, Menlo, monospace; }
 .jam-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-.jam-lista a { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 0.2rem 1rem; padding: 0.9rem 1rem; border-radius: 14px; background: var(--jam-panel); border: 1px solid var(--jam-borde); text-decoration: none; }
+.jam-lista a { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 0.2rem 1rem; padding: 0.9rem 1rem; border-radius: 4px; background: var(--jam-panel); border: 1px solid var(--jam-borde); text-decoration: none; }
 .jam-lista strong { color: var(--jam-texto); }
-.jam-lista-foto { grid-column: 1; grid-row: 1 / span 2; width: 56px; height: 56px; border-radius: 14px; background: var(--fondo-suave) center / cover; box-shadow: 0 0 0 1px rgba(30, 215, 96, 0.4); }
+.jam-lista-foto { grid-column: 1; grid-row: 1 / span 2; width: 56px; height: 56px; border-radius: 4px; background: var(--fondo-suave) center / cover; box-shadow: 0 0 0 1px rgba(30, 215, 96, 0.4); }
 [data-theme='dark'] .jam-lista-foto { background-color: #0d1512; }
 .jam-lista strong { grid-column: 2; }
 .jam-lista a > span:not(.jam-estado):not(.jam-lista-foto) { grid-column: 2; font-size: 0.82rem; color: var(--jam-sec); }
@@ -226,8 +226,8 @@
 @media (max-width: 560px) {
   .jam { padding: 1rem var(--gutter-movil, 16px) 2rem; }
   .jam-codigo-caja { align-items: flex-start; }
-  .jam-hero { padding: 4rem 1rem 1.1rem; border-radius: 20px; }
-  .jam-perfil { width: 68px; height: 68px; font-size: 1.4rem; border-radius: 18px; }
+  .jam-hero { padding: 4rem 1rem 1.1rem; border-radius: 10px; }
+  .jam-perfil { width: 68px; height: 68px; font-size: 1.4rem; border-radius: 8px; }
   .jam-identidad { align-items: center; }
   .jam-rest button { grid-template-columns: 64px 1fr auto; }
   .jam-rest img { width: 64px; height: 64px; }

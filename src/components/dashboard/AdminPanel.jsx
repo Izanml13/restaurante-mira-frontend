@@ -185,7 +185,7 @@ export default function AdminPanel({ usuario }) {
                     <button className="btn-cta btn-peq" onClick={() => handleAddPoints(pointsModal.uid)}>
                       {t("dashboard.confirmar")}
                     </button>
-                    <button className="btn-secundario btn-peq" onClick={() => setPointsModal(null)}>
+                    <button className="btn-secundario btn-peq btn-cancelar" onClick={() => setPointsModal(null)}>
                       {t("dashboard.cancelar")}
                     </button>
                   </div>

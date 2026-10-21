@@ -69,7 +69,7 @@
   width: 0.14em;
   height: 0.68em;
   translate: -50% 0;
-  border-radius: 1px;
+  border-radius: 0;
   background: var(--lm-tinta);
   transform-origin: bottom;
   transition: transform var(--lm-dur) var(--lm-curva), opacity 0.25s ease;

@@ -40,7 +40,7 @@
 .fx-barra-acciones { display: flex; gap: 8px; }
 .fx-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
+  border: 0; border-radius: 0; padding: 9px 14px; cursor: pointer;
   font: 600 13px/1 inherit; font-family: inherit;
   background: #fff; color: var(--fx-tinta);
   box-shadow: 0 1px 2px rgba(0,0,0,0.08);
@@ -57,7 +57,7 @@
 
 .fx-papel {
   background: var(--fx-papel);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: clamp(20px, 4vw, 44px);
   box-shadow: 0 30px 60px -20px rgba(0, 40, 25, 0.35), 0 0 0 1px rgba(0,0,0,0.04);
 }
@@ -71,7 +71,7 @@
 .fx-etiqueta { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fx-verde); background: var(--fx-menta); padding: 4px 10px; border-radius: 999px; }
 
 .fx-partes, .fx-resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 24px 0; }
-.fx-parte, .fx-resumen > div { background: var(--fx-fondo); border-radius: 12px; padding: 14px 16px; }
+.fx-parte, .fx-resumen > div { background: var(--fx-fondo); border-radius: 2px; padding: 14px 16px; }
 .fx-parte span, .fx-resumen span { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fx-gris); }
 .fx-parte strong, .fx-resumen strong { display: block; margin-top: 4px; font-size: 15px; font-variant-numeric: tabular-nums; }
 .fx-parte p { margin: 4px 0 0; font-size: 12px; color: var(--fx-gris); line-height: 1.5; }
@@ -79,7 +79,7 @@
 .fx-resumen .acento { background: var(--fx-verde); color: #fff; }
 .fx-resumen .acento span { color: rgba(255,255,255,0.75); }
 
-.fx-tabla-wrap { overflow-x: auto; border: 1px solid var(--fx-linea); border-radius: 14px; }
+.fx-tabla-wrap { overflow-x: auto; border: 1px solid var(--fx-linea); border-radius: 4px; }
 .fx-tabla { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
 .fx-tabla th {
   text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
@@ -115,16 +115,16 @@
 .fx-totales div { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--fx-linea); font-variant-numeric: tabular-nums; }
 .fx-totales dt { color: var(--fx-gris); }
 .fx-totales dd { margin: 0; font-weight: 700; }
-.fx-totales .total { border: 0; margin-top: 6px; padding: 14px 16px; border-radius: 12px; background: var(--fx-verde); color: #fff; }
+.fx-totales .total { border: 0; margin-top: 6px; padding: 14px 16px; border-radius: 2px; background: var(--fx-verde); color: #fff; }
 .fx-totales .total dt { color: rgba(255,255,255,0.8); font-weight: 600; }
 .fx-totales .total dd { font-size: 20px; font-weight: 800; }
 
 .fx-modelos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 24px; }
-.fx-modelo { display: flex; align-items: center; gap: 12px; border: 1px solid var(--fx-linea); border-radius: 12px; padding: 12px 14px; }
+.fx-modelo { display: flex; align-items: center; gap: 12px; border: 1px solid var(--fx-linea); border-radius: 2px; padding: 12px 14px; }
 .fx-modelo > div { flex: 1; }
 .fx-modelo strong { font-size: 13px; }
 .fx-modelo p { margin: 2px 0 0; font-size: 12px; color: var(--fx-gris); font-variant-numeric: tabular-nums; }
-.fx-modelo-cod { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; background: var(--fx-tinta); color: #fff; font-weight: 800; font-size: 13px; }
+.fx-modelo-cod { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 0; background: var(--fx-tinta); color: #fff; font-weight: 800; font-size: 13px; }
 .fx-estado { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--fx-fondo); color: var(--fx-gris); }
 .fx-estado.ok { background: var(--fx-menta); color: var(--fx-verde); }
 

@@ -75,7 +75,7 @@ export default function TicketUpload({ reserva, onUploaded, t, comisionPct = 8 }
 
   if (success || yaRegistrado || reserva.ticketId) {
     return (
-      <div style={{background:'#d1fae5', color:'#065f46', padding:'0.7rem', borderRadius:'0.5rem', fontWeight:700, textAlign:'center', fontSize:'0.82rem'}}>
+      <div style={{background:'#d1fae5', color:'#065f46', padding:'0.7rem', borderRadius:'0', fontWeight:700, textAlign:'center', fontSize:'0.82rem'}}>
         {success
           ? `${tt("dashboard.ticketSubido", "Ticket registrado")} · ${euro(neto)} ${tt("dashboard.neto", "neto")} · ${euro(comision)} ${tt("dashboard.comision", "comisión")} ${pct}%`
           : tt("dashboard.ticketYaRegistrado", "Ticket ya registrado (máx. 1 por reserva)")}
@@ -84,21 +84,21 @@ export default function TicketUpload({ reserva, onUploaded, t, comisionPct = 8 }
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:'0.5rem', background:'var(--op-surface-low)', padding:'0.7rem', borderRadius:'0.5rem', border:'1px solid var(--op-border)'}}>
+    <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:'0.5rem', background:'var(--op-surface-low)', padding:'0.7rem', borderRadius:'0', border:'1px solid var(--op-border)'}}>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:'0.5rem'}}>
         <strong style={{fontSize:'0.78rem'}}>{reserva.nombreRestaurante || reserva.restaurantName || tt("dashboard.reserva","Reserva")}</strong>
-        <span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.62rem', background:'var(--op-surface-lowest)', padding:'0.1rem 0.35rem', borderRadius:'0.3rem'}}>{reserva.codigo || reserva.id?.slice(0,6)}</span>
+        <span style={{fontFamily:'ui-monospace, monospace', fontSize:'0.62rem', background:'var(--op-surface-lowest)', padding:'0.1rem 0.35rem', borderRadius:'0'}}>{reserva.codigo || reserva.id?.slice(0,6)}</span>
       </div>
       <div style={{fontSize:'0.72rem', color:'var(--op-on-variant)'}}>{reserva.fecha} {reserva.hora} · {reserva.comensales} pax · {reserva.usuarioNombre || reserva.usuarioEmail || tt("dashboard.cliente","Cliente")}</div>
 
       <label style={{display:'flex', flexDirection:'column', gap:'0.2rem'}}>
         <span style={{fontSize:'0.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.04em'}}>{tt("dashboard.precioTotal","Importe total")}</span>
         <div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}>
-          <input type="number" value={precio} onChange={e=> setPrecio(e.target.value)} placeholder={tt("dashboard.precioPlaceholder","45.50")} step="0.01" min="0" style={{flex:1, height:'2.2rem', padding:'0 0.6rem', border:'1px solid var(--op-outline-variant)', borderRadius:'0.5rem'}} />
+          <input type="number" value={precio} onChange={e=> setPrecio(e.target.value)} placeholder={tt("dashboard.precioPlaceholder","45.50")} step="0.01" min="0" style={{flex:1, height:'2.2rem', padding:'0 0.6rem', border:'1px solid var(--op-outline-variant)', borderRadius:'0'}} />
           <span style={{fontSize:'0.72rem'}}>EUR</span>
         </div>
         {total>0 && (
-          <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.68rem', background:'white', padding:'0.35rem 0.5rem', borderRadius:'0.4rem', marginTop:'0.2rem'}}>
+          <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.68rem', background:'white', padding:'0.35rem 0.5rem', borderRadius:'0', marginTop:'0.2rem'}}>
             <span>{tt("dashboard.comisionMira", `Comisión MIRA ${pct}%`, { pct })}: <strong>{euro(comision)}</strong></span>
             <span>{tt("dashboard.netoRestaurante", "Neto restaurante")}: <strong style={{color:'var(--op-primary)'}}>{euro(neto)}</strong></span>
           </div>
@@ -118,7 +118,7 @@ export default function TicketUpload({ reserva, onUploaded, t, comisionPct = 8 }
         <span style={{fontSize:'0.62rem', color:'var(--op-on-variant)'}}>{tt("dashboard.soloNombreFichero","Solo se guarda el nombre del fichero como referencia; el archivo no se sube todavía.")}</span>
       </label>
 
-      {error && <span style={{color:'#b44d3e', fontSize:'0.78rem', background:'#ffdad6', padding:'0.35rem 0.5rem', borderRadius:'0.4rem'}}>{error}</span>}
+      {error && <span style={{color:'#b44d3e', fontSize:'0.78rem', background:'#ffdad6', padding:'0.35rem 0.5rem', borderRadius:'0'}}>{error}</span>}
 
       <button type="submit" disabled={uploading} className="op-btn-primary" style={{justifyContent:'center'}}>
         {uploading ? tt("otros.cargando","Cargando…") : (<><span className="material-symbols-outlined" style={{fontSize:14}}>upload</span> {tt("dashboard.registrarTicketY","Registrar ticket y")} {asistio? tt("dashboard.confirmarAsistencia","confirmar asistencia") : tt("dashboard.marcarNoShow","marcar no-show")}</>)}

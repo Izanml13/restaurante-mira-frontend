@@ -212,7 +212,7 @@ export default function OfertasPanel({ restauranteId }) {
             <button type="button" className="op-btn-primary" onClick={guardar} disabled={guardando} data-test="ofertas-guardar">
               {guardando ? t("ofertas.guardando") : t("ofertas.guardar")}
             </button>
-            <button type="button" className="op-btn-ghost" onClick={() => setModo("lista")} disabled={guardando}>
+            <button type="button" className="op-btn-ghost btn-cancelar" onClick={() => setModo("lista")} disabled={guardando}>
               {t("ofertas.cancelar")}
             </button>
           </div>

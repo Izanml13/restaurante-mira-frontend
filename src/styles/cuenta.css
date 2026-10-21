@@ -65,8 +65,258 @@
 }
 
 /* ---------- Cuenta ---------- */
-.cuenta-tarjeta {
-  max-width: 640px;
+/* Perfil (BUG-159): ficha lateral fija + bloques en tarjetas claras. */
+.cuenta-pagina {
+  --cuenta-radio: 8px;
+  justify-items: stretch;
+}
+
+.cuenta-layout {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.cuenta-perfil,
+.cuenta-bloque {
+  background: var(--papel);
+  border: 1px solid var(--borde);
+  border-radius: var(--cuenta-radio);
+  box-shadow: var(--sombra-card);
+}
+
+.cuenta-perfil {
+  position: sticky;
+  top: 5.5rem;
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.5rem 1.3rem;
+  overflow: hidden;
+}
+
+/* Franja de marca tras el avatar */
+.cuenta-perfil::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7.6rem;
+  background: var(--primary-container);
+  z-index: 0;
+}
+
+.cuenta-perfil > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cuenta-perfil .emblema-progreso-label,
+.cuenta-perfil .emblema-progreso-titulo {
+  color: #fff;
+}
+
+.cuenta-perfil h1 {
+  font-family: var(--fuente-display);
+  font-size: 1.5rem;
+  margin: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.cuenta-perfil .cuenta-datos > div {
+  grid-template-columns: 1fr;
+  gap: 0.1rem;
+}
+
+.cuenta-perfil .cuenta-acciones > * {
+  flex: 1 1 auto;
+  text-align: center;
+  margin-top: 0;
+}
+
+.cuenta-nav {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--borde);
+}
+
+.cuenta-nav-item {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 0;
+  border-radius: var(--radio-peq);
+  background: transparent;
+  color: var(--tinta);
+  font: 600 0.95rem var(--fuente);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cuenta-nav-item:hover {
+  background: var(--verde-suave);
+  color: var(--primary-container);
+}
+
+[data-theme='dark'] .cuenta-nav-item:hover {
+  color: var(--primary);
+}
+
+.cuenta-nav-item:focus-visible {
+  outline: 3px solid var(--secondary-container);
+  outline-offset: 2px;
+}
+
+.cuenta-main {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.cuenta-bloque {
+  padding: 0.4rem 1.4rem 1.4rem;
+  scroll-margin-top: 5.5rem;
+  min-width: 0;
+}
+
+.cuenta-bloque > .cuenta-sub:first-child,
+.cuenta-bloque > :first-child .cuenta-sub:first-child {
+  border-top: 0;
+}
+
+.cuenta-pagina .cuenta-dashboard-banner {
+  border-radius: var(--cuenta-radio);
+  margin: 0;
+}
+
+.cuenta-pagina .prefs-card {
+  border-radius: var(--cuenta-radio);
+}
+
+/* BUG-160: la ficha lateral se desplaza sola si es más alta que la ventana. */
+@media (min-width: 861px) {
+  .cuenta-perfil {
+    max-height: calc(100svh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--borde) transparent;
+  }
+
+  .cuenta-perfil::-webkit-scrollbar { width: 6px; }
+  .cuenta-perfil::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 999px; }
+}
+
+/* BUG-160: modo oscuro del perfil — superficies verdosas escalonadas. */
+[data-theme='dark'] .cuenta-pagina {
+  --cuenta-sup: #171c19;
+  --cuenta-sup-alta: #1e2521;
+  --cuenta-borde: rgba(168, 213, 186, 0.12);
+  --cuenta-texto-sec: #b3bcb6;
+}
+
+[data-theme='dark'] .cuenta-perfil,
+[data-theme='dark'] .cuenta-bloque {
+  background: var(--cuenta-sup);
+  border-color: var(--cuenta-borde);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .cuenta-perfil::before {
+  background: linear-gradient(180deg, #24463a, #1c3a30);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card,
+[data-theme='dark'] .cuenta-pagina .cuenta-points {
+  background: var(--cuenta-sup-alta);
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-points {
+  background: radial-gradient(120% 140% at 100% 0%, rgba(254, 214, 91, 0.07), transparent 55%), var(--cuenta-sup-alta);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-points__amount {
+  color: #e8cf7a;
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-redemption {
+  background: rgba(168, 213, 186, 0.06);
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-datos > div,
+[data-theme='dark'] .cuenta-nav,
+[data-theme='dark'] .cuenta-bloque .cuenta-sub {
+  border-color: var(--cuenta-borde);
+}
+
+[data-theme='dark'] .cuenta-pagina .cuenta-datos dt,
+[data-theme='dark'] .cuenta-pagina .vacio-texto,
+[data-theme='dark'] .cuenta-pagina .cuenta-points__label,
+[data-theme='dark'] .cuenta-pagina .registro-detalle {
+  color: var(--cuenta-texto-sec);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check {
+  background: var(--cuenta-sup);
+  border-color: rgba(168, 213, 186, 0.22);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check:hover,
+[data-theme='dark'] .cuenta-nav-item:hover {
+  background: rgba(168, 213, 186, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .cuenta-pagina .prefs-card .campo-check:has(input:checked) {
+  background: #2f5a4a;
+  border-color: #2f5a4a;
+  color: #fff;
+}
+
+@media (max-width: 860px) {
+  .cuenta-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cuenta-perfil {
+    position: relative;
+    top: auto;
+  }
+
+  .cuenta-nav {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cuenta-nav-item {
+    flex: none;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cuenta-pagina {
+    padding-left: var(--gutter-movil);
+    padding-right: var(--gutter-movil);
+  }
+
+  .cuenta-perfil,
+  .cuenta-bloque {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 .prefs-card {
@@ -115,7 +365,7 @@
   margin-left: 0.2rem;
 }
 
-.cuenta-tarjeta .cuenta-sub {
+.cuenta-bloque .cuenta-sub {
   display: flex;
   align-items: center;
   gap: 0.5rem;

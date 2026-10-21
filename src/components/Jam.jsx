@@ -416,7 +416,7 @@ function Sala({ codigo, usuario, perfil }) {
               <button type="button" className="btn-cta" disabled={guardando} onClick={() => window.confirm('¿Cerrar la votación y reservar la opción ganadora ahora?') && accion(() => jamsApi.cerrar(sala.codigo))}>
                 {t('tx.jamCerrarReservar')}
               </button>
-              <button type="button" className="btn-texto" disabled={guardando} onClick={() => window.confirm('¿Cancelar esta JAM? Se avisará al grupo.') && accion(() => jamsApi.cancelar(sala.codigo))}>{t('tx.jamCancelar')}</button>
+              <button type="button" className="btn-texto btn-cancelar" disabled={guardando} onClick={() => window.confirm('¿Cancelar esta JAM? Se avisará al grupo.') && accion(() => jamsApi.cancelar(sala.codigo))}>{t('tx.jamCancelar')}</button>
             </>
           ) : sala.estoyDentro && (
             <button type="button" className="btn-texto" disabled={guardando} onClick={() => accion(() => jamsApi.salir(sala.codigo))}>{t('tx.jamSalir')}</button>

@@ -204,7 +204,7 @@ export default function OfertasEscanner({ restauranteId, onValidar, onCargarList
           <p style={{ fontWeight: 700, margin: "0.4rem 0" }}>{t(claveMensajeEstado(resultado.estado))}</p>
           {resultado.estado === ESTADOS.OK && (
             <div style={{
-              background: "var(--op-surface-container)", borderRadius: "0.6rem", padding: "0.75rem",
+              background: "var(--op-surface-container)", borderRadius: "0", padding: "0.75rem",
               margin: "0.5rem auto", maxWidth: 360,
             }}>
               {resultado.cliente && <strong>{resultado.cliente}</strong>}
@@ -228,7 +228,7 @@ export default function OfertasEscanner({ restauranteId, onValidar, onCargarList
           <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
             <video ref={videoRef} playsInline muted style={{
               display: camara === "activa" ? "block" : "none",
-              width: "100%", maxWidth: 360, borderRadius: "0.6rem", background: "#000", margin: "0 auto",
+              width: "100%", maxWidth: 360, borderRadius: "0", background: "#000", margin: "0 auto",
             }} />
             <canvas ref={canvasRef} style={{ display: "none" }} />
             {camara === "activa" ? (

@@ -330,7 +330,7 @@ export default function OpsRestaurantes() {
               <textarea
                 id="ops-mensaje"
                 className="ops-input"
-                style={{ height: 120, paddingTop: 10, resize: 'vertical', fontFamily: 'inherit' }}
+                style={{ height: 120, paddingTop: 10, resize: 'vertical' }}
                 value={mensaje}
                 onChange={(e) => setMensaje(e.target.value)}
                 placeholder={t('ops.phTextoDueno')}
@@ -342,7 +342,7 @@ export default function OpsRestaurantes() {
               <button type="button" className="ops-btn primary sm" onClick={enviarAlDueno} disabled={guardando || !mensaje.trim()}>
                 {guardando ? t('ops.enviando') : t('ops.enviar')}
               </button>
-              <button type="button" className="ops-btn soft sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
+              <button type="button" className="ops-btn danger sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
             </div>
           </div>
         </div>
@@ -372,7 +372,7 @@ export default function OpsRestaurantes() {
               <button type="button" className="ops-btn primary sm" onClick={guardarEdicion} disabled={guardando}>
                 {guardando ? t('ops.guardando') : t('ops.guardarCambios')}
               </button>
-              <button type="button" className="ops-btn soft sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
+              <button type="button" className="ops-btn danger sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
             </div>
           </div>
         </div>
@@ -390,7 +390,7 @@ export default function OpsRestaurantes() {
               <button type="button" className="ops-btn danger sm" onClick={confirmarEliminar} disabled={guardando}>
                 {guardando ? t('ops.eliminando') : t('ops.siEliminar')}
               </button>
-              <button type="button" className="ops-btn soft sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
+              <button type="button" className="ops-btn danger sm" onClick={cerrarModal} disabled={guardando}>{t('ops.cancelar')}</button>
             </div>
           </div>
         </div>

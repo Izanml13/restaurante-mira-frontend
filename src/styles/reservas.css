@@ -22,7 +22,7 @@
 
 /* Carga */
 .rsv-carga { display: grid; gap: 0.8rem; }
-.rsv-esq { height: 86px; border-radius: 18px; background: linear-gradient(90deg, var(--fondo-suave), var(--borde), var(--fondo-suave)); background-size: 200% 100%; animation: rsv-brillo 1.3s ease-in-out infinite; }
+.rsv-esq { height: 86px; border-radius: 8px; background: linear-gradient(90deg, var(--fondo-suave), var(--borde), var(--fondo-suave)); background-size: 200% 100%; animation: rsv-brillo 1.3s ease-in-out infinite; }
 .rsv-esq--grande { height: 240px; }
 @keyframes rsv-brillo { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
@@ -32,7 +32,7 @@
   display: grid;
   grid-template-columns: minmax(220px, 0.9fr) 1.6fr auto;
   background: var(--rsv-papel);
-  border-radius: 24px;
+  border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 30px 60px -32px rgba(14, 40, 28, 0.55), 0 0 0 1px var(--borde);
   animation: rsv-entra 520ms var(--rsv-ease) both;
@@ -51,7 +51,7 @@
 .tkd-eyebrow { margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary-container, #0e6b47); }
 .tkd-info h2 { margin: 0; font-family: var(--fuente-display); font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.05; color: var(--rsv-tinta); }
 .tkd-datos { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.6rem; }
-.tkd-datos div { padding: 0.65rem 0.8rem; border-radius: 12px; background: var(--fondo-suave); }
+.tkd-datos div { padding: 0.65rem 0.8rem; border-radius: 2px; background: var(--fondo-suave); }
 .tkd-datos dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texto-sec); }
 .tkd-datos dt::first-letter { text-transform: uppercase; }
 .tkd-datos dd { margin: 0.2rem 0 0; font-weight: 800; font-size: 1.05rem; color: var(--rsv-tinta); font-variant-numeric: tabular-nums; }
@@ -81,7 +81,7 @@
 }
 
 /* Vacío */
-.rsv-vacio { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.3rem 1.5rem; border-radius: 20px; background: var(--fondo-suave); border: 1px dashed var(--borde); }
+.rsv-vacio { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.3rem 1.5rem; border-radius: 10px; background: var(--fondo-suave); border: 1px dashed var(--borde); }
 .rsv-vacio > span { font-size: 2rem; }
 .rsv-vacio > div { flex: 1 1 220px; }
 .rsv-vacio p { margin: 0.2rem 0 0; color: var(--texto-sec); }
@@ -100,14 +100,14 @@
 .rsv-jam:focus-visible { outline: 3px solid var(--verde); outline-offset: 3px; }
 .rsv-jam:active { transform: scale(0.98); }
 .rsv-espera ul { list-style: none; margin: 0.7rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
-.rsv-espera li { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; padding: 0.75rem 0.9rem; border-radius: 14px; background: var(--rsv-papel); box-shadow: 0 0 0 1px var(--borde); }
+.rsv-espera li { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; padding: 0.75rem 0.9rem; border-radius: 4px; background: var(--rsv-papel); box-shadow: 0 0 0 1px var(--borde); }
 .rsv-espera li > div { flex: 1 1 200px; display: flex; flex-direction: column; }
 .rsv-espera li span { font-size: 0.84rem; color: var(--texto-sec); }
 .rsv-espera-estado { padding: 0.2rem 0.6rem; border-radius: 999px; background: var(--fondo-suave); font-weight: 700; }
 
 /* ── Calendario + agenda ── */
 .rsv-rejilla { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.25rem; }
-.rsv-panel { padding: 1.25rem 1.35rem; border-radius: 20px; background: var(--rsv-papel); box-shadow: 0 0 0 1px var(--borde); }
+.rsv-panel { padding: 1.25rem 1.35rem; border-radius: 10px; background: var(--rsv-papel); box-shadow: 0 0 0 1px var(--borde); }
 .rsv-cal-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
 .rsv-cal-cab h2 { margin: 0; font-family: var(--fuente-display); font-size: 1.45rem; text-transform: capitalize; color: var(--rsv-tinta); }
 .rsv-cal-cab h2 span { color: var(--texto-sec); font-weight: 400; }
@@ -122,7 +122,7 @@
 .rsv-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; }
 .rsv-cal-nombre { text-align: center; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-sec); padding-bottom: 0.3rem; }
 .rsv-cal-dia {
-  position: relative; aspect-ratio: 1; border: 0; border-radius: 12px; cursor: pointer;
+  position: relative; aspect-ratio: 1; border: 0; border-radius: 2px; cursor: pointer;
   display: grid; place-items: center; background: none; color: var(--rsv-tinta);
   font: 600 0.92rem var(--fuente); font-variant-numeric: tabular-nums;
   transition: background-color 150ms ease, color 150ms ease, transform 150ms var(--rsv-ease);
@@ -145,7 +145,7 @@
 .rsv-cal-dia.is-sel .rsv-cal-temp { color: rgba(255, 255, 255, 0.8); }
 
 .rsv-agenda-fecha { margin: 0.2rem 0 1rem; color: var(--texto-sec); text-transform: capitalize; }
-.rsv-agenda-vacia { margin: 0; padding: 1.2rem; border-radius: 14px; background: var(--fondo-suave); color: var(--texto-sec); text-align: center; }
+.rsv-agenda-vacia { margin: 0; padding: 1.2rem; border-radius: 4px; background: var(--fondo-suave); color: var(--texto-sec); text-align: center; }
 /* Hoja pautada: margen horario y apuntes sobre líneas, con colores del tema. */
 .rsv-agenda {
   list-style: none; margin: 0; padding: 0.5rem 0;
@@ -179,7 +179,7 @@
   position: relative;
   display: grid; grid-template-columns: 78px 1fr auto;
   min-height: 108px;
-  border-radius: 18px; overflow: hidden;
+  border-radius: 8px; overflow: hidden;
   background: var(--rsv-papel);
   box-shadow: 0 14px 30px -24px rgba(14, 40, 28, 0.6), 0 0 0 1px var(--borde);
   animation: rsv-entra 420ms var(--rsv-ease) both;
@@ -214,7 +214,7 @@
 /* Sello de estado (como un tampón sobre el ticket) */
 .tk-sello {
   position: absolute; top: 10px; right: 128px;
-  padding: 0.15rem 0.5rem; border-radius: 6px;
+  padding: 0.15rem 0.5rem; border-radius: 0;
   border: 1.5px solid currentColor;
   font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--primary-container, #0e6b47);

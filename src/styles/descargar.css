@@ -240,7 +240,7 @@
   }
 }
 
-.aviso-app img { border-radius: 10px; flex-shrink: 0; }
+.aviso-app img { border-radius: 0; flex-shrink: 0; }
 
 .aviso-app-texto {
   display: grid;

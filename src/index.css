@@ -75,8 +75,19 @@ a {
 
 button,
 input,
+textarea,
 select {
   font: inherit;
+}
+
+/* Evita el zoom de iOS al enfocar campos, incluso en formularios compactos. */
+@media (max-width: 768px) {
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='hidden'], [type='button'], [type='submit'], [type='reset'], [type='image']),
+  textarea,
+  select {
+    /* Los tamaños locales y los shorthands de los paneles no deben reducirlo. */
+    font-size: max(16px, 1em) !important;
+  }
 }
 
 :focus-visible {

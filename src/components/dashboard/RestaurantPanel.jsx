@@ -144,7 +144,7 @@ export default function RestaurantPanel({ usuario }) {
                     <button className="btn-cta btn-peq" onClick={handleSave} disabled={saving}>
                       {saving ? t("otros.cargando") : t("dashboard.guardar")}
                     </button>
-                    <button className="btn-secundario btn-peq" onClick={() => { setEditing(false); setFormData(restaurante); }}>
+                    <button className="btn-secundario btn-peq btn-cancelar" onClick={() => { setEditing(false); setFormData(restaurante); }}>
                       {t("dashboard.cancelar")}
                     </button>
                   </>

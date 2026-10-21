@@ -179,6 +179,11 @@ export default {
     "googleContinuar": "Continuar con Google"
   },
   "cuenta": {
+    "navLabel": "Secciones de mi cuenta",
+    "navPuntos": "Puntos",
+    "navPreferencias": "Preferencias",
+    "navAjustes": "Ajustes",
+    "navActividad": "Actividad",
     "miCuenta": "Mi cuenta",
     "miNegocio": "Mi negocio",
     "panelRestaurante": "Panel de Restaurante",

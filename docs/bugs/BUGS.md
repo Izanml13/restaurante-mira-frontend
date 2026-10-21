@@ -157,3 +157,16 @@ ni la app móvil.
 | [BUG-150](BUG-150.md) | No se puede cambiar el idioma desde Ajustes del admin | admin/ajustes | opencode | en revisión | fix/tanda2-ui |
 | [BUG-151](BUG-151.md) | Falta una pista visual del menú lateral en el admin | admin/ux | opencode | en revisión | fix/tanda2-ui |
 | [BUG-152](BUG-152.md) | Los modales del admin se centran en la página, no en la pantalla | admin/ui | opencode | en revisión | fix/tanda2-ui |
+
+## Tanda 3 de UI (Claude) — oct 2026
+
+| ID | Título | Zona | Asignado | Estado | Rama |
+|----|--------|------|----------|--------|------|
+| [BUG-153](BUG-153.md) | La insignia «Recomendado» debe ser verde | buscador/mapa | claude | hecho | fix/ui-153-155 |
+| [BUG-154](BUG-154.md) | Los botones de cancelar deben ser rojos | global | claude | hecho | fix/ui-153-155 |
+| [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | hecho | fix/ui-153-155 |
+| [BUG-156](BUG-156.md) | Fuentes de formularios iguales en toda la web | global / formularios | codex | hecho | fix/BUG-156-fuentes-formularios |
+| [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | hecho | fix/ui-153-155 |
+| [BUG-158](BUG-158.md) | Ajuste fino de la redondez (personas, filtros, puntos) | detalle/buscador/puntos | claude | hecho | fix/ui-153-155 |
+| [BUG-159](BUG-159.md) | Rediseño de la página de perfil | cuenta | claude | hecho | fix/ui-153-155 |
+| [BUG-160](BUG-160.md) | Scrolls independientes y modo oscuro del perfil | cuenta | claude | hecho | fix/ui-153-155 |

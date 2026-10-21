@@ -7,7 +7,7 @@
   max-width: 880px;
   border-top: 0;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 18px;
   background: var(--papel);
 }
 
@@ -102,7 +102,7 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0.5rem 0.95rem 0.5rem 0.7rem;
-  border-radius: 16px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -198,7 +198,7 @@
   display: grid;
   gap: 0.2rem;
   padding: 0.9rem 0.95rem;
-  border-radius: 16px;
+  border-radius: 6px;
   border: 1px solid var(--det-borde);
   background: var(--fondo-suave);
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
@@ -232,7 +232,7 @@
 .det-menu {
   position: relative;
   padding: 1.4rem clamp(1.1rem, 3vw, 1.8rem) 1.2rem;
-  border-radius: 20px;
+  border-radius: 10px;
   background:
     radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
     #f7f1e6;
@@ -245,7 +245,7 @@
   position: absolute;
   inset: 8px;
   border: 1px solid rgba(160, 120, 50, 0.3);
-  border-radius: 14px;
+  border-radius: 4px;
   pointer-events: none;
 }
 .det-menu-eyebrow {
@@ -266,7 +266,7 @@
   flex: none;
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: 6px;
   overflow: hidden;
   background: linear-gradient(110deg, #ece3d2 30%, #f8f2e6 50%, #ece3d2 70%) 0 0 / 220% 100%;
   box-shadow: 0 6px 16px -8px rgba(60, 40, 10, 0.55), inset 0 0 0 1px rgba(120, 90, 40, 0.15);
@@ -307,7 +307,7 @@
 /* ── Reserva ── */
 .det-reserva {
   padding: clamp(1.1rem, 3vw, 1.6rem);
-  border-radius: 22px;
+  border-radius: 12px;
   background:
     radial-gradient(600px 300px at 100% 0%, color-mix(in srgb, var(--oro) 12%, transparent), transparent 60%),
     var(--fondo-suave);
@@ -348,7 +348,7 @@
   gap: 0.05rem;
   min-width: 4.2rem;
   padding: 0.55rem 0.5rem;
-  border-radius: 14px;
+  border-radius: 4px;
   border: 1px solid var(--det-borde);
   background: var(--papel);
   color: var(--tinta);
@@ -386,14 +386,14 @@
   gap: 0.4rem;
   justify-self: start;
   padding: 0.3rem;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--det-borde);
   background: var(--papel);
 }
 .det-personas button {
   width: 2.3rem;
   height: 2.3rem;
-  border-radius: 50%;
+  border-radius: var(--radio-peq);
   border: 0;
   background: var(--fondo-suave);
   color: var(--tinta);
@@ -442,7 +442,7 @@
   gap: 0.9rem;
   margin-top: 1rem;
   padding: 1rem 1.1rem;
-  border-radius: 16px;
+  border-radius: 6px;
   background: color-mix(in srgb, #2f7d50 10%, var(--papel));
   border: 1px solid color-mix(in srgb, #2f7d50 35%, transparent);
   animation: det-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -463,8 +463,8 @@
 
 /* ── Mapa y parkings ── */
 .det-mapa { grid-template-columns: 1fr 300px; gap: 0.8rem; }
-.det-mapa .restaurant-map { border-radius: 18px; height: 400px; }
-.det-mapa .parkings-panel { border-radius: 18px; max-height: 400px; padding: 0.9rem; }
+.det-mapa .restaurant-map { border-radius: 8px; height: 400px; }
+.det-mapa .parkings-panel { border-radius: 8px; max-height: 400px; padding: 0.9rem; }
 .parking-item {
   position: relative;
   display: flex;
@@ -479,7 +479,7 @@
   align-items: center;
   flex: 1;
   min-width: 0;
-  border-radius: 14px;
+  border-radius: 4px;
   padding: 0.6rem 0.65rem;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -491,7 +491,7 @@
   place-items: center;
   width: 2.1rem;
   height: 2.1rem;
-  border-radius: 9px;
+  border-radius: 0;
   background: #2563eb;
   color: #fff;
   font-weight: 800;
@@ -515,7 +515,7 @@
   display: grid;
   place-items: center;
   width: 2.3rem;
-  border-radius: 12px;
+  border-radius: 2px;
   border: 1px solid var(--det-borde);
   background: var(--fondo-suave);
   color: var(--primary-container);
@@ -530,7 +530,7 @@
   gap: 1.4rem;
   align-items: center;
   padding: 1.1rem 1.2rem;
-  border-radius: 18px;
+  border-radius: 8px;
   background: var(--fondo-suave);
   margin-bottom: 1rem;
 }
@@ -575,7 +575,7 @@
   display: flex;
   gap: 0.85rem;
   padding: 1rem;
-  border-radius: 18px;
+  border-radius: 8px;
   border: 1px solid var(--det-borde);
   background: var(--papel);
   animation: det-sube 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -600,7 +600,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   padding: 0.12rem 0.45rem;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .det-fuente--mira { background: var(--primary-container); color: #fff; }
 .det-fuente--yelp { background: #d32323; color: #fff; }
@@ -632,7 +632,7 @@
   gap: 0.6rem;
   margin-top: 1.2rem;
   padding: 1.1rem;
-  border-radius: 18px;
+  border-radius: 8px;
   background: var(--fondo-suave);
   border: 1px dashed var(--det-borde);
 }
@@ -663,7 +663,7 @@
 
 /* ── Móvil ── */
 @media (max-width: 720px) {
-  .modal.det { border-radius: 22px; }
+  .modal.det { border-radius: 12px; }
   .det-mapa { grid-template-columns: 1fr; }
   .det-mapa .restaurant-map { height: 280px; }
   .det-resumen-resenas { grid-template-columns: 1fr; }
@@ -686,7 +686,7 @@
 }
 
 /* Lista de espera y reserva en grupo (ficha) */
-.det-espera { margin: 0.6rem 0; padding: 0.8rem 0.9rem; border-radius: 14px; background: var(--fondo-suave); border: 1px dashed var(--borde); display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.det-espera { margin: 0.6rem 0; padding: 0.8rem 0.9rem; border-radius: 4px; background: var(--fondo-suave); border: 1px dashed var(--borde); display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
 .det-espera p { margin: 0; font-size: 0.9rem; }
 .det-espera--tuya { border-style: solid; border-color: var(--dorado, #c9a227); background: color-mix(in srgb, var(--dorado, #c9a227) 14%, transparent); font-weight: 600; }
 .det-grupo {

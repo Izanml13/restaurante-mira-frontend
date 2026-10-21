@@ -12,7 +12,7 @@
   top: 0.6rem;
   z-index: 100;
   margin: 0.6rem 0.75rem 0;
-  border-radius: 24px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%),
     var(--lg-tinte);
@@ -105,7 +105,7 @@
   width: 0;
   height: 2px;
   background: var(--dorado);
-  border-radius: 1px;
+  border-radius: 0;
   transition: width 0.2s ease;
 }
 
@@ -223,7 +223,7 @@
   flex: 1;
   padding: 0.5rem 0;
   border: 1.5px solid var(--borde);
-  border-radius: var(--radio-med, 12px);
+  border-radius: var(--radio-med, 2px);
   background: var(--papel);
   cursor: pointer;
   font-size: 0.8rem;
@@ -358,6 +358,25 @@
 .btn-secundario:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* Botones de cancelar: rojo de peligro en todos los estilos (BUG-154).
+   !important porque se combina con .btn-secundario, .btn-texto, .op-btn-ghost… y sus :hover. */
+.btn-cancelar,
+.btn-cancelar:hover:not(:disabled) {
+  color: var(--error-tinta) !important;
+  background: var(--error-tinte) !important;
+  border: 1px solid var(--error-borde) !important;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  border-color: var(--error-tinta) !important;
+}
+
+.btn-texto.btn-cancelar {
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
 }
 
 .btn-reservar {
@@ -610,11 +629,11 @@
   position: absolute;
   top: 0.6rem;
   left: 0.6rem;
-  background: var(--tertiary-container);
-  color: #fff;
+  background: var(--recomendado-fondo);
+  color: var(--recomendado-tinta);
   font-size: 0.7rem;
   font-weight: 700;
-  border-radius: 6px;
+  border-radius: 0;
   padding: 0.25rem 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1053,7 +1072,7 @@
   color: var(--tinta);
   border: 1px solid var(--borde);
   padding: 0.1rem 0.35rem;
-  border-radius: 4px;
+  border-radius: 0;
   font-weight: 700;
 }
 
@@ -1395,7 +1414,7 @@ code {
   align-items: center;
   gap: 0.35rem;
   padding: 0.35rem 0.7rem;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
@@ -1412,7 +1431,7 @@ code {
 .cuenta-dashboard-banner {
   background: var(--glass-bg);
   border: 2px solid var(--primary-container);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 1.2rem;
   margin-bottom: 1rem;
   text-align: center;
@@ -2524,7 +2543,7 @@ button.btn-texto {
 }
 
 .parking-skeleton-bar {
-  border-radius: 4px;
+  border-radius: 0;
   background: linear-gradient(90deg, var(--fondo-suave) 25%, var(--borde) 50%, var(--fondo-suave) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -2551,7 +2570,7 @@ button.btn-texto {
   padding-top: 1.15rem;
 }
 .skeleton-bar {
-  border-radius: 4px;
+  border-radius: 0;
   background: linear-gradient(90deg, var(--fondo-suave) 25%, var(--borde) 50%, var(--fondo-suave) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -2786,7 +2805,7 @@ button.btn-texto {
   width: 2rem;
   height: 4px;
   background: var(--borde);
-  border-radius: 2px;
+  border-radius: 0;
   margin: 0 auto 1rem;
 }
 
@@ -3045,7 +3064,7 @@ button.btn-texto {
   position: relative;
   width: 64px;
   height: 64px;
-  border-radius: 20px;
+  border-radius: 6px;
   background: linear-gradient(135deg, #FEF3C7, #FDE68A);
   border: 2px solid #F59E0B;
   display: flex;
@@ -3839,7 +3858,7 @@ button.btn-texto {
     radial-gradient(120% 140% at 100% 0%, rgba(254, 214, 91, 0.28), transparent 55%),
     linear-gradient(135deg, var(--verde-suave), #fffdf5);
   border: 1px solid rgba(115, 92, 0, 0.18);
-  border-radius: var(--radio-xl);
+  border-radius: 8px;
   box-shadow: var(--sombra-card);
   padding: 1.4rem 1.5rem;
   margin: 0.5rem 0;
@@ -3882,6 +3901,7 @@ button.btn-texto {
   gap: 0.5rem;
   padding: 0.6rem;
   background: rgba(46, 125, 50, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   font-size: 0.85rem;
   color: var(--verde);
@@ -3972,7 +3992,7 @@ button.btn-texto {
 .dash-stat-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -4008,7 +4028,7 @@ button.btn-texto {
 .dash-chart {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 1.2rem;
   margin-bottom: 1.2rem;
 }
@@ -4049,7 +4069,7 @@ button.btn-texto {
 .dash-input, .dash-input-sm, select.dash-input {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 0.55rem 0.75rem;
   font-size: 0.9rem;
   color: var(--text-primary);
@@ -4078,7 +4098,7 @@ button.btn-texto {
 .dash-reservation-item {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: 0;
   padding: 1rem;
   display: flex;
   justify-content: space-between;
@@ -4119,7 +4139,7 @@ button.btn-texto {
 .dash-ticket-form {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: 0;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -4127,14 +4147,14 @@ button.btn-texto {
 }
 
 .dash-ticket-header { display: flex; justify-content: space-between; align-items: center; }
-.dash-ticket-codigo { font-family: monospace; font-size: 0.8rem; color: var(--text-secondary); background: var(--glass-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+.dash-ticket-codigo { font-family: monospace; font-size: 0.8rem; color: var(--text-secondary); background: var(--glass-bg); padding: 0.1rem 0.4rem; border-radius: 0; }
 .dash-ticket-row { font-size: 0.85rem; color: var(--text-secondary); }
 .dash-precio-row { display: flex; align-items: center; gap: 0.5rem; }
 .dash-currency { font-size: 0.85rem; color: var(--text-secondary); }
 .dash-file-row { display: flex; align-items: center; gap: 0.5rem; }
 .dash-file-input { font-size: 0.85rem; }
 .dash-file-name { font-size: 0.8rem; color: var(--text-secondary); }
-.dash-ticket-success { background: #d1fae5; color: #065f46; padding: 0.8rem; border-radius: 8px; font-weight: 600; text-align: center; }
+.dash-ticket-success { background: #d1fae5; color: #065f46; padding: 0.8rem; border-radius: 0; font-weight: 600; text-align: center; }
 .dash-error { color: #dc2626; font-size: 0.85rem; }
 .dash-help-text { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; }
 
@@ -4155,7 +4175,7 @@ button.btn-texto {
   padding: 0.6rem 0.8rem;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 0.9rem;
 }
 
@@ -4171,7 +4191,7 @@ button.btn-texto {
   padding: 0.8rem 1rem;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: 0;
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -4188,7 +4208,7 @@ button.btn-texto {
   padding: 0.8rem 1rem;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: 0;
   cursor: pointer;
   transition: border-color 0.15s;
 }
@@ -4211,7 +4231,7 @@ button.btn-texto {
 .dash-modal {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 1.5rem;
   width: 100%;
   max-width: 400px;
@@ -4241,7 +4261,7 @@ button.btn-texto {
 
 .streak-modal {
   background: var(--papel);
-  border-radius: 32px;
+  border-radius: 22px;
   max-width: 720px;
   width: 100%;
   max-height: 92vh;
@@ -4274,7 +4294,7 @@ button.btn-texto {
 .streak-modal__brand-icon {
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--primary-container);
   display: flex;
   align-items: center;
@@ -4381,7 +4401,7 @@ button.btn-texto {
   right: -40px;
   background: var(--papel);
   border: 2px solid #F59E0B;
-  border-radius: 20px;
+  border-radius: 6px;
   padding: 6px 14px;
   display: flex;
   align-items: center;
@@ -4512,7 +4532,7 @@ button.btn-texto {
   background: var(--recompensa-fondo);
   border: 1px solid #FDE68A;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: 0;
 }
 
 .streak-grid {
@@ -4525,7 +4545,7 @@ button.btn-texto {
 .streak-day {
   background: var(--fondo-suave);
   border: 2px solid var(--borde);
-  border-radius: 22px;
+  border-radius: 6px;
   padding: 8px 2px;
   display: flex;
   flex-direction: column;
@@ -4629,7 +4649,7 @@ button.btn-texto {
   font-size: 0.5rem;
   font-weight: 900;
   padding: 1px 6px;
-  border-radius: 999px;
+  border-radius: 0 0 0 0;
   text-transform: uppercase;
 }
 
@@ -4655,7 +4675,7 @@ button.btn-texto {
   gap: 10px;
   background: rgba(0,0,0,0.03);
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 22px;
+  border-radius: 6px;
   padding: 10px 14px;
   flex: 1;
   min-width: 200px;
@@ -4663,7 +4683,7 @@ button.btn-texto {
 .streak-modal__balance-icon {
   width: 40px;
   height: 40px;
-  border-radius: 14px;
+  border-radius: 0;
   background: rgba(251, 191, 36, 0.15);
   border: 1px solid rgba(251, 191, 36, 0.3);
   display: flex;
@@ -4732,7 +4752,7 @@ button.btn-texto {
   background: var(--primary-container);
   color: #fff;
   border: none;
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 14px 28px;
   font-size: 0.92rem;
   font-weight: 900;
@@ -4792,7 +4812,7 @@ button.btn-texto {
   color: #fff;
   border: 1px solid rgba(255,255,255,0.1);
   padding: 12px 20px;
-  border-radius: 999px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -4833,7 +4853,7 @@ button.btn-texto {
   position: fixed;
   pointer-events: none;
   z-index: 800;
-  border-radius: 2px;
+  border-radius: 0;
 }
 
 /* Racha en modo oscuro: los fondos negros translúcidos no se ven sobre papel oscuro. */
@@ -4871,7 +4891,7 @@ button.btn-texto {
 
 .wheel-modal {
   background: var(--papel);
-  border-radius: 32px;
+  border-radius: 22px;
   max-width: 520px;
   width: 100%;
   max-height: 92vh;
@@ -4901,7 +4921,7 @@ button.btn-texto {
 .wheel-modal__brand-icon {
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--primary-container);
   display: flex;
   align-items: center;
@@ -5006,7 +5026,7 @@ button.btn-texto {
   background: linear-gradient(180deg, #FBBF24, #F59E0B);
   color: #fff;
   border: none;
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 14px 36px;
   font-size: 1rem;
   font-weight: 900;
@@ -5080,13 +5100,13 @@ button.btn-texto {
 
 /* Responsive streak */
 @media (max-width: 560px) {
-  .streak-modal { border-radius: 24px; max-height: 95vh; }
+  .streak-modal { border-radius: 14px; max-height: 95vh; }
   .streak-modal__hero { padding: 0.3rem 1rem 0.8rem; }
   .streak-modal__mascot-img { width: 110px; height: 110px; }
   .streak-modal__speech { right: -20px; font-size: 0.65rem; padding: 4px 10px; }
   .streak-modal__calendar { padding: 0 1rem; }
   .streak-grid { gap: 4px; }
-  .streak-day { padding: 6px 1px; border-radius: 18px; }
+  .streak-day { padding: 6px 1px; border-radius: 2px; }
   .streak-day__icon { width: 28px; height: 28px; }
   .streak-day__check { width: 28px; height: 28px; font-size: 0.75rem; }
   .streak-day__coin, .streak-day__wheel-icon { width: 26px; height: 26px; }
@@ -5097,12 +5117,12 @@ button.btn-texto {
   .streak-claim-btn { width: 100%; }
   .streak-modal__coin { width: 45px; height: 45px; }
   .wheel-container { width: 240px; height: 240px; }
-  .wheel-modal { border-radius: 24px; }
+  .wheel-modal { border-radius: 14px; }
 }
 
 @media (max-width: 380px) {
   .streak-grid { gap: 3px; }
-  .streak-day { padding: 5px 0; border-radius: 16px; }
+  .streak-day { padding: 5px 0; border-radius: 0; }
   .streak-day__icon { width: 24px; height: 24px; }
   .streak-modal__title { font-size: 1.2rem; }
 }
@@ -5132,7 +5152,7 @@ button.btn-texto {
   .streak-modal__subtitle { font-size: 0.8rem; line-height: 1.35; }
   .streak-modal__calendar { margin: 0.45rem 0; padding: 0 1.4rem; }
   .streak-modal__calendar-header { margin-bottom: 6px; }
-  .streak-day { padding: 5px 2px; border-radius: 18px; }
+  .streak-day { padding: 5px 2px; border-radius: 2px; }
   .streak-day__icon { width: 28px; height: 28px; margin: 3px 0; }
   .streak-day__check { width: 28px; height: 28px; font-size: 0.8rem; }
   .streak-day__coin, .streak-day__wheel-icon { width: 26px; height: 26px; }
@@ -5173,7 +5193,7 @@ button.btn-texto {
   .balance-card__details { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
 
   .streak-badge { padding: 1rem; }
-  .streak-badge__fire-img-wrap { width: 52px; height: 52px; border-radius: 18px; }
+  .streak-badge__fire-img-wrap { width: 52px; height: 52px; border-radius: 4px; }
   .streak-badge__fire-img { width: 36px; height: 36px; }
   .streak-badge__fire-title { font-size: 0.88rem; }
   .streak-badge__fire-sub { font-size: 0.72rem; }
@@ -5241,7 +5261,7 @@ button.btn-texto {
 }
 .foto-credito {
   position: absolute; z-index: 2; left: 8px; bottom: 8px; max-width: calc(100% - 16px);
-  padding: 0.12rem 0.45rem; border-radius: 6px;
+  padding: 0.12rem 0.45rem; border-radius: 0;
   background: rgba(10, 18, 14, 0.55); color: rgba(255, 255, 255, 0.92);
   font-size: 0.64rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }

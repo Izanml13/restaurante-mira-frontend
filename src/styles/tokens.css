@@ -34,9 +34,9 @@
   --fuente-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
 
   /* Border radius */
-  --radio: 12px;
-  --radio-peq: 8px;
-  --radio-xl: 24px;
+  --radio: 2px;
+  --radio-peq: 6px;
+  --radio-xl: 14px;
   --radio-med: var(--radio);
   --radio-grande: var(--radio-xl);
   --text-primary: var(--tinta);
@@ -71,6 +71,9 @@
   --error-borde: #e7a3ad;
   --confirm-tinte: #fdf6e3;
   --confirm-tinta: #5c4300;
+  /* Insignia «Recomendado» (BUG-153): verde con contraste AA */
+  --recomendado-fondo: #1e6b45;
+  --recomendado-tinta: #ffffff;
 }
 
 /* Dark mode */
@@ -107,6 +110,8 @@
   --error-borde: rgba(255, 179, 193, 0.45);
   --confirm-tinte: rgba(254, 214, 91, 0.1);
   --confirm-tinta: #fde9a8;
+  --recomendado-fondo: #a8d5ba;
+  --recomendado-tinta: #0b251d;
 
   --badge-bg: rgba(28, 32, 28, 0.92);
   --fav-bg: rgba(28, 32, 28, 0.88);
