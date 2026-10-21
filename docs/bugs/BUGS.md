@@ -157,3 +157,4 @@ ni la app móvil.
 | [BUG-150](BUG-150.md) | No se puede cambiar el idioma desde Ajustes del admin | admin/ajustes | opencode | en revisión | fix/tanda2-ui |
 | [BUG-151](BUG-151.md) | Falta una pista visual del menú lateral en el admin | admin/ux | opencode | en revisión | fix/tanda2-ui |
 | [BUG-152](BUG-152.md) | Los modales del admin se centran en la página, no en la pantalla | admin/ui | opencode | en revisión | fix/tanda2-ui |
+| [BUG-156](BUG-156.md) | Fuentes de formularios iguales en toda la web | global / formularios | codex | en revisión | fix/BUG-156-fuentes-formularios |
