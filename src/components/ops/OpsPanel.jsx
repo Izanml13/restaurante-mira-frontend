@@ -170,7 +170,7 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
               <span>{t('ops.pistaMenu')}</span>
             </button>
           )}
-          <aside className={`ops-sidebar${menuMovil ? ' open' : ''}${sidebarFija ? ' pinned' : ''}`}
+          <aside id="ops-sidebar" className={`ops-sidebar${menuMovil ? ' open' : ''}${sidebarFija ? ' pinned' : ''}`}
             onMouseLeave={() => setSidebarFija(false)}
             aria-label={t('ops.navPanel')}>
           <div>
@@ -231,9 +231,6 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
 
         <div className="ops-main">
           <header className="ops-header">
-            <button type="button" className="ops-icon-btn ops-menu-btn" onClick={() => setMenuMovil((v) => !v)} aria-label={t('ops.abrirMenu')}>
-              <span className="material-symbols-outlined">menu</span>
-            </button>
             <div className="ops-search">
               <span className="material-symbols-outlined">search</span>
               <input
@@ -287,6 +284,11 @@ export default function OpsPanel({ usuario, esAdmin, perfil, tema, onCambiarTema
                 <span>Master Operator</span>
               </div>
             </div>
+            {/* Hamburguesa: abre/cierra el mismo menú lateral que el hover (móvil y escritorio). */}
+            <button type="button" className="ops-icon-btn ops-menu-btn" onClick={() => setMenuMovil((v) => !v)}
+              aria-label={t('ops.abrirMenu')} aria-expanded={menuMovil} aria-controls="ops-sidebar">
+              <span className="material-symbols-outlined" aria-hidden="true">menu</span>
+            </button>
           </header>
 
           <main className="ops-content" key={refresco.version}>

@@ -91,7 +91,7 @@ export default function ReservationActions({ reserva, onStatusChange, t, comisio
             <button className="op-btn-ghost" style={{fontSize:'0.72rem', padding:'0.35rem 0.6rem'}} onClick={()=> handleAction("no_show")} disabled={loading}>
               <span className="material-symbols-outlined" style={{fontSize:12}}>person_off</span> {tt("dashboard.marcarNoShow","No-show")}
             </button>
-            <button className="op-btn-ghost" style={{fontSize:'0.72rem', padding:'0.35rem 0.6rem', color:'#b44d3e'}} onClick={()=> handleAction("cancelar")} disabled={loading}>
+            <button className="op-btn-ghost btn-cancelar" style={{fontSize:'0.72rem', padding:'0.35rem 0.6rem'}} onClick={()=> handleAction("cancelar")} disabled={loading}>
               {tt("dashboard.cancelarReserva","Cancelar")}
             </button>
           </>

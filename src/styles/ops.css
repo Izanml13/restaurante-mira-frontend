@@ -423,7 +423,7 @@
 code.ops-code { font-family: ui-monospace, monospace; font-size: 11px; background: var(--ops-surface-high); border-radius: 4px; padding: 1px 5px; }
 
 /* ---------- Responsive ---------- */
-.ops-menu-btn { display: none; }
+.ops-menu-btn:focus-visible { outline: 2px solid var(--ops-primary-container); outline-offset: 2px; }
 @media (max-width: 1280px) {
   .ops-kpis { grid-template-columns: repeat(3, 1fr); }
   .ops-feed { grid-template-columns: repeat(2, 1fr); }
@@ -434,7 +434,6 @@ code.ops-code { font-family: ui-monospace, monospace; font-size: 11px; backgroun
   .ops-sidebar.open { transform: none; box-shadow: var(--ops-shadow-lg); }
   .ops-main { margin-left: 0; }
   .ops-header { left: 0; }
-  .ops-menu-btn { display: grid; }
   .ops-profile-meta { display: none; }
 }
 @media (max-width: 720px) {

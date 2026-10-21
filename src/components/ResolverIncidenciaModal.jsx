@@ -56,7 +56,7 @@ export default function ResolverIncidenciaModal({ onConfirmar, onCancelar }) {
         ))}
         {error && <p role="alert" className="auth-error">{error}</p>}
         <div className="resolver-acciones">
-          <button type="button" className="btn-secundario" disabled={guardando} onClick={onCancelar}>{t('admin.cancelarResolucion')}</button>
+          <button type="button" className="btn-secundario btn-cancelar" disabled={guardando} onClick={onCancelar}>{t('admin.cancelarResolucion')}</button>
           <button type="submit" className="btn-cta" disabled={guardando}>{t('admin.confirmarResolucion')}</button>
         </div>
       </form>

@@ -361,7 +361,7 @@ const restDropdownRef = useRef(null);
               <label className="op-field"><span>{t("dashboard.descripcion")}</span><textarea className="op-input" style={{height:'auto', padding:'0.6rem'}} rows={3} value={newRest.descripcion} onChange={e=> setNewRest(p=>({...p, descripcion:e.target.value}))} /></label>
               <div style={{display:'flex', gap:'0.5rem'}}>
                 <button type="submit" className="op-btn-primary" disabled={creating}>{creating ? t("otros.cargando") : t("dashboard.crearRestaurante")}</button>
-                <button type="button" className="op-btn-ghost" onClick={()=>{ setShowCreateForm(false); setError("");}}>{t("dashboard.cancelar")}</button>
+                <button type="button" className="op-btn-ghost btn-cancelar" onClick={()=>{ setShowCreateForm(false); setError("");}}>{t("dashboard.cancelar")}</button>
               </div>
             </form>
           )}
@@ -553,7 +553,7 @@ const restDropdownRef = useRef(null);
                 </label>
               </div>
               <div style={{display:'flex', gap:'0.5rem', marginTop:'0.5rem'}}>
-                {editing ? <><button className="op-btn-primary" onClick={handleSave} disabled={saving}>{saving? t("otros.cargando"):t("dashboard.guardar")}</button><button className="op-btn-ghost" onClick={()=>{ setEditing(false); setFormData(restaurante);}}>{t("dashboard.cancelar")}</button></> : <button className="op-btn-ghost" onClick={()=> setEditing(true)}>{t("dashboard.editar")}</button>}
+                {editing ? <><button className="op-btn-primary" onClick={handleSave} disabled={saving}>{saving? t("otros.cargando"):t("dashboard.guardar")}</button><button className="op-btn-ghost btn-cancelar" onClick={()=>{ setEditing(false); setFormData(restaurante);}}>{t("dashboard.cancelar")}</button></> : <button className="op-btn-ghost" onClick={()=> setEditing(true)}>{t("dashboard.editar")}</button>}
               </div>
             </div>
           )}
@@ -930,7 +930,7 @@ const restDropdownRef = useRef(null);
             </label>
             <div style={{fontSize:'0.68rem', background:'var(--op-surface-low)', padding:'0.5rem', borderRadius:'0.4rem'}}>{t("dashboard.actual")} <strong>{data?.restaurante?.maxReservasPorHora || 12} pax/hora</strong> · {t("dashboard.nuevo")} <strong>{aforoLimit}</strong></div>
             <div style={{display:'flex', justifyContent:'flex-end', gap:'0.4rem'}}>
-              <button className="op-btn-ghost" onClick={()=> setShowAforoModal(false)}>{t("dashboard.cancelar")}</button>
+              <button className="op-btn-ghost btn-cancelar" onClick={()=> setShowAforoModal(false)}>{t("dashboard.cancelar")}</button>
               <button className="op-btn-primary" onClick={handleSaveAforo} disabled={saving}>{saving? t("dashboard.guardando") : t("dashboard.guardarAforo")}</button>
             </div>
           </div>

@@ -87,7 +87,7 @@ export default function RedeemModal({ saldoActual, onClose }) {
         {error && <p className="redeem-error">{error}</p>}
 
         <div className="redeem-modal__actions">
-          <button className="btn-texto" onClick={onClose}>{t('points.cancel')}</button>
+          <button className="btn-texto btn-cancelar" onClick={onClose}>{t('points.cancel')}</button>
           <button className="btn-cta" onClick={handleRedeem} disabled={loading || puntos > saldoActual}>
             {loading ? t('points.redeeming') : t('points.redeemAmount', { n: puntos })}
           </button>

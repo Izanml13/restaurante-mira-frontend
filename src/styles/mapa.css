@@ -125,7 +125,7 @@
 .mapa-preview-media { position: relative; flex: 0 0 auto; aspect-ratio: 16 / 10; overflow: hidden; background: var(--fondo-suave); }
 .mapa-preview-media img { width: 100%; height: 100%; object-fit: cover; display: block; animation: mapa-foto 700ms var(--mapa-ease) both; }
 @keyframes mapa-foto { from { transform: scale(1.06); opacity: 0.4; } }
-.mapa-preview-top { position: absolute; left: 12px; top: 12px; padding: 0.3rem 0.6rem; border-radius: 999px; background: var(--dorado, #c9a227); color: #1b1e18; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; }
+.mapa-preview-top { position: absolute; left: 12px; top: 12px; padding: 0.3rem 0.6rem; border-radius: 999px; background: var(--recomendado-fondo, #1e6b45); color: var(--recomendado-tinta, #fff); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; }
 .mapa-preview-cerrar {
   position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; border-radius: 50%;
   border: 0; cursor: pointer; background: rgba(10, 18, 14, 0.55); color: #fff; font-size: 0.9rem;

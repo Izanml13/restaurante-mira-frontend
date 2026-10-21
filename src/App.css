@@ -360,6 +360,25 @@
   cursor: not-allowed;
 }
 
+/* Botones de cancelar: rojo de peligro en todos los estilos (BUG-154).
+   !important porque se combina con .btn-secundario, .btn-texto, .op-btn-ghost… y sus :hover. */
+.btn-cancelar,
+.btn-cancelar:hover:not(:disabled) {
+  color: var(--error-tinta) !important;
+  background: var(--error-tinte) !important;
+  border: 1px solid var(--error-borde) !important;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  border-color: var(--error-tinta) !important;
+}
+
+.btn-texto.btn-cancelar {
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
 .btn-reservar {
   background: var(--primary-container);
   color: #fff;
@@ -610,8 +629,8 @@
   position: absolute;
   top: 0.6rem;
   left: 0.6rem;
-  background: var(--tertiary-container);
-  color: #fff;
+  background: var(--recomendado-fondo);
+  color: var(--recomendado-tinta);
   font-size: 0.7rem;
   font-weight: 700;
   border-radius: 6px;
