@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "test": "node --test \"test/*.test.js\"",
     "mock-api": "node scripts/mock-api.mjs",
-    "dev:mock": "VITE_API_URL=http://localhost:3001 vite"
+    "dev:mock": "VITE_API_URL=http://localhost:3001 vite",
+    "qa:flujo": "bzt qa/bzt/01-flujo.yml",
+    "qa:monkey": "bzt qa/bzt/02-monkey.yml",
+    "qa:regresion": "bzt qa/bzt/03-regresion.yml"
   },
   "dependencies": {
     "firebase": "^12.18.0",
