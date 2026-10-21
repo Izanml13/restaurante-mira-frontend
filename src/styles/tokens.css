@@ -35,7 +35,7 @@
 
   /* Border radius */
   --radio: 2px;
-  --radio-peq: 0;
+  --radio-peq: 6px;
   --radio-xl: 14px;
   --radio-med: var(--radio);
   --radio-grande: var(--radio-xl);

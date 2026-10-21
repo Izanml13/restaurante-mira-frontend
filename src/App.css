@@ -3858,7 +3858,7 @@ button.btn-texto {
     radial-gradient(120% 140% at 100% 0%, rgba(254, 214, 91, 0.28), transparent 55%),
     linear-gradient(135deg, var(--verde-suave), #fffdf5);
   border: 1px solid rgba(115, 92, 0, 0.18);
-  border-radius: var(--radio-xl);
+  border-radius: 8px;
   box-shadow: var(--sombra-card);
   padding: 1.4rem 1.5rem;
   margin: 0.5rem 0;
@@ -3901,6 +3901,7 @@ button.btn-texto {
   gap: 0.5rem;
   padding: 0.6rem;
   background: rgba(46, 125, 50, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radio-peq);
   font-size: 0.85rem;
   color: var(--verde);

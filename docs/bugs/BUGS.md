@@ -166,3 +166,4 @@ ni la app móvil.
 | [BUG-154](BUG-154.md) | Los botones de cancelar deben ser rojos | global | claude | en revisión | fix/ui-153-155 |
 | [BUG-155](BUG-155.md) | Botón de hamburguesa para el menú lateral del admin | admin/ux | claude | en revisión | fix/ui-153-155 |
 | [BUG-157](BUG-157.md) | 10 px menos de redondez en toda la web | global | claude | en revisión | fix/ui-153-155 |
+| [BUG-158](BUG-158.md) | Ajuste fino de la redondez (personas, filtros, puntos) | detalle/buscador/puntos | claude | en revisión | fix/ui-153-155 |
